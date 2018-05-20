@@ -1,22 +1,69 @@
 {
-  "name": "monopoly",
-  "version": "0.0.0",
-  "description": "Online Monopoly game",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
-  },
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
-  },
-  "homepage": "https://github.com/SeawolvesAtCali/Monopoly#readme",
-  "dependencies": {
-    "socket.io": "^2.1.0"
-  }
+    "name": "monopoly",
+    "version": "0.0.0",
+    "description": "Online Monopoly game",
+    "main": "index.js",
+    "scripts": {
+        "start:server": "node server/index.js",
+        "test": "jest",
+        "lint": "eslint .",
+        "fix": "eslint --fix ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+    },
+    "author": "",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+    },
+    "homepage": "https://github.com/SeawolvesAtCali/Monopoly#readme",
+    "eslintConfig": {
+        "extends": ["airbnb-base", "plugin:prettier/recommended"],
+        "rules": {
+            "no-unused-vars": [
+                "error",
+                {
+                    "vars": "local",
+                    "args": "none"
+                }
+            ],
+            "class-methods-use-this": "off",
+            "no-unused-expressions": [
+                "error",
+                {
+                    "allowShortCircuit": true
+                }
+            ],
+            "no-plusplus": "off",
+            "no-console": "off"
+        },
+        "env": {
+            "jest": true
+        }
+    },
+    "prettier": {
+        "printWidth": 100,
+        "tabWidth": 4,
+        "singleQuote": true,
+        "trailingComma": "all",
+        "arrowParens": "always",
+        "proseWrap": "always"
+    },
+    "dependencies": {
+        "socket.io": "^2.1.0"
+    },
+    "devDependencies": {
+        "eslint": "4.19.1",
+        "eslint-config-airbnb-base": "^12.1.0",
+        "eslint-plugin-import": "2.12.0",
+        "jest": "^22.4.4",
+        "prettier": "^1.12.1",
+        "eslint-config-prettier": "^2.9.0",
+        "eslint-plugin-prettier": "^2.6.0"
+    },
+    "jest": {
+        "testMatch": ["<rootDir>/**/__test__/**/*.{js,mjs}"]
+    }
 }

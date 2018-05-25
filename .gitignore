@@ -61,4 +61,7 @@ typings/
 .next
 
 # lock files
-.lock
+*.lock
+
+# vscode
+.vscode/

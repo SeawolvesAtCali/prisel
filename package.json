@@ -20,7 +20,10 @@
     },
     "homepage": "https://github.com/SeawolvesAtCali/Monopoly#readme",
     "eslintConfig": {
-        "extends": ["airbnb-base", "plugin:prettier/recommended"],
+        "extends": [
+            "airbnb-base",
+            "plugin:prettier/recommended"
+        ],
         "rules": {
             "no-unused-vars": [
                 "error",
@@ -52,18 +55,21 @@
         "proseWrap": "always"
     },
     "dependencies": {
-        "socket.io": "^2.1.0"
+        "socket.io": "^2.1.0",
+        "socket.io-client": "^2.1.1"
     },
     "devDependencies": {
         "eslint": "4.19.1",
         "eslint-config-airbnb-base": "^12.1.0",
-        "eslint-plugin-import": "2.12.0",
-        "jest": "^22.4.4",
-        "prettier": "^1.12.1",
         "eslint-config-prettier": "^2.9.0",
-        "eslint-plugin-prettier": "^2.6.0"
+        "eslint-plugin-import": "2.12.0",
+        "eslint-plugin-prettier": "^2.6.0",
+        "jest": "^22.4.4",
+        "prettier": "^1.12.1"
     },
     "jest": {
-        "testMatch": ["<rootDir>/**/__test__/**/*.{js,mjs}"]
+        "testMatch": [
+            "<rootDir>/**/__test__/**/*.{js,mjs}"
+        ]
     }
 }

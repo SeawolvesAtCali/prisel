@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Home</title>
+    <link rel = "stylesheet" type = "text/css" href = "/static/css/index.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="/static/js/index.js"></script>
+  </head>
+  <body>
+    <ul id="navigation">
+      <li><a class="active" href="/">Home</a></li>
+      <li><a id="chat" href="/chat.html">Chat</a></li>
+      <li><a id="richGame" >Rich Game</a></li>
+    </ul>
+    <p id='msg'>Enter a username to start chat</p>
+    <form id="loginForm" action="">
+      <input id="userName" autocomplete="off" />
+      <!-- <input id="passWord" autocomplete="off" /> -->
+      <button>Confirm</button>
+    </form>
+    <!-- <button onclick="myFunction()">Click me</button>
+    <script>
+      function myFunction() {
+        console.log(JSON.parse(sessionStorage.getItem('user')).userName);
+      }
+    </script> -->
+  </body>
+</html>

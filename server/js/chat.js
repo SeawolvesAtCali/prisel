@@ -1,5 +1,4 @@
-
-
+/* eslint-disable */
 function initChat(){
   console.log("yes");
   greeding();

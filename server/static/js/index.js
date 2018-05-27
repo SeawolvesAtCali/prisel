@@ -1,3 +1,4 @@
+/* eslint-disable */
 var socket = io();
 $(document).ready(function(){
 	loginListener();

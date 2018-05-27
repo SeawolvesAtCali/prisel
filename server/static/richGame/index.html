@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+	<title>Rich Game</title>
+	<link type="text/css" rel="stylesheet" href="css/index.css" />
+	<link type="text/css" rel="stylesheet" href="css/style.css" />
+	<link type="text/css" rel="stylesheet" href="css/role.css" />
+	<link type="text/css" rel="stylesheet" href="css/extra_view.css" />
+</head>
+<body onSelectStart="return false;">
+	<ul id="navigation">
+      <li><a class="active" href="/">Home</a></li>
+      <li><a id="richGame" >Rich Game</a></li>
+    </ul>
+	<audio id='bg_music' loop src='audio/bg_music.mp3'></audio>
+	<div class="role role-1" id="player1">
+		<div class="money">2039</div>
+		<div class="notice normal-notice">
+			<div class="tip">点击骰子就可以开始游戏了～～</div>
+		</div>
+		<div class="notice confirm-notice">
+			<div class="tip">买下这块地只需要花费1000现金，买下么？</div>
+			<div class="buttons">
+				<span class="btn confirm-btn">确定</span>
+				<span class="btn cancel-btn">取消</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="role role-2" id="player2">
+		<div class="money">2039</div>
+		<div class="notice normal-notice">
+			<div class="tip">点击骰子就可以开始游戏了～～</div>
+		</div>
+		<div class="notice confirm-notice">
+			<div class="tip">买下这块地只需要花费1000现金，买下么？</div>
+			<div class="buttons">
+				<span class="btn confirm-btn">确定</span>
+				<span class="btn cancel-btn">取消</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="actions actions-1" id="action-panel-1">
+		<!--
+	<div class="block-item buyit"><span class="buy"></span></div>
+		<div class="block-item updateit"><span class="update"></span></div>
+	-->
+		<div class="block-item blocker"><span></span></div>
+		<div class="block-item blocker"><span></span></div>
+		<div class="block-item blocker"><span></span></div>
+		<div class="saizi"></div>
+	</div>
+
+	<div class="actions actions-2" id="action-panel-2">
+		<!--
+	<div class="block-item buyit"><span class="buy"></span></div>
+		<div class="block-item updateit"><span class="update"></span></div>
+	-->
+		<div class="block-item blocker"><span></span></div>
+		<div class="block-item blocker"><span></span></div>
+		<div class="block-item blocker"><span></span></div>
+		<div class="saizi"></div>
+	</div>
+
+	<div class="magPerson1">
+		<strong>User 1</strong><br />
+		Balance: <span id="balance-1">0</span><br />
+		Block Number: <span id="block-number-1">0</span><br />
+		Is Locked: <span id="locked-1">false</span><br />
+		Need Confirm: <span id="confirm-1">false</span>
+	</div>
+
+	<div class="magPerson2">
+		<strong>User 2</strong><br />
+		Balance: <span id="balance-2"></span><br />
+		Block Number: <span id="block-number-2"></span><br />
+		Is Locked: <span id="locked-2">false</span><br />
+		Need Confirm: <span id="confirm-2">false</span>
+	</div>
+
+		<script type="text/javascript" src="js/jquery.js"></script>
+		
+		<script type="text/javascript" src="js/config.js"></script>
+		<script type="text/javascript" src="js/mapConfig.js"></script>
+		<script type="text/javascript" src="js/ClassBase.js"></script>
+		<script type="text/javascript" src="js/ClassSound.js"></script>
+		<script type="text/javascript" src="js/ClassMapElement.js"></script>
+		<script type="text/javascript" src="js/ClassMap.js"></script>
+		
+		<script type="text/javascript" src="js/person.js"></script>
+		<script type="text/javascript" src="js/block.js"></script>
+		<script type="text/javascript" src="js/extra.js"></script>
+		<script type="text/javascript" src="js/model.js"></script>
+		<script type="text/javascript" src="js/game.js"></script>
+		<script type="text/javascript">
+		var imageCache=loadImage(IMAGE_LIST,init);
+		var engine;
+		function init(){
+	/*
+			var map=new MapView(mapData,1024,768,SCALE,280,150,imageCache['map'],imageCache['bg']);
+			map.draw();
+			map.setMap(5,1);
+			map.drawByIndex(5);
+
+			map.setMap(5,1);
+			map.drawByIndex(5);
+			
+			var p = new PersonView(map);
+			var b = new BlockView(map, imageCache['map']);
+			
+			
+			p.init(1, 0);
+			p.init(2, 3);
+			
+			
+			p.move(2, 8);
+			
+			p.move(1,5);
+			
+			b.add(5);
+			
+			b.add(9);
+			
+			setTimeout(function(){
+				p.move(1, 9);
+			},2000)
+			setTimeout(function(){
+				b.remove(9);
+			},2800);
+	*/
+			
+			engine = new Game();
+			
+			var sound=new Sound('bg_music');
+			sound.play();
+			
+			$(window).bind("click,dblclick", function(evt) {
+				evt.preventDefault();
+			});
+		}
+		</script>	
+</body>
+</html>

@@ -4,7 +4,7 @@
     "description": "Online Monopoly game",
     "main": "index.js",
     "scripts": {
-        "start:server": "node server/index.js",
+        "start:server": "node server/app.js",
         "test": "jest",
         "lint": "eslint .",
         "fix": "eslint --fix ."

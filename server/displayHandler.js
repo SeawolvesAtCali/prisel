@@ -1,4 +1,6 @@
-function handleDisplayConnection(client) {}
+function handleDisplayConnection(client) {
+    return () => {};
+}
 
 module.exports = {
     handleDisplayConnection,

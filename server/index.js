@@ -6,7 +6,7 @@ const { handleDisplayConnection } = require('./displayHandler');
 const constants = require('../common/constants');
 
 const io = socketIO();
-
+console.log('starting server');
 io.of(constants.CONTROLLER_NS).on('connection', handleControllerConnection(StateManager));
 io.of(constants.DISPLAY_NS).on('connection', handleDisplayConnection(StateManager));
 
@@ -14,4 +14,4 @@ io.of(constants.DISPLAY_NS).on('connection', handleDisplayConnection(StateManage
 
 // io.of(constants.CHAT_NS).on('connection', handleChatConnection);
 
-io.listen(3000);
+io.listen(constants.PORT);

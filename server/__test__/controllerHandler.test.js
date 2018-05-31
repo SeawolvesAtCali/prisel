@@ -16,7 +16,7 @@ describe('controllerHandler', () => {
             mockClient = {};
         });
         it('should save the connection in StateManager', () => {
-            handler.handleLogin(mockStateManager, mockClient);
+            handler.handleLogin(mockStateManager, mockClient)({});
             expect(
                 mockStateManager.connections.controllers.find(
                     (controller) => controller.socket === mockClient,
@@ -25,7 +25,7 @@ describe('controllerHandler', () => {
         });
         it('should emit login accept message back to client', () => {
             roomMessages.getLoginAccept = jest.fn(() => []).mockName('getLoginAccept');
-            handler.handleLogin(mockStateManager, mockClient);
+            handler.handleLogin(mockStateManager, mockClient)({});
             expect(roomMessages.getLoginAccept).toHaveBeenCalled();
         });
     });

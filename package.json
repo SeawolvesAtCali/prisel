@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "start:server": "node server/index.js",
+        "start:sampleLoginClient": "node client/sampleLoginClient.js",
         "test": "jest",
         "lint": "eslint .",
         "fix": "eslint --fix ."
@@ -20,10 +21,7 @@
     },
     "homepage": "https://github.com/SeawolvesAtCali/Monopoly#readme",
     "eslintConfig": {
-        "extends": [
-            "airbnb-base",
-            "plugin:prettier/recommended"
-        ],
+        "extends": ["airbnb-base", "plugin:prettier/recommended"],
         "rules": {
             "no-unused-vars": [
                 "error",
@@ -68,8 +66,6 @@
         "prettier": "^1.12.1"
     },
     "jest": {
-        "testMatch": [
-            "<rootDir>/**/__test__/**/*.{js,mjs}"
-        ]
+        "testMatch": ["<rootDir>/**/__test__/**/*.{js,mjs}"]
     }
 }

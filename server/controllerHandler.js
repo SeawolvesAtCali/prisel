@@ -4,18 +4,21 @@ const roomMessages = require('./roomMessages');
 
 const CONTROLLER = 'CONTROLLER';
 function handleLogin(StateManager, client) {
-    const controller = {
-        socket: client,
-        id: newId(CONTROLLER),
+    return (data) => {
+        const controller = {
+            socket: client,
+            id: newId(CONTROLLER),
+        };
+        console.log(`controller ${data.username} logged in, give id ${controller.id}`);
+        StateManager.connections.controllers.push(controller);
+        networkUtils.emit(client, ...roomMessages.getLoginAccept());
     };
-    StateManager.connections.controllers.push(controller);
-    networkUtils.emit(client, ...roomMessages.getLoginAccept());
 }
 
 function handleControllerConnection(StateManager) {
     return (client) => {
-        // eslint-disable-next-line
-        const controller = handleLogin(StateManager, client);
+        console.log('client connected');
+        client.on('LOGIN', handleLogin(StateManager, client));
 
         // Add message handlings below
         // for example:

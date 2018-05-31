@@ -1,11 +1,12 @@
 const io = require('socket.io-client');
+const assert = require('assert');
 const constants = require('../common/constants');
 
 /**
  * Create connection with server
  * Usage:
  *     const connection = connect();
- *     const controllerConnection = connection.as(constants.CONTROLLER_NS);
+ *     const controllerClient = connection.as(constants.CONTROLLER_NS);
  *     const displayConnection = connection.as(constants.DISPLAY_NS);
  */
 function connect() {
@@ -23,6 +24,7 @@ function connect() {
  *     emitToServer(controllerConnection, 'ROLL A DICE');
  */
 function emitToServer(client, ...data) {
+    assert(data.length > 1, 'Did you forget to spread the argument using ...?');
     client.emit(...data);
 }
 

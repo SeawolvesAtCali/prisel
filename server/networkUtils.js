@@ -2,10 +2,12 @@
  * Utility functions to perform network calls.
  */
 
+const assert = require('assert');
 const constants = require('../common/constants');
 
-function emit(clients, data) {
-    clients.emit();
+function emit(clients, ...data) {
+    assert(data.length > 1, 'Did you forget to spread the data using ...?');
+    clients.emit(...data);
 }
 
 function getAllControllersInRoom(io, roomId) {

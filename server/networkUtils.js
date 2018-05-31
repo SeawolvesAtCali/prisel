@@ -1,6 +1,7 @@
 /**
- * Clients connects to different namespace based on their types.
+ * Utility functions to perform network calls.
  */
+
 const constants = require('../common/constants');
 
 function emit(clients, data) {

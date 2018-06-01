@@ -14,24 +14,25 @@ io.of(constants.DISPLAY_NS).on('connection', handleDisplayConnection(StateManage
 
 // type message in terminal and broadcast to all clients
 const readcommand = require('readline');
-var rc = readcommand.createInterface(process.stdin, process.stdout);
-rc.on('line', function (data) {
-    io.sockets.emit('broadcast',data);
+
+const rc = readcommand.createInterface(process.stdin, process.stdout);
+rc.on('line', (data) => {
+    io.sockets.emit('broadcast', data);
     rc.prompt(true);
 });
 
-io.on('connection', function (socket) {
-    io.sockets.emit('this', { will: 'be received by everyone'});
+io.on('connection', (socket) => {
+    io.sockets.emit('this', { will: 'be received by everyone' });
 
-    socket.on('CHAT', function(data){
+    socket.on('CHAT', (data) => {
         console.log(data);
-    })
+    });
 
-    socket.on('private message', function (from, msg) {
+    socket.on('private message', (from, msg) => {
         console.log('I received a private message by ', from, ' saying ', msg);
     });
 
-    socket.on('disconnect', function () {
+    socket.on('disconnect', () => {
         io.emit('user disconnected');
     });
 });

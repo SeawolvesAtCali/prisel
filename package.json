@@ -5,8 +5,8 @@
     "main": "index.js",
     "scripts": {
         "start:server": "node server/index.js",
-        "test": "jest",
-        "lint": "eslint .",
+        "start:client": "node client/controller/index.js",
+        "test": "eslint .",
         "fix": "eslint --fix ."
     },
     "repository": {

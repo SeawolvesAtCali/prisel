@@ -1,8 +1,15 @@
-const network = require('../networkUtils');
-const constants = require('../../common/constants');
+const io = require('socket.io-client');
+const readline = require('readline');
+const chatMessages = require('../message/chat');
 
-// eslint-disable-next-line no-unused-vars
-function startController() {
-    const connection = network.connect().as(constants.CONTROLLER_NS);
-    return connection;
-}
+const socket = io('http://localhost:3000');
+const rl = readline.createInterface(process.stdin, process.stdout);
+rl.on('line', (line) => {
+    socket.emit(...chatMessages.getMessage(line));
+    rl.prompt(true);
+});
+
+// display what server send
+socket.on('broadcast', (data) => {
+    console.log(data);
+});

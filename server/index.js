@@ -1,8 +1,20 @@
-/* eslint-disable */
-const io = require('socket.io')();
+const socketIO = require('socket.io');
+const StateManager = require('./stateManager');
+const { handleControllerConnection } = require('./controllerHandler');
+const { handleDisplayConnection } = require('./displayHandler');
+
+const constants = require('../common/constants');
+
+const io = socketIO();
+console.log('starting server');
+io.of(constants.CONTROLLER_NS).on('connection', handleControllerConnection(StateManager));
+io.of(constants.DISPLAY_NS).on('connection', handleDisplayConnection(StateManager));
+
+// connect any other namespaces below
+
+// type message in terminal and broadcast to all clients
 const readcommand = require('readline');
 var rc = readcommand.createInterface(process.stdin, process.stdout);
-// type message in terminal(server side) and broadcast to all clients
 rc.on('line', function (data) {
     io.sockets.emit('broadcast',data);
     rc.prompt(true);
@@ -23,4 +35,6 @@ io.on('connection', function (socket) {
         io.emit('user disconnected');
     });
 });
-io.listen(3000);
+// io.of(constants.CHAT_NS).on('connection', handleChatConnection);
+
+io.listen(constants.PORT);

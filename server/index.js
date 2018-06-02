@@ -1,4 +1,5 @@
 const socketIO = require('socket.io');
+const debug = require('debug')('debug');
 const StateManager = require('./stateManager');
 const { handleControllerConnection } = require('./controllerHandler');
 const { handleDisplayConnection } = require('./displayHandler');
@@ -6,7 +7,7 @@ const { handleDisplayConnection } = require('./displayHandler');
 const constants = require('../common/constants');
 
 const io = socketIO();
-console.log('starting server');
+debug('starting server');
 io.of(constants.CONTROLLER_NS).on('connection', handleControllerConnection(StateManager));
 io.of(constants.DISPLAY_NS).on('connection', handleDisplayConnection(StateManager));
 
@@ -25,11 +26,11 @@ io.on('connection', (socket) => {
     io.sockets.emit('this', { will: 'be received by everyone' });
 
     socket.on('CHAT', (data) => {
-        console.log(data);
+        debug(data);
     });
 
     socket.on('private message', (from, msg) => {
-        console.log('I received a private message by ', from, ' saying ', msg);
+        debug('I received a private message by ', from, ' saying ', msg);
     });
 
     socket.on('disconnect', () => {

@@ -1,3 +1,4 @@
+const debug = require('debug')('debug');
 const { newId } = require('./idUtils');
 const networkUtils = require('./networkUtils');
 const roomMessages = require('./roomMessages');
@@ -9,7 +10,7 @@ function handleLogin(StateManager, client) {
             socket: client,
             id: newId(CONTROLLER),
         };
-        console.log(`controller ${data.username} logged in, give id ${controller.id}`);
+        debug(`controller ${data.username} logged in, give id ${controller.id}`);
         StateManager.connections.controllers.push(controller);
         networkUtils.emit(client, ...roomMessages.getLoginAccept());
     };
@@ -17,7 +18,7 @@ function handleLogin(StateManager, client) {
 
 function handleControllerConnection(StateManager) {
     return (client) => {
-        console.log('client connected');
+        debug('client connected');
         client.on('LOGIN', handleLogin(StateManager, client));
 
         // Add message handlings below

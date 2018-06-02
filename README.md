@@ -42,6 +42,51 @@ To run a file in watch mode(automatically rerun the test when any related files 
 npm test server/__test__/index.test.js -- --watch
 ```
 
+# Debugging
+
+This project uses [debug](https://github.com/visionmedia/debug), the same logging library that
+Socket.io uses. To enable debugging, set `DEBUG` environment variables before running the script.
+
+To see all the debugging messages from Socket.io, use `DEBUG="socket.io*"`. For example
+
+```
+env DEBUG="socket.io*" npm run start:server
+```
+
+In the code, we should use `debug` instead of `console.log` for debug messages.
+
+```
+const debug = require('debug')('debug'); // Import debug and set the debug message label to `debug`
+
+debug('Hello world'); // This will print "debug: Hello world"
+```
+
+To see all the logs with 'debug' label, use
+
+```
+env DEBUG="debug" npm run start:server
+```
+
+Debugging using Visual Studio Code is super easy.
+
+1.  In the debug panel, click on the gear icon to create a `launch.json`.
+2.  The content of the json file could be as simple as
+    ```
+    {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "type": "node",
+                "request": "launch",
+                "name": "debug server",
+                "program": "${workspaceFolder}/server/index.js"
+            }
+        ]
+    }
+    ```
+3.  Set a breakpoint in editor
+4.  Click on the green run button to start debugging.
+
 # Linting
 
 Linting makes sure that the source code follows the same coding style. It's recommend to run linting

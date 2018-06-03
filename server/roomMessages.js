@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-    getLoginAccept() {
-        return ['LOGIN_ACCEPT', {}];
+    getLoginAccept(userId) {
+        return ['LOGIN_ACCEPT', { userId }];
     },
 };

@@ -7,6 +7,7 @@ const manager = {
         controllers: [],
         displays: [],
     },
+    messages: [],
 };
 
 module.exports = manager;

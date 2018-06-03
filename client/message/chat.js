@@ -1,4 +1,4 @@
-function getMessage(message) {
-    return ['CHAT', { message }];
+function getMessage(userId, message) {
+    return ['CHAT', { userId, message }];
 }
 module.exports = { getMessage };

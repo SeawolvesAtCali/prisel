@@ -7,6 +7,7 @@
         "start:server": "node server/index.js",
         "start:client": "node client/controller/index.js",
         "start:sampleLoginClient": "node client/sampleLoginClient.js",
+        "start:chatClient": "node client/sampleChatClient.js",
         "test": "jest",
         "lint": "eslint .",
         "fix": "eslint --fix ."

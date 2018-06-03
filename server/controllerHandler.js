@@ -9,10 +9,16 @@ function handleLogin(StateManager, client) {
         const controller = {
             socket: client,
             id: newId(CONTROLLER),
+            username: data.username,
         };
         debug(`controller ${data.username} logged in, give id ${controller.id}`);
-        StateManager.connections.controllers.push(controller);
-        networkUtils.emit(client, ...roomMessages.getLoginAccept());
+        const { connections } = StateManager;
+        connections.controllers = {
+            ...StateManager.connections.controllers,
+            [controller.id]: controller,
+        };
+
+        networkUtils.emit(client, ...roomMessages.getLoginAccept(controller.id));
     };
 }
 

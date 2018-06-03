@@ -18,7 +18,7 @@ describe('controllerHandler', () => {
         it('should save the connection in StateManager', () => {
             handler.handleLogin(mockStateManager, mockClient)({});
             expect(
-                mockStateManager.connections.controllers.find(
+                Object.values(mockStateManager.connections.controllers).find(
                     (controller) => controller.socket === mockClient,
                 ),
             ).toEqual(expect.any(Object));

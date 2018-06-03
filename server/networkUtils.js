@@ -26,7 +26,12 @@ function emitToDisplays(io, roomId, ...data) {
     emit(getAllDisplaysInRoom(io, roomId), ...data);
 }
 
+function emitToChat(io, ...data) {
+    emit(io.of(constants.CHAT_NS), ...data);
+}
+
 module.exports = {
+    emitToChat,
     emit,
     emitToControllers,
     emitToDisplays,

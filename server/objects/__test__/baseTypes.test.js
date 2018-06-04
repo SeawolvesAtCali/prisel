@@ -107,7 +107,7 @@ describe('baseTypes type checking', () => {
         });
     });
 
-    describe('isObjectOf', () => {
+    describe('isObjectShape', () => {
         it('success when all props match', () => {
             const successObject = { color: 'yellow', count: 12 };
             Types.isObjectShape({ color: Types.isString, count: Types.isNumber })(successObject);
@@ -121,11 +121,10 @@ describe('baseTypes type checking', () => {
             const failObject = { color: 'yellow' };
             Types.isObjectShape({ color: Types.isString, count: Types.isNumber })(failObject);
             expect(error).toHaveBeenCalledWith('Number', undefined, '.count');
-            expect(error).toHaveBeenCalledWith('Object', failObject, '');
         });
     });
 
-    describe('isObjectOfElement', () => {
+    describe('isObjectOf', () => {
         it('success when object empty', () => {
             const successObject = {};
             Types.isObjectOf(Types.isString)(successObject);

@@ -5,7 +5,7 @@
 const debug = require('debug')('debug');
 const { connect, emitToServer } = require('./networkUtils');
 const constants = require('../common/constants');
-const { getLogin } = require('./roomMessages');
+const { getLogin } = require('./message/room');
 const readline = require('readline');
 const chatMessages = require('./message/chat');
 

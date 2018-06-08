@@ -1,7 +1,7 @@
 const debug = require('debug')('debug');
 const { newId } = require('./idUtils');
 const networkUtils = require('./networkUtils');
-const roomMessages = require('./roomMessages');
+const roomMessages = require('./message/room');
 
 const CONTROLLER = 'CONTROLLER';
 function handleLogin(StateManager, client) {

@@ -13,6 +13,11 @@ let user = '';
 const connection = connect();
 const controllerClient = connection.as(constants.CONTROLLER_NS);
 const chatClient = connection.as(constants.CHAT_NS);
+const generalClient = connection.as('');
+
+generalClient.on('LOGIN_ACCEPT', (data) => {
+    debug('general client receive login_accept', data);
+});
 
 const rl = readline.createInterface(process.stdin, process.stdout);
 

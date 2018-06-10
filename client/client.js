@@ -4,6 +4,28 @@ const constants = require('../common/constants');
 const { getLogin } = require('./message/room');
 
 const DEFAULT_USERNAME = 'user';
+
+/**
+ * Client class
+ *
+ * A client encapsulates the socket.io connection with server and provides methods to interact with the connection.
+ * A client has the following lifecycle
+ *
+ * Create: A client is instantiated.
+ * Connect: the client connects to server and logs in.
+ * Message: Client receives message from server
+ * Disconnect: Client disconnects from server and stop process.
+ *
+ * To create a client, call the constructor with socket namespaces that this client needs to connect to.
+ *
+ *      const client = new Client(CHAT_NS, CONTROLLER_NS); // create a client to be connect to chat and controller namespace
+ *
+ * Creating a Client instance doesn't connect to the server, we need to call `client.connect(username)`
+ * If controller namespace is used, connect will also log in with the username.
+ *
+ * After a client is connected, we can attach message handler using `client.on`
+ * We can use `client.addPlugin` before connect to attach some plugins. Each plugin will be trigger upon some lifecycle
+ */
 class Client {
     constructor(...namespaces) {
         this.namespaces = namespaces || [];
@@ -11,6 +33,7 @@ class Client {
         this.plugins = new Set();
         this.connections = {};
         this.emit = this.emit.bind(this);
+        this.isConnected = false;
     }
 
     /**
@@ -47,6 +70,7 @@ class Client {
                 });
             }
         });
+        this.isConnected = true;
     }
 
     addPlugin(plugin) {
@@ -66,8 +90,7 @@ class Client {
         if (namespace in this.connections) {
             emitToServer(this.connections[namespace], ...data);
         } else {
-            debug(`ERROR: Cannot find connection ${namespace}`);
-            process.exit(2);
+            throw new Error(`Cannot find connection ${namespace}`);
         }
     }
 
@@ -78,6 +101,9 @@ class Client {
      * @param {(state, emit) => (data) => newState} func listener
      */
     on(namespace, type, func) {
+        if (!this.isConnected) {
+            throw new Error('Please call client.connect(username) first');
+        }
         if (namespace in this.connections) {
             this.connections[namespace].on(type, (data) => {
                 debug(`${namespace}: ${type} ${data}`);
@@ -86,8 +112,7 @@ class Client {
                 this.triggerPlugins('onMessage', type, data);
             });
         } else {
-            debug(`ERROR: cannot listen to ${type} on ${namespace}, have you connected?`);
-            process.exit(2);
+            throw new Error(`Cannot listen to ${type} on ${namespace}, have you connected?`);
         }
     }
 }

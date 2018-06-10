@@ -32,7 +32,8 @@
                 "error",
                 {
                     "vars": "local",
-                    "args": "none"
+                    "args": "none",
+                    "varsIgnorePattern": "debug"
                 }
             ],
             "class-methods-use-this": "off",
@@ -43,7 +44,10 @@
                 }
             ],
             "no-plusplus": "off",
-            "no-console": "off"
+            "no-console": "off",
+            "no-case-declarations": "off",
+            "global-require": "off",
+            "import/no-dynamic-require": "off"
         },
         "env": {
             "jest": true
@@ -58,6 +62,7 @@
         "proseWrap": "always"
     },
     "dependencies": {
+        "commander": "^2.15.1",
         "debug": "^3.1.0",
         "socket.io": "^2.1.0",
         "socket.io-client": "^2.1.1"

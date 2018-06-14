@@ -1,5 +1,5 @@
 const handler = require('../controllerHandler');
-const roomMessages = require('../roomMessages');
+const roomMessages = require('../message/room');
 
 jest.mock('../networkUtils');
 

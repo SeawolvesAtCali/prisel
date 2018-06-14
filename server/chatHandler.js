@@ -1,6 +1,6 @@
 const debug = require('debug')('debug');
 const networkUtils = require('./networkUtils');
-const messages = require('./chatMessages');
+const messages = require('./message/chat');
 
 function handleChatConnection(StateManager, io) {
     return (client) => {

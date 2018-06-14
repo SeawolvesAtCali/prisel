@@ -5,7 +5,7 @@
 const debug = require('debug')('debug');
 const { connect, emitToServer } = require('./networkUtils');
 const constants = require('../common/constants');
-const { getLogin } = require('./roomMessages');
+const { getLogin } = require('./message/room');
 const readline = require('readline');
 const chatMessages = require('./message/chat');
 
@@ -13,6 +13,11 @@ let user = '';
 const connection = connect();
 const controllerClient = connection.as(constants.CONTROLLER_NS);
 const chatClient = connection.as(constants.CHAT_NS);
+const generalClient = connection.as('');
+
+generalClient.on('LOGIN_ACCEPT', (data) => {
+    debug('general client receive login_accept', data);
+});
 
 const rl = readline.createInterface(process.stdin, process.stdout);
 

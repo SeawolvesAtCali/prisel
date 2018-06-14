@@ -30,7 +30,7 @@ controllerClient.on('LOGIN_ACCEPT', (data) => {
         debug(message.username, ': ', message.message);
     });
     rl.on('line', (line) => {
-        emitToServer(chatClient, ...chatMessages.getMessage(user, line));
+        emitToServer(chatClient, ...chatMessages.getChat(user, line));
         rl.prompt(true);
         debug(user, ': ', line);
     });

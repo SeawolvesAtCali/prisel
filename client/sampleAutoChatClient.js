@@ -21,6 +21,7 @@ if (program.script) {
         debug(`Cannot load script ${program.script}`);
     }
     if (script) {
+        debug(`successfully loaded script ${program.script}`);
         client.addPlugin(new AutoScriptPlugin(script));
     }
 }

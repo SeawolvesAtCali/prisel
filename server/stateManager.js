@@ -8,6 +8,7 @@ const manager = {
         displays: [],
     },
     messages: [],
+    rooms: {},
 };
 
 module.exports = manager;

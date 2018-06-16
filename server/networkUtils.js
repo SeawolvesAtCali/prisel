@@ -10,6 +10,14 @@ function emit(clients, ...data) {
     clients.emit(...data);
 }
 
+function join(client, roomId) {
+    client.join(roomId);
+}
+
+function leave(client, roomId) {
+    client.leave(roomId);
+}
+
 function getAllControllersInRoom(io, roomId) {
     return io.of(constants.CONTROLLER_NS).to(roomId);
 }
@@ -33,6 +41,8 @@ function emitToChat(io, ...data) {
 module.exports = {
     emitToChat,
     emit,
+    join,
+    leave,
     emitToControllers,
     emitToDisplays,
 };

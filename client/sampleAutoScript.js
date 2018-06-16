@@ -1,4 +1,4 @@
-const { getMessage } = require('./message/chat');
+const { getChat } = require('./message/chat');
 const { wait, emit, disconnect } = require('./autoScriptUtils');
 const constants = require('../common/constants');
 
@@ -12,9 +12,9 @@ const constants = require('../common/constants');
  */
 module.exports = {
     actions: [
-        emit(constants.CHAT_NS, (state) => getMessage(state.userId, 'hello')),
+        emit(constants.CHAT_NS, (state) => getChat(state.userId, 'hello')),
         wait('BROADCAST'),
-        emit(constants.CHAT_NS, (state) => getMessage(state.userId, 'bye')),
+        emit(constants.CHAT_NS, (state) => getChat(state.userId, 'bye')),
         wait('BROADCAST'),
         disconnect(),
     ],

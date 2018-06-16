@@ -1,6 +1,6 @@
 const readline = require('readline');
 const { CHAT_NS } = require('../common/constants');
-const { getMessage } = require('./message/chat');
+const { getChat } = require('./message/chat');
 
 class ReadlinePlugin {
     constructor() {
@@ -10,7 +10,7 @@ class ReadlinePlugin {
     onConnect(state, emit) {
         this.rl.prompt(true);
         this.rl.on('line', (line) => {
-            emit(CHAT_NS, ...getMessage(state.userId, line));
+            emit(CHAT_NS, ...getChat(state.userId, line));
             this.rl.prompt(true);
         });
     }

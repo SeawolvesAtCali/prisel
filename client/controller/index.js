@@ -5,7 +5,7 @@ const chatMessages = require('../message/chat');
 const socket = io('http://localhost:3000');
 const rl = readline.createInterface(process.stdin, process.stdout);
 rl.on('line', (line) => {
-    socket.emit(...chatMessages.getMessage(line));
+    socket.emit(...chatMessages.getChat(line));
     rl.prompt(true);
 });
 

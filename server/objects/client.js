@@ -11,10 +11,10 @@ const clientSchema = {
 function isClient(value, path = '') {
     return errorIfChildError(
         [error('Client', value, path)],
-        Types.isObjectShape(clientSchema)(value, path)
-    )
+        Types.isObjectShape(clientSchema)(value, path),
+    );
 }
 
 module.exports = {
-    isClient: Types.setTypeName(isClient, 'Client');
-}
+    isClient: Types.setTypeName(isClient, 'Client'),
+};

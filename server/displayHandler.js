@@ -1,4 +1,4 @@
-function handleDisplayConnection(client) {
+function handleDisplayConnection(context) {
     return () => {};
 }
 

@@ -2,19 +2,25 @@ const debug = require('debug')('debug');
 const { newId } = require('./idUtils');
 const networkUtils = require('./networkUtils');
 const roomMessages = require('./message/room');
+const { handleRoomActions } = require('./roomController');
 
 const CONTROLLER = 'CONTROLLER';
-function handleLogin(StateManager, client) {
-    return (data) => {
-        const controller = {
-            socket: client,
-            id: newId(CONTROLLER),
-            username: data.username,
-        };
-        debug(`controller ${data.username} logged in, give id ${controller.id}`);
+function handleLogin(context, client) {
+    return (data = {}) => {
+        const id = newId(CONTROLLER);
+        const { username } = data;
+        const { StateManager, SocketManager } = context;
         const { connections } = StateManager;
+        debug(`controller ${username} logged in, give id ${id}`);
+        SocketManager.add(id, client);
+
+        const controller = {
+            id,
+            username,
+        };
+
         connections.controllers = {
-            ...StateManager.connections.controllers,
+            ...connections.controllers,
             [controller.id]: controller,
         };
 
@@ -22,15 +28,11 @@ function handleLogin(StateManager, client) {
     };
 }
 
-function handleControllerConnection(StateManager) {
+function handleControllerConnection(context) {
     return (client) => {
         debug('client connected');
-        client.on('LOGIN', handleLogin(StateManager, client));
-
-        // Add message handlings below
-        // for example:
-        //      client.on('JOIN', handleJoin);
-        //      client.on('LEAVE', handleLeave);
+        client.on('LOGIN', handleLogin(context, client));
+        handleRoomActions(context, client);
     };
 }
 

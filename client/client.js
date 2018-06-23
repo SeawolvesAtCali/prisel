@@ -75,6 +75,9 @@ class Client {
 
     addPlugin(plugin) {
         this.plugins.add(plugin);
+        if (plugin.setClient) {
+            plugin.setClient(this);
+        }
     }
 
     removePlugin(plugin) {
@@ -109,7 +112,7 @@ class Client {
                 debug(`${namespace}: ${type} ${data}`);
                 const updatedState = func(this.state, this.emit)(data) || this.state;
                 this.state = updatedState;
-                this.triggerPlugins('onMessage', type, data);
+                this.triggerPlugins('onMessage', type, namespace, data);
             });
         } else {
             throw new Error(`Cannot listen to ${type} on ${namespace}, have you connected?`);

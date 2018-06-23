@@ -5,12 +5,12 @@ describe('autoScriptUtils', () => {
         it('should have action', () => {
             expect(autoScriptUtils.wait('EVENT_TYPE').action).toBe(autoScriptUtils.ACTION.WAIT);
         });
-        it('should have all event type and callback function', () => {
+        it('should have event type and namespace', () => {
             const event = 'EVENT_TYPE';
-            const mockCallback = () => {};
-            expect(autoScriptUtils.wait(event, mockCallback)).toMatchObject({
+            const namespace = 'NS';
+            expect(autoScriptUtils.wait(event, namespace)).toMatchObject({
                 type: event,
-                callback: mockCallback,
+                namespace,
             });
         });
     });

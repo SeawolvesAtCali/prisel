@@ -4,13 +4,11 @@ const ACTION = {
     DISCONNECT: 'DISCONNECT',
 };
 
-const noop = () => {};
-
-function wait(type, func = noop) {
+function wait(type, namespace) {
     return {
         action: ACTION.WAIT,
         type,
-        callback: func,
+        namespace,
     };
 }
 

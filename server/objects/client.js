@@ -3,7 +3,6 @@ const Types = require('./baseTypes');
 const { error, errorIfChildError } = require('./typeError');
 
 const clientSchema = {
-    socket: Types.isObject,
     id: Types.isString,
     username: Types.Optional(Types.isString),
 };

@@ -1,4 +1,6 @@
 const debug = require('debug')('debug');
+const networkUtils = require('./networkUtils');
+const roomMessages = require('./message/room');
 const { newId } = require('./idUtils');
 
 const handleCreateRoom = (context, client) => (data = {}) => {
@@ -17,7 +19,7 @@ const handleCreateRoom = (context, client) => (data = {}) => {
     StateManager.rooms[roomId] = room;
     client.join(roomId);
     debug(`roomController: ${hostId} created room ${roomName} ${roomId}`);
-    // TODO: emit JOIN_ACCEPT to client
+    networkUtils.emit(client, ...roomMessages.getCreateRoomAccept(roomId));
 };
 
 function handleRoomActions(context, client) {

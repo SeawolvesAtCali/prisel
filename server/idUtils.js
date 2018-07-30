@@ -1,10 +1,12 @@
+// @flow
+
 /**
  * Utility functions for Id
  */
 
 const idCounts = {};
 
-function newId(type) {
+function newId(type: string): string {
     if (!idCounts[type]) {
         idCounts[type] = 1;
     } else {
@@ -13,7 +15,7 @@ function newId(type) {
     return `${type}-${idCounts[type]}`;
 }
 
-function parseId(id) {
+function parseId(id: string): { type: string, number: number } {
     const idParts = id.split('-');
     return {
         type: idParts[0],

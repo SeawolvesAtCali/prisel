@@ -4,14 +4,15 @@
     "description": "Online Monopoly game",
     "main": "index.js",
     "scripts": {
-        "start:server": "node server/index.js",
-        "start:client": "node client/controller/index.js",
-        "start:sampleLoginClient": "node client/sampleLoginClient.js",
-        "start:chatClient": "node client/sampleChatClient.js",
-        "start:createRoomClient": "node client/sampleAutoClient.js --script ./autoScripts/autoCreateRoomScript",
+        "start:server": "flow-node server/index.js",
+        "start:client": "flow-node client/controller/index.js",
+        "start:sampleLoginClient": "flow-node client/sampleLoginClient.js",
+        "start:chatClient": "flow-node client/sampleChatClient.js",
+        "start:createRoomClient": "flow-node client/sampleAutoClient.js --script ./autoScripts/autoCreateRoomScript",
         "test": "jest",
         "lint": "eslint .",
-        "fix": "eslint --fix ."
+        "fix": "eslint --fix .",
+        "flow": "flow"
     },
     "repository": {
         "type": "git",
@@ -27,6 +28,10 @@
         "extends": [
             "airbnb-base",
             "plugin:prettier/recommended"
+        ],
+        "parser": "babel-eslint",
+        "plugins": [
+            "flowtype"
         ],
         "rules": {
             "no-unused-vars": [
@@ -48,7 +53,8 @@
             "no-console": "off",
             "no-case-declarations": "off",
             "global-require": "off",
-            "import/no-dynamic-require": "off"
+            "import/no-dynamic-require": "off",
+            "no-param-reassign": "off"
         },
         "env": {
             "jest": true
@@ -70,18 +76,26 @@
         "socket.io-client": "^2.1.1"
     },
     "devDependencies": {
+        "babel-eslint": "^8.2.6",
         "eslint": "4.19.1",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-config-prettier": "^2.9.0",
+        "eslint-plugin-flowtype": "^2.50.0",
         "eslint-plugin-import": "2.12.0",
         "eslint-plugin-prettier": "^2.6.0",
+        "flow-bin": "^0.77.0",
+        "flow-node": "^1.2.3",
         "jest": "^22.4.4",
+        "jest-flow-transform": "^1.0.1",
         "prettier": "^1.12.1",
         "prop-types": "^15.6.1"
     },
     "jest": {
         "testMatch": [
             "<rootDir>/**/__test__/**/*.{js,mjs}"
-        ]
+        ],
+        "transform": {
+            "^.+\\.js(?:\\.flow)?$": "jest-flow-transform"
+        }
     }
 }

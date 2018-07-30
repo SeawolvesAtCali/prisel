@@ -1,15 +1,9 @@
-const Types = require('./baseTypes');
-const { isClient } = require('./client');
+// @flow
+import type { ClientT } from './client';
+import type { RoomT } from './room';
 
-const stateManagerSchema = {
-    connections: Types.isObjectShape({
-        controllers: Types.isObjectOf(isClient),
-        display: Types.isObjectOf(isClient),
-    }),
-};
-
-function isStateManager(value) {
-    return Types.isObjectShape(stateManagerSchema)(value, 'STATE_MANAGER');
-}
-
-module.exports = { isStateManager };
+export type StateManagerT = {|
+    connections: {| controllers: { [id: string]: ClientT }, displays: { [id: string]: ClientT } |},
+    messages: Array<string>,
+    rooms: { [room_id: string]: RoomT },
+|};

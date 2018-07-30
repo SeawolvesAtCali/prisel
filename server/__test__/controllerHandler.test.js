@@ -1,7 +1,6 @@
+jest.mock('../networkUtils');
 const handler = require('../controllerHandler');
 const roomMessages = require('../message/room');
-
-jest.mock('../networkUtils');
 
 describe('controllerHandler', () => {
     describe('handleLogin', () => {
@@ -11,7 +10,7 @@ describe('controllerHandler', () => {
         beforeEach(() => {
             mockStateManager = {
                 connections: {
-                    controllers: [],
+                    controllers: {},
                 },
             };
             mockSocketManager = {
@@ -20,6 +19,7 @@ describe('controllerHandler', () => {
             mockContext = {
                 StateManager: mockStateManager,
                 SocketManager: mockSocketManager,
+                io: {},
             };
         });
 
@@ -34,12 +34,12 @@ describe('controllerHandler', () => {
 
         it('should save the connection in SocketMap', () => {
             const mockClient = {};
-            handler.handleLogin(mockContext, mockClient)();
+            handler.handleLogin(mockContext, mockClient)({ username: 'Batman' });
             expect(mockSocketManager.add).toHaveBeenCalledWith(expect.any(String), mockClient);
         });
         it('should emit login accept message back to client', () => {
             roomMessages.getLoginAccept = jest.fn(() => []).mockName('getLoginAccept');
-            handler.handleLogin(mockContext, {})({});
+            handler.handleLogin(mockContext, {})({ username: 'Batman' });
             expect(roomMessages.getLoginAccept).toHaveBeenCalled();
         });
     });

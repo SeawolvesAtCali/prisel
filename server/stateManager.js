@@ -1,11 +1,14 @@
+// @flow
+import type { StateManagerT } from './objects/stateManager';
+
 /**
  * The container for all the data in the server.
  */
 
-const manager = {
+const manager: StateManagerT = {
     connections: {
-        controllers: [],
-        displays: [],
+        controllers: {},
+        displays: {},
     },
     messages: [],
     rooms: {},

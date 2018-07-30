@@ -1,19 +1,9 @@
-const Types = require('./baseTypes');
+// @flow
 
-const { error, errorIfChildError } = require('./typeError');
-
-const clientSchema = {
-    id: Types.isString,
-    username: Types.Optional(Types.isString),
-};
-
-function isClient(value, path = '') {
-    return errorIfChildError(
-        [error('Client', value, path)],
-        Types.isObjectShape(clientSchema)(value, path),
-    );
-}
-
-module.exports = {
-    isClient: Types.setTypeName(isClient, 'Client'),
+export type ClientT = {
+    id: string,
+    username: string,
+    roomId?: string,
+    type: 'controller' | 'display',
+    isReady?: boolean,
 };

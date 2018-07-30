@@ -1,4 +1,8 @@
-function handleDisplayConnection(context) {
+// @flow
+
+import type { ContextT } from './objects';
+
+function handleDisplayConnection(context: ContextT) {
     return () => {};
 }
 

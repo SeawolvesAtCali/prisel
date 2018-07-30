@@ -1,3 +1,5 @@
+// @flow
+
 const PORT = 3000;
 module.exports = {
     // namespaces

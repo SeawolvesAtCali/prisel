@@ -1,3 +1,6 @@
+// @flow
+import type { ContextT } from './objects';
+
 const socketIO = require('socket.io');
 const debug = require('debug')('debug');
 const StateManager = require('./stateManager');
@@ -11,7 +14,7 @@ const constants = require('../common/constants');
 const io = socketIO();
 debug('starting server');
 
-const context = {
+const context: ContextT = {
     StateManager,
     SocketManager: new SocketManager(),
     io,

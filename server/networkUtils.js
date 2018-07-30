@@ -1,40 +1,41 @@
+// @flow
+
+import type { SocketT, MessageT } from './objects';
 /**
  * Utility functions to perform network calls.
  */
 
-const assert = require('assert');
 const constants = require('../common/constants');
 
-function emit(clients, ...data) {
-    assert(data.length > 1, 'Did you forget to spread the data using ...?');
-    clients.emit(...data);
+function emit(clients: SocketT, messageType: string, data: Object) {
+    clients.emit(messageType, data);
 }
 
-function join(client, roomId) {
+function join(client: SocketT, roomId: string) {
     client.join(roomId);
 }
 
-function leave(client, roomId) {
+function leave(client: SocketT, roomId: string) {
     client.leave(roomId);
 }
 
-function getAllControllersInRoom(io, roomId) {
+function getAllControllersInRoom(io: any, roomId: string): SocketT {
     return io.of(constants.CONTROLLER_NS).to(roomId);
 }
 
-function getAllDisplaysInRoom(io, roomId) {
+function getAllDisplaysInRoom(io: any, roomId: string): SocketT {
     return io.of(constants.DISPLAY_NS).to(roomId);
 }
 
-function emitToControllers(io, roomId, ...data) {
+function emitToControllers(io: any, roomId: string, ...data: MessageT) {
     emit(getAllControllersInRoom(io, roomId), ...data);
 }
 
-function emitToDisplays(io, roomId, ...data) {
+function emitToDisplays(io: any, roomId: string, ...data: MessageT) {
     emit(getAllDisplaysInRoom(io, roomId), ...data);
 }
 
-function emitToChat(io, ...data) {
+function emitToChat(io: any, ...data: MessageT) {
     emit(io.of(constants.CHAT_NS), ...data);
 }
 

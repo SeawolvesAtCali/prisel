@@ -1,22 +1,9 @@
-const Types = require('./baseTypes');
+// @flow
 
-const { isUserState } = require('./userState');
-const { error, errorIfChildError } = require('./typeError');
-
-const roomSchema = {
-    id: Types.isString,
-    name: Types.isString,
-    // array of userId
-    users: Types.isObjectOf(isUserState),
-};
-
-function isRoom(value, path = '') {
-    return errorIfChildError(
-        [error('Room', value, path)],
-        Types.isObjectShape(roomSchema)(value, path),
-    );
-}
-
-module.exports = {
-    isRoom: Types.setTypeName(isRoom, 'Room'),
-};
+export type RoomT = {|
+    id: string,
+    name: string,
+    host: string, // client id
+    guests: Array<string>, // client id
+    displays: Array<any>,
+|};

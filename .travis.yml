@@ -7,3 +7,5 @@ cache:
 script:
   - npm run lint
   - npm test
+  - npm run flow
+  - ./automation.sh

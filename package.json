@@ -9,6 +9,7 @@
         "start:sampleLoginClient": "flow-node client/sampleLoginClient.js",
         "start:chatClient": "flow-node client/sampleChatClient.js",
         "start:createRoomClient": "flow-node client/sampleAutoClient.js --script ./autoScripts/autoCreateRoomScript",
+        "flow-node": "flow-node",
         "test": "jest",
         "lint": "eslint .",
         "fix": "eslint --fix .",

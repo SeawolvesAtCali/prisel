@@ -8,6 +8,5 @@ const server = run(path.resolve(__dirname, '../server/index.js'), {
 });
 
 runScript(path.resolve(__dirname, '../client/autoScripts/autoCreateRoomScript.js'), () => {
-    console.log('disconnecting server');
     server.kill();
 });

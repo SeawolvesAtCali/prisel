@@ -1,12 +1,17 @@
+// @flow
+import type { ClientClass } from './client';
+
 /**
  * Base class for plugin.
  */
 class Plugin {
+    client: ClientClass;
+
     getClient() {
         return this.client;
     }
 
-    setClient(client) {
+    setClient(client: ClientClass) {
         this.client = client;
     }
 
@@ -15,7 +20,7 @@ class Plugin {
      * @param {object} state client state
      * @param {function} emit function to emit to server
      */
-    onConnect(state, emit) {}
+    onConnect(state: {}, emit: any) {}
 
     /**
      * Callback fired when client receives a message
@@ -25,7 +30,9 @@ class Plugin {
      * @param {string} namespace namespace the message is from
      * @param {object} data data of the message
      */
-    onMessage(state, emit, type, namespace, data) {}
+    onMessage(state: {}, emit: any, type: string, namespace: string, data: {}) {}
 }
 
 module.exports = Plugin;
+
+export type PluginClass = Plugin;

@@ -35,6 +35,19 @@ module.exports = {
         return ['LEAVE_ACCEPT', {}];
     },
     /**
+     * Host successfully kick a user out of the room
+     */
+    getKickAccept(): MessageT {
+        return ['KICK_ACCEPT', {}];
+    },
+    /**
+     * Cannot kick user out of the room
+     * @param {*} errorType
+     */
+    getKickError(errorType: string): MessageT {
+        return ['KICK_ERROR', { errorType }];
+    },
+    /**
      * Success response for client ready
      */
     getReadyAccept(): MessageT {
@@ -59,5 +72,9 @@ module.exports = {
      */
     getCreateRoomError(errorType: string): MessageT {
         return ['CREATE_ROOM_ERROR', { errorType }];
+    },
+
+    getRoomUpdate(roomData: Object): MessageT {
+        return ['ROOM_UPDATE', roomData];
     },
 };

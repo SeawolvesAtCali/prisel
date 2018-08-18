@@ -23,14 +23,22 @@ class AutoScriptPlugin extends Plugin {
     }
 
     runWait(action, state, emit) {
-        const { type, namespace } = action;
+        const { type, namespace, callback } = action;
         return this.messages.slice(this.messageHead).some((message, index) => {
             if (message.type === type && message.namespace === namespace) {
+                if (callback) {
+                    callback(state, message.data);
+                }
                 this.messageHead = index + 1;
                 return true;
             }
             return false;
         });
+    }
+
+    runExecute(action, state, emit) {
+        const { callback } = action;
+        callback(state);
     }
 
     runDisconnect() {
@@ -44,6 +52,8 @@ class AutoScriptPlugin extends Plugin {
                 return this.runEmit(action, state, emit);
             case ACTION.WAIT:
                 return this.runWait(action, state, emit);
+            case ACTION.EXECUTE:
+                return this.runExecute(action, state, emit);
             case ACTION.DISCONNECT:
                 return this.runDisconnect();
             default:

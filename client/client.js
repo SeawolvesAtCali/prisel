@@ -1,3 +1,6 @@
+// @flow
+import type { PluginClass } from './plugin';
+
 const debug = require('debug')('debug');
 const { connect, emitToServer } = require('./networkUtils');
 const constants = require('../common/constants');
@@ -27,7 +30,14 @@ const DEFAULT_USERNAME = 'user';
  * We can use `client.addPlugin` before connect to attach some plugins. Each plugin will be trigger upon some lifecycle
  */
 class Client {
-    constructor(...namespaces) {
+    namespaces: Array<string>;
+    state: {};
+    plugins: Set<PluginClass>;
+    connections: { [connection: string]: any };
+    emit: () => mixed;
+    isConnected: boolean;
+
+    constructor(...namespaces: Array<string>) {
         this.namespaces = namespaces || [];
         this.state = {};
         this.plugins = new Set();
@@ -40,8 +50,8 @@ class Client {
      * trigger all the plugins with the event name
      * @param {String} event event name starts with 'on'
      */
-    triggerPlugins(event, ...data) {
-        this.plugins.forEach((plugin) => {
+    triggerPlugins(event: string, ...data: Array<any>) {
+        this.plugins.forEach((plugin: any) => {
             if (event in plugin) {
                 plugin[event](this.state, this.emit, ...data);
             }
@@ -51,7 +61,7 @@ class Client {
      * Connect to server and log in as [username]
      * @param {String} username
      */
-    connect(username = DEFAULT_USERNAME) {
+    connect(username: string = DEFAULT_USERNAME) {
         const connection = connect();
         this.connections = {};
         this.namespaces.forEach((namespace) => {
@@ -73,14 +83,14 @@ class Client {
         this.isConnected = true;
     }
 
-    addPlugin(plugin) {
+    addPlugin(plugin: PluginClass) {
         this.plugins.add(plugin);
         if (plugin.setClient) {
             plugin.setClient(this);
         }
     }
 
-    removePlugin(plugin) {
+    removePlugin(plugin: PluginClass) {
         this.plugins.delete(plugin);
     }
 
@@ -89,7 +99,7 @@ class Client {
      * @param {String} namespace
      * @param {type and data} data
      */
-    emit(namespace, ...data) {
+    emit(namespace: string, ...data: [string, {}]) {
         if (namespace in this.connections) {
             emitToServer(this.connections[namespace], ...data);
         } else {
@@ -103,7 +113,11 @@ class Client {
      * @param {String} type message type
      * @param {(state, emit) => (data) => newState} func listener
      */
-    on(namespace, type, func) {
+    on(
+        namespace: string,
+        type: string,
+        func: (state: Object, emit: Function) => (data: Object) => Object,
+    ) {
         if (!this.isConnected) {
             throw new Error('Please call client.connect(username) first');
         }
@@ -121,3 +135,5 @@ class Client {
 }
 
 module.exports = Client;
+
+export type ClientClass = Client;

@@ -9,11 +9,18 @@ const constants = require('../common/constants');
  *     const controllerClient = connection.as(constants.CONTROLLER_NS);
  *     const displayConnection = connection.as(constants.DISPLAY_NS);
  */
-function connect() {
+function connect(callback) {
     const manager = new io.Manager(constants.SERVER);
     return {
         as(namespace) {
+            const socket = manager.socket(namespace);
+            if (callback) {
+                callback(socket);
+            }
             return manager.socket(namespace);
+        },
+        disconnect() {
+            manager.disconnect();
         },
     };
 }

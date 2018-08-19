@@ -76,7 +76,50 @@ function runScript(autoScriptPath: string, onExit: onExitT) {
     });
 }
 
+function runFunc(
+    func: () => Promise<void>,
+    {
+        onExit,
+        maxTimeout = 10000,
+    }: {
+        onExit?: Function,
+        maxTimeout?: number,
+    },
+) {
+    const timeoutId = setTimeout(() => {
+        if (onExit) {
+            onExit();
+        }
+        throw new Error(`Timeout running function: ${func.toString()}`);
+    }, maxTimeout);
+
+    return func()
+        .then(() => {
+            debug('function finished running');
+            clearTimeout(timeoutId);
+            if (onExit) {
+                onExit();
+            }
+        })
+        .catch((error) => {
+            clearTimeout(timeoutId);
+            if (onExit) {
+                onExit();
+            }
+            throw error;
+        });
+}
+
+function startServer() {
+    const serverProcess = run(path.resolve(__dirname, '../server/index.js'), {
+        maxTimeout: 8000,
+    });
+    return serverProcess;
+}
+
 module.exports = {
     run,
     runScript,
+    runFunc,
+    startServer,
 };

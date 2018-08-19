@@ -13,7 +13,6 @@ const handleLogin = (context: ContextT, client: SocketT) => (data: { username: s
     const { username } = data;
     const { StateManager, SocketManager } = context;
     const { connections } = StateManager;
-    debug(`controller ${username} logged in, give id ${id}`);
     SocketManager.add(id, client);
 
     const controller: ClientT = {
@@ -31,7 +30,9 @@ const handleLogin = (context: ContextT, client: SocketT) => (data: { username: s
 };
 
 const handleControllerConnection = (context: ContextT) => (client: SocketT) => {
-    debug('client connected');
+    client.on('PING', () => {
+        networkUtils.emit(client, ...roomMessages.getPong());
+    });
     client.on('LOGIN', handleLogin(context, client));
     handleRoomActions(context, client);
 };

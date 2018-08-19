@@ -1,5 +1,12 @@
 module.exports = {
     /**
+     * Ping server to see if connected.
+     * Server will respond 'PONG' if connected.
+     */
+    getPing() {
+        return ['PING', {}];
+    },
+    /**
      * Login
      * @param {String} username
      */

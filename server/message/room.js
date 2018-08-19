@@ -8,6 +8,9 @@ import type { MessageT } from '../objects';
  */
 
 module.exports = {
+    getPong(): MessageT {
+        return ['PONG', {}];
+    },
     /**
      * Success response for client login
      * @param {String} userId

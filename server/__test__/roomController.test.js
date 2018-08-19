@@ -1,3 +1,4 @@
+jest.mock('../updateUtils');
 const roomController = require('../roomController');
 
 describe('roomController', () => {

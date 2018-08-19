@@ -5,10 +5,6 @@
     "main": "index.js",
     "scripts": {
         "start:server": "flow-node server/index.js",
-        "start:client": "flow-node client/controller/index.js",
-        "start:sampleLoginClient": "flow-node client/sampleLoginClient.js",
-        "start:chatClient": "flow-node client/sampleChatClient.js",
-        "start:createRoomClient": "flow-node client/sampleAutoClient.js --script ./autoScripts/autoCreateRoomScript",
         "flow-node": "flow-node",
         "test": "jest",
         "lint": "eslint .",

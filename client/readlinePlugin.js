@@ -1,11 +1,9 @@
 const readline = require('readline');
 const { CHAT_NS } = require('../common/constants');
 const { getChat } = require('./message/chat');
-const Plugin = require('./plugin');
 
-class ReadlinePlugin extends Plugin {
+class ReadlinePlugin {
     constructor() {
-        super();
         this.rl = readline.createInterface(process.stdin, process.stdout);
     }
 

@@ -4,25 +4,11 @@ import type { ContextT, RoomT, SocketT, StateManagerT } from './objects';
 
 const debug = require('debug')('debug');
 const omit = require('lodash/omit');
-const pick = require('lodash/pick');
 const networkUtils = require('./networkUtils');
 const roomMessages = require('./message/room');
 const { newId } = require('./idUtils');
+const { updateClientWithRoomData } = require('./updateUtils');
 
-const denormalizeRoom = (StateManager: StateManagerT, room: RoomT) => ({
-    ...room,
-    controllers: pick(StateManager.connections.controllers, [room.host, ...room.guests]),
-});
-
-const updateClientWithRoomData = (context: ContextT, roomId: string) => {
-    const { StateManager, io } = context;
-    const room = StateManager.rooms[roomId];
-    if (room) {
-        const roomData = denormalizeRoom(StateManager, room);
-        networkUtils.emitToControllers(io, room.id, ...roomMessages.getRoomUpdate(roomData));
-        networkUtils.emitToDisplays(io, room.id, ...roomMessages.getRoomUpdate(roomData));
-    }
-};
 const addClientToRoom = (context: ContextT, clientId: string, roomId: string) => {
     const { StateManager, SocketManager } = context;
     const { controllers } = StateManager.connections;

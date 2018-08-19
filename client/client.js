@@ -1,97 +1,82 @@
 // @flow
-import type { PluginClass } from './plugin';
-
 const debug = require('debug')('debug');
 const { connect, emitToServer } = require('./networkUtils');
 const constants = require('../common/constants');
-const { getLogin } = require('./message/room');
+const { getLogin, getPing } = require('./message/room');
 
 const DEFAULT_USERNAME = 'user';
+
+type ClientPromiseT = Promise<{ state: {}, data: {}, emit: Function, setState: Function }>;
+
+type RemoveListenerT = () => void;
 
 /**
  * Client class
  *
  * A client encapsulates the socket.io connection with server and provides methods to interact with the connection.
- * A client has the following lifecycle
- *
- * Create: A client is instantiated.
- * Connect: the client connects to server and logs in.
- * Message: Client receives message from server
- * Disconnect: Client disconnects from server and stop process.
- *
  * To create a client, call the constructor with socket namespaces that this client needs to connect to.
  *
  *      const client = new Client(CHAT_NS, CONTROLLER_NS); // create a client to be connect to chat and controller namespace
  *
- * Creating a Client instance doesn't connect to the server, we need to call `client.connect(username)`
+ * Creating a Client instance doesn't connect to the server, we need to call `client.connect()`
  * If controller namespace is used, connect will also log in with the username.
  *
+ * After connection, we can login using `client.login(username)`
+ *
  * After a client is connected, we can attach message handler using `client.on`
- * We can use `client.addPlugin` before connect to attach some plugins. Each plugin will be trigger upon some lifecycle
  */
 class Client {
     namespaces: Array<string>;
     state: {};
-    plugins: Set<PluginClass>;
     connections: { [connection: string]: any };
-    emit: () => mixed;
+    emit: Function;
+    disconnect: () => void;
+    setState: (newState: {}) => void;
     isConnected: boolean;
 
     constructor(...namespaces: Array<string>) {
         this.namespaces = namespaces || [];
         this.state = {};
-        this.plugins = new Set();
         this.connections = {};
         this.emit = this.emit.bind(this);
+        this.setState = this.setState.bind(this);
         this.isConnected = false;
     }
 
     /**
-     * trigger all the plugins with the event name
-     * @param {String} event event name starts with 'on'
+     * Connect to server
      */
-    triggerPlugins(event: string, ...data: Array<any>) {
-        this.plugins.forEach((plugin: any) => {
-            if (event in plugin) {
-                plugin[event](this.state, this.emit, ...data);
-            }
-        });
-    }
-    /**
-     * Connect to server and log in as [username]
-     * @param {String} username
-     */
-    connect(username: string = DEFAULT_USERNAME) {
-        const connection = connect();
-        this.connections = {};
-        this.namespaces.forEach((namespace) => {
-            const conn = connection.as(namespace);
-            this.connections[namespace] = conn;
-            if (namespace === constants.CONTROLLER_NS) {
-                emitToServer(conn, ...getLogin(username));
-                conn.on('LOGIN_ACCEPT', (data) => {
-                    debug(`Logged in as ${username}. Id is ${data.userId}`);
-                    this.state = {
-                        ...this.state,
-                        isLoggedIn: true,
-                        userId: data.userId,
-                    };
-                    this.triggerPlugins('onConnect');
+    connect(): Promise<{ [connection: string]: {} }> {
+        return new Promise((resolve, reject) => {
+            const connection = connect();
+            this.connections = {};
+            const ping = getPing();
+            this.namespaces.forEach((namespace) => {
+                const conn = connection.as(namespace);
+                conn.on('PONG', () => {
+                    this.connections[namespace] = conn;
+                    if (Object.keys(this.connections).length === this.namespaces.length) {
+                        this.isConnected = true;
+                        resolve(this.connections);
+                    }
                 });
-            }
+                emitToServer(conn, ...ping);
+            });
+            this.isConnected = true;
+            this.disconnect = connection.disconnect;
+            return this.connections;
         });
-        this.isConnected = true;
     }
 
-    addPlugin(plugin: PluginClass) {
-        this.plugins.add(plugin);
-        if (plugin.setClient) {
-            plugin.setClient(this);
-        }
-    }
-
-    removePlugin(plugin: PluginClass) {
-        this.plugins.delete(plugin);
+    /**
+     * Login to server using the username specified.
+     * Throw error if not connected, or don't have controller namespace.
+     * @param {string} username username to login with
+     */
+    login(username: string = DEFAULT_USERNAME): ClientPromiseT {
+        this.assertConnected();
+        this.emit(constants.CONTROLLER_NS, ...getLogin(username));
+        return this.once(constants.CONTROLLER_NS, 'LOGIN_ACCEPT');
     }
 
     /**
@@ -100,6 +85,7 @@ class Client {
      * @param {type and data} data
      */
     emit(namespace: string, ...data: [string, {}]) {
+        this.assertConnected();
         if (namespace in this.connections) {
             emitToServer(this.connections[namespace], ...data);
         } else {
@@ -107,6 +93,14 @@ class Client {
         }
     }
 
+    /**
+     * Throw error if not connected to server.
+     */
+    assertConnected() {
+        if (!this.isConnected) {
+            throw new Error('Please call client.connect(username) first');
+        }
+    }
     /**
      * Attach handler for messages from server
      * @param {String} namespace The namespace to listen to
@@ -116,22 +110,63 @@ class Client {
     on(
         namespace: string,
         type: string,
-        func: (state: Object, emit: Function) => (data: Object) => Object,
-    ) {
-        if (!this.isConnected) {
-            throw new Error('Please call client.connect(username) first');
-        }
+        func: (state: Object, emit: Function) => (data: Object) => Object | void,
+    ): RemoveListenerT {
+        this.assertConnected();
         if (namespace in this.connections) {
-            this.connections[namespace].on(type, (data) => {
-                debug(`${namespace}: ${type} ${data}`);
+            const handler = (data) => {
                 const updatedState = func(this.state, this.emit)(data) || this.state;
                 this.state = updatedState;
-                this.triggerPlugins('onMessage', type, namespace, data);
-            });
-        } else {
-            throw new Error(`Cannot listen to ${type} on ${namespace}, have you connected?`);
+            };
+            this.connections[namespace].on(type, handler);
+            return () => {
+                this.connections[namespace].off(type, handler);
+            };
         }
+        throw new Error(`Cannot listen to ${type} on ${namespace}, have you connected?`);
     }
+
+    /**
+     * Set the client state
+     * @param {Object} newState new state object to replace the old state
+     */
+    setState(newState: {}) {
+        this.state = newState;
+    }
+
+    /**
+     * Listen to message until state and message data matches requirement
+     * @param {string} namespace namespace to listen to
+     * @param {string} type message type to listen to
+     * @param {function} checker function that returns true to stop listening
+     */
+    until(
+        namespace: string,
+        type: string,
+        checker: (state: Object, data: Object) => boolean,
+    ): ClientPromiseT {
+        return new Promise((resolve, reject) => {
+            let off;
+            const checkUntil = (state: Object, emit: Function) => (data: Object) => {
+                if (checker(state, data)) {
+                    off();
+                    resolve({ state, data, emit, setState: this.setState });
+                }
+            };
+            off = this.on(namespace, type, checkUntil);
+        });
+    }
+
+    /**
+     * Listen for message until receive the message once.
+     * @param {string} namespace namespace to listen to
+     * @param {string} type message type to listen to
+     */
+    once(namespace: string, type: string): ClientPromiseT {
+        return this.until(namespace, type, () => true);
+    }
+
+    exit() {}
 }
 
 module.exports = Client;

@@ -5,11 +5,13 @@ import type { ContextT, SocketT } from './objects';
 const debug = require('debug')('debug');
 const networkUtils = require('./networkUtils');
 const messages = require('./message/chat');
+const roomMessages = require('./message/room');
 
 const handleChatConnection = (context: ContextT) => (client: SocketT) => {
-    debug('on chat connection');
+    client.on('PING', () => {
+        networkUtils.emit(client, ...roomMessages.getPong());
+    });
     client.on('CHAT', (data: { userId: string, message: string }) => {
-        debug('chatHandler:', data);
         const { StateManager, io } = context;
         const { userId, message } = data;
         const { username } = StateManager.connections.controllers[userId];

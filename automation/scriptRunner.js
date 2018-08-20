@@ -4,8 +4,6 @@ const path = require('path');
 const { spawn } = require('child_process');
 const debug = require('debug')('debug');
 
-type onExitT = (code: ?number, signal: ?string) => void;
-
 /**
  * Run a node script using flow-node. Only works in unix environment
  * Options:
@@ -24,7 +22,7 @@ function run(
         params = [],
         maxTimeout = 10000,
     }: {
-        onExit?: onExitT,
+        onExit?: (code: ?number, signal: ?string) => void,
         prefix?: string,
         params?: Array<string>,
         maxTimeout?: number,
@@ -63,19 +61,10 @@ function run(
 }
 
 /**
- * Run an autoscript
- * @param {string} autoScriptPath
- * @param {function} onExit
+ * Run a function that returns a promise of execution result. If the promise rejects, throw error.
+ * @param {() => Promise<any>} func A function to execute, the function should return a promise.
+ * @param {Object} options options.
  */
-function runScript(autoScriptPath: string, onExit: onExitT) {
-    const label = path.basename(autoScriptPath);
-    run(path.resolve(__dirname, '../client/sampleAutoClient.js'), {
-        prefix: label,
-        onExit,
-        params: ['--script', autoScriptPath],
-    });
-}
-
 function runFunc(
     func: () => Promise<void>,
     {
@@ -85,7 +74,7 @@ function runFunc(
         onExit?: Function,
         maxTimeout?: number,
     },
-) {
+): Promise<void> {
     const timeoutId = setTimeout(() => {
         if (onExit) {
             onExit();
@@ -110,16 +99,19 @@ function runFunc(
         });
 }
 
+/**
+ * Start a server in a child process, return the process.
+ */
 function startServer() {
     const serverProcess = run(path.resolve(__dirname, '../server/index.js'), {
         maxTimeout: 8000,
+        prefix: 'server',
     });
     return serverProcess;
 }
 
 module.exports = {
     run,
-    runScript,
     runFunc,
     startServer,
 };

@@ -21,7 +21,6 @@ const addClientToRoom = (context: ContextT, clientId: string, roomId: string) =>
 
     const socket = SocketManager.getSocket(clientId);
     socket.join(roomId);
-    updateClientWithRoomData(context, roomId);
 };
 
 const handleCreateRoom = (context: ContextT, client: SocketT) => (data: { roomName: string }) => {

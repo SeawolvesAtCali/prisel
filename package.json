@@ -6,7 +6,8 @@
     "scripts": {
         "start:server": "flow-node server/index.js",
         "flow-node": "flow-node",
-        "test": "jest",
+        "test": "jest --testPathPattern=/__test__/",
+        "automation": "jest --runInBand --testPathPattern=/__integration__/",
         "lint": "eslint .",
         "fix": "eslint --fix .",
         "flow": "flow"
@@ -89,7 +90,7 @@
     },
     "jest": {
         "testMatch": [
-            "<rootDir>/**/__test__/**/*.{js,mjs}"
+            "<rootDir>/**/*.test.js"
         ],
         "transform": {
             "^.+\\.js(?:\\.flow)?$": "jest-flow-transform"

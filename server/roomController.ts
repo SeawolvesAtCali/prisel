@@ -1,15 +1,13 @@
-// @flow
+import { Context, Room, Socket, StateManager } from './objects';
+import omit from 'lodash/omit';
+import { emit } from './networkUtils';
+import * as roomMessages from './message/room';
+import { newId } from './idUtils';
+import { updateClientWithRoomData } from './updateUtils';
 
-import type { ContextT, RoomT, SocketT, StateManagerT } from './objects';
+import debug from './debug';
 
-const debug = require('debug')('debug');
-const omit = require('lodash/omit');
-const networkUtils = require('./networkUtils');
-const roomMessages = require('./message/room');
-const { newId } = require('./idUtils');
-const { updateClientWithRoomData } = require('./updateUtils');
-
-const addClientToRoom = (context: ContextT, clientId: string, roomId: string) => {
+export const addClientToRoom = (context: Context, clientId: string, roomId: string) => {
     const { StateManager, SocketManager } = context;
     const { controllers } = StateManager.connections;
 
@@ -23,12 +21,14 @@ const addClientToRoom = (context: ContextT, clientId: string, roomId: string) =>
     socket.join(roomId);
 };
 
-const handleCreateRoom = (context: ContextT, client: SocketT) => (data: { roomName: string }) => {
+export const handleCreateRoom = (context: Context, client: Socket) => (data: {
+    roomName: string;
+}) => {
     const { roomName } = data;
     const { SocketManager, StateManager } = context;
     const hostId = SocketManager.getId(client);
     const roomId = newId('ROOM');
-    const room = {
+    const room: Room = {
         id: roomId,
         name: roomName,
         host: hostId,
@@ -38,12 +38,12 @@ const handleCreateRoom = (context: ContextT, client: SocketT) => (data: { roomNa
     StateManager.rooms[roomId] = room;
     addClientToRoom(context, hostId, roomId);
     debug(`roomController: ${hostId} created room ${roomName} ${roomId}`);
-    networkUtils.emit(client, ...roomMessages.getCreateRoomAccept(roomId));
+    emit(client, ...roomMessages.getCreateRoomAccept(roomId));
     updateClientWithRoomData(context, roomId);
 };
 
-const attemptJoinRoom = (context: ContextT, clientId: string, roomId: string): string => {
-    const room: RoomT | void = context.StateManager.rooms[roomId];
+const attemptJoinRoom = (context: Context, clientId: string, roomId: string): string => {
+    const room = context.StateManager.rooms[roomId];
     if (room === undefined) {
         return 'ROOM DOES NOT EXIST';
     }
@@ -58,21 +58,21 @@ const attemptJoinRoom = (context: ContextT, clientId: string, roomId: string): s
     return '';
 };
 
-const handleJoin = (context: ContextT, client: SocketT) => (data: { roomId: string }) => {
+const handleJoin = (context: Context, client: Socket) => (data: { roomId: string }) => {
     const { roomId } = data;
 
     const { SocketManager } = context;
     const clientId = SocketManager.getId(client);
     const attempJoinRoomError = attemptJoinRoom(context, clientId, roomId);
     if (attempJoinRoomError === '') {
-        networkUtils.emit(client, ...roomMessages.getJoinAccept());
+        emit(client, ...roomMessages.getJoinAccept());
     } else {
-        networkUtils.emit(client, ...roomMessages.getJoinError(attempJoinRoomError));
+        emit(client, ...roomMessages.getJoinError(attempJoinRoomError));
     }
     updateClientWithRoomData(context, roomId);
 };
 
-const attemptRemoveHost = (StateManager: StateManagerT, room: RoomT) => {
+const attemptRemoveHost = (StateManager: StateManager, room: Room) => {
     // host is leaving, promote another guest to host
     const nextHost = room.guests.shift();
     if (nextHost !== undefined) {
@@ -83,11 +83,11 @@ const attemptRemoveHost = (StateManager: StateManagerT, room: RoomT) => {
     }
 };
 
-const attemptRemoveGuest = (room: RoomT, clientId: string) => {
+const attemptRemoveGuest = (room: Room, clientId: string) => {
     room.guests = room.guests.filter((guestId: string) => guestId !== clientId);
 };
 
-const handleLeave = (context: ContextT, client: SocketT) => (data: {}) => {
+export const handleLeave = (context: Context, client: Socket) => (data: {}) => {
     const { SocketManager, StateManager } = context;
     const clientId = SocketManager.getId(client);
     const controller = StateManager.connections.controllers[clientId];
@@ -104,41 +104,34 @@ const handleLeave = (context: ContextT, client: SocketT) => (data: {}) => {
     }
 };
 
-const handleKick = (context: ContextT, client: SocketT) => (data: { userId: string }) => {
+const handleKick = (context: Context, client: Socket) => (data: { userId: string }) => {
     const { SocketManager, StateManager } = context;
     const hostId = SocketManager.getId(client);
     const { userId } = data;
     if (hostId === userId) {
-        networkUtils.emit(client, ...roomMessages.getKickError('Cannot self kick'));
+        emit(client, ...roomMessages.getKickError('Cannot self kick'));
         return;
     }
     const controller = StateManager.connections.controllers[hostId];
     const { roomId } = controller;
     if (!roomId) {
-        networkUtils.emit(client, ...roomMessages.getKickError('Not in a room'));
+        emit(client, ...roomMessages.getKickError('Not in a room'));
         return;
     }
     const room = StateManager.rooms[roomId];
     if (room.host !== hostId) {
-        networkUtils.emit(client, ...roomMessages.getKickError('Not enough privilage'));
+        emit(client, ...roomMessages.getKickError('Not enough privilage'));
         return;
     }
 
     handleLeave(context, SocketManager.getSocket(userId))({});
-    networkUtils.emit(client, ...roomMessages.getKickAccept());
+    emit(client, ...roomMessages.getKickAccept());
     updateClientWithRoomData(context, roomId);
 };
 
-function handleRoomActions(context: ContextT, client: SocketT) {
+export function handleRoomActions(context: Context, client: Socket) {
     client.on('CREATE_ROOM', handleCreateRoom(context, client));
     client.on('JOIN', handleJoin(context, client));
     client.on('LEAVE', handleLeave(context, client));
     client.on('KICK', handleKick(context, client));
 }
-
-module.exports = {
-    addClientToRoom,
-    handleCreateRoom,
-    handleRoomActions,
-    handleLeave,
-};

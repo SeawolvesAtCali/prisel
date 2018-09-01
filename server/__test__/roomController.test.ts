@@ -1,5 +1,6 @@
+import * as roomController from '../roomController';
+
 jest.mock('../updateUtils');
-const roomController = require('../roomController');
 
 describe('roomController', () => {
     describe('addClientToRoom', () => {
@@ -11,13 +12,14 @@ describe('roomController', () => {
                     controllers: {
                         [mockClientId]: {},
                     },
+                    displays: {},
                 },
             };
             const mockSocketManager = {
                 getSocket: () => ({ join: () => {} }),
             };
             roomController.addClientToRoom(
-                { StateManager: mockStateManager, SocketManager: mockSocketManager },
+                { StateManager: mockStateManager, SocketManager: mockSocketManager, io: null },
                 mockClientId,
                 mockRoomId,
             );

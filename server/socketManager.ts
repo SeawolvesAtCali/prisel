@@ -1,21 +1,20 @@
-// @flow
-import type { SocketT } from './objects';
+import { Socket } from './objects';
 
-const debug = require('debug')('debug');
+import debug from './debug';
 
 /**
  * Singleton class to manage sockets and their ids.
  */
 class SocketManager {
-    socketMap: WeakMap<SocketT, string>;
-    idMap: Map<string, SocketT>;
+    socketMap: WeakMap<Socket, string>;
+    idMap: Map<string, Socket>;
 
     constructor() {
         this.socketMap = new WeakMap();
         this.idMap = new Map();
     }
 
-    add(id: string, socket: SocketT) {
+    add(id: string, socket: Socket) {
         const existingId = this.socketMap.get(socket);
         const existingSocket = this.idMap.get(id);
         if (existingId === id && existingSocket === socket) {
@@ -36,7 +35,7 @@ class SocketManager {
         this.idMap.set(id, socket);
     }
 
-    getId(socket: SocketT): string {
+    getId(socket: Socket): string {
         const id = this.socketMap.get(socket);
         if (id === undefined) {
             throw new Error('got undefined socket id');
@@ -44,7 +43,7 @@ class SocketManager {
         return id;
     }
 
-    getSocket(id: string): SocketT {
+    getSocket(id: string): Socket {
         const socket = this.idMap.get(id);
         if (socket === undefined) {
             throw new Error(`got undefined socket for id ${id}`);
@@ -56,19 +55,19 @@ class SocketManager {
         return this.idMap.has(id);
     }
 
-    hasSocket(socket: SocketT) {
+    hasSocket(socket: Socket) {
         return this.socketMap.has(socket);
     }
 
     removeById(id: string) {
-        const socket: SocketT | void = this.idMap.get(id);
+        const socket: Socket | void = this.idMap.get(id);
         this.idMap.delete(id);
         if (socket !== undefined) {
             this.socketMap.delete(socket);
         }
     }
 
-    removeBySocket(socket: SocketT) {
+    removeBySocket(socket: Socket) {
         const id: string | void = this.socketMap.get(socket);
         if (id !== undefined) {
             this.idMap.delete(id);
@@ -77,4 +76,4 @@ class SocketManager {
     }
 }
 
-module.exports = SocketManager;
+export default SocketManager;

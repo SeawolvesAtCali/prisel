@@ -4,13 +4,12 @@
     "description": "Online Monopoly game",
     "main": "index.js",
     "scripts": {
-        "start:server": "flow-node server/index.js",
-        "flow-node": "flow-node",
+        "start:server": "ts-node server/index.ts",
+        "ts-node": "ts-node",
         "test": "jest --testPathPattern=/__test__/",
         "automation": "jest --runInBand --testPathPattern=/__integration__/",
         "lint": "eslint .",
-        "fix": "eslint --fix .",
-        "flow": "flow"
+        "fix": "eslint --fix ."
     },
     "repository": {
         "type": "git",
@@ -28,9 +27,6 @@
             "plugin:prettier/recommended"
         ],
         "parser": "babel-eslint",
-        "plugins": [
-            "flowtype"
-        ],
         "rules": {
             "no-unused-vars": [
                 "error",
@@ -74,26 +70,39 @@
         "socket.io-client": "^2.1.1"
     },
     "devDependencies": {
+        "@types/debug": "0.0.30",
+        "@types/jest": "^23.3.1",
+        "@types/lodash": "^4.14.116",
+        "@types/socket.io": "^1.4.38",
         "babel-eslint": "^8.2.6",
         "eslint": "4.19.1",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-config-prettier": "^2.9.0",
-        "eslint-plugin-flowtype": "^2.50.0",
         "eslint-plugin-import": "2.12.0",
         "eslint-plugin-prettier": "^2.6.0",
-        "flow-bin": "^0.77.0",
-        "flow-node": "^1.2.3",
         "jest": "^22.4.4",
-        "jest-flow-transform": "^1.0.1",
         "prettier": "^1.12.1",
-        "prop-types": "^15.6.1"
+        "prop-types": "^15.6.1",
+        "ts-jest": "^23.1.4",
+        "ts-node": "^7.0.1",
+        "typescript": "^3.0.3"
     },
     "jest": {
-        "testMatch": [
-            "<rootDir>/**/*.test.js"
+        "globals": {
+            "ts-jest": {
+                "tsConfigFile": "tsconfig.json"
+            }
+        },
+        "moduleFileExtensions": [
+            "ts",
+            "js"
         ],
         "transform": {
-            "^.+\\.js(?:\\.flow)?$": "jest-flow-transform"
-        }
+            "^.+\\.(ts|tsx)$    ": "./node_modules/ts-jest/preprocessor.js"
+        },
+        "testMatch": [
+            "<rootDir>/**/*.test.(ts|js)"
+        ],
+        "testEnvironment": "node"
     }
 }

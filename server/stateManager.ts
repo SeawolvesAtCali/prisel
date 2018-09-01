@@ -1,11 +1,10 @@
-// @flow
-import type { StateManagerT } from './objects/stateManager';
+import { StateManager } from './objects/stateManager';
 
 /**
  * The container for all the data in the server.
  */
 
-const manager: StateManagerT = {
+const manager: StateManager = {
     connections: {
         controllers: {},
         displays: {},
@@ -14,4 +13,4 @@ const manager: StateManagerT = {
     rooms: {},
 };
 
-module.exports = manager;
+export default manager;

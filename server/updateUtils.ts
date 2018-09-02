@@ -1,10 +1,10 @@
-import { Context, Room, StateManager } from './objects';
+import { Context, Room, StateManager as StateManagerT } from './objects';
 
 import pick from 'lodash/pick';
 import { emitToControllers, emitToDisplays } from './networkUtils';
 import * as roomMessages from './message/room';
 
-const denormalizeRoom = (StateManager: StateManager, room: Room) => ({
+const denormalizeRoom = (StateManager: StateManagerT, room: Room) => ({
     ...room,
     controllers: pick(StateManager.connections.controllers, [room.host, ...room.guests]),
 });

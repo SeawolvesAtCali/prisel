@@ -5,7 +5,7 @@ import { Socket, Message } from './objects';
  */
 import { CONTROLLER_NS, DISPLAY_NS, CHAT_NS } from '../common/constants';
 
-export function emit(clients: Socket, Messageype: string, data: Object) {
+export function emit(clients: Socket, Messageype: string, data: object) {
     clients.emit(Messageype, data);
 }
 

@@ -75,6 +75,6 @@ export function getCreateRoomError(errorType: string): Message {
     return ['CREATE_ROOM_ERROR', { errorType }];
 }
 
-export function getRoomUpdate(roomData: Object): Message {
+export function getRoomUpdate(roomData: object): Message {
     return ['ROOM_UPDATE', roomData];
 }

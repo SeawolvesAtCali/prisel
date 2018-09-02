@@ -3,10 +3,10 @@ export enum ClientType {
     Display = 'display',
 }
 
-export type Client = {
+export interface Client {
     id: string;
     username: string;
     roomId?: string;
     type: ClientType;
     isReady?: boolean;
-};
+}

@@ -1,1 +1,1 @@
-export type Message = [string, Object];
+export type Message = [string, object];

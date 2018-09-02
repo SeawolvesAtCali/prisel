@@ -1,4 +1,4 @@
-import { Context, Room, Socket, StateManager } from './objects';
+import { Context, Room, Socket, StateManager as StateManagerT } from './objects';
 import omit from 'lodash/omit';
 import { emit } from './networkUtils';
 import * as roomMessages from './message/room';
@@ -72,7 +72,7 @@ const handleJoin = (context: Context, client: Socket) => (data: { roomId: string
     updateClientWithRoomData(context, roomId);
 };
 
-const attemptRemoveHost = (StateManager: StateManager, room: Room) => {
+const attemptRemoveHost = (StateManager: StateManagerT, room: Room) => {
     // host is leaving, promote another guest to host
     const nextHost = room.guests.shift();
     if (nextHost !== undefined) {

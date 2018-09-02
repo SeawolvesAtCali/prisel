@@ -2,8 +2,8 @@
 import { Client } from './client';
 import { Room } from './room';
 
-export type StateManager = {
+export interface StateManager {
     connections: { controllers: { [id: string]: Client }; displays: { [id: string]: Client } };
-    messages: Array<string>;
-    rooms: { [room_id: string]: Room };
-};
+    messages: string[];
+    rooms: { [roomId: string]: Room };
+}

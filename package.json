@@ -6,10 +6,11 @@
     "scripts": {
         "start:server": "ts-node server/index.ts",
         "ts-node": "ts-node",
+        "build:server": "tsc",
         "test": "jest --testPathPattern=/__test__/",
         "automation": "jest --runInBand --testPathPattern=/__integration__/",
-        "lint": "eslint .",
-        "fix": "eslint --fix ."
+        "lint": "tslint --project tsconfig.json",
+        "fix": "tslint --project tsconfig.json --fix"
     },
     "repository": {
         "type": "git",
@@ -75,6 +76,7 @@
         "@types/lodash": "^4.14.116",
         "@types/socket.io": "^1.4.38",
         "babel-eslint": "^8.2.6",
+        "babel-jest": "^23.4.2",
         "eslint": "4.19.1",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-config-prettier": "^2.9.0",
@@ -82,9 +84,10 @@
         "eslint-plugin-prettier": "^2.6.0",
         "jest": "^22.4.4",
         "prettier": "^1.12.1",
-        "prop-types": "^15.6.1",
         "ts-jest": "^23.1.4",
         "ts-node": "^7.0.1",
+        "tslint": "~5.11.0",
+        "tslint-config-prettier": "~1.15.0",
         "typescript": "^3.0.3"
     },
     "jest": {
@@ -98,7 +101,7 @@
             "js"
         ],
         "transform": {
-            "^.+\\.(ts|tsx)$    ": "./node_modules/ts-jest/preprocessor.js"
+            "^.+\\.(ts|js)?$": "ts-jest"
         },
         "testMatch": [
             "<rootDir>/**/*.test.(ts|js)"

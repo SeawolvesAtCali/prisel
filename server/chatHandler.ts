@@ -1,5 +1,4 @@
 import { Context, Socket } from './objects';
-import debug from './debug';
 import { emit, emitToChat } from './networkUtils';
 import * as messages from './message/chat';
 import * as roomMessages from './message/room';

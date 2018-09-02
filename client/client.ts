@@ -155,7 +155,7 @@ class Client {
     ): ClientPromise {
         return new Promise((resolve, reject) => {
             let off: RemoveListenerFunc;
-            const checkUntil = (state: AnyObject, emit: EmitFunc) => (data: AnyObject) => {
+            const checkUntil = (data: AnyObject, state: AnyObject, emit: EmitFunc) => {
                 if (checker(state, data)) {
                     off();
                     resolve({ state, data, emit, setState: this.setState });

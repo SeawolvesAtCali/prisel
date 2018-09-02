@@ -6,7 +6,7 @@
     "scripts": {
         "start:server": "ts-node server/index.ts",
         "ts-node": "ts-node",
-        "build:server": "tsc",
+        "build": "tsc",
         "test": "jest --testPathPattern=/__test__/",
         "automation": "jest --runInBand --testPathPattern=/__integration__/",
         "lint": "tslint --project tsconfig.json",
@@ -23,10 +23,7 @@
     },
     "homepage": "https://github.com/SeawolvesAtCali/Monopoly#readme",
     "eslintConfig": {
-        "extends": [
-            "airbnb-base",
-            "plugin:prettier/recommended"
-        ],
+        "extends": ["airbnb-base", "plugin:prettier/recommended"],
         "parser": "babel-eslint",
         "rules": {
             "no-unused-vars": [
@@ -75,6 +72,7 @@
         "@types/jest": "^23.3.1",
         "@types/lodash": "^4.14.116",
         "@types/socket.io": "^1.4.38",
+        "@types/socket.io-client": "^1.4.32",
         "babel-eslint": "^8.2.6",
         "babel-jest": "^23.4.2",
         "eslint": "4.19.1",
@@ -82,7 +80,7 @@
         "eslint-config-prettier": "^2.9.0",
         "eslint-plugin-import": "2.12.0",
         "eslint-plugin-prettier": "^2.6.0",
-        "jest": "^22.4.4",
+        "jest": "^23.5.0",
         "prettier": "^1.12.1",
         "ts-jest": "^23.1.4",
         "ts-node": "^7.0.1",
@@ -96,15 +94,12 @@
                 "tsConfigFile": "tsconfig.json"
             }
         },
-        "moduleFileExtensions": [
-            "ts",
-            "js"
-        ],
+        "moduleFileExtensions": ["ts", "js"],
         "transform": {
             "^.+\\.(ts|js)?$": "ts-jest"
         },
         "testMatch": [
-            "<rootDir>/**/*.test.(ts|js)"
+            "<rootDir>/(common|server|client|automation|__integration__)/**/*.test.(ts|js)"
         ],
         "testEnvironment": "node"
     }

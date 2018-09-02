@@ -1,4 +1,3 @@
-// @flow
 import { Client } from './client';
 import { Room } from './room';
 

@@ -1,10 +1,10 @@
-const debug = require('debug')('debug');
-const { startServer, runFunc } = require('../automation/scriptRunner');
-const constants = require('../common/constants');
-const { createClients } = require('./testHelper');
+import { startServer, runFunc } from '../automation/scriptRunner';
+import * as constants from '../common/constants';
+import { createClients } from './testHelper';
+import { ChildProcess } from 'child_process';
 
 describe('connect', () => {
-    let server;
+    let server: ChildProcess;
     beforeEach(() => {
         server = startServer();
     });

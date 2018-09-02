@@ -1,11 +1,10 @@
-// @flow
+import path from 'path';
+import { spawn } from 'child_process';
+import debugPkg from 'debug';
 
-const path = require('path');
-const { spawn } = require('child_process');
-const debug = require('debug')('debug');
-
+const debug = debugPkg('debug');
 /**
- * Run a node script using flow-node. Only works in unix environment
+ * Run a node script using ts-node. Only works in unix environment
  * Options:
  *      onExit: callback function triggered when the process is exiting
  *      prefix: label to show when process prints to stdout or stderr
@@ -14,7 +13,7 @@ const debug = require('debug')('debug');
  * @param {string} scriptPath the path of the script. Recommend using absolute path
  * @param {*} options
  */
-function run(
+export function run(
     scriptPath: string,
     {
         onExit,
@@ -22,16 +21,16 @@ function run(
         params = [],
         maxTimeout = 10000,
     }: {
-        onExit?: (code: ?number, signal: ?string) => void,
-        prefix?: string,
-        params?: Array<string>,
-        maxTimeout?: number,
+        onExit?: (code: number | void, signal: string | void) => void;
+        prefix?: string;
+        params?: string[];
+        maxTimeout?: number;
     },
 ) {
-    const env = { ...process.env, DEBUG_HIDE_DATE: true };
+    const env = { ...process.env, DEBUG_HIDE_DATE: 'true' };
     const label = prefix || path.basename(scriptPath);
     const child = spawn(
-        path.resolve(__dirname, '../node_modules/.bin/flow-node'),
+        path.resolve(__dirname, '../node_modules/.bin/ts-node'),
         [scriptPath, ...params],
         {
             env,
@@ -65,14 +64,14 @@ function run(
  * @param {() => Promise<any>} func A function to execute, the function should return a promise.
  * @param {Object} options options.
  */
-function runFunc(
+export function runFunc(
     func: () => Promise<void>,
     {
         onExit,
         maxTimeout = 10000,
     }: {
-        onExit?: Function,
-        maxTimeout?: number,
+        onExit?: () => void;
+        maxTimeout?: number;
     },
 ): Promise<void> {
     const timeoutId = setTimeout(() => {
@@ -102,16 +101,10 @@ function runFunc(
 /**
  * Start a server in a child process, return the process.
  */
-function startServer() {
-    const serverProcess = run(path.resolve(__dirname, '../server/index.js'), {
+export function startServer() {
+    const serverProcess = run(path.resolve(__dirname, '../server/index.ts'), {
         maxTimeout: 8000,
         prefix: 'server',
     });
     return serverProcess;
 }
-
-module.exports = {
-    run,
-    runFunc,
-    startServer,
-};

@@ -1,23 +1,25 @@
-const readline = require('readline');
-const { CHAT_NS } = require('../common/constants');
-const { getChat } = require('./message/chat');
+import readline from 'readline';
+import { CHAT_NS } from '../common/constants';
+import { getChat } from './message/chat';
 
 class ReadlinePlugin {
+    private rl: readline.ReadLine;
+
     constructor() {
         this.rl = readline.createInterface(process.stdin, process.stdout);
     }
 
-    onConnect(state, emit) {
+    public onConnect(state: { userId: string }, emit: (...props: any[]) => void) {
         this.rl.prompt(true);
         this.rl.on('line', (line) => {
             emit(CHAT_NS, ...getChat(state.userId, line));
             this.rl.prompt(true);
         });
     }
-    onMessage() {
+    public onMessage() {
         // start a new line
         this.rl.prompt(true);
     }
 }
 
-module.exports = ReadlinePlugin;
+export default ReadlinePlugin;

@@ -1,14 +1,15 @@
-const debug = require('debug')('debug');
-const { startServer, runFunc } = require('../automation/scriptRunner');
-const constants = require('../common/constants');
-const { createClients } = require('./testHelper');
-const roomMessages = require('../client/message/room');
+import debug from './debug';
+import { startServer, runFunc } from '../automation/scriptRunner';
+import * as constants from '../common/constants';
+import { createClients } from './testHelper';
+import * as roomMessages from '../client/message/room';
+import { ChildProcess } from 'child_process';
 
 const { CONTROLLER_NS } = constants;
 
 jest.setTimeout(30000);
 describe('create room', () => {
-    let server;
+    let server: ChildProcess;
     beforeEach(() => {
         server = startServer();
     });
@@ -53,7 +54,7 @@ describe('create room', () => {
                     host.until(CONTROLLER_NS, 'ROOM_UPDATE', (state, data) =>
                         data.guests.includes(clientId),
                     ),
-                    client.once(CONTROLLER_NS, 'ROOM_UPDATE', (state, data) =>
+                    client.until(CONTROLLER_NS, 'ROOM_UPDATE', (state, data) =>
                         data.guests.includes(clientId),
                     ),
                 ]);

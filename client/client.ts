@@ -1,14 +1,24 @@
-// @flow
-const debug = require('debug')('debug');
-const { connect, emitToServer } = require('./networkUtils');
-const constants = require('../common/constants');
-const { getLogin, getPing } = require('./message/room');
+import debug from './debug';
+import { connect, emitToServer } from './networkUtils';
+import { CONTROLLER_NS } from '../common/constants';
+
+import { getLogin, getPing } from './message/room';
 
 const DEFAULT_USERNAME = 'user';
+interface AnyObject {
+    [prop: string]: any;
+}
 
-type ClientPromiseT = Promise<{ state: {}, data: {}, emit: Function, setState: Function }>;
+type EmitFunc = (namespace: string, messageType: string, data: AnyObject) => void;
+type SetStateFunc = (newState: AnyObject) => void;
+type ClientPromise = Promise<{
+    state: AnyObject;
+    data: AnyObject;
+    emit: EmitFunc;
+    setState: SetStateFunc;
+}>;
 
-type RemoveListenerT = () => void;
+type RemoveListenerFunc = () => void;
 
 /**
  * Client class
@@ -26,15 +36,13 @@ type RemoveListenerT = () => void;
  * After a client is connected, we can attach message handler using `client.on`
  */
 class Client {
-    namespaces: Array<string>;
-    state: {};
-    connections: { [connection: string]: any };
-    emit: Function;
-    disconnect: () => void;
-    setState: (newState: {}) => void;
-    isConnected: boolean;
+    public namespaces: string[];
+    public state: AnyObject;
+    public connections: { [connection: string]: SocketIOClient.Socket };
+    public disconnect: () => void;
+    public isConnected: boolean;
 
-    constructor(...namespaces: Array<string>) {
+    constructor(...namespaces: string[]) {
         this.namespaces = namespaces || [];
         this.state = {};
         this.connections = {};
@@ -46,7 +54,7 @@ class Client {
     /**
      * Connect to server
      */
-    connect(): Promise<{ [connection: string]: {} }> {
+    public connect(): Promise<{ [connection: string]: AnyObject }> {
         return new Promise((resolve, reject) => {
             const connection = connect();
             this.connections = {};
@@ -73,10 +81,10 @@ class Client {
      * Throw error if not connected, or don't have controller namespace.
      * @param {string} username username to login with
      */
-    login(username: string = DEFAULT_USERNAME): ClientPromiseT {
+    public login(username: string = DEFAULT_USERNAME): ClientPromise {
         this.assertConnected();
-        this.emit(constants.CONTROLLER_NS, ...getLogin(username));
-        return this.once(constants.CONTROLLER_NS, 'LOGIN_ACCEPT');
+        this.emit(CONTROLLER_NS, ...getLogin(username));
+        return this.once(CONTROLLER_NS, 'LOGIN_ACCEPT');
     }
 
     /**
@@ -84,10 +92,10 @@ class Client {
      * @param {String} namespace
      * @param {type and data} data
      */
-    emit(namespace: string, ...data: [string, {}]) {
+    public emit(namespace: string, messageType: string, data: AnyObject) {
         this.assertConnected();
         if (namespace in this.connections) {
-            emitToServer(this.connections[namespace], ...data);
+            emitToServer(this.connections[namespace], messageType, data);
         } else {
             throw new Error(`Cannot find connection ${namespace}`);
         }
@@ -96,7 +104,7 @@ class Client {
     /**
      * Throw error if not connected to server.
      */
-    assertConnected() {
+    public assertConnected() {
         if (!this.isConnected) {
             throw new Error('Please call client.connect(username) first');
         }
@@ -104,33 +112,33 @@ class Client {
     /**
      * Attach handler for messages from server
      * @param {String} namespace The namespace to listen to
-     * @param {String} type message type
-     * @param {(state, emit) => (data) => newState} func listener
+     * @param {String} messageType message type
+     * @param {(state, emit) => (data) => newState} handler listener
      */
-    on(
+    public on(
         namespace: string,
-        type: string,
-        func: (state: Object, emit: Function) => (data: Object) => Object | void,
-    ): RemoveListenerT {
+        messageType: string,
+        callback: (data: AnyObject, state: AnyObject, emit: EmitFunc) => AnyObject | void,
+    ): RemoveListenerFunc {
         this.assertConnected();
         if (namespace in this.connections) {
-            const handler = (data) => {
-                const updatedState = func(this.state, this.emit)(data) || this.state;
+            const handler = (data: AnyObject) => {
+                const updatedState = callback(data, this.state, this.emit) || this.state;
                 this.state = updatedState;
             };
-            this.connections[namespace].on(type, handler);
+            this.connections[namespace].on(messageType, handler);
             return () => {
-                this.connections[namespace].off(type, handler);
+                this.connections[namespace].off(messageType, handler);
             };
         }
-        throw new Error(`Cannot listen to ${type} on ${namespace}, have you connected?`);
+        throw new Error(`Cannot listen to ${messageType} on ${namespace}, have you connected?`);
     }
 
     /**
      * Set the client state
      * @param {Object} newState new state object to replace the old state
      */
-    setState(newState: {}) {
+    public setState(newState: AnyObject) {
         this.state = newState;
     }
 
@@ -140,14 +148,14 @@ class Client {
      * @param {string} type message type to listen to
      * @param {function} checker function that returns true to stop listening
      */
-    until(
+    public until(
         namespace: string,
         type: string,
-        checker: (state: Object, data: Object) => boolean,
-    ): ClientPromiseT {
+        checker: (state: AnyObject, data: AnyObject) => boolean,
+    ): ClientPromise {
         return new Promise((resolve, reject) => {
-            let off;
-            const checkUntil = (state: Object, emit: Function) => (data: Object) => {
+            let off: RemoveListenerFunc;
+            const checkUntil = (state: AnyObject, emit: EmitFunc) => (data: AnyObject) => {
                 if (checker(state, data)) {
                     off();
                     resolve({ state, data, emit, setState: this.setState });
@@ -162,13 +170,9 @@ class Client {
      * @param {string} namespace namespace to listen to
      * @param {string} type message type to listen to
      */
-    once(namespace: string, type: string): ClientPromiseT {
+    public once(namespace: string, type: string): ClientPromise {
         return this.until(namespace, type, () => true);
     }
-
-    exit() {}
 }
 
-module.exports = Client;
-
-export type ClientClass = Client;
+export default Client;

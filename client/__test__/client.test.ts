@@ -1,4 +1,4 @@
-const Client = require('../client');
+import Client from '../client';
 
 describe('Client', () => {
     describe('constructor', () => {

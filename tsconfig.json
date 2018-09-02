@@ -11,6 +11,6 @@
         "sourceMap": true,
         "lib": ["dom", "es7"]
     },
-    "include": ["server/**/*", "common/**/*"],
+    "include": ["server/**/*", "common/**/*", "client/**/*", "__integration__"],
     "exclude": ["node_modules"]
 }

@@ -1,6 +1,6 @@
-const io = require('socket.io-client');
-const assert = require('assert');
-const constants = require('../common/constants');
+import io from 'socket.io-client';
+import assert from './assert';
+import { SERVER } from '../common/constants';
 
 /**
  * Create connection with server
@@ -9,10 +9,10 @@ const constants = require('../common/constants');
  *     const controllerClient = connection.as(constants.CONTROLLER_NS);
  *     const displayConnection = connection.as(constants.DISPLAY_NS);
  */
-function connect(callback) {
-    const manager = new io.Manager(constants.SERVER);
+export function connect(callback?: (socket: SocketIOClient.Socket) => void) {
+    const manager = new io.Manager(SERVER);
     return {
-        as(namespace) {
+        as(namespace: string) {
             const socket = manager.socket(namespace);
             if (callback) {
                 callback(socket);
@@ -20,6 +20,8 @@ function connect(callback) {
             return manager.socket(namespace);
         },
         disconnect() {
+            // @ts-ignore
+            // Manager has disconnect method, but not exposed in doc
             manager.disconnect();
         },
     };
@@ -30,12 +32,7 @@ function connect(callback) {
  * Usage:
  *     emitToServer(controllerConnection, 'ROLL A DICE');
  */
-function emitToServer(client, ...data) {
+export function emitToServer(client: SocketIOClient.Socket, ...data: [string, object]) {
     assert(data.length > 1, 'Did you forget to spread the argument using ...?');
     client.emit(...data);
 }
-
-module.exports = {
-    connect,
-    emitToServer,
-};

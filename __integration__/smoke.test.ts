@@ -50,8 +50,7 @@ describe('connect', () => {
         await runFunc(
             async () => {
                 await client.connect();
-                client.login('super');
-                await client.once(constants.CONTROLLER_NS, 'LOGIN_ACCEPT');
+                await client.login('super');
             },
             {
                 onExit: () => {

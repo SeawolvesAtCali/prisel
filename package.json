@@ -8,7 +8,8 @@
         "ts-node": "ts-node",
         "build": "tsc",
         "test": "jest --testPathPattern=/__test__/",
-        "automation": "jest --runInBand --testPathPattern=/__integration__/",
+        "automation":
+            "env DEBUG=debug CI=true jest --runInBand --testPathPattern=/__integration__/",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },

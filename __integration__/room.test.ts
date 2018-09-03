@@ -1,9 +1,10 @@
 import debug from './debug';
 import { startServer, runFunc } from '../automation/scriptRunner';
 import * as constants from '../common/constants';
-import { createClients } from './testHelper';
+import { createClients, untilSuccess } from './testHelper';
 import * as roomMessages from '../client/message/room';
 import { ChildProcess } from 'child_process';
+import RoomType from '../common/message/room';
 
 const { CONTROLLER_NS } = constants;
 
@@ -18,10 +19,9 @@ describe('create room', () => {
         await runFunc(
             async () => {
                 await client.connect();
-                client.login('batman');
-                await client.once(CONTROLLER_NS, 'LOGIN_ACCEPT');
+                await client.login('batman');
                 client.emit(CONTROLLER_NS, ...roomMessages.getCreateRoom('party room'));
-                const { data } = await client.once(CONTROLLER_NS, 'CREATE_ROOM_ACCEPT');
+                const { data } = await untilSuccess(client, CONTROLLER_NS, RoomType.CREATE_ROOM);
                 expect(typeof data.roomId).toBe('string');
             },
             {
@@ -38,23 +38,25 @@ describe('create room', () => {
         await runFunc(
             async () => {
                 await host.connect();
-                host.login('host');
-                const { data: hostData } = await host.once(CONTROLLER_NS, 'LOGIN_ACCEPT');
+                const { data: hostData } = await host.login('host');
                 const hostId = hostData.userId;
                 await client.connect();
-                client.login('client');
-                const { data: clientData } = await client.once(CONTROLLER_NS, 'LOGIN_ACCEPT');
+                const { data: clientData } = await client.login('client');
                 const clientId = clientData.userId;
                 host.emit(CONTROLLER_NS, ...roomMessages.getCreateRoom('party room'));
-                const { data: roomData } = await host.once(CONTROLLER_NS, 'CREATE_ROOM_ACCEPT');
+                const { data: roomData } = await untilSuccess(
+                    host,
+                    CONTROLLER_NS,
+                    RoomType.CREATE_ROOM,
+                );
                 const { roomId } = roomData;
                 client.emit(CONTROLLER_NS, ...roomMessages.getJoin(roomId));
                 const [, hostRoomUpdateResult, clientRoomUpdateResult] = await Promise.all([
-                    client.once(CONTROLLER_NS, 'JOIN_ACCEPT'),
-                    host.until(CONTROLLER_NS, 'ROOM_UPDATE', (state, data) =>
+                    untilSuccess(client, CONTROLLER_NS, RoomType.JOIN),
+                    host.until(CONTROLLER_NS, RoomType.ROOM_UPDATE, (state, data) =>
                         data.guests.includes(clientId),
                     ),
-                    client.until(CONTROLLER_NS, 'ROOM_UPDATE', (state, data) =>
+                    client.until(CONTROLLER_NS, RoomType.ROOM_UPDATE, (state, data) =>
                         data.guests.includes(clientId),
                     ),
                 ]);

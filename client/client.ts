@@ -3,6 +3,7 @@ import { connect, emitToServer } from './networkUtils';
 import { CONTROLLER_NS } from '../common/constants';
 
 import { getLogin, getPing } from './message/room';
+import RoomType from '../common/message/room';
 
 const DEFAULT_USERNAME = 'user';
 interface AnyObject {
@@ -61,7 +62,7 @@ class Client {
             const ping = getPing();
             this.namespaces.forEach((namespace) => {
                 const conn = connection.as(namespace);
-                conn.on('PONG', () => {
+                conn.on(RoomType.PONG, () => {
                     this.connections[namespace] = conn;
                     if (Object.keys(this.connections).length === this.namespaces.length) {
                         this.isConnected = true;
@@ -84,7 +85,11 @@ class Client {
     public login(username: string = DEFAULT_USERNAME): ClientPromise {
         this.assertConnected();
         this.emit(CONTROLLER_NS, ...getLogin(username));
-        return this.once(CONTROLLER_NS, 'LOGIN_ACCEPT');
+        return this.until(
+            CONTROLLER_NS,
+            RoomType.SUCCESS,
+            (state, data) => data.action === RoomType.LOGIN,
+        );
     }
 
     /**

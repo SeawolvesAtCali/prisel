@@ -24,7 +24,7 @@ export const handleLogin = (context: Context, client: Socket) => (data: { userna
         id: controller,
     };
 
-    emit(client, ...roomMessages.getLoginAccept(controller.id));
+    emit(client, ...roomMessages.getLoginSuccess(controller.id));
 };
 
 export const handleControllerConnection = (context: Context) => (client: Socket) => {

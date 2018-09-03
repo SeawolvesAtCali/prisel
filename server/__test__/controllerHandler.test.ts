@@ -48,10 +48,10 @@ describe('controllerHandler', () => {
         });
         it('should emit login accept message back to client', () => {
             // @ts-ignore
-            roomMessages.getLoginAccept = jest.fn(() => []).mockName('getLoginAccept');
+            roomMessages.getLoginSuccess = jest.fn(() => []).mockName('getLoginAccept');
             // @ts-ignore
             handler.handleLogin(mockContext, {})({ username: 'Batman' });
-            expect(roomMessages.getLoginAccept).toHaveBeenCalled();
+            expect(roomMessages.getLoginSuccess).toHaveBeenCalled();
         });
     });
 });

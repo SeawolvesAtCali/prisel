@@ -1,4 +1,6 @@
 import { Message } from '../objects';
+import RoomType from '../../common/message/room';
+
 /**
  * functions to create messages.
  * Each function should return an array.
@@ -7,74 +9,64 @@ import { Message } from '../objects';
  */
 
 export function getPong(): Message {
-    return ['PONG', {}];
+    return [RoomType.PONG, {}];
 }
+
+export function getSuccess(action: RoomType, data: object): Message {
+    return [RoomType.SUCCESS, { action, ...data }];
+}
+
+export function getFailure(action: RoomType, error: string): Message {
+    return [RoomType.FAILURE, { action, error }];
+}
+
 /**
  * Success response for client login
  * @param {String} userId
  */
-export function getLoginAccept(userId: string): Message {
-    return ['LOGIN_ACCEPT', { userId }];
+export function getLoginSuccess(userId: string) {
+    return getSuccess(RoomType.LOGIN, { userId });
 }
 /**
  * Success response for client joining room
  */
-export function getJoinAccept(): Message {
-    return ['JOIN_ACCEPT', {}];
+export function getJoinSuccess() {
+    return getSuccess(RoomType.JOIN, {});
 }
-/**
- * Error response for client joinomg room
- * @param {String} errorType
- */
-export function getJoinError(errorType: string): Message {
-    return ['JOIN_ERROR', { errorType }];
-}
+
 /**
  * Success response for client leaving room
  */
-export function getLeaveAccept(): Message {
-    return ['LEAVE_ACCEPT', {}];
+export function getLeaveSuccess() {
+    return getSuccess(RoomType.LEAVE, {});
 }
 /**
  * Host successfully kick a user out of the room
  */
-export function getKickAccept(): Message {
-    return ['KICK_ACCEPT', {}];
+export function getKickSuccess() {
+    return getSuccess(RoomType.KICK, {});
 }
-/**
- * Cannot kick user out of the room
- * @param {*} errorType
- */
-export function getKickError(errorType: string): Message {
-    return ['KICK_ERROR', { errorType }];
-}
+
 /**
  * Success response for client ready
  */
-export function getReadyAccept(): Message {
-    return ['READY_ACCEPT', {}];
+export function getReadySuccess() {
+    return getSuccess(RoomType.READY, {});
 }
 /**
  * Host start the game
  */
-export function getGameStart(): Message {
-    return ['GAME_START', {}];
+export function getGameStartSuccess() {
+    return getSuccess(RoomType.GAME_START, {});
 }
 /**
  * Success response for client creating room
  * @param {String} roomId
  */
-export function getCreateRoomAccept(roomId: string): Message {
-    return ['CREATE_ROOM_ACCEPT', { roomId }];
-}
-/**
- * Error response for client creating room
- * @param {String} errorType
- */
-export function getCreateRoomError(errorType: string): Message {
-    return ['CREATE_ROOM_ERROR', { errorType }];
+export function getCreateRoomSuccess(roomId: string) {
+    return getSuccess(RoomType.CREATE_ROOM, { roomId });
 }
 
 export function getRoomUpdate(roomData: object): Message {
-    return ['ROOM_UPDATE', roomData];
+    return [RoomType.ROOM_UPDATE, roomData];
 }

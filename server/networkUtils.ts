@@ -1,12 +1,13 @@
 import { Socket, Message } from './objects';
-
+import debug from './debug';
 /**
  * Utility functions to perform network calls.
  */
 import { CONTROLLER_NS, DISPLAY_NS, CHAT_NS } from '../common/constants';
 
-export function emit(clients: Socket, Messageype: string, data: object) {
-    clients.emit(Messageype, data);
+export function emit(clients: Socket, messageType: string, data: object) {
+    debug(`SERVER: ${messageType} ${JSON.stringify(data)}`);
+    clients.emit(messageType, data);
 }
 
 export function join(client: Socket, roomId: string) {

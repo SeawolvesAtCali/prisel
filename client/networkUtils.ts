@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
 import assert from './assert';
 import { SERVER } from '../common/constants';
+import debug from './debug';
 
 /**
  * Create connection with server
@@ -32,7 +33,8 @@ export function connect(callback?: (socket: SocketIOClient.Socket) => void) {
  * Usage:
  *     emitToServer(controllerConnection, 'ROLL A DICE');
  */
-export function emitToServer(client: SocketIOClient.Socket, ...data: [string, object]) {
-    assert(data.length > 1, 'Did you forget to spread the argument using ...?');
-    client.emit(...data);
+export function emitToServer(client: SocketIOClient.Socket, message: string, data: object) {
+    assert(data !== undefined, 'Did you forget to spread the argument using ...?');
+    client.emit(message, data);
+    debug(`CLIENT: ${message} ${JSON.stringify(data)}`);
 }

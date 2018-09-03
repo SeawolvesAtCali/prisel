@@ -133,8 +133,8 @@ const handleKick = (context: Context, client: Socket) => (data: { userId: string
 };
 
 export function handleRoomActions(context: Context, client: Socket) {
-    client.on('CREATE_ROOM', handleCreateRoom(context, client));
-    client.on('JOIN', handleJoin(context, client));
-    client.on('LEAVE', handleLeave(context, client));
-    client.on('KICK', handleKick(context, client));
+    client.on(RoomType.CREATE_ROOM, handleCreateRoom(context, client));
+    client.on(RoomType.JOIN, handleJoin(context, client));
+    client.on(RoomType.LEAVE, handleLeave(context, client));
+    client.on(RoomType.KICK, handleKick(context, client));
 }

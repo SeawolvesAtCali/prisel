@@ -2,6 +2,7 @@ import { Context, Socket, Client, ClientType } from './objects';
 import { newId } from './idUtils';
 import { emit } from './networkUtils';
 import * as roomMessages from './message/room';
+import RoomType from '../common/message/room';
 import { handleRoomActions } from './roomController';
 import debug from './debug';
 
@@ -28,9 +29,9 @@ export const handleLogin = (context: Context, client: Socket) => (data: { userna
 };
 
 export const handleControllerConnection = (context: Context) => (client: Socket) => {
-    client.on('PING', () => {
+    client.on(RoomType.PING, () => {
         emit(client, ...roomMessages.getPong());
     });
-    client.on('LOGIN', handleLogin(context, client));
+    client.on(RoomType.LOGIN, handleLogin(context, client));
     handleRoomActions(context, client);
 };

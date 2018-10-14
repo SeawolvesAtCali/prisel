@@ -10,11 +10,13 @@ const denormalizeRoom = (StateManager: StateManagerT, room: Room) => ({
 });
 
 export const updateClientWithRoomData = (context: Context, roomId: string) => {
-    const { StateManager, io } = context;
-    const room = StateManager.rooms[roomId];
-    if (room) {
-        const roomData = denormalizeRoom(StateManager, room);
-        emitToControllers(io, room.id, ...roomMessages.getRoomUpdate(roomData));
-        emitToDisplays(io, room.id, ...roomMessages.getRoomUpdate(roomData));
-    }
+    Promise.resolve().then(() => {
+        const { StateManager, io } = context;
+        const room = StateManager.rooms[roomId];
+        if (room) {
+            const roomData = denormalizeRoom(StateManager, room);
+            emitToControllers(io, room.id, ...roomMessages.getRoomUpdate(roomData));
+            emitToDisplays(io, room.id, ...roomMessages.getRoomUpdate(roomData));
+        }
+    });
 };

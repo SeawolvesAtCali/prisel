@@ -1,57 +1,46 @@
 import * as handler from '../controllerHandler';
 import * as roomMessages from '../message/room';
+import SocketIO from 'socket.io';
+import createContext from '../createContext';
+import { Context } from '../objects';
+import { emit } from '../networkUtils';
 
 jest.mock('../networkUtils');
 
 describe('controllerHandler', () => {
     describe('handleLogin', () => {
-        // @ts-ignore
-        let mockStateManager;
-        // @ts-ignore
-        let mockContext;
-        // @ts-ignore
-        let mockSocketManager;
+        let mockContext: Context;
         beforeEach(() => {
-            mockStateManager = {
-                connections: {
-                    controllers: {},
-                },
-            };
-            mockSocketManager = {
-                add: jest.fn().mockName('SocketManager.add'),
-            };
-            mockContext = {
-                StateManager: mockStateManager,
-                SocketManager: mockSocketManager,
-                io: {},
-            };
+            mockContext = createContext({});
         });
 
         it('should save the connection in StateManager', () => {
-            // @ts-ignore
-            handler.handleLogin(mockContext, {})({ username: 'Batman' });
+            const mockClient = {} as SocketIO.Socket;
+            handler.handleLogin(mockContext, mockClient)({ username: 'Batman' });
             expect(
-                // @ts-ignore
-                Object.values(mockStateManager.connections.controllers).find(
-                    // @ts-ignore
+                Object.values(mockContext.StateManager.connections.controllers).find(
                     (controller) => controller.username === 'Batman',
                 ),
             ).toEqual(expect.any(Object));
         });
 
         it('should save the connection in SocketMap', () => {
-            const mockClient = {};
-            // @ts-ignore
+            const mockClient = {} as SocketIO.Socket;
+            jest.spyOn(mockContext.SocketManager, 'add').mockImplementation();
             handler.handleLogin(mockContext, mockClient)({ username: 'Batman' });
-            // @ts-ignore
-            expect(mockSocketManager.add).toHaveBeenCalledWith(expect.any(String), mockClient);
+            expect(mockContext.SocketManager.add).toHaveBeenCalledWith(
+                expect.any(String),
+                mockClient,
+            );
         });
+
         it('should emit login accept message back to client', () => {
-            // @ts-ignore
-            roomMessages.getLoginSuccess = jest.fn(() => []).mockName('getLoginAccept');
-            // @ts-ignore
-            handler.handleLogin(mockContext, {})({ username: 'Batman' });
-            expect(roomMessages.getLoginSuccess).toHaveBeenCalled();
+            const mockClient = {} as SocketIO.Socket;
+            handler.handleLogin(mockContext, mockClient)({ username: 'Batman' });
+            expect(emit).toHaveBeenCalledWith(
+                mockClient,
+                ...roomMessages.getLoginSuccess(expect.any(String)),
+            );
         });
     });
 });

@@ -1,7 +1,6 @@
 import { Context, Room, Socket, StateManager as StateManagerT } from './objects';
-import omit from 'lodash/omit';
 import partial from 'lodash/partial';
-import { emit } from './networkUtils';
+import { emit, join } from './networkUtils';
 import RoomType from '../common/message/room';
 import * as messages from './message/room';
 import { newId } from './idUtils';
@@ -9,25 +8,23 @@ import { updateClientWithRoomData } from './updateUtils';
 
 import debug from './debug';
 
-export const addClientToRoom = (context: Context, clientId: string, roomId: string) => {
-    const { StateManager, SocketManager } = context;
-    const { controllers } = StateManager.connections;
-
-    controllers[clientId] = {
-        ...controllers[clientId],
-        isReady: false,
-        roomId,
-    };
+export const setClientRoomAttributes = (context: Context, clientId: string, roomId: string) => {
+    const { updateState, SocketManager } = context;
+    updateState((draftState) => {
+        const client = draftState.connections.controllers[clientId];
+        client.isReady = false;
+        client.roomId = roomId;
+    });
 
     const socket = SocketManager.getSocket(clientId);
-    socket.join(roomId);
+    join(socket, roomId);
 };
 
 export const handleCreateRoom = (context: Context, client: Socket) => (data: {
     roomName: string;
 }) => {
     const { roomName } = data;
-    const { SocketManager, StateManager } = context;
+    const { SocketManager, updateState } = context;
     const hostId = SocketManager.getId(client);
     const roomId = newId('ROOM');
     const room: Room = {
@@ -37,14 +34,15 @@ export const handleCreateRoom = (context: Context, client: Socket) => (data: {
         guests: [],
         displays: [],
     };
-    StateManager.rooms[roomId] = room;
-    addClientToRoom(context, hostId, roomId);
+    updateState((draftState) => void (draftState.rooms[roomId] = room));
+    setClientRoomAttributes(context, hostId, roomId);
     debug(`roomController: ${hostId} created room ${roomName} ${roomId}`);
     emit(client, ...messages.getCreateRoomSuccess(roomId));
     updateClientWithRoomData(context, roomId);
 };
 
 const attemptJoinRoom = (context: Context, clientId: string, roomId: string): string => {
+    const { updateState } = context;
     const room = context.StateManager.rooms[roomId];
     if (room === undefined) {
         return 'ROOM DOES NOT EXIST';
@@ -54,8 +52,8 @@ const attemptJoinRoom = (context: Context, clientId: string, roomId: string): st
         return 'ALREADY JOINED ROOM';
     }
 
-    room.guests = [...room.guests, clientId];
-    addClientToRoom(context, clientId, roomId);
+    updateState((draftState) => void draftState.rooms[roomId].guests.push(clientId));
+    setClientRoomAttributes(context, clientId, roomId);
 
     return '';
 };
@@ -74,42 +72,41 @@ const handleJoin = (context: Context, client: Socket) => (data: { roomId: string
     updateClientWithRoomData(context, roomId);
 };
 
-const attemptRemoveHost = (StateManager: StateManagerT, room: Room) => {
-    // host is leaving, promote another guest to host
-    const nextHost = room.guests.shift();
-    if (nextHost !== undefined) {
-        room.host = nextHost;
-    } else {
-        // no one is in the room, remove the room
-        StateManager.rooms = omit(StateManager.rooms, room.id);
-    }
-};
-
-const attemptRemoveGuest = (room: Room, clientId: string) => {
-    room.guests = room.guests.filter((guestId: string) => guestId !== clientId);
-};
-
 export const handleLeave = (context: Context, client: Socket) => (data: {}) => {
-    const { SocketManager, StateManager } = context;
+    const { SocketManager, updateState } = context;
     const clientId = SocketManager.getId(client);
-    const controller = StateManager.connections.controllers[clientId];
-    const { roomId } = controller;
-    StateManager.connections.controllers[clientId] = omit(controller, 'roomId', 'isReady');
-    if (roomId !== undefined) {
-        const room = StateManager.rooms[roomId];
+    updateState((draftState) => {
+        const controller = draftState.connections.controllers[clientId];
+        const { roomId } = controller;
+        delete controller.roomId;
+        delete controller.isReady;
+        if (roomId === undefined) {
+            return;
+        }
+        const room = draftState.rooms[roomId];
         if (room.host === clientId) {
-            attemptRemoveHost(StateManager, room);
+            // handle host leaving
+            // host is leaving, promote another guest to host
+            const nextHost = room.guests.shift();
+            if (nextHost !== undefined) {
+                room.host = nextHost;
+            } else {
+                // no one is in the room, remove the room
+                delete draftState.rooms[roomId];
+            }
         } else {
-            attemptRemoveGuest(room, clientId);
+            // handle guest leaving
+            const { guests } = room;
+            guests.splice(guests.indexOf(clientId), 1);
         }
         updateClientWithRoomData(context, roomId);
-    }
+    });
 };
 
 const handleKick = (context: Context, client: Socket) => (data: { userId: string }) => {
     const { SocketManager, StateManager } = context;
-    const hostId = SocketManager.getId(client);
     const { userId } = data;
+    const hostId = SocketManager.getId(client);
     const getKickFailure = partial(messages.getFailure, RoomType.KICK);
     if (hostId === userId) {
         emit(client, ...getKickFailure('Cannot self kick'));

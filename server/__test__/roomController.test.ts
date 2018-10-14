@@ -1,33 +1,37 @@
 import * as roomController from '../roomController';
-import { Client } from '../objects';
+import { Client, ClientType, Context } from '../objects';
+import createContext from '../createContext';
 
 jest.mock('../updateUtils');
+jest.mock('../networkUtils');
 
+const createMockClient: (
+    id: string,
+    mockContext: Context,
+) => { client: Client; socket: SocketIO.Socket } = (id, mockContext) => {
+    const mockSocket = {} as SocketIO.Socket;
+    mockContext.SocketManager.add(id, mockSocket);
+    mockContext.updateState((draftState) => {
+        draftState.connections.controllers[id] = {
+            id,
+            type: ClientType.Controller,
+            username: 'username',
+        };
+    });
+    return { client: mockContext.StateManager.connections.controllers[id], socket: mockSocket };
+};
 describe('roomController', () => {
-    describe('addClientToRoom', () => {
+    describe('setClientRoomAttributes', () => {
         it('should add to StateManager controllers list', () => {
             const mockClientId = '123';
             const mockRoomId = '456';
-            const mockStateManager = {
-                connections: {
-                    controllers: {
-                        [mockClientId]: {},
-                    },
-                    displays: {},
-                },
-            };
-            const mockSocketManager = {
-                getSocket: () => ({ join: () => {} }),
-            };
-            roomController.addClientToRoom(
-                // @ts-ignore
-                { StateManager: mockStateManager, SocketManager: mockSocketManager, io: null },
-                mockClientId,
-                mockRoomId,
-            );
+            const mockContext = createContext({});
+            createMockClient(mockClientId, mockContext);
 
-            // @ts-ignore
-            const mockClient: Client = mockStateManager.connections.controllers[mockClientId];
+            roomController.setClientRoomAttributes(mockContext, mockClientId, mockRoomId);
+
+            const mockClient: Client =
+                mockContext.StateManager.connections.controllers[mockClientId];
             expect(mockClient.roomId).toBe(mockRoomId);
             expect(mockClient.isReady).toBe(false);
         });
@@ -36,79 +40,69 @@ describe('roomController', () => {
     describe('handleLeave', () => {
         const mockClientId = '123';
         const mockRoomId = '456';
-        const mockSocketManager = {
-            getId: () => mockClientId,
-        };
-        // @ts-ignore
-        let mockStateManager;
-        // @ts-ignore
-        let mockContext;
-        beforeEach(() => {
-            mockStateManager = {
-                connections: {
-                    controllers: {
-                        [mockClientId]: {
-                            roomId: mockRoomId,
-                            isReady: true,
-                        },
-                    },
-                },
-                rooms: {
-                    [mockRoomId]: {
-                        guests: [],
-                    },
-                },
-            };
-            mockContext = {
-                StateManager: mockStateManager,
-                SocketManager: mockSocketManager,
-            };
-        });
-        it('should remove from controller list', () => {
-            // @ts-ignore
-            roomController.handleLeave(mockContext, {})();
+        const mockGuestId = '789';
 
-            // @ts-ignore
-            const controller = mockStateManager.connections.controllers[mockClientId];
+        let mockContext: Context;
+        beforeEach(() => {
+            mockContext = createContext();
+            createMockClient(mockClientId, mockContext);
+            createMockClient(mockGuestId, mockContext);
+
+            mockContext.updateState((draftState) => {
+                draftState.rooms[mockRoomId] = {
+                    id: mockRoomId,
+                    name: 'roomName',
+                    host: mockClientId,
+                    guests: [mockGuestId],
+                    displays: [],
+                };
+            });
+
+            roomController.setClientRoomAttributes(mockContext, mockClientId, mockRoomId);
+            roomController.setClientRoomAttributes(mockContext, mockGuestId, mockRoomId);
+        });
+
+        it('should remove from controller list', () => {
+            roomController.handleLeave(
+                mockContext,
+                mockContext.SocketManager.getSocket(mockClientId),
+            )({});
+
+            const controller = mockContext.StateManager.connections.controllers[mockClientId];
             expect(controller.roomId).toBeUndefined();
             expect(controller.isReady).toBeUndefined();
         });
 
         it('should remove host', () => {
-            const mockNextGuest = '789';
-            // @ts-ignore
-            mockStateManager.rooms = {
-                [mockRoomId]: {
-                    host: mockClientId,
-                    guests: [mockNextGuest],
-                },
-            };
-            // @ts-ignore
-            roomController.handleLeave(mockContext, {})();
-            // @ts-ignore
-            const room = mockStateManager.rooms[mockRoomId];
+            roomController.handleLeave(
+                mockContext,
+                mockContext.SocketManager.getSocket(mockClientId),
+            )({});
+            const room = mockContext.StateManager.rooms[mockRoomId];
             expect(room.host).not.toBe(mockClientId);
-            expect(room.host).toBe(mockNextGuest);
+            expect(room.host).toBe(mockGuestId);
             expect(room.guests.length).toBe(0);
         });
 
         it('should remove guest', () => {
-            const mockHostId = '000';
             const mockOtherGuestId = '111';
-            // @ts-ignore
-            mockStateManager.rooms = {
-                [mockRoomId]: {
-                    host: mockHostId,
-                    guests: [mockOtherGuestId, mockClientId],
-                },
-            };
-            // @ts-ignore
-            roomController.handleLeave(mockContext, {})();
-            // @ts-ignore
-            const room = mockStateManager.rooms[mockRoomId];
+            const { socket } = createMockClient(mockOtherGuestId, mockContext);
+
+            mockContext.updateState((draftState) => {
+                draftState.rooms[mockRoomId].guests.push(mockOtherGuestId);
+            });
+
+            roomController.setClientRoomAttributes(mockContext, mockOtherGuestId, mockRoomId);
+
+            roomController.handleLeave(
+                mockContext,
+                mockContext.SocketManager.getSocket(mockGuestId),
+            )({});
+
+            const room = mockContext.StateManager.rooms[mockRoomId];
             expect(room.guests.length).toBe(1);
             expect(room.guests).not.toBe(expect.arrayContaining([mockClientId]));
-            expect(room.host).toBe(mockHostId);
+            expect(room.host).toBe(mockClientId);
             expect(room.guests[0]).toBe(mockOtherGuestId);
         });
     });

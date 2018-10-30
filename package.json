@@ -8,8 +8,7 @@
         "ts-node": "ts-node",
         "build": "tsc",
         "test": "jest --testPathPattern=/__test__/",
-        "automation":
-            "env DEBUG=debug CI=true jest --runInBand --testPathPattern=/__integration__/",
+        "automation": "env DEBUG=debug CI=true jest --runInBand --testPathPattern=/__integration__/",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },
@@ -24,7 +23,10 @@
     },
     "homepage": "https://github.com/SeawolvesAtCali/Monopoly#readme",
     "eslintConfig": {
-        "extends": ["airbnb-base", "plugin:prettier/recommended"],
+        "extends": [
+            "airbnb-base",
+            "plugin:prettier/recommended"
+        ],
         "parser": "babel-eslint",
         "rules": {
             "no-unused-vars": [
@@ -96,7 +98,10 @@
                 "tsConfigFile": "tsconfig.json"
             }
         },
-        "moduleFileExtensions": ["ts", "js"],
+        "moduleFileExtensions": [
+            "ts",
+            "js"
+        ],
         "transform": {
             "^.+\\.(ts|js)?$": "ts-jest"
         },

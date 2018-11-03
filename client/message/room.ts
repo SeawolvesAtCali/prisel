@@ -41,6 +41,11 @@ export function getLeave(): Message {
 export function getReady(): Message {
     return [RoomType.READY, {}];
 }
+
+export function getUnready(): Message {
+    return [RoomType.UNREADY, {}];
+}
+
 /**
  *  Host start the game
  */

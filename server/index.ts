@@ -14,6 +14,10 @@ const context: Context = createContext({
     io,
 });
 
+// @ts-ignore
+// make the context available when debugging in chrome
+global.context = context;
+
 io.of(CONTROLLER_NS).on('connection', handleControllerConnection(context));
 io.of(DISPLAY_NS).on('connection', handleDisplayConnection(context));
 io.of(CHAT_NS).on('connection', handleChatConnection(context));

@@ -99,11 +99,12 @@ export const handleLeave = (context: Context, client: Socket) => (data: {}) => {
             const { guests } = room;
             guests.splice(guests.indexOf(clientId), 1);
         }
+        emit(client, ...messages.getLeaveSuccess());
         updateClientWithRoomData(context, roomId);
     });
 };
 
-const handleKick = (context: Context, client: Socket) => (data: { userId: string }) => {
+export const handleKick = (context: Context, client: Socket) => (data: { userId: string }) => {
     const { SocketManager, StateManager } = context;
     const { userId } = data;
     const hostId = SocketManager.getId(client);

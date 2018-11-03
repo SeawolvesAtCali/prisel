@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "start:server": "ts-node server/index.ts",
+        "start:client": "ts-node client/testClient.ts",
         "ts-node": "ts-node",
         "build": "tsc",
         "test": "jest --testPathPattern=/__test__/",

@@ -33,6 +33,26 @@ describe('create room', () => {
         );
     });
 
+    it('create a room, join and then leave', async () => {
+        const [client] = createClients();
+        await runFunc(
+            async () => {
+                await client.connect();
+                await client.login('batman');
+                client.emit(CONTROLLER_NS, ...roomMessages.getCreateRoom('room'));
+                await untilSuccess(client, CONTROLLER_NS, RoomType.CREATE_ROOM);
+                client.emit(CONTROLLER_NS, ...roomMessages.getLeave());
+                await untilSuccess(client, CONTROLLER_NS, RoomType.LEAVE);
+            },
+            {
+                onExit: () => {
+                    client.disconnect();
+                    server.kill();
+                },
+            },
+        );
+    });
+
     it('create a room and a client join', async () => {
         const [host, client] = createClients(2);
         await runFunc(

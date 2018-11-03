@@ -1,5 +1,4 @@
 import debug from './debug';
-import { connect, emitToServer } from './networkUtils';
 import { CONTROLLER_NS, CHAT_NS, DISPLAY_NS } from '../common/constants';
 import * as roomMessages from '../client/message/room';
 import * as chatMessages from '../client/message/chat';
@@ -12,7 +11,7 @@ const client = new Client(CONTROLLER_NS, CHAT_NS, DISPLAY_NS);
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 function printHelp() {
-    console.log(
+    debug(
         `h: print help
 m join roomId: join room
 m create_room roomName: create a room
@@ -25,23 +24,27 @@ q: disconnect
     );
 }
 
-function handleMessage(client: Client, message: string, data: string): void {
+function handleMessage(
+    emit: (namespace: string, message: string, data: object) => void,
+    message: string,
+    data: string,
+): void {
     const trimData = data ? trim(data) : '';
     switch (message.toLowerCase()) {
         case 'join':
-            return void client.emit(CONTROLLER_NS, ...roomMessages.getJoin(trimData));
+            return void emit(CONTROLLER_NS, ...roomMessages.getJoin(trimData));
         case 'create_room':
-            return void client.emit(CONTROLLER_NS, ...roomMessages.getCreateRoom(trimData));
+            return void emit(CONTROLLER_NS, ...roomMessages.getCreateRoom(trimData));
         case 'leave':
-            return void client.emit(CONTROLLER_NS, ...roomMessages.getLeave());
+            return void emit(CONTROLLER_NS, ...roomMessages.getLeave());
         case 'kick':
-            return void client.emit(CONTROLLER_NS, ...roomMessages.getKick(trimData));
+            return void emit(CONTROLLER_NS, ...roomMessages.getKick(trimData));
         case 'ready':
-            return void client.emit(CONTROLLER_NS, ...roomMessages.getReady());
+            return void emit(CONTROLLER_NS, ...roomMessages.getReady());
         case 'unready':
-            return void client.emit(CONTROLLER_NS, ...roomMessages.getUnready());
+            return void emit(CONTROLLER_NS, ...roomMessages.getUnready());
         case 'game_start':
-            return void client.emit(CONTROLLER_NS, ...roomMessages.getStart());
+            return void emit(CONTROLLER_NS, ...roomMessages.getStart());
     }
 }
 
@@ -57,8 +60,10 @@ function handleMessage(client: Client, message: string, data: string): void {
 
     printHelp();
 
+    const emitToServer = client.emit.bind(client);
+
     rl.on('line', (line) => {
-        console.log(`receive command "${line}"`);
+        debug(`receive command "${line}"`);
         if (!trim(line)) {
             return;
         }
@@ -67,7 +72,7 @@ function handleMessage(client: Client, message: string, data: string): void {
             case 'h':
                 return void printHelp();
             case 'm':
-                return void handleMessage(client, message, data);
+                return void handleMessage(emitToServer, message, data);
             case 'q':
                 return void client.disconnect();
         }

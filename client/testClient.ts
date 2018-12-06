@@ -1,5 +1,4 @@
 import debug from './debug';
-import { CONTROLLER_NS, CHAT_NS, DISPLAY_NS } from '../common/constants';
 import * as roomMessages from '../client/message/room';
 import * as chatMessages from '../client/message/chat';
 import trim from 'lodash/trim';
@@ -7,7 +6,7 @@ import Client from './client';
 import RoomType from '../common/message/room';
 import readline from 'readline';
 
-const client = new Client(CONTROLLER_NS, CHAT_NS, DISPLAY_NS);
+const client = new Client();
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 function printHelp() {
@@ -25,36 +24,36 @@ q: disconnect
 }
 
 function handleMessage(
-    emit: (namespace: string, message: string, data: object) => void,
+    emit: (message: string, data: object) => void,
     message: string,
     data: string,
 ): void {
     const trimData = data ? trim(data) : '';
     switch (message.toLowerCase()) {
         case 'join':
-            return void emit(CONTROLLER_NS, ...roomMessages.getJoin(trimData));
+            return void emit(...roomMessages.getJoin(trimData));
         case 'create_room':
-            return void emit(CONTROLLER_NS, ...roomMessages.getCreateRoom(trimData));
+            return void emit(...roomMessages.getCreateRoom(trimData));
         case 'leave':
-            return void emit(CONTROLLER_NS, ...roomMessages.getLeave());
+            return void emit(...roomMessages.getLeave());
         case 'kick':
-            return void emit(CONTROLLER_NS, ...roomMessages.getKick(trimData));
+            return void emit(...roomMessages.getKick(trimData));
         case 'ready':
-            return void emit(CONTROLLER_NS, ...roomMessages.getReady());
+            return void emit(...roomMessages.getReady());
         case 'unready':
-            return void emit(CONTROLLER_NS, ...roomMessages.getUnready());
+            return void emit(...roomMessages.getUnready());
         case 'game_start':
-            return void emit(CONTROLLER_NS, ...roomMessages.getStart());
+            return void emit(...roomMessages.getStart());
     }
 }
 
 (async () => {
     await client.connect();
     client.login('batman');
-    client.on(CONTROLLER_NS, RoomType.SUCCESS, (data, state, emit) => {
+    client.on(RoomType.SUCCESS, (data, state, emit) => {
         debug(RoomType.SUCCESS, data, state);
     });
-    client.on(CONTROLLER_NS, RoomType.ROOM_UPDATE, (data, state, emit) => {
+    client.on(RoomType.ROOM_UPDATE, (data, state, emit) => {
         debug(RoomType.SUCCESS, data, state);
     });
 

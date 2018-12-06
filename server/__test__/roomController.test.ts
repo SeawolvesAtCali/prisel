@@ -1,4 +1,4 @@
-import * as roomController from '../roomController';
+import * as roomController from '../handler/handleRoomActions';
 import { Client, ClientType, Context } from '../objects';
 import createContext from '../createContext';
 

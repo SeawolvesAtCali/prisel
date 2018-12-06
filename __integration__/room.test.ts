@@ -1,12 +1,9 @@
 import debug from './debug';
 import { startServer, runFunc } from '../automation/scriptRunner';
-import * as constants from '../common/constants';
 import { createClients, untilSuccess } from './testHelper';
 import * as roomMessages from '../client/message/room';
 import { ChildProcess } from 'child_process';
 import RoomType from '../common/message/room';
-
-const { CONTROLLER_NS } = constants;
 
 jest.setTimeout(30000);
 describe('create room', () => {
@@ -20,8 +17,8 @@ describe('create room', () => {
             async () => {
                 await client.connect();
                 await client.login('batman');
-                client.emit(CONTROLLER_NS, ...roomMessages.getCreateRoom('party room'));
-                const { data } = await untilSuccess(client, CONTROLLER_NS, RoomType.CREATE_ROOM);
+                client.emit(...roomMessages.getCreateRoom('party room'));
+                const { data } = await untilSuccess(client, RoomType.CREATE_ROOM);
                 expect(typeof data.roomId).toBe('string');
             },
             {
@@ -39,10 +36,10 @@ describe('create room', () => {
             async () => {
                 await client.connect();
                 await client.login('batman');
-                client.emit(CONTROLLER_NS, ...roomMessages.getCreateRoom('room'));
-                await untilSuccess(client, CONTROLLER_NS, RoomType.CREATE_ROOM);
-                client.emit(CONTROLLER_NS, ...roomMessages.getLeave());
-                await untilSuccess(client, CONTROLLER_NS, RoomType.LEAVE);
+                client.emit(...roomMessages.getCreateRoom('room'));
+                await untilSuccess(client, RoomType.CREATE_ROOM);
+                client.emit(...roomMessages.getLeave());
+                await untilSuccess(client, RoomType.LEAVE);
             },
             {
                 onExit: () => {
@@ -63,20 +60,20 @@ describe('create room', () => {
                 await client.connect();
                 const { data: clientData } = await client.login('client');
                 const clientId = clientData.userId;
-                host.emit(CONTROLLER_NS, ...roomMessages.getCreateRoom('party room'));
+                host.emit(...roomMessages.getCreateRoom('party room'));
                 const { data: roomData } = await untilSuccess(
                     host,
-                    CONTROLLER_NS,
+
                     RoomType.CREATE_ROOM,
                 );
                 const { roomId } = roomData;
-                client.emit(CONTROLLER_NS, ...roomMessages.getJoin(roomId));
+                client.emit(...roomMessages.getJoin(roomId));
                 const [, hostRoomUpdateResult, clientRoomUpdateResult] = await Promise.all([
-                    untilSuccess(client, CONTROLLER_NS, RoomType.JOIN),
-                    host.until(CONTROLLER_NS, RoomType.ROOM_UPDATE, (state, data) =>
+                    untilSuccess(client, RoomType.JOIN),
+                    host.until(RoomType.ROOM_UPDATE, (state, data) =>
                         data.guests.includes(clientId),
                     ),
-                    client.until(CONTROLLER_NS, RoomType.ROOM_UPDATE, (state, data) =>
+                    client.until(RoomType.ROOM_UPDATE, (state, data) =>
                         data.guests.includes(clientId),
                     ),
                 ]);

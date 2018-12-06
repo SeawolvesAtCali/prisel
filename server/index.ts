@@ -1,13 +1,13 @@
 import { Context } from './objects';
-import { CONTROLLER_NS, DISPLAY_NS, CHAT_NS, PORT } from '../common/constants';
+import { PORT } from '../common/constants';
 import createContext from './createContext';
-import { handleControllerConnection } from './controllerHandler';
-import { handleDisplayConnection } from './displayHandler';
-import { handleChatConnection } from './chatHandler';
 import SocketIO from 'socket.io';
 import debug from './debug';
+import './handler';
+import clientHandlerRegister, { Handler } from './clientHandlerRegister';
 
 const io = SocketIO();
+
 debug('starting server');
 
 const context: Context = createContext({
@@ -18,8 +18,14 @@ const context: Context = createContext({
 // make the context available when debugging in chrome
 global.context = context;
 
-io.of(CONTROLLER_NS).on('connection', handleControllerConnection(context));
-io.of(DISPLAY_NS).on('connection', handleDisplayConnection(context));
-io.of(CHAT_NS).on('connection', handleChatConnection(context));
+io.on('connection', (client: SocketIO.Socket) => {
+    debug('client connected', clientHandlerRegister.length);
+    clientHandlerRegister.forEach(([event, handler]: [string, Handler]) => {
+        client.on(event, handler(context, client));
+    });
+    client.on('disconnect', () => {
+        debug('client disconnected');
+    });
+});
 
 io.listen(PORT);

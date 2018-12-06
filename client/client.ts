@@ -1,16 +1,17 @@
 import debug from './debug';
-import { connect, emitToServer } from './networkUtils';
-import { CONTROLLER_NS } from '../common/constants';
+import once from 'lodash/once';
+import { SERVER } from '../common/constants';
 
-import { getLogin, getPing } from './message/room';
+import { getLogin } from './message/room';
 import RoomType from '../common/message/room';
+import io from 'socket.io-client';
 
 const DEFAULT_USERNAME = 'user';
 interface AnyObject {
     [prop: string]: any;
 }
 
-type EmitFunc = (namespace: string, messageType: string, data: AnyObject) => void;
+type EmitFunc = (messageType: string, data: AnyObject) => void;
 type SetStateFunc = (newState: AnyObject) => void;
 type ClientPromise = Promise<{
     state: AnyObject;
@@ -20,6 +21,10 @@ type ClientPromise = Promise<{
 }>;
 
 type RemoveListenerFunc = () => void;
+
+const DEFAULT_TIMEOUT = 5000;
+const CONNECTION_TIMEOUT = DEFAULT_TIMEOUT;
+const LOGIN_TIMEOUT = DEFAULT_TIMEOUT;
 
 /**
  * Client class
@@ -37,44 +42,59 @@ type RemoveListenerFunc = () => void;
  * After a client is connected, we can attach message handler using `client.on`
  */
 class Client {
-    public namespaces: string[];
     public state: AnyObject;
-    public connections: { [connection: string]: SocketIOClient.Socket };
-    public disconnect: () => void;
-    public isConnected: boolean;
+    private conn: SocketIOClient.Socket;
+    private serverUri: string;
 
-    constructor(...namespaces: string[]) {
-        this.namespaces = namespaces || [];
+    constructor(server: string = SERVER) {
         this.state = {};
-        this.connections = {};
+        this.serverUri = server;
         this.emit = this.emit.bind(this);
         this.setState = this.setState.bind(this);
-        this.isConnected = false;
+        this.connect = once(this.connect.bind(this));
+    }
+
+    public get connection(): SocketIOClient.Socket {
+        if (this.conn) {
+            return this.conn;
+        }
+        throw new Error('Please call client.connect(username) first');
+    }
+
+    public get isConnected(): boolean {
+        return !!this.conn;
     }
 
     /**
      * Connect to server
      */
-    public connect(): Promise<{ [connection: string]: AnyObject }> {
+    public connect(): Promise<SocketIOClient.Socket> {
         return new Promise((resolve, reject) => {
-            const connection = connect();
-            this.connections = {};
-            const ping = getPing();
-            this.namespaces.forEach((namespace) => {
-                const conn = connection.as(namespace);
-                conn.on(RoomType.PONG, () => {
-                    this.connections[namespace] = conn;
-                    if (Object.keys(this.connections).length === this.namespaces.length) {
-                        this.isConnected = true;
-                        resolve(this.connections);
-                    }
+            const connection = io(this.serverUri, { transports: ['websocket'] });
+            const connectionTimeout = setTimeout(() => {
+                clearTimeout(connectionTimeout);
+                connection.off('connect', onConnect);
+                reject(new Error('connection timeout'));
+            }, CONNECTION_TIMEOUT);
+            const onConnect = () => {
+                debug('client connected');
+                this.conn = connection;
+                connection.off('connect', onConnect);
+                connection.on('disconnect', () => {
+                    debug('client disconnected');
                 });
-                emitToServer(conn, ...ping);
-            });
-            this.isConnected = true;
-            this.disconnect = connection.disconnect;
-            return this.connections;
+                connection.on('error', (e: any) => {
+                    debug('client error', e);
+                });
+                clearTimeout(connectionTimeout);
+                resolve(connection);
+            };
+            connection.on('connect', onConnect);
         });
+    }
+
+    public disconnect() {
+        this.connection.close();
     }
 
     /**
@@ -83,12 +103,11 @@ class Client {
      * @param {string} username username to login with
      */
     public login(username: string = DEFAULT_USERNAME): ClientPromise {
-        this.assertConnected();
-        this.emit(CONTROLLER_NS, ...getLogin(username));
+        this.emit(...getLogin(username));
         return this.until(
-            CONTROLLER_NS,
             RoomType.SUCCESS,
-            (state, data) => data.action === RoomType.LOGIN,
+            (_, data) => data.action === RoomType.LOGIN,
+            LOGIN_TIMEOUT,
         );
     }
 
@@ -97,23 +116,10 @@ class Client {
      * @param {String} namespace
      * @param {type and data} data
      */
-    public emit(namespace: string, messageType: string, data: AnyObject) {
-        this.assertConnected();
-        if (namespace in this.connections) {
-            emitToServer(this.connections[namespace], messageType, data);
-        } else {
-            throw new Error(`Cannot find connection ${namespace}`);
-        }
+    public emit(messageType: string, data: AnyObject) {
+        this.connection.emit(messageType, data);
     }
 
-    /**
-     * Throw error if not connected to server.
-     */
-    public assertConnected() {
-        if (!this.isConnected) {
-            throw new Error('Please call client.connect(username) first');
-        }
-    }
     /**
      * Attach handler for messages from server
      * @param {String} namespace The namespace to listen to
@@ -121,22 +127,17 @@ class Client {
      * @param {(state, emit) => (data) => newState} handler listener
      */
     public on(
-        namespace: string,
         messageType: string,
         callback: (data: AnyObject, state: AnyObject, emit: EmitFunc) => AnyObject | void,
     ): RemoveListenerFunc {
-        this.assertConnected();
-        if (namespace in this.connections) {
-            const handler = (data: AnyObject) => {
-                const updatedState = callback(data, this.state, this.emit) || this.state;
-                this.state = updatedState;
-            };
-            this.connections[namespace].on(messageType, handler);
-            return () => {
-                this.connections[namespace].off(messageType, handler);
-            };
-        }
-        throw new Error(`Cannot listen to ${messageType} on ${namespace}, have you connected?`);
+        const handler = (data: AnyObject) => {
+            const updatedState = callback(data, this.state, this.emit) || this.state;
+            this.state = updatedState;
+        };
+        this.connection.on(messageType, handler);
+        return () => {
+            this.connection.off(messageType, handler);
+        };
     }
 
     /**
@@ -149,24 +150,31 @@ class Client {
 
     /**
      * Listen to message until state and message data matches requirement
-     * @param {string} namespace namespace to listen to
      * @param {string} type message type to listen to
      * @param {function} checker function that returns true to stop listening
      */
     public until(
-        namespace: string,
         type: string,
         checker: (state: AnyObject, data: AnyObject) => boolean,
+        timeout?: number,
     ): ClientPromise {
         return new Promise((resolve, reject) => {
-            let off: RemoveListenerFunc;
+            const timer = isFinite(timeout)
+                ? setTimeout(() => {
+                      off();
+                      reject(new Error(`"until" timeout for type ${type}`));
+                  }, timeout)
+                : undefined;
             const checkUntil = (data: AnyObject, state: AnyObject, emit: EmitFunc) => {
                 if (checker(state, data)) {
                     off();
+                    if (timer !== undefined) {
+                        clearTimeout(timer);
+                    }
                     resolve({ state, data, emit, setState: this.setState });
                 }
             };
-            off = this.on(namespace, type, checkUntil);
+            const off = this.on(type, checkUntil);
         });
     }
 
@@ -175,8 +183,8 @@ class Client {
      * @param {string} namespace namespace to listen to
      * @param {string} type message type to listen to
      */
-    public once(namespace: string, type: string): ClientPromise {
-        return this.until(namespace, type, () => true);
+    public once(type: string): ClientPromise {
+        return this.until(type, () => true);
     }
 }
 

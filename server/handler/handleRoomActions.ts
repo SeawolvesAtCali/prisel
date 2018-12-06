@@ -1,12 +1,13 @@
-import { Context, Room, Socket, StateManager as StateManagerT } from './objects';
+import { Context, Room, Socket } from '../objects';
 import partial from 'lodash/partial';
-import { emit, join } from './networkUtils';
-import RoomType from '../common/message/room';
-import * as messages from './message/room';
-import { newId } from './idUtils';
-import { updateClientWithRoomData } from './updateUtils';
+import { emit, join } from '../networkUtils';
+import RoomType from '../../common/message/room';
+import * as messages from '../message/room';
+import { newId } from '../idUtils';
+import { updateClientWithRoomData } from '../updateUtils';
+import clientHandlerRegister from '../clientHandlerRegister';
 
-import debug from './debug';
+import debug from '../debug';
 
 export const setClientRoomAttributes = (context: Context, clientId: string, roomId: string) => {
     const { updateState, SocketManager } = context;
@@ -130,9 +131,7 @@ export const handleKick = (context: Context, client: Socket) => (data: { userId:
     updateClientWithRoomData(context, roomId);
 };
 
-export function handleRoomActions(context: Context, client: Socket) {
-    client.on(RoomType.CREATE_ROOM, handleCreateRoom(context, client));
-    client.on(RoomType.JOIN, handleJoin(context, client));
-    client.on(RoomType.LEAVE, handleLeave(context, client));
-    client.on(RoomType.KICK, handleKick(context, client));
-}
+clientHandlerRegister.push([RoomType.CREATE_ROOM, handleCreateRoom]);
+clientHandlerRegister.push([RoomType.JOIN, handleJoin]);
+clientHandlerRegister.push([RoomType.LEAVE, handleLeave]);
+clientHandlerRegister.push([RoomType.KICK, handleKick]);

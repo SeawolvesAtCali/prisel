@@ -1,4 +1,4 @@
-import * as handler from '../controllerHandler';
+import * as handler from '../handler/handleLogin';
 import * as roomMessages from '../message/room';
 import SocketIO from 'socket.io';
 import createContext from '../createContext';

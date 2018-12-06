@@ -6,8 +6,8 @@ import ChatType from '../../common/message/chat';
  * @param {String} userId
  * @param {String} message
  */
-export function getChat(userId: string, message: string): Message {
-    return [ChatType.CHAT, { userId, message }];
+export function getChat(userId: string, message: string, roomId: string = null): Message {
+    return [ChatType.CHAT, { userId, message, roomId }];
 }
 /**
  * Send a chat message to a room

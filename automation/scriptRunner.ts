@@ -92,6 +92,7 @@ export function runFunc(
         .catch((error) => {
             clearTimeout(timeoutId);
             if (onExit) {
+                debug('error exiting');
                 onExit();
             }
             throw error;

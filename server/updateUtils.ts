@@ -1,7 +1,7 @@
 import { Context, Room, StateManager as StateManagerT } from './objects';
 
 import pick from 'lodash/pick';
-import { emitToControllers, emitToDisplays } from './networkUtils';
+import { broadcastInRoom } from './networkUtils';
 import * as roomMessages from './message/room';
 
 const denormalizeRoom = (StateManager: StateManagerT, room: Room) => ({
@@ -15,8 +15,7 @@ export const updateClientWithRoomData = (context: Context, roomId: string) => {
         const room = StateManager.rooms[roomId];
         if (room) {
             const roomData = denormalizeRoom(StateManager, room);
-            emitToControllers(io, room.id, ...roomMessages.getRoomUpdate(roomData));
-            emitToDisplays(io, room.id, ...roomMessages.getRoomUpdate(roomData));
+            broadcastInRoom(io, room.id, ...roomMessages.getRoomUpdate(roomData));
         }
     });
 };

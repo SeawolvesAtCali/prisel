@@ -1,0 +1,34 @@
+{
+    "name": "@monopoly/client",
+    "version": "0.0.0",
+    "description": "> TODO: description",
+    "author": "Yiou Chen <chen.yiou1992@gmail.com>",
+    "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/client#readme",
+    "license": "ISC",
+    "main": "lib/client.js",
+    "files": ["lib"],
+    "directories": {
+        "lib": "./",
+        "test": "__test__"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+    },
+    "scripts": {
+        "build": "tsc",
+        "test": "jest",
+        "start": "parcel serve index.html",
+        "lint": "tslint --project tsconfig.json",
+        "fix": "tslint --project tsconfig.json --fix"
+    },
+    "bugs": {
+        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+    },
+    "dependencies": {
+        "@monopoly/common": "file:../common",
+        "immer": "^1.8.2",
+        "lodash": "^4.17.11"
+    },
+    "devDependencies": {}
+}

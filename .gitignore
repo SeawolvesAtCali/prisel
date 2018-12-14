@@ -68,3 +68,5 @@ typings/
 *.code-workspace
 
 dist
+.cache
+lib

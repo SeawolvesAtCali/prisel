@@ -1,17 +1,19 @@
 {
-    "name": "monopoly",
+    "name": "monopoly-mono",
     "version": "0.0.0",
+    "private": true,
     "description": "Online Monopoly game",
     "main": "index.js",
     "scripts": {
-        "start:server": "ts-node server/index.ts",
-        "start:client": "ts-node client/testClient.ts",
-        "ts-node": "ts-node",
-        "build": "tsc",
-        "test": "jest --testPathPattern=/__test__/",
-        "automation": "env DEBUG=debug CI=true jest --runInBand --testPathPattern=/__integration__/ --verbose",
-        "lint": "tslint --project tsconfig.json",
-        "fix": "tslint --project tsconfig.json --fix"
+        "start:server": "ts-node packages/server/index.ts",
+        "start:client": "parcel serve packages/client/index.html",
+        "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
+        "prebuild": "lerna exec -- rm -rf lib",
+        "build": "lerna run build",
+        "test": "lerna run --no-bail test --ignore @monopoly/e2e",
+        "automation": "lerna run test --scope @monopoly/e2e",
+        "lint": "lerna run lint",
+        "fix": "lerna run fix"
     },
     "repository": {
         "type": "git",
@@ -65,19 +67,15 @@
         "proseWrap": "always"
     },
     "dependencies": {
-        "commander": "^2.15.1",
-        "debug": "^3.1.0",
-        "immer": "^1.7.2",
-        "lodash": "^4.17.10",
-        "socket.io": "^2.1.0",
-        "socket.io-client": "^2.1.1"
+        "@monopoly/client": "file:packages/client",
+        "@monopoly/common": "file:packages/common",
+        "@monopoly/e2e": "file:packages/e2e",
+        "@monopoly/server": "file:packages/server"
     },
     "devDependencies": {
         "@types/debug": "0.0.30",
         "@types/jest": "^23.3.1",
         "@types/lodash": "^4.14.116",
-        "@types/socket.io": "^1.4.38",
-        "@types/socket.io-client": "^1.4.32",
         "babel-eslint": "^8.2.6",
         "babel-jest": "^23.4.2",
         "eslint": "4.19.1",
@@ -86,31 +84,16 @@
         "eslint-plugin-import": "2.12.0",
         "eslint-plugin-prettier": "^2.6.0",
         "jest": "^23.6.0",
+        "jest-dev-server": "^3.7.0",
+        "lerna": "^3.6.0",
+        "mock-socket": "^8.0.5",
+        "parcel-bundler": "^1.10.3",
         "prettier": "^1.12.1",
+        "recursive-install": "^1.4.0",
         "ts-jest": "^23.1.4",
         "ts-node": "^7.0.1",
         "tslint": "~5.11.0",
         "tslint-config-prettier": "~1.15.0",
         "typescript": "^3.0.3"
-    },
-    "jest": {
-        "globals": {
-            "ts-jest": {
-                "tsConfigFile": "tsconfig.json"
-            }
-        },
-        "moduleFileExtensions": [
-            "ts",
-            "js"
-        ],
-        "transform": {
-            "^.+\\.(ts|js)?$": "ts-jest"
-        },
-        "testMatch": [
-            "<rootDir>/(common|server|client|automation|__integration__)/**/*.test.(ts|js)"
-        ],
-        "testEnvironment": "node",
-        "restoreMocks": true,
-        "clearMocks": true
     }
 }

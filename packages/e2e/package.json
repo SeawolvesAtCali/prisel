@@ -1,0 +1,38 @@
+{
+    "name": "@monopoly/e2e",
+    "version": "0.0.0",
+    "description": "> TODO: description",
+    "author": "Yiou Chen <chen.yiou1992@gmail.com>",
+    "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/e2e#readme",
+    "license": "ISC",
+    "main": "lib/e2e.js",
+    "directories": {
+        "lib": "lib"
+    },
+    "files": [
+        "lib"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+    },
+    "scripts": {
+        "test": "env DEBUG=debug CI=true jest --runInBand",
+        "lint": "tslint --project tsconfig.json",
+        "fix": "tslint --project tsconfig.json --fix"
+    },
+    "bugs": {
+        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+    },
+    "dependencies": {
+        "@monopoly/client": "file:../client",
+        "@monopoly/common": "file:../common",
+        "@monopoly/server": "file:../server",
+        "immer": "^1.8.2",
+        "lodash": "^4.17.11"
+    },
+    "devDependencies": {
+        "jest-dev-server": "^3.7.0",
+        "jest-environment-jsdom": "^23.4.0"
+    }
+}

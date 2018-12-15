@@ -1,12 +1,6 @@
 import Client from '../client';
 import { getCreateRoom } from '../message/room';
 
-export enum Action {
-    MESSAGE,
-    LOGIN,
-    CONNECT,
-}
-
 export enum Fields {
     TEXT,
     NUMBER,
@@ -24,7 +18,6 @@ interface ResolvedFields {
 }
 
 export interface ActionType {
-    type: Action;
     title: string;
     fields?: FieldType[];
     handler: (client: Client, fields?: ResolvedFields) => Promise<any> | any;
@@ -37,23 +30,6 @@ export interface Profile {
 const defaultProfile: Profile = {
     actions: [
         {
-            type: Action.CONNECT,
-            title: 'connect',
-            handler: async (client: Client) => {
-                await client.connect();
-                return 'connected';
-            },
-        },
-        {
-            type: Action.LOGIN,
-            title: 'login',
-            fields: [{ label: 'username', key: 'username', type: Fields.TEXT, default: 'batman' }],
-            handler: (client: Client, fields: any) => {
-                return client.login(fields.username);
-            },
-        },
-        {
-            type: Action.MESSAGE,
             title: 'create room',
             fields: [{ label: 'room name', key: 'roomName', type: Fields.TEXT, default: 'room-1' }],
             handler: (client: Client, fields: any) => {

@@ -2,7 +2,7 @@ import * as React from 'react';
 import pick from 'lodash/pick';
 import { produce } from 'immer';
 import { Card, InputNumber, Input, Button, Row, Col } from 'antd';
-import { Profile, FieldType, Fields, Action, ActionType } from './profile';
+import { Profile, FieldType, Fields, ActionType } from './profile';
 import Client from '../client';
 import LoadingButton from './loadingButton';
 
@@ -12,6 +12,8 @@ interface ClientContainerProps {
 interface ClientContainerStates {
     fields: any;
     output: string[];
+    connected: boolean;
+    loggedIn: boolean;
 }
 
 function stringify(...rest: any[]): string {
@@ -37,6 +39,8 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         this.state = {
             fields: ClientContainer.getResolvedFieldsFromProfile(this.props.profile),
             output: [],
+            connected: false,
+            loggedIn: false,
         };
     }
 
@@ -52,26 +56,53 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                 );
             },
         );
+
+        this.client.connect().then(() => {
+            this.setState({
+                connected: true,
+            });
+        });
     }
     public render() {
         const { profile } = this.props;
         const { actions } = profile;
         const actionTiles = actions.map(this.getActionTile.bind(this));
+        const { connected, loggedIn } = this.state;
+
+        const loginBox = connected && !loggedIn && (
+            <Input.Search
+                placeholder="username"
+                defaultValue="batman"
+                onSearch={(value) =>
+                    this.client.login(value).then(() => {
+                        this.setState({
+                            loggedIn: true,
+                        });
+                    })
+                }
+                enterButton="Login"
+            />
+        );
+
         return (
-            <Card title="Card" style={{ width: 300 }}>
-                {actionTiles}
-                <div
-                    style={{
-                        minHeight: '10px',
-                        background: '#000066',
-                        color: 'white',
-                        wordBreak: 'break-all',
-                    }}
-                >
-                    {this.state.output.map((line, index) => (
-                        <p key={index}>{line}</p>
-                    ))}
-                </div>
+            <Card title="Client" style={{ width: 400 }} extra={loginBox}>
+                {connected && loggedIn && (
+                    <React.Fragment>
+                        {actionTiles}
+                        <div
+                            style={{
+                                minHeight: '10px',
+                                background: '#000066',
+                                color: 'white',
+                                wordBreak: 'break-all',
+                            }}
+                        >
+                            {this.state.output.map((line, index) => (
+                                <p key={index}>{line}</p>
+                            ))}
+                        </div>
+                    </React.Fragment>
+                )}
             </Card>
         );
     }

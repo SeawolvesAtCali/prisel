@@ -1,47 +1,40 @@
 import { State } from './objects';
+import { AnyObject } from './client';
 
-type Handler = (data: object) => State;
+type Handler = (data: object, messageType?: string) => State;
 
+export type MessageFilter = (messageType: string, data: AnyObject) => boolean;
+
+export type HandlerKey = string | MessageFilter;
 export default class PubSub {
-    private subscription = new Map<string, Set<Handler>>();
+    private subscription = new Map<HandlerKey, Set<Handler>>();
+    private filters = new Set<MessageFilter>();
 
-    public on(messageType: string, handler: Handler) {
+    public on(messageTypeOrFilter: HandlerKey, handler: Handler) {
         if (!this.subscription) {
             return;
         }
-        const handlerSet = this.subscription.get(messageType) || new Set();
+        const handlerSet = this.subscription.get(messageTypeOrFilter) || new Set();
         handlerSet.add(handler);
-        this.subscription.set(messageType, handlerSet);
+        this.subscription.set(messageTypeOrFilter, handlerSet);
+        if (typeof messageTypeOrFilter === 'function') {
+            this.filters.add(messageTypeOrFilter);
+        }
         return () => {
             handlerSet.delete(handler);
         };
     }
 
-    public once(messageType: string, handler: Handler) {
+    public once(messageTypeOrFilter: HandlerKey, handler: Handler) {
         if (!this.subscription) {
             return;
         }
-        const onceHandler = (data: object) => {
-            handler(data);
+        const onceHandler = (data: object, messageType: string) => {
+            handler(data, messageType);
             off();
         };
 
-        const off = this.on(messageType, onceHandler);
-        return off;
-    }
-
-    public onceWhen(messageType: string, handler: Handler, predicate: (data: object) => boolean) {
-        if (!this.subscription) {
-            return;
-        }
-        const onceHandler = (data: object) => {
-            if (predicate(data)) {
-                handler(data);
-                off();
-            }
-        };
-
-        const off = this.on(messageType, onceHandler);
+        const off = this.on(messageTypeOrFilter, onceHandler);
         return off;
     }
 
@@ -49,15 +42,21 @@ export default class PubSub {
         if (!this.subscription) {
             return;
         }
-        const handlerSet = this.subscription.get(messageType);
-        if (handlerSet) {
-            handlerSet.forEach((handler) => {
-                handler(data);
-            });
-        }
+        const keys = (Array.from(this.filters).filter((filter) =>
+            filter(messageType, data),
+        ) as HandlerKey[]).concat(messageType);
+        keys.forEach((key) => {
+            const handlerSet = this.subscription.get(key);
+            if (handlerSet) {
+                handlerSet.forEach((handler) => {
+                    handler(data, messageType);
+                });
+            }
+        });
     }
 
     public close() {
         this.subscription = undefined;
+        this.filters = new Set<MessageFilter>();
     }
 }

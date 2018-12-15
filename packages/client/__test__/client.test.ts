@@ -65,6 +65,21 @@ describe('Client', () => {
             connection.send(createPacket('HI', {}));
             await waitForHi;
         });
+
+        it('should be able to take a filter', async () => {
+            const client = new Client(fakeURL);
+            let connection: WebSocket;
+            mockServer.on('connection', (socket) => (connection = socket));
+            await client.connect();
+            const waitForHiFive = new Promise<any>((resolve) =>
+                client.on((messageType, data) => messageType === 'HI' && data.value === 5, resolve),
+            );
+            connection.send(createPacket('HI', { value: 3 }));
+            connection.send(createPacket('HI', { value: 5 }));
+            connection.send(createPacket('HI', { value: 7 }));
+            const result = await waitForHiFive;
+            expect(result.value).toBe(5);
+        });
     });
 
     describe('once', () => {
@@ -77,21 +92,6 @@ describe('Client', () => {
             connection.send(createPacket('HI', { value: 3 }));
             const result = await waitForHi;
             expect(result.value).toBe(3);
-        });
-    });
-
-    describe('onceWhen', () => {
-        it('should resolve when receive message that matches predicate', async () => {
-            const client = new Client(fakeURL);
-            let connection: WebSocket;
-            mockServer.on('connection', (socket) => (connection = socket));
-            await client.connect();
-            const waitForHiFive = client.onceWhen('HI', (_, data) => data.value === 5);
-            connection.send(createPacket('HI', { value: 3 }));
-            connection.send(createPacket('HI', { value: 5 }));
-            connection.send(createPacket('HI', { value: 7 }));
-            const result = await waitForHiFive;
-            expect(result.value).toBe(5);
         });
     });
 });

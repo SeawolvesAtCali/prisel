@@ -41,8 +41,14 @@ describe('create room', () => {
         client.emit(...roomMessages.getJoin(roomId));
         const [, hostRoomUpdateResult, clientRoomUpdateResult] = await Promise.all([
             untilSuccess(client, RoomType.JOIN),
-            host.onceWhen(RoomType.ROOM_UPDATE, (state, data) => data.guests.includes(clientId)),
-            client.onceWhen(RoomType.ROOM_UPDATE, (state, data) => data.guests.includes(clientId)),
+            host.once(
+                (messageType, data) =>
+                    RoomType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
+            ),
+            client.once(
+                (messageType, data) =>
+                    RoomType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
+            ),
         ]);
 
         expect(clientRoomUpdateResult.id).toBe(roomId);

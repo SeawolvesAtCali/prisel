@@ -3,6 +3,7 @@
     "compilerOptions": {
         "outDir": "./lib",
         "rootDir": "./",
-        "lib": ["dom", "es2015", "es2016", "es2017"]
+        "lib": ["dom", "es2015", "es2016", "es2017"],
+        "jsx": "react"
     }
 }

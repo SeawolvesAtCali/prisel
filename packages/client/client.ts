@@ -5,7 +5,7 @@ import createPacket from '@monopoly/common/lib/createPacket';
 
 import { getLogin, getExit } from './message/room';
 import RoomType from '@monopoly/common/lib/message/room';
-import PubSub from './pubSub';
+import PubSub, { HandlerKey } from './pubSub';
 import withTimer from './withTimer';
 
 const DEFAULT_USERNAME = 'user';
@@ -39,7 +39,6 @@ const LOGIN_TIMEOUT = DEFAULT_TIMEOUT;
  * After a client is connected, we can attach message handler using `client.on`
  */
 class Client {
-
     public get connection(): WebSocket {
         if (this.conn) {
             return this.conn;
@@ -110,7 +109,10 @@ class Client {
     public login(username: string = DEFAULT_USERNAME): Promise<MessageData> {
         this.emit(...getLogin(username));
         return withTimer(
-            this.onceWhen(RoomType.SUCCESS, (_, data) => data.action === RoomType.LOGIN),
+            this.once(
+                (messageType, data) =>
+                    messageType === RoomType.SUCCESS && data.action === RoomType.LOGIN,
+            ),
             LOGIN_TIMEOUT,
         );
     }
@@ -126,19 +128,18 @@ class Client {
 
     /**
      * Attach handler for messages from server
-     * @param {String} namespace The namespace to listen to
-     * @param {String} messageType message type
+     * @param {HandlerKey} messageTypeOrFilter message type
      * @param {(state, emit) => (data) => newState} handler listener
      */
     public on(
-        messageType: string,
-        callback: (data: AnyObject) => AnyObject | void,
+        messageTypeOrFilter: HandlerKey,
+        callback: (data: AnyObject, messageType?: string) => AnyObject | void,
     ): RemoveListenerFunc {
-        const handler = (data: AnyObject) => {
-            const updatedState = callback(data) || this.state;
+        const handler = (data: AnyObject, messageType: string) => {
+            const updatedState = callback(data, messageType) || this.state;
             this.state = updatedState;
         };
-        return this.messageQueue.on(messageType, handler);
+        return this.messageQueue.on(messageTypeOrFilter, handler);
     }
 
     /**
@@ -150,27 +151,12 @@ class Client {
     }
 
     /**
-     * Listen to message until state and message data matches requirement
-     * @param {string} type message type to listen to
-     * @param {function} checker function that returns true to stop listening
-     */
-    public onceWhen(
-        type: string,
-        checker: (state: AnyObject, data: AnyObject) => boolean,
-    ): Promise<MessageData> {
-        return new Promise((resolve) => {
-            this.messageQueue.onceWhen(type, resolve, (data) => checker(this.state, data));
-        });
-    }
-
-    /**
      * Listen for message until receive the message once.
-     * @param {string} namespace namespace to listen to
-     * @param {string} type message type to listen to
+     * @param {HandlerKey} messageTypeOrFilter message type to listen to
      */
-    public once(type: string): Promise<MessageData> {
+    public once(messageTypeOrFilter: HandlerKey): Promise<MessageData> {
         return new Promise((resolve) => {
-            this.messageQueue.once(type, resolve);
+            this.messageQueue.once(messageTypeOrFilter, resolve);
         });
     }
     private disconnect() {

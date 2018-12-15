@@ -82,6 +82,7 @@
         "@types/debug": "0.0.30",
         "@types/jest": "^23.3.1",
         "@types/lodash": "^4.14.116",
+        "antd": "^3.11.2",
         "babel-eslint": "^8.2.6",
         "babel-jest": "^23.4.2",
         "eslint": "4.19.1",

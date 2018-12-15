@@ -6,7 +6,9 @@
     "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/client#readme",
     "license": "ISC",
     "main": "lib/client.js",
-    "files": ["lib"],
+    "files": [
+        "lib"
+    ],
     "directories": {
         "lib": "./",
         "test": "__test__"
@@ -30,5 +32,7 @@
         "immer": "^1.8.2",
         "lodash": "^4.17.11"
     },
-    "devDependencies": {}
+    "devDependencies": {
+        "antd": "^3.11.2"
+    }
 }

@@ -1,4 +1,3 @@
-// eslint-disable-next-line
 const JSDomEnvironment = require('jest-environment-jsdom');
 const path = require('path');
 const { setup: setupDevServer, teardown: teardownDevServer } = require('jest-dev-server');

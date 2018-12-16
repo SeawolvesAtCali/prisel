@@ -1,5 +1,6 @@
 import Client from '../client';
-import { getCreateRoom } from '../message/room';
+import { getCreateRoom, getJoin } from '../message/room';
+import { getChat } from '../message/chat';
 
 export enum Fields {
     TEXT,
@@ -34,6 +35,24 @@ const defaultProfile: Profile = {
             fields: [{ label: 'room name', key: 'roomName', type: Fields.TEXT, default: 'room-1' }],
             handler: (client: Client, fields: any) => {
                 client.emit(...getCreateRoom(fields.roomName));
+            },
+        },
+        {
+            title: 'join',
+            fields: [{ label: 'room id', key: 'roomid', type: Fields.TEXT }],
+            handler: (client: Client, fields: any) => {
+                client.emit(...getJoin(fields.roomid));
+            },
+        },
+        {
+            title: 'send',
+            fields: [
+                { label: '', key: 'msg', type: Fields.TEXT },
+                { label: 'user id', key: 'uid', type: Fields.TEXT },
+                { label: 'room id', key: 'rid', type: Fields.TEXT },
+            ],
+            handler: (client: Client, fields: any) => {
+                client.emit(...getChat(fields.uid, fields.msg, fields.rid));
             },
         },
     ],

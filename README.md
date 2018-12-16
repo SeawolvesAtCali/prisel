@@ -4,7 +4,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 
-WebSocket game engine
+WebSocket game engine (WIP). For how to reach 0.1 release (all crucial features complete), see [milestone](https://github.com/SeawolvesAtCali/Monopoly/milestone/1)
 
 # Install
 
@@ -15,6 +15,10 @@ To install dependencies, run the following command in project root directory:
 
 ```
 npm install
+```
+After install, we need to build TypeScript files into JavaScript files. Some of the TypeScript files depends on compiled JavaScript file.
+```
+npm run build
 ```
 
 # Test
@@ -32,16 +36,13 @@ To run all the test
 npm test
 ```
 
-To run just one test file, for example `server/__test__/index.test.ts`
-
+To run a test in a package
 ```
-npx jest server/__test__/index.test.ts
+npm test --scope <package-name>
 ```
-
-To run a file in watch mode(automatically rerun the test when any related files change)
-
+for example:
 ```
-npx jest server/__test__/index.test.ts -- --watch
+npm test --scope @monopoly/server
 ```
 
 # Debugging
@@ -116,3 +117,6 @@ current file when save.
 
 ## tslint (search for `eg2.tslint`) for TypeScript linting
 Also recommend enabling `tslint.autoFixOnSave` in vscode setting.
+
+## prettier (search for `esbenp.prettier-vscode`)
+Prettier formats the code. On editor setting, enable `editor.formatOnSave`

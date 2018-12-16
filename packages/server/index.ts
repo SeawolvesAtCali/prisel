@@ -6,7 +6,7 @@ import { createServer } from './networkUtils';
 import clientHandlerRegister, { Handler } from './clientHandlerRegister';
 import { parsePacket } from '@monopoly/common/lib/createPacket';
 
-debug('starting server');
+process.stdout.write('starting server');
 
 process.title = 'monopoly-server';
 

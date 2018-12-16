@@ -3,20 +3,22 @@
 [![Build Status](https://travis-ci.org/SeawolvesAtCali/Monopoly.svg?branch=master)](https://travis-ci.org/SeawolvesAtCali/Monopoly)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-
-WebSocket game engine (WIP). For how to reach 0.1 release (all crucial features complete), see [milestone](https://github.com/SeawolvesAtCali/Monopoly/milestone/1)
+WebSocket game engine (WIP). For how to reach 0.1 release (all crucial features complete), see
+[milestone](https://github.com/SeawolvesAtCali/Monopoly/milestone/1)
 
 # Install
 
-make sure you have [node](https://nodejs.org/en/) installed, the recommended version is 9.11.1 and
-up.
+make sure you have [node](https://nodejs.org/en/) installed, the recommended version is 10.x and up.
 
 To install dependencies, run the following command in project root directory:
 
 ```
 npm install
 ```
-After install, we need to build TypeScript files into JavaScript files. Some of the TypeScript files depends on compiled JavaScript file.
+
+After install, we need to build TypeScript files into JavaScript files. Some of the TypeScript files
+depends on compiled JavaScript file.
+
 ```
 npm run build
 ```
@@ -37,10 +39,13 @@ npm test
 ```
 
 To run a test in a package
+
 ```
 npm test --scope <package-name>
 ```
+
 for example:
+
 ```
 npm test --scope @monopoly/server
 ```
@@ -116,7 +121,9 @@ This extension displays linting issues in the code. Also recommend turning on
 current file when save.
 
 ## tslint (search for `eg2.tslint`) for TypeScript linting
+
 Also recommend enabling `tslint.autoFixOnSave` in vscode setting.
 
 ## prettier (search for `esbenp.prettier-vscode`)
+
 Prettier formats the code. On editor setting, enable `editor.formatOnSave`

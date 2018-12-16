@@ -26,9 +26,14 @@
     },
     "dependencies": {
         "@monopoly/common": "file:../common",
+        "@types/koa": "^2.0.47",
         "@types/ws": "^6.0.1",
         "immer": "^1.8.2",
+        "koa": "^2.6.2",
         "lodash": "^4.17.11",
         "ws": "^6.1.2"
+    },
+    "devDependencies": {
+        "@types/koa": "^2.0.47"
     }
 }

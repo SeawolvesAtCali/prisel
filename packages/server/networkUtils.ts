@@ -2,12 +2,20 @@ import { Server, Context } from './objects';
 import debug from './debug';
 import createPacket from '@monopoly/common/lib/createPacket';
 import WebSocket from 'ws';
+import http from 'http';
+import Koa from 'koa';
 
-export function createServer({ host = 'localhost', port = 3000 } = {}): Server {
-    const ws = new WebSocket.Server({
-        host,
-        port,
+export function createServer({
+    host = '0.0.0.0',
+    port = Number(process.env.PORT) || 3000,
+} = {}): Server {
+    const app = new Koa();
+    app.use((ctx) => {
+        ctx.body = 'Server is running';
     });
+    const httpServer = http.createServer(app.callback());
+    const ws = new WebSocket.Server({ server: httpServer });
+    httpServer.listen(port, host, undefined, undefined);
     debug(`start serving at ws://${host}:${port}`);
     return ws;
 }

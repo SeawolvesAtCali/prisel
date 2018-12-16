@@ -3,13 +3,13 @@
     "version": "0.0.0",
     "private": true,
     "description": "Online Monopoly game",
-    "main": "index.js",
     "scripts": {
         "start:server": "env DEBUG=debug ts-node packages/server/index.ts",
         "start:client": "parcel serve packages/client/index.html",
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "prebuild": "lerna exec -- rm -rf lib",
         "build": "lerna run build --stream",
+        "deploy:server": "npm run build && node packages/server/lib/index.js",
         "test": "lerna run --no-bail test --ignore @monopoly/e2e --stream",
         "automation": "lerna run test --scope @monopoly/e2e --stream",
         "lint": "lerna run lint",
@@ -63,6 +63,9 @@
         "env": {
             "jest": true
         }
+    },
+    "engines": {
+        "node": "^10.x"
     },
     "prettier": {
         "printWidth": 100,

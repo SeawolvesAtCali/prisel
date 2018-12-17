@@ -9,6 +9,7 @@
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "prebuild": "lerna exec -- rm -rf lib",
         "build": "lerna run build --stream",
+        "predeploy:server": "npm ci",
         "deploy:server": "npm run build && node packages/server/lib/index.js",
         "test": "lerna run --no-bail test --ignore @monopoly/e2e --stream",
         "automation": "lerna run test --scope @monopoly/e2e --stream",

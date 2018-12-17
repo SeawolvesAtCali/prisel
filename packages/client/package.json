@@ -29,6 +29,7 @@
     },
     "dependencies": {
         "@monopoly/common": "file:../common",
+        "debug": "^4.1.0",
         "immer": "^1.8.2",
         "lodash": "^4.17.11"
     },

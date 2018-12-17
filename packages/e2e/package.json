@@ -28,6 +28,7 @@
         "@monopoly/client": "file:../client",
         "@monopoly/common": "file:../common",
         "@monopoly/server": "file:../server",
+        "debug": "^4.1.0",
         "immer": "^1.8.2",
         "lodash": "^4.17.11"
     },

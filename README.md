@@ -16,13 +16,6 @@ To install dependencies, run the following command in project root directory:
 npm install
 ```
 
-After install, we need to build TypeScript files into JavaScript files. Some of the TypeScript files
-depends on compiled JavaScript file.
-
-```
-npm run build
-```
-
 # Test
 
 This project uses [jest](https://facebook.github.io/jest/) as the testing framework.

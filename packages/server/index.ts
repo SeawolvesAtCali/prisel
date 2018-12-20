@@ -2,7 +2,7 @@ import { Context, Socket } from './objects';
 import createContext from './createContext';
 import debug from './debug';
 import './handler';
-import { createServer } from './networkUtils';
+import { createServer, watchForDisconnection, getConnectionToken } from './networkUtils';
 import clientHandlerRegister, { Handler } from './clientHandlerRegister';
 import { parsePacket } from '@monopoly/common/lib/createPacket';
 
@@ -19,7 +19,7 @@ const context: Context = createContext({
 global.context = context;
 
 server.on('connection', (socket) => {
-    debug('client connected', clientHandlerRegister.map(([messageType]) => messageType).join(' '));
+    debug('client connected');
     socket.on('message', (data: any) => {
         if (data) {
             const packet = parsePacket(data);
@@ -30,11 +30,19 @@ server.on('connection', (socket) => {
             });
         }
     });
-    // clientHandlerRegister.forEach(([event, handler]: [string, Handler]) => {
-    //     socket.on(event, handler(context, socket));
-    // });
+
+    const connectionToken = getConnectionToken();
     socket.on('disconnect', () => {
+        connectionToken.safeDisconnect();
         debug('client disconnected');
+    });
+
+    watchForDisconnection(socket, connectionToken).then(() => {
+        if (!connectionToken.safeDisconnected) {
+            // client is not responding
+            // forcefully terminate connection
+            socket.terminate();
+        }
     });
 });
 

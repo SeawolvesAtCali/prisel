@@ -20,6 +20,42 @@ export function createServer({
     return ws;
 }
 
+interface ConnectionToken {
+    isAlive: boolean;
+    safeDisconnect: () => void;
+    safeDisconnected: boolean;
+}
+
+export function getConnectionToken(): ConnectionToken {
+    const token: ConnectionToken = {
+        isAlive: true,
+        safeDisconnected: false,
+        safeDisconnect() {
+            token.isAlive = false;
+            token.safeDisconnected = true;
+        },
+    };
+    return token;
+}
+
+export function watchForDisconnection(socket: WebSocket, connectionToken: ConnectionToken) {
+    return new Promise((resolve) => {
+        socket.on('pong', () => {
+            connectionToken.isAlive = true;
+        });
+        function noop() {}
+        const interval = setInterval(() => {
+            if (connectionToken.isAlive === false) {
+                clearInterval(interval);
+                resolve();
+                return;
+            }
+            socket.ping(noop);
+            connectionToken.isAlive = false;
+        }, 30000);
+    });
+}
+
 /**
  * Utility functions to perform network calls.
  */

@@ -86,7 +86,7 @@ const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string
     updateClientWithRoomData(context, roomId);
 };
 
-const handleLeaveImpl = (context: Context, socket: Socket) => (data: {}) => {
+export const handleLeaveImpl = (context: Context, socket: Socket) => (data: {}) => {
     const { SocketManager, updateState } = context;
     const clientId = SocketManager.getId(socket);
     let roomId: string;

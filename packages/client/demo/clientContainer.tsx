@@ -85,7 +85,11 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         );
 
         return (
-            <Card title="Client" style={{ width: 400 }} extra={loginBox}>
+            <Card
+                title="Client"
+                style={{ width: 400, display: 'inline-block', margin: '5px', verticalAlign: 'top' }}
+                extra={loginBox}
+            >
                 {connected && loggedIn && (
                     <React.Fragment>
                         {actionTiles}
@@ -95,6 +99,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                                 background: '#000066',
                                 color: 'white',
                                 wordBreak: 'break-all',
+                                whiteSpace: 'normal',
                             }}
                         >
                             {this.state.output.map((line, index) => (

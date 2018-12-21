@@ -5,14 +5,11 @@
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/common#readme",
     "license": "ISC",
-    "main": "lib/common.js",
+    "main": "lib/index.js",
     "directories": {
         "lib": "./",
         "test": "__test__"
     },
-    "files": [
-        "lib"
-    ],
     "repository": {
         "type": "git",
         "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"

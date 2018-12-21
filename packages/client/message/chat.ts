@@ -1,5 +1,5 @@
 import { Message } from '../objects';
-import ChatType from '@monopoly/common/lib/message/chat';
+import { ChatType } from '@monopoly/common';
 
 /**
  * Send a public message

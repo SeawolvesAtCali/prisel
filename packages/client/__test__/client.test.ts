@@ -1,5 +1,5 @@
 import Client from '../client';
-import createPacket from '@monopoly/common/lib/createPacket';
+import { createPacket } from '@monopoly/common';
 import { Server } from 'mock-socket';
 
 describe('Client', () => {

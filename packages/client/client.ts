@@ -1,10 +1,10 @@
 import debug from './debug';
 import once from 'lodash/once';
-import { SERVER } from '@monopoly/common/lib/constants';
-import createPacket from '@monopoly/common/lib/createPacket';
+import { SERVER } from '@monopoly/common';
+import { createPacket } from '@monopoly/common';
 
 import { getLogin, getExit } from './message/room';
-import RoomType from '@monopoly/common/lib/message/room';
+import { RoomType } from '@monopoly/common';
 import PubSub, { HandlerKey } from './pubSub';
 import withTimer from './withTimer';
 
@@ -29,10 +29,9 @@ const LOGIN_TIMEOUT = DEFAULT_TIMEOUT;
  * A client encapsulates the socket.io connection with server and provides methods to interact with the connection.
  * To create a client, call the constructor with socket namespaces that this client needs to connect to.
  *
- *      const client = new Client(CHAT_NS, CONTROLLER_NS); // create a client to be connect to chat and controller namespace
+ *      const client = new Client(serverURL); // create a client
  *
  * Creating a Client instance doesn't connect to the server, we need to call `client.connect()`
- * If controller namespace is used, connect will also log in with the username.
  *
  * After connection, we can login using `client.login(username)`
  *

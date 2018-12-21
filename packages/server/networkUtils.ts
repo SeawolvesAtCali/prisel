@@ -1,6 +1,6 @@
 import { Server, Context } from './objects';
 import debug from './debug';
-import createPacket from '@monopoly/common/lib/createPacket';
+import { createPacket } from '@monopoly/common';
 import WebSocket from 'ws';
 import http from 'http';
 import Koa from 'koa';

@@ -1,5 +1,5 @@
 import { Message } from '../objects';
-import GameType from '@monopoly/common/lib/message/game';
+import { GameType } from '@monopoly/common';
 /**
  * Update client on current game state
  * @param {object} gameState

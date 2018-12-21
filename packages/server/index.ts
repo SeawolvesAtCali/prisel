@@ -4,7 +4,7 @@ import debug from './debug';
 import './handler';
 import { createServer, watchForDisconnection, getConnectionToken } from './networkUtils';
 import clientHandlerRegister, { Handler } from './clientHandlerRegister';
-import { parsePacket } from '@monopoly/common/lib/createPacket';
+import { parsePacket } from '@monopoly/common';
 import { handleDisconnect } from './handler/handleDisconnect';
 
 process.stdout.write('starting server');

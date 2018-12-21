@@ -1,5 +1,5 @@
 import { Message } from '../objects';
-import RoomType from '@monopoly/common/lib/message/room';
+import { RoomType } from '@monopoly/common';
 
 /**
  * functions to create messages.

@@ -80,7 +80,8 @@
         "@monopoly/client": "file:packages/client",
         "@monopoly/common": "file:packages/common",
         "@monopoly/e2e": "file:packages/e2e",
-        "@monopoly/server": "file:packages/server"
+        "@monopoly/server": "file:packages/server",
+        "@monopoly/template": "file:packages/template"
     },
     "devDependencies": {
         "@types/debug": "0.0.30",

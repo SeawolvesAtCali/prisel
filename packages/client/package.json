@@ -4,7 +4,7 @@
     "description": "> TODO: description",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/client#readme",
-    "license": "ISC",
+    "license": "MIT",
     "main": "lib/client.js",
     "files": [
         "lib"

@@ -1,6 +1,6 @@
 import debug from './debug';
 import { createClients, untilSuccess } from './testHelper';
-import * as roomMessages from '@monopoly/client/lib/message/room';
+import { Messages } from '@monopoly/client';
 import { RoomType } from '@monopoly/common';
 
 jest.setTimeout(30000);
@@ -9,7 +9,7 @@ describe('create room', () => {
         const [client] = createClients();
         await client.connect();
         await client.login('batman');
-        client.emit(...roomMessages.getCreateRoom('party room'));
+        client.emit(...Messages.getCreateRoom('party room'));
         const data = await untilSuccess(client, RoomType.CREATE_ROOM);
         expect(typeof data.roomId).toBe('string');
         client.exit();
@@ -19,9 +19,9 @@ describe('create room', () => {
         const [client] = createClients();
         await client.connect();
         await client.login('batman');
-        client.emit(...roomMessages.getCreateRoom('room'));
+        client.emit(...Messages.getCreateRoom('room'));
         await untilSuccess(client, RoomType.CREATE_ROOM);
-        client.emit(...roomMessages.getLeave());
+        client.emit(...Messages.getLeave());
         await untilSuccess(client, RoomType.LEAVE);
         client.exit();
     });
@@ -35,10 +35,10 @@ describe('create room', () => {
         await client.connect();
         const clientData = await client.login('client');
         const clientId = clientData.userId;
-        host.emit(...roomMessages.getCreateRoom('party room'));
+        host.emit(...Messages.getCreateRoom('party room'));
         const roomData = await untilSuccess(host, RoomType.CREATE_ROOM);
         const { roomId } = roomData;
-        client.emit(...roomMessages.getJoin(roomId));
+        client.emit(...Messages.getJoin(roomId));
         const [, hostRoomUpdateResult, clientRoomUpdateResult] = await Promise.all([
             untilSuccess(client, RoomType.JOIN),
             host.once(

@@ -1,10 +1,10 @@
 import { StateManager } from './stateManager';
 import SocketManager from '../socketManager';
-import { Server } from './server';
+import { wsServer } from './server';
 
 export interface Context {
     SocketManager: SocketManager;
     StateManager: StateManager;
-    server: Server;
+    server: wsServer;
     updateState: (updater: (draftState: StateManager, baseState: StateManager) => void) => void;
 }

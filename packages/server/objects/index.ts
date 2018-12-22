@@ -4,4 +4,4 @@ export { Room } from './room';
 export { Socket } from './socket';
 export { StateManager } from './stateManager';
 export { Message } from './message';
-export { Server } from './server';
+export { wsServer } from './server';

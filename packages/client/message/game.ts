@@ -15,3 +15,11 @@ export function getDice(): Message {
 export function getResponse(response: string, actionId: string): Message {
     return ['RESPONSE', { response, actionId }];
 }
+
+/**
+ * Give server instruction on current player's move
+ * @param move
+ */
+export function getMove(move: { [key: string]: any }): Message {
+    return ['MOVE', move];
+}

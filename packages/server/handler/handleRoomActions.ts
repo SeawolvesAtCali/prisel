@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { Context, Room, Socket } from '../objects';
 import partial from 'lodash/partial';
 import { emit, closeSocket } from '../networkUtils';
-import RoomType from '@monopoly/common/lib/message/room';
+import { RoomType } from '@monopoly/common';
 import * as messages from '../message/room';
 import { newId } from '../idUtils';
 import { updateClientWithRoomData } from '../updateUtils';
@@ -86,7 +86,7 @@ const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string
     updateClientWithRoomData(context, roomId);
 };
 
-const handleLeaveImpl = (context: Context, socket: Socket) => (data: {}) => {
+export const handleLeaveImpl = (context: Context, socket: Socket) => (data: {}) => {
     const { SocketManager, updateState } = context;
     const clientId = SocketManager.getId(socket);
     let roomId: string;

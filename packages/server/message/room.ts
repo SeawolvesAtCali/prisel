@@ -1,5 +1,5 @@
 import { Message } from '../objects';
-import RoomType from '@monopoly/common/lib/message/room';
+import { RoomType } from '@monopoly/common';
 
 /**
  * functions to create messages.
@@ -8,6 +8,9 @@ import RoomType from '@monopoly/common/lib/message/room';
  * the rest are the content
  */
 
+export function getWelcome(): Message {
+    return [RoomType.WELCOME, {}];
+}
 export function getPong(): Message {
     return [RoomType.PONG, {}];
 }

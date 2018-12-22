@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { Context, Socket } from '../objects';
 import { broadcast } from '../networkUtils';
 import * as messages from '../message/chat';
-import ChatType from '@monopoly/common/lib/message/chat';
+import { ChatType } from '@monopoly/common';
 import clientHandlerRegister from '../clientHandlerRegister';
 
 export const handleChat = (context: Context, client: Socket) => (data: {

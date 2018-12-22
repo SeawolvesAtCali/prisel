@@ -1,4 +1,4 @@
-export default function createPacket(messageType: string, payload: object) {
+export function createPacket(messageType: string, payload: object) {
     return JSON.stringify({
         type: messageType,
         payload,

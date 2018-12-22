@@ -2,7 +2,7 @@ import { handleChat } from '../handleChat';
 import createContext from '../../createContext';
 import { Socket, ClientType } from '../../objects';
 import { broadcast } from '../../networkUtils';
-import ChatType from '@monopoly/common/lib/message/chat';
+import { ChatType } from '@monopoly/common';
 
 jest.mock('../../networkUtils');
 

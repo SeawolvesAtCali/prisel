@@ -1,6 +1,6 @@
 import { Server, Context } from './objects';
 import debug from './debug';
-import createPacket from '@monopoly/common/lib/createPacket';
+import { createPacket, HEARTBEAT_INTERVAL } from '@monopoly/common';
 import WebSocket from 'ws';
 import http from 'http';
 import Koa from 'koa';
@@ -18,6 +18,42 @@ export function createServer({
     httpServer.listen(port, host, undefined, undefined);
     debug(`start serving at ws://${host}:${port}`);
     return ws;
+}
+
+interface ConnectionToken {
+    isAlive: boolean;
+    safeDisconnect: () => void;
+    safeDisconnected: boolean;
+}
+
+export function getConnectionToken(): ConnectionToken {
+    const token: ConnectionToken = {
+        isAlive: true,
+        safeDisconnected: false,
+        safeDisconnect() {
+            token.isAlive = false;
+            token.safeDisconnected = true;
+        },
+    };
+    return token;
+}
+
+export function watchForDisconnection(socket: WebSocket, connectionToken: ConnectionToken) {
+    return new Promise((resolve) => {
+        socket.on('pong', () => {
+            connectionToken.isAlive = true;
+        });
+        function noop() {}
+        const interval = setInterval(() => {
+            if (connectionToken.isAlive === false) {
+                clearInterval(interval);
+                resolve();
+                return;
+            }
+            socket.ping(noop);
+            connectionToken.isAlive = false;
+        }, HEARTBEAT_INTERVAL);
+    });
 }
 
 /**

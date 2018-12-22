@@ -8,6 +8,9 @@ import { RoomType } from '@monopoly/common';
  * the rest are the content
  */
 
+export function getWelcome(): Message {
+    return [RoomType.WELCOME, {}];
+}
 export function getPong(): Message {
     return [RoomType.PONG, {}];
 }

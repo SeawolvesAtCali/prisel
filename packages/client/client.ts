@@ -15,8 +15,6 @@ export interface AnyObject {
 
 type MessageData = AnyObject;
 
-type EmitFunc = (messageType: string, data: AnyObject) => void;
-
 type RemoveListenerFunc = () => void;
 
 const DEFAULT_TIMEOUT = 5000;
@@ -87,6 +85,8 @@ class Client {
             }),
             CONNECTION_TIMEOUT,
         );
+
+        // connection.
         return connection;
     }
 

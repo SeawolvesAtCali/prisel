@@ -2,10 +2,11 @@ import { Context, Socket } from './objects';
 import createContext from './createContext';
 import debug from './debug';
 import './handler';
-import { createServer, watchForDisconnection, getConnectionToken } from './networkUtils';
+import { createServer, watchForDisconnection, getConnectionToken, emit } from './networkUtils';
 import clientHandlerRegister, { Handler } from './clientHandlerRegister';
-import { parsePacket } from '@monopoly/common';
+import { parsePacket, RoomType } from '@monopoly/common';
 import { handleDisconnect } from './handler/handleDisconnect';
+import { getWelcome } from './message/room';
 
 process.stdout.write('starting server');
 
@@ -21,6 +22,7 @@ global.context = context;
 
 server.on('connection', (socket) => {
     debug('client connected');
+    emit(socket, ...getWelcome());
     socket.on('message', (data: any) => {
         if (data) {
             const packet = parsePacket(data);
@@ -43,6 +45,7 @@ server.on('connection', (socket) => {
         if (!connectionToken.safeDisconnected) {
             // client is not responding
             // forcefully terminate connection
+            debug(`client ${context.SocketManager.getId(socket)} lost connection`);
             socket.terminate();
             handleDisconnect(context, socket);
         }

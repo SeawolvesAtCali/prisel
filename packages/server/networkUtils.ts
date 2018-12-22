@@ -1,6 +1,6 @@
 import { Server, Context } from './objects';
 import debug from './debug';
-import { createPacket } from '@monopoly/common';
+import { createPacket, HEARTBEAT_INTERVAL } from '@monopoly/common';
 import WebSocket from 'ws';
 import http from 'http';
 import Koa from 'koa';
@@ -52,7 +52,7 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
             }
             socket.ping(noop);
             connectionToken.isAlive = false;
-        }, 30000);
+        }, HEARTBEAT_INTERVAL);
     });
 }
 

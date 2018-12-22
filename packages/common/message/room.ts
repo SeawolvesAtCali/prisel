@@ -1,4 +1,5 @@
 enum Type {
+    WELCOME = 'WELCOME',
     PING = 'PING',
     PONG = 'PONG',
     RECONNECT = 'RECONNECT',

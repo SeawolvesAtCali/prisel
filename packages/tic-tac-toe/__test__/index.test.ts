@@ -1,11 +1,6 @@
-import hello from '../index';
 import { checkWin, isEven } from '../state';
 
 describe('@monopoly/template', () => {
-    it('should say hello', () => {
-        expect(hello).toBe('Hello world');
-    });
-
     describe('checkWin', () => {
         it('should win if line up horizontally', () => {
             expect(checkWin({ map: ['', '', '', 'x', 'x', 'x', '', '', ''] })).toBe(true);

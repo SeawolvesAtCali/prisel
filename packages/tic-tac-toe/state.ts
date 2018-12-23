@@ -105,6 +105,3 @@ export function checkWin(state: any) {
 
 clientHandlerRegister.push([RoomType.GAME_START, handleGameStart]);
 clientHandlerRegister.push([GameType.MOVE, handleMove]);
-
-const server = new Server();
-server.start();

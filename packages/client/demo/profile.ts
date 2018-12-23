@@ -5,6 +5,7 @@ import { getChat } from '../message/chat';
 export enum Fields {
     TEXT,
     NUMBER,
+    CUSTOM,
 }
 
 export interface FieldType {
@@ -12,6 +13,7 @@ export interface FieldType {
     key: string;
     type: Fields;
     default?: any;
+    render?: any;
 }
 
 interface ResolvedFields {

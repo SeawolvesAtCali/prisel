@@ -23,6 +23,7 @@ class Server {
             debug('client connected');
             emit(socket, ...getWelcome());
             socket.on('message', (data: any) => {
+                debug(data);
                 if (data) {
                     const packet = parsePacket(data);
                     clientHandlerRegister.forEach(([event, handler]) => {

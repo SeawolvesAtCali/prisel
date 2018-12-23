@@ -1,6 +1,7 @@
 import Client from '../client';
 import { getCreateRoom, getJoin } from '../message/room';
 import { getChat } from '../message/chat';
+import { getGameStart, getMove } from '../message';
 
 export enum Fields {
     TEXT,
@@ -39,7 +40,7 @@ const defaultProfile: Profile = {
         },
         {
             title: 'join',
-            fields: [{ label: 'room id', key: 'roomid', type: Fields.TEXT }],
+            fields: [{ label: 'room id', key: 'roomid', type: Fields.TEXT, default: 'ROOM-1' }],
             handler: (client: Client, fields: any) => {
                 client.emit(...getJoin(fields.roomid));
             },
@@ -53,6 +54,21 @@ const defaultProfile: Profile = {
             ],
             handler: (client: Client, fields: any) => {
                 client.emit(...getChat(fields.uid, fields.msg, fields.rid));
+            },
+        },
+        {
+            title: 'gameStart',
+            fields: [],
+            handler: (client: Client, fields: any) => {
+                client.emit(...getGameStart());
+            },
+        },
+        {
+            title: 'move',
+            fields: [{ label: 'position', key: 'index', type: Fields.TEXT }],
+            handler: (client: Client, fields: any) => {
+                console.log(Number(fields.index));
+                client.emit(...getMove({ index: Number(fields.index) }));
             },
         },
     ],

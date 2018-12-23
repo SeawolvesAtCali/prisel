@@ -2,6 +2,7 @@ import Server from './server';
 import debug from './debug';
 
 const server = new Server();
+server.start();
 process.stdout.write('starting server');
 
 process.title = 'monopoly-server';

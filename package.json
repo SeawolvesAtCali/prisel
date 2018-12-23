@@ -4,8 +4,8 @@
     "private": true,
     "description": "Online Monopoly game",
     "scripts": {
-        "start:server": "env DEBUG=debug ts-node packages/server/index.ts",
-        "start:client": "parcel serve packages/client/index.html",
+        "start:server": "lerna run start --scope @monopoly/server --stream",
+        "start:client": "lerna run start --scope @monopoly/client --stream",
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "prebuild": "lerna exec -- rm -rf lib",
         "postinstall": "npm run build",

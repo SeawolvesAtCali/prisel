@@ -2,7 +2,7 @@ import Client from '../client';
 import { getCreateRoom, getJoin } from '../message/room';
 import { getChat } from '../message/chat';
 import { getGameStart, getMove } from '../message';
-
+import TicTacToe from './tic-tac-toe';
 export enum Fields {
     TEXT,
     NUMBER,
@@ -66,10 +66,16 @@ const defaultProfile: Profile = {
             },
         },
         {
-            title: 'move',
-            fields: [{ label: 'position', key: 'index', type: Fields.TEXT }],
+            title: 'tic tac toe',
+            fields: [
+                {
+                    label: 'tic',
+                    key: 'index',
+                    type: Fields.CUSTOM,
+                    render: TicTacToe,
+                },
+            ],
             handler: (client: Client, fields: any) => {
-                console.log(Number(fields.index));
                 client.emit(...getMove({ index: Number(fields.index) }));
             },
         },

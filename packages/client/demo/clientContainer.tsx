@@ -23,7 +23,13 @@ function stringify(...rest: any[]): string {
         )
         .join(', ');
 }
-
+type offEvent = () => void;
+type MessageWatcher = (messageType: string, data: any) => void;
+export interface CustomFieldProps {
+    onEvent: (handler: MessageWatcher) => offEvent;
+    onChange: (value: any) => void;
+    value: any;
+}
 class ClientContainer extends React.Component<ClientContainerProps, ClientContainerStates> {
     private static getResolvedFieldsFromProfile(profile: Profile) {
         const fields: any = {};
@@ -33,7 +39,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         return fields;
     }
     private client: Client;
-    private messageWatchers = new Set<Function>();
+    private messageWatchers = new Set<MessageWatcher>();
 
     constructor(props: any) {
         super(props);
@@ -115,7 +121,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         );
     }
 
-    private addOnEvent = (handle: (eventType: string, data: any) => void) => {
+    private addOnEvent = (handle: MessageWatcher) => {
         this.messageWatchers.add(handle);
         return () => {
             this.messageWatchers.delete(handle);

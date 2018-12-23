@@ -1,8 +1,7 @@
 import * as React from 'react';
+import { CustomFieldProps } from './clientContainer';
 const indice = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-type offEvent = () => void;
-interface TicTacToeProps {
-    onEvent: (handler: (type: string, data: any) => void) => offEvent;
+interface TicTacToeProps extends CustomFieldProps {
     onChange: (value: number) => void;
     value: number;
 }

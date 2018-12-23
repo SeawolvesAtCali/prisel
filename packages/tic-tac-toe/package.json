@@ -29,6 +29,7 @@
     },
     "dependencies": {
         "@monopoly/client": "file:../client",
-        "@monopoly/server": "file:../server"
+        "@monopoly/server": "file:../server",
+        "debug": "^4.1.1"
     }
 }

@@ -5,4 +5,5 @@ export interface Room {
     name: string;
     host: ClientId;
     guests: ClientId[];
+    gameState?: any;
 }

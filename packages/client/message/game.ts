@@ -1,4 +1,5 @@
 import { Message } from '../objects';
+import { RoomType } from '@monopoly/common';
 
 /**
  * Roll a dice
@@ -14,6 +15,10 @@ export function getDice(): Message {
  */
 export function getResponse(response: string, actionId: string): Message {
     return ['RESPONSE', { response, actionId }];
+}
+
+export function getGameStart(): Message {
+    return [RoomType.GAME_START, {}];
 }
 
 /**

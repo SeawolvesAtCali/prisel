@@ -4,7 +4,7 @@
     "description": "> TODO: description",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/e2e#readme",
-    "license": "ISC",
+    "license": "MIT",
     "main": "lib/e2e.js",
     "directories": {
         "lib": "lib"

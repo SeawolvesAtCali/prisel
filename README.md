@@ -1,6 +1,6 @@
 # prisel
 
-[![Build Status](https://travis-ci.org/SeawolvesAtCali/Monopoly.svg?branch=master)](https://travis-ci.org/SeawolvesAtCali/Monopoly)
+[![Build Status](https://travis-ci.org/SeawolvesAtCali/prisel.svg?branch=master)](https://travis-ci.org/SeawolvesAtCali/prisel)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 WebSocket game engine (WIP). For how to reach 0.1 release (all crucial features complete), see

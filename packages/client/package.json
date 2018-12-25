@@ -1,6 +1,9 @@
 {
     "name": "@prisel/client",
     "version": "0.0.0",
+    "publishConfig": {
+        "access": "public"
+    },
     "description": "> TODO: description",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/client#readme",

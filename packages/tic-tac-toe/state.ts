@@ -1,8 +1,8 @@
-import clientHandlerRegister from '@monopoly/server/lib/clientHandlerRegister';
-import { Context, Socket, Server } from '@monopoly/server';
-import { broadcast } from '@monopoly/server/lib/networkUtils';
-import { Messages } from '@monopoly/server';
-import { RoomType, GameType } from '@monopoly/common';
+import clientHandlerRegister from '@prisel/server/lib/clientHandlerRegister';
+import { Context, Socket, Server } from '@prisel/server';
+import { broadcast } from '@prisel/server/lib/networkUtils';
+import { Messages } from '@prisel/server';
+import { RoomType, GameType } from '@prisel/common';
 import debug from 'debug';
 function createGameState() {
     const state: any = {

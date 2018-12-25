@@ -1,5 +1,5 @@
 import { Message } from '../objects';
-import { RoomType } from '@monopoly/common';
+import { RoomType } from '@prisel/common';
 
 /**
  * Roll a dice

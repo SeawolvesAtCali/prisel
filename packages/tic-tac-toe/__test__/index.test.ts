@@ -1,6 +1,6 @@
 import { checkWin, isEven } from '../state';
 
-describe('@monopoly/template', () => {
+describe('@prisel/template', () => {
     describe('checkWin', () => {
         it('should win if line up horizontally', () => {
             expect(checkWin({ map: ['', '', '', 'x', 'x', 'x', '', '', ''] })).toBe(true);

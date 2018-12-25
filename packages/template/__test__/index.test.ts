@@ -1,6 +1,6 @@
 import hello from '../index';
 
-describe('@monopoly/template', () => {
+describe('@prisel/template', () => {
     it('should say hello', () => {
         expect(hello).toBe('Hello world');
     });

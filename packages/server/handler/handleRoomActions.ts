@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { Context, Room, Socket } from '../objects';
 import partial from 'lodash/partial';
 import { emit, closeSocket } from '../networkUtils';
-import { RoomType } from '@monopoly/common';
+import { RoomType } from '@prisel/common';
 import * as messages from '../message/room';
 import { newId } from '../idUtils';
 import { updateClientWithRoomData } from '../updateUtils';

@@ -1,10 +1,10 @@
 import debug from './debug';
 import once from 'lodash/once';
-import { SERVER } from '@monopoly/common';
-import { createPacket } from '@monopoly/common';
+import { SERVER } from '@prisel/common';
+import { createPacket } from '@prisel/common';
 
 import { getLogin, getExit } from './message/room';
-import { RoomType } from '@monopoly/common';
+import { RoomType } from '@prisel/common';
 import PubSub, { HandlerKey } from './pubSub';
 import withTimer from './withTimer';
 

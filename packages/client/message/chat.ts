@@ -1,5 +1,5 @@
 import { Message } from '../objects';
-import { ChatType } from '@monopoly/common';
+import { ChatType } from '@prisel/common';
 
 /**
  * Send a public message

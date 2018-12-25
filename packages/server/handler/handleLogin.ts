@@ -3,7 +3,7 @@ import { Context, Socket, ClientType } from '../objects';
 import { newId } from '../idUtils';
 import { emit } from '../networkUtils';
 import * as roomMessages from '../message/room';
-import { RoomType } from '@monopoly/common';
+import { RoomType } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';
 import debug from '../debug';
 import { ClientId } from '../objects/client';

@@ -1,7 +1,7 @@
 import debug from './debug';
 import { createClients, untilSuccess } from './testHelper';
-import { Messages } from '@monopoly/client';
-import { RoomType } from '@monopoly/common';
+import { Messages } from '@prisel/client';
+import { RoomType } from '@prisel/common';
 
 jest.setTimeout(30000);
 describe('create room', () => {

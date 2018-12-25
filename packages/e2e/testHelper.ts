@@ -1,5 +1,5 @@
-import Client from '@monopoly/client/lib/client';
-import { RoomType } from '@monopoly/common';
+import Client from '@prisel/client/lib/client';
+import { RoomType } from '@prisel/common';
 
 export function createClients(num = 1) {
     return Array.from({ length: num }).map(() => new Client());

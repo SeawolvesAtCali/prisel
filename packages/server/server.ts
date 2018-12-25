@@ -5,7 +5,7 @@ import debug from './debug';
 import './handler';
 import { createServer, watchForDisconnection, getConnectionToken, emit } from './networkUtils';
 import clientHandlerRegister, { Handler } from './clientHandlerRegister';
-import { parsePacket, RoomType } from '@monopoly/common';
+import { parsePacket, RoomType } from '@prisel/common';
 import { handleDisconnect } from './handler/handleDisconnect';
 import { getWelcome } from './message/room';
 

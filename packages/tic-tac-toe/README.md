@@ -1,4 +1,4 @@
-# `@monopoly/template`
+# `@prisel/template`
 
 > A template for creating new package
 

@@ -1,4 +1,4 @@
-import { Context, Socket, Server } from '@monopoly/server';
+import { Context, Socket, Server } from '@prisel/server';
 import './state';
 
 const server = new Server();

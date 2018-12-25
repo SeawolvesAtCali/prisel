@@ -1,31 +1,31 @@
 {
-    "name": "monopoly-mono",
+    "name": "prisel-mono",
     "version": "0.0.0",
     "private": true,
-    "description": "Online Monopoly game",
+    "description": "Online prisel game",
     "scripts": {
-        "start:server": "lerna run start --scope @monopoly/server --stream",
-        "start:client": "lerna run start --scope @monopoly/client --stream",
+        "start:server": "lerna run start --scope @prisel/server --stream",
+        "start:client": "lerna run start --scope @prisel/client --stream",
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "prebuild": "lerna exec -- rm -rf lib",
         "postinstall": "npm run build",
         "build": "lerna run build --stream",
         "deploy:server": "node packages/server/lib/index.js",
-        "test": "lerna run --no-bail test --ignore @monopoly/e2e --stream",
-        "automation": "lerna run test --scope @monopoly/e2e --stream",
+        "test": "lerna run --no-bail test --ignore @prisel/e2e --stream",
+        "automation": "lerna run test --scope @prisel/e2e --stream",
         "lint": "lerna run lint",
         "fix": "lerna run fix"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+        "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "author": "",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+        "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
-    "homepage": "https://github.com/SeawolvesAtCali/Monopoly#readme",
+    "homepage": "https://github.com/SeawolvesAtCali/prisel#readme",
     "eslintConfig": {
         "extends": [
             "airbnb-base",
@@ -77,12 +77,12 @@
         "proseWrap": "always"
     },
     "dependencies": {
-        "@monopoly/client": "file:packages/client",
-        "@monopoly/common": "file:packages/common",
-        "@monopoly/e2e": "file:packages/e2e",
-        "@monopoly/server": "file:packages/server",
-        "@monopoly/template": "file:packages/template",
-        "@monopoly/tic-tac-toe": "file:packages/tic-tac-toe"
+        "@prisel/client": "file:packages/client",
+        "@prisel/common": "file:packages/common",
+        "@prisel/e2e": "file:packages/e2e",
+        "@prisel/server": "file:packages/server",
+        "@prisel/template": "file:packages/template",
+        "@prisel/tic-tac-toe": "file:packages/tic-tac-toe"
     },
     "devDependencies": {
         "@types/debug": "0.0.30",

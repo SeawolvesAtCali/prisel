@@ -1,7 +1,7 @@
 import debug from './debug';
 import { createClients, untilSuccess } from './testHelper';
 import { Messages } from '@prisel/client';
-import { RoomType } from '@prisel/common';
+import { MessageType } from '@prisel/common';
 
 jest.setTimeout(30000);
 describe('create room', () => {
@@ -10,7 +10,7 @@ describe('create room', () => {
         await client.connect();
         await client.login('batman');
         client.emit(...Messages.getCreateRoom('party room'));
-        const data = await untilSuccess(client, RoomType.CREATE_ROOM);
+        const data = await untilSuccess(client, MessageType.CREATE_ROOM);
         expect(typeof data.roomId).toBe('string');
         client.exit();
     });
@@ -20,9 +20,9 @@ describe('create room', () => {
         await client.connect();
         await client.login('batman');
         client.emit(...Messages.getCreateRoom('room'));
-        await untilSuccess(client, RoomType.CREATE_ROOM);
+        await untilSuccess(client, MessageType.CREATE_ROOM);
         client.emit(...Messages.getLeave());
-        await untilSuccess(client, RoomType.LEAVE);
+        await untilSuccess(client, MessageType.LEAVE);
         client.exit();
     });
 
@@ -36,18 +36,18 @@ describe('create room', () => {
         const clientData = await client.login('client');
         const clientId = clientData.userId;
         host.emit(...Messages.getCreateRoom('party room'));
-        const roomData = await untilSuccess(host, RoomType.CREATE_ROOM);
+        const roomData = await untilSuccess(host, MessageType.CREATE_ROOM);
         const { roomId } = roomData;
         client.emit(...Messages.getJoin(roomId));
         const [, hostRoomUpdateResult, clientRoomUpdateResult] = await Promise.all([
-            untilSuccess(client, RoomType.JOIN),
+            untilSuccess(client, MessageType.JOIN),
             host.once(
                 (messageType, data) =>
-                    RoomType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
             ),
             client.once(
                 (messageType, data) =>
-                    RoomType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
             ),
         ]);
 

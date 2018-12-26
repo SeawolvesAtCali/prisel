@@ -4,7 +4,7 @@ import { SERVER } from '@prisel/common';
 import { createPacket } from '@prisel/common';
 
 import { getLogin, getExit } from './message/room';
-import { RoomType } from '@prisel/common';
+import { MessageType } from '@prisel/common';
 import PubSub, { HandlerKey } from './pubSub';
 import withTimer from './withTimer';
 
@@ -110,7 +110,7 @@ class Client {
         return withTimer(
             this.once(
                 (messageType, data) =>
-                    messageType === RoomType.SUCCESS && data.action === RoomType.LOGIN,
+                    messageType === MessageType.SUCCESS && data.action === MessageType.LOGIN,
             ),
             LOGIN_TIMEOUT,
         );

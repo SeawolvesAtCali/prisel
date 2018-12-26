@@ -19,6 +19,7 @@
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
+        "prebuild": "rm -rf ./lib",
         "build": "tsc",
         "start": "echo HI",
         "test": "jest",

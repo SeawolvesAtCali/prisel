@@ -1,14 +1,14 @@
 import WebSocket from 'ws';
-import { Context, Socket, ClientType } from '../objects';
+import { Context, Socket } from '../objects';
 import { newId } from '../idUtils';
 import { emit } from '../networkUtils';
 import * as roomMessages from '../message/room';
-import { RoomType } from '@prisel/common';
+import { MessageType } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';
 import debug from '../debug';
 import { ClientId } from '../objects/client';
 
-const SOCKET = 'CONTROLLER';
+const SOCKET = 'CLIENT';
 export const handleLogin = (context: Context, client: Socket) => (data: { username: string }) => {
     const id = newId<ClientId>(SOCKET);
     const { updateState, SocketManager } = context;
@@ -18,10 +18,9 @@ export const handleLogin = (context: Context, client: Socket) => (data: { userna
         draftState.connections[id] = {
             id,
             username,
-            type: ClientType.Controller,
         };
     });
     emit(client, ...roomMessages.getLoginSuccess(id));
 };
 
-clientHandlerRegister.push([RoomType.LOGIN, handleLogin]);
+clientHandlerRegister.push([MessageType.LOGIN, handleLogin]);

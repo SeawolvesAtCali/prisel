@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { Context, Room, Socket } from '../objects';
 import partial from 'lodash/partial';
 import { emit, closeSocket } from '../networkUtils';
-import { RoomType } from '@prisel/common';
+import { MessageType } from '@prisel/common';
 import * as messages from '../message/room';
 import { newId } from '../idUtils';
 import { updateClientWithRoomData } from '../updateUtils';
@@ -81,7 +81,7 @@ const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string
     if (attempJoinRoomError === '') {
         emit(socket, ...messages.getJoinSuccess());
     } else {
-        emit(socket, ...messages.getFailure(RoomType.JOIN, attempJoinRoomError));
+        emit(socket, ...messages.getFailure(MessageType.JOIN, attempJoinRoomError));
     }
     updateClientWithRoomData(context, roomId);
 };
@@ -130,7 +130,7 @@ export const handleKick = (context: Context, socket: Socket) => (data: { userId:
     const { SocketManager, StateManager } = context;
     const { userId } = data;
     const hostId = SocketManager.getId(socket);
-    const getKickFailure = partial(messages.getFailure, RoomType.KICK);
+    const getKickFailure = partial(messages.getFailure, MessageType.KICK);
     if (hostId === userId) {
         emit(socket, ...getKickFailure('Cannot self kick'));
         return;
@@ -152,8 +152,8 @@ export const handleKick = (context: Context, socket: Socket) => (data: { userId:
     updateClientWithRoomData(context, roomId);
 };
 
-clientHandlerRegister.push([RoomType.CREATE_ROOM, handleCreateRoom]);
-clientHandlerRegister.push([RoomType.JOIN, handleJoin]);
-clientHandlerRegister.push([RoomType.LEAVE, handleLeave]);
-clientHandlerRegister.push([RoomType.KICK, handleKick]);
-clientHandlerRegister.push([RoomType.EXIT, handleExit]);
+clientHandlerRegister.push([MessageType.CREATE_ROOM, handleCreateRoom]);
+clientHandlerRegister.push([MessageType.JOIN, handleJoin]);
+clientHandlerRegister.push([MessageType.LEAVE, handleLeave]);
+clientHandlerRegister.push([MessageType.KICK, handleKick]);
+clientHandlerRegister.push([MessageType.EXIT, handleExit]);

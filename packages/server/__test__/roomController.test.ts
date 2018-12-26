@@ -1,5 +1,5 @@
 import * as roomController from '../handler/handleRoomActions';
-import { Client, ClientType, Context, Socket } from '../objects';
+import { Client, Context, Socket } from '../objects';
 import createContext from '../createContext';
 
 jest.mock('../updateUtils');
@@ -14,7 +14,6 @@ const createMockClient: (id: string, mockContext: Context) => { client: Client; 
     mockContext.updateState((draftState) => {
         draftState.connections[id] = {
             id,
-            type: ClientType.Controller,
             username: 'username',
         };
     });

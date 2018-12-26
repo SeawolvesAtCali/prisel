@@ -2,7 +2,7 @@ import clientHandlerRegister from '@prisel/server/lib/clientHandlerRegister';
 import { Context, Socket, Server } from '@prisel/server';
 import { broadcast } from '@prisel/server/lib/networkUtils';
 import { Messages } from '@prisel/server';
-import { RoomType, GameType } from '@prisel/common';
+import { MessageType } from '@prisel/common';
 import debug from 'debug';
 function createGameState() {
     const state: any = {
@@ -29,7 +29,7 @@ const handleGameStart = (context: Context, client: Socket) => (data: any) => {
         state.player[1] = draftState.rooms[roomId].guests[0];
         draftState.rooms[roomId].gameState = state;
     });
-    broadcast(context, roomId, ...Messages.getSuccess(RoomType.GAME_START, {}));
+    broadcast(context, roomId, ...Messages.getSuccess(MessageType.GAME_START, {}));
     broadcast(
         context,
         roomId,
@@ -103,5 +103,5 @@ export function checkWin(state: any) {
     return false;
 }
 
-clientHandlerRegister.push([RoomType.GAME_START, handleGameStart]);
-clientHandlerRegister.push([GameType.MOVE, handleMove]);
+clientHandlerRegister.push([MessageType.GAME_START, handleGameStart]);
+clientHandlerRegister.push([MessageType.MOVE, handleMove]);

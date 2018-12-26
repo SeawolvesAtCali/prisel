@@ -1,8 +1,8 @@
 import { handleChat } from '../handleChat';
 import createContext from '../../createContext';
-import { Socket, ClientType } from '../../objects';
+import { Socket } from '../../objects';
 import { broadcast } from '../../networkUtils';
-import { ChatType } from '@prisel/common';
+import { MessageType } from '@prisel/common';
 
 jest.mock('../../networkUtils');
 
@@ -11,7 +11,7 @@ describe('handleChat', () => {
         const mockContext = createContext({
             StateManager: {
                 connections: {
-                    user1: { id: 'user1', username: 'userA', type: ClientType.Controller },
+                    user1: { id: 'user1', username: 'userA' },
                 },
                 messages: [],
                 rooms: { 'Room-1': { id: 'Room-1', name: 'roomA', host: 'user1', guests: [] } },
@@ -24,7 +24,7 @@ describe('handleChat', () => {
             roomId: 'Room-1',
         });
 
-        expect(broadcast).toHaveBeenCalledWith(mockContext, 'Room-1', ChatType.BROADCAST, {
+        expect(broadcast).toHaveBeenCalledWith(mockContext, 'Room-1', MessageType.BROADCAST, {
             username: 'userA',
             message: 'testing',
             roomId: 'Room-1',

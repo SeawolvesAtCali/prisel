@@ -7,7 +7,6 @@
         "start:server": "lerna run start --scope @prisel/server --stream",
         "start:client": "lerna run start --scope @prisel/client --stream",
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
-        "prebuild": "lerna exec -- rm -rf lib",
         "postinstall": "npm run build",
         "build": "lerna run build --stream",
         "deploy:server": "node packages/server/lib/index.js",

@@ -1,5 +1,5 @@
 import { Message } from '../objects';
-import { RoomType } from '@prisel/common';
+import { MessageType } from '@prisel/common';
 
 /**
  * Roll a dice
@@ -18,7 +18,7 @@ export function getResponse(response: string, actionId: string): Message {
 }
 
 export function getGameStart(): Message {
-    return [RoomType.GAME_START, {}];
+    return [MessageType.GAME_START, {}];
 }
 
 /**

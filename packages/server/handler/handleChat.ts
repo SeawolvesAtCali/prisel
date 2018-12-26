@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { Context, Socket } from '../objects';
 import { broadcast } from '../networkUtils';
 import * as messages from '../message/chat';
-import { ChatType } from '@prisel/common';
+import { MessageType } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';
 
 export const handleChat = (context: Context, client: Socket) => (data: {
@@ -23,4 +23,4 @@ export const handleChat = (context: Context, client: Socket) => (data: {
     }
 };
 
-clientHandlerRegister.push([ChatType.CHAT, handleChat]);
+clientHandlerRegister.push([MessageType.CHAT, handleChat]);

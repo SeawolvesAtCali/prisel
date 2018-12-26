@@ -22,6 +22,7 @@
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
+        "prebuild": "rm -rf ./lib",
         "build": "tsc",
         "start": "env DEBUG=debug ts-node demo.ts",
         "test": "jest",

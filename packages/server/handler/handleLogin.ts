@@ -1,4 +1,3 @@
-import WebSocket from 'ws';
 import { Context, Socket } from '../objects';
 import { newId } from '../idUtils';
 import { emit } from '../networkUtils';

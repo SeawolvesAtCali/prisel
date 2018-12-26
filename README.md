@@ -43,6 +43,18 @@ for example:
 npm test --scope @prisel/server
 ```
 
+To run a single test file
+
+```
+npx jest <test-file-name>
+```
+
+for example
+
+```
+npx jest handleRoomActions.test.ts
+```
+
 # Debugging
 
 This project uses [debug](https://github.com/visionmedia/debug), the same logging library that

@@ -1,4 +1,3 @@
-import WebSocket from 'ws';
 import { Context, Room, Socket } from '../objects';
 import partial from 'lodash/partial';
 import { emit, closeSocket } from '../networkUtils';
@@ -37,8 +36,17 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (data: {
     roomName: string;
 }) => {
     const { roomName } = data;
-    const { SocketManager, updateState } = context;
+    const { SocketManager, updateState, StateManager } = context;
     const hostId = SocketManager.getId(socket);
+    const { roomId: currentRoomId } = StateManager.connections[hostId];
+    if (currentRoomId) {
+        // already in a room
+        emit(
+            socket,
+            ...messages.getFailure(MessageType.CREATE_ROOM, `ALREADY IN A ROOM ${currentRoomId}`),
+        );
+        return;
+    }
     const roomId = newId<RoomId>('ROOM');
     const room: Room = {
         id: roomId,
@@ -57,13 +65,13 @@ type ErrorMessage = string;
 
 const attemptJoinRoom = (context: Context, clientId: ClientId, roomId: ClientId): ErrorMessage => {
     const { updateState } = context;
+    const currentRoomId = context.StateManager.connections[clientId].roomId;
+    if (currentRoomId) {
+        return `ALREADY IN A ROOM ${currentRoomId}`;
+    }
     const room = context.StateManager.rooms[roomId];
     if (room === undefined) {
         return 'ROOM DOES NOT EXIST';
-    }
-
-    if (room.host === clientId || room.guests.includes(clientId)) {
-        return 'ALREADY JOINED ROOM';
     }
 
     updateState((draftState) => void draftState.rooms[roomId].guests.push(clientId));
@@ -72,7 +80,7 @@ const attemptJoinRoom = (context: Context, clientId: ClientId, roomId: ClientId)
     return '';
 };
 
-const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string }) => {
+export const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string }) => {
     const { roomId } = data;
 
     const { SocketManager } = context;
@@ -144,6 +152,13 @@ export const handleKick = (context: Context, socket: Socket) => (data: { userId:
     const room = StateManager.rooms[roomId];
     if (room.host !== hostId) {
         emit(socket, ...getKickFailure('Not enough privilage'));
+        return;
+    }
+
+    const kickedUser = StateManager.connections[userId];
+    const kickedUserRoomId = kickedUser && kickedUser.roomId;
+    if (kickedUserRoomId !== roomId) {
+        emit(socket, ...getKickFailure('Target user is not in the room'));
         return;
     }
 

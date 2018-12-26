@@ -66,6 +66,33 @@ describe('handleRoomActions', () => {
             expect(roomId).toBeDefined();
             expect(mockContext.StateManager.rooms[roomId].host).toBe(mockUserId);
         });
+        it('should not create room if already in a room', () => {
+            const mockHost = {} as Socket;
+            const mockGuest = {} as Socket;
+            const mockRoomId = 'bedroom';
+            const mockContext = createContext({
+                StateManager: {
+                    connections: {
+                        host1: { id: 'host1', username: 'host', roomId: mockRoomId },
+                        guest1: { id: 'guest1', username: 'guest', roomId: mockRoomId },
+                    },
+                    messages: [],
+                    rooms: {
+                        [mockRoomId]: {
+                            id: mockRoomId,
+                            name: 'nice bedroom',
+                            host: 'host1',
+                            guests: ['guest1'],
+                        },
+                    },
+                },
+            });
+            mockContext.SocketManager.add('host1', mockHost);
+            mockContext.SocketManager.add('guest1', mockGuest);
+            roomHandler.handleCreateRoom(mockContext, mockHost)({ roomName: 'anotherRoom' });
+            roomHandler.handleCreateRoom(mockContext, mockGuest)({ roomName: 'anotherRoom2' });
+            expect(Object.entries(mockContext.StateManager.rooms).length).toBe(1);
+        });
     });
 
     describe('handleJoin', () => {

@@ -37,8 +37,17 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (data: {
     roomName: string;
 }) => {
     const { roomName } = data;
-    const { SocketManager, updateState } = context;
+    const { SocketManager, updateState, StateManager } = context;
     const hostId = SocketManager.getId(socket);
+    const { roomId: currentRoomId } = StateManager.connections[hostId];
+    if (currentRoomId) {
+        // already in a room
+        emit(
+            socket,
+            ...messages.getFailure(MessageType.CREATE_ROOM, `ALREADY IN A ROOM ${currentRoomId}`),
+        );
+        return;
+    }
     const roomId = newId<RoomId>('ROOM');
     const room: Room = {
         id: roomId,

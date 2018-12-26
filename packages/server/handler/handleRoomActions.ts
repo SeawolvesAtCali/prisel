@@ -57,13 +57,13 @@ type ErrorMessage = string;
 
 const attemptJoinRoom = (context: Context, clientId: ClientId, roomId: ClientId): ErrorMessage => {
     const { updateState } = context;
+    const currentRoomId = context.StateManager.connections[clientId].roomId;
+    if (currentRoomId) {
+        return `ALREADY IN A ROOM ${currentRoomId}`;
+    }
     const room = context.StateManager.rooms[roomId];
     if (room === undefined) {
         return 'ROOM DOES NOT EXIST';
-    }
-
-    if (room.host === clientId || room.guests.includes(clientId)) {
-        return 'ALREADY JOINED ROOM';
     }
 
     updateState((draftState) => void draftState.rooms[roomId].guests.push(clientId));
@@ -72,7 +72,7 @@ const attemptJoinRoom = (context: Context, clientId: ClientId, roomId: ClientId)
     return '';
 };
 
-const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string }) => {
+export const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string }) => {
     const { roomId } = data;
 
     const { SocketManager } = context;

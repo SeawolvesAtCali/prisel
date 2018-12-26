@@ -155,6 +155,13 @@ export const handleKick = (context: Context, socket: Socket) => (data: { userId:
         return;
     }
 
+    const kickedUser = StateManager.connections[userId];
+    const kickedUserRoomId = kickedUser && kickedUser.roomId;
+    if (kickedUserRoomId !== roomId) {
+        emit(socket, ...getKickFailure('Target user is not in the room'));
+        return;
+    }
+
     handleLeave(context, SocketManager.getSocket(userId))({});
     emit(socket, ...messages.getKickSuccess());
     updateClientWithRoomData(context, roomId);

@@ -1,6 +1,5 @@
 import createContext from '../../createContext';
 import { Socket, Context } from '../../objects';
-import { closeSocket } from '../../networkUtils';
 import { handleLeaveImpl } from '../handleRoomActions';
 
 jest.mock('../../networkUtils');
@@ -20,10 +19,9 @@ describe('handleLeave', () => {
                 rooms: {},
             },
         });
+        const originalState = mockContext.StateManager;
         mockContext.SocketManager.add('client', mockClient);
-        expect(() => {
-            handleLeaveImpl(mockContext, mockClient)({});
-        }).not.toThrow();
+        expect(mockContext.StateManager).toBe(originalState);
     });
 
     it('should remove the client from guests if it is a guest', () => {

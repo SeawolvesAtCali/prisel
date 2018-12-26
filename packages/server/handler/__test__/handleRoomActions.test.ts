@@ -89,9 +89,10 @@ describe('handleRoomActions', () => {
             });
             mockContext.SocketManager.add('host1', mockHost);
             mockContext.SocketManager.add('guest1', mockGuest);
+            const originalState = mockContext.StateManager;
             roomHandler.handleCreateRoom(mockContext, mockHost)({ roomName: 'anotherRoom' });
             roomHandler.handleCreateRoom(mockContext, mockGuest)({ roomName: 'anotherRoom2' });
-            expect(Object.entries(mockContext.StateManager.rooms).length).toBe(1);
+            expect(mockContext.StateManager).toBe(originalState);
         });
     });
 

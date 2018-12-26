@@ -164,5 +164,42 @@ describe('handleRoomActions', () => {
             expect(rooms[mockOtherRoomId].host).toBe('anotherhost');
             expect(rooms[mockOtherRoomId].guests).toEqual([]);
         });
+        it('should record join order', () => {
+            const mockGuest1 = {} as Socket;
+            const mockGuest2 = {} as Socket;
+            const mockGuest3 = {} as Socket;
+            const mockContext = createContext({
+                StateManager: {
+                    connections: {
+                        guest3: { id: 'guest3', username: 'guest' },
+                        guest2: { id: 'guest2', username: 'guest' },
+                        guest1: { id: 'guest1', username: 'guest' },
+                    },
+                    messages: [],
+                    rooms: {
+                        room1: {
+                            id: 'room1',
+                            name: 'bathroom',
+                            host: 'host1',
+                            guests: [],
+                        },
+                    },
+                },
+            });
+            const { SocketManager } = mockContext;
+            SocketManager.add('guest3', mockGuest3);
+            SocketManager.add('guest2', mockGuest2);
+            SocketManager.add('guest1', mockGuest1);
+
+            roomHandler.handleJoin(mockContext, mockGuest2)({ roomId: 'room1' });
+            roomHandler.handleJoin(mockContext, mockGuest3)({ roomId: 'room1' });
+            roomHandler.handleJoin(mockContext, mockGuest1)({ roomId: 'room1' });
+
+            expect(mockContext.StateManager.rooms.room1.guests).toEqual([
+                'guest2',
+                'guest3',
+                'guest1',
+            ]);
+        });
     });
 });

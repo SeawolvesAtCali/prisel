@@ -1,4 +1,3 @@
-import WebSocket from 'ws';
 import { Context, Socket } from '../objects';
 import { handleLeaveImpl } from './handleRoomActions';
 import { updateClientWithRoomData } from '../updateUtils';

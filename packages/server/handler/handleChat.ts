@@ -1,4 +1,3 @@
-import WebSocket from 'ws';
 import { Context, Socket } from '../objects';
 import { broadcast } from '../networkUtils';
 import * as messages from '../message/chat';

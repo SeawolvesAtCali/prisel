@@ -1,4 +1,3 @@
-import WebSocket from 'ws';
 import { Context, Room, Socket } from '../objects';
 import partial from 'lodash/partial';
 import { emit, closeSocket } from '../networkUtils';

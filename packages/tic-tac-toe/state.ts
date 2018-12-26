@@ -1,5 +1,5 @@
 import clientHandlerRegister from '@prisel/server/lib/clientHandlerRegister';
-import { Context, Socket, Server } from '@prisel/server';
+import { Context, Socket } from '@prisel/server';
 import { broadcast } from '@prisel/server/lib/networkUtils';
 import { Messages } from '@prisel/server';
 import { MessageType } from '@prisel/common';
@@ -53,7 +53,7 @@ export const handleMoveImpl = (context: Context, roomId: string, moveData: any) 
     });
     return context.StateManager.rooms[roomId].gameState;
 };
-export const handleMove = (context: Context, client: any) => (data: any) => {
+export const handleMove = (context: Context, client: Socket) => (data: any) => {
     const { SocketManager, StateManager, updateState } = context;
     const roomId = getRoomId(context, client);
     const state = StateManager.rooms[roomId].gameState;

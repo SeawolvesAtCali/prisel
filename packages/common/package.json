@@ -8,11 +8,15 @@
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/common#readme",
     "license": "MIT",
-    "main": "lib/index.js",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
     },
+    "files": [
+        "lib"
+    ],
     "repository": {
         "type": "git",
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"

@@ -37,7 +37,7 @@ class Server {
             const connectionToken = getConnectionToken();
             socket.on('disconnect', () => {
                 connectionToken.safeDisconnect();
-                handleDisconnect(context, socket);
+                handleDisconnect(context, socket)({});
                 debug('client disconnected');
             });
 

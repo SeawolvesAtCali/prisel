@@ -115,6 +115,23 @@ This project uses Travis CI as continous intergration service. Travis will pick 
 whenever we have a new commit, our build will run both `npm test` and `npm run lint`. Either one of
 them fail will result in a failed build.
 
+# Deploying
+
+The server package is deployed to heroku at [https://game-server-monopoly.herokuapp.com/](https://game-server-monopoly.herokuapp.com/).
+
+When a pull request gets merged into master branch, heroku will automatically redeploy.
+We have the following configuration set for Heroku
+```bash
+> heroku config:set NPM_CONFIG_PRODUCTION=false --app game-server-monopoly
+```
+This make sure that Heroku doesn't do `npm install --production` which causes devDependencies to not get installed.
+```bash
+> heroku config:set NODEMODULESCACHE=false --app game-server-monopoly
+```
+This make sure that Heroku doesn't cache node_modules.
+
+If you need to make change to Heroku, ask @yiochen for credential.
+
 # Recommended Visual Studio Code plugin
 
 If you are using Visual Studio Code, it's recommended to install the following extension:

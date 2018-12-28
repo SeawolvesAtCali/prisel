@@ -4,7 +4,7 @@ import createContext from '../createContext';
 import { Context, Socket } from '../objects';
 import { emit } from '../utils/networkUtils';
 
-jest.mock('../networkUtils');
+jest.mock('../utils/networkUtils');
 
 describe('controllerHandler', () => {
     describe('handleLogin', () => {

@@ -1,6 +1,6 @@
 import clientHandlerRegister from '@prisel/server/lib/clientHandlerRegister';
 import { Context, Socket } from '@prisel/server';
-import { broadcast } from '@prisel/server/lib/networkUtils';
+import { broadcast } from '@prisel/server/lib/utils/networkUtils';
 import { Messages } from '@prisel/server';
 import { MessageType } from '@prisel/common';
 import debug from 'debug';

@@ -5,10 +5,28 @@
 [![version](https://img.shields.io/npm/v/@prisel/server.svg)](https://www.npmjs.com/package/@prisel/server)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-WebSocket game engine (WIP). For how to reach 0.1 release (all crucial features complete), see
-[milestone](https://github.com/SeawolvesAtCali/prisel/milestone/1)
+WebSocket game engine with a focus on room management.
 
-# Install
+# Guiding principles
+
+This project is being developed with the following principle in mind:
+
+1. **Robust and opinionated room system** It should provide a room system with reasonable defaults,
+   but also customizable.
+2. **Total freedom of game logic implementation** It should be totally unopinionated on how/when to
+   store state and how/when to synchronize with the client.
+3. **Client side technology agnostic** It should not require a corresponding client engine. Client
+   server communication should be based on raw WebSocket with clearly defined messages, so that
+   client can be built in any language with ease.
+4. **Develop server in JavaScript or TypeScript** Although the project is developed in TypeScript,
+   user should have the freedom to use it with either JavaScript or TypeScript.
+5. **Testing and debugging support** It should provide good testing and debugging utilities.
+
+---
+
+# Contributor guide
+
+## Install
 
 make sure you have [node](https://nodejs.org/en/) installed, the recommended version is 10.x and up.
 
@@ -18,7 +36,7 @@ To install dependencies, run the following command in project root directory:
 npm install
 ```
 
-# Test
+## Test
 
 This project uses [jest](https://facebook.github.io/jest/) as the testing framework.
 
@@ -57,7 +75,7 @@ for example
 npx jest handleRoomActions.test.ts
 ```
 
-# Debugging
+## Debugging
 
 This project uses [debug](https://github.com/visionmedia/debug), the same logging library that
 Socket.io uses. To enable debugging, set `DEBUG` environment variables before running the script.
@@ -96,7 +114,7 @@ Debugging using Visual Studio Code is super easy.
 3.  Set a breakpoint in editor
 4.  Click on the green run button to start debugging.
 
-# Linting
+## Linting
 
 Linting makes sure that the source code follows the same coding style. It's recommend to run linting
 with fix to automatically fix fixable linting issues.
@@ -111,43 +129,49 @@ If you just want to see the issues without automatically fixing, you can run
 npm run lint
 ```
 
-# Continous Intergration
+## Continous Intergration
 
 This project uses Travis CI as continous intergration service. Travis will pick up our project
 whenever we have a new commit, our build will run both `npm test` and `npm run lint`. Either one of
 them fail will result in a failed build.
 
-# Deploying
+## Deploying
 
-The server package is deployed to heroku at [https://game-server-monopoly.herokuapp.com/](https://game-server-monopoly.herokuapp.com/).
+The server package is deployed to heroku at
+[https://game-server-monopoly.herokuapp.com/](https://game-server-monopoly.herokuapp.com/).
 
-When a pull request gets merged into master branch, heroku will automatically redeploy.
-We have the following configuration set for Heroku
+When a pull request gets merged into master branch, heroku will automatically redeploy. We have the
+following configuration set for Heroku
+
 ```bash
 > heroku config:set NPM_CONFIG_PRODUCTION=false --app game-server-monopoly
 ```
-This make sure that Heroku doesn't do `npm install --production` which causes devDependencies to not get installed.
+
+This make sure that Heroku doesn't do `npm install --production` which causes devDependencies to not
+get installed.
+
 ```bash
 > heroku config:set NODEMODULESCACHE=false --app game-server-monopoly
 ```
+
 This make sure that Heroku doesn't cache node_modules.
 
 If you need to make change to Heroku, ask @yiochen for credential.
 
-# Recommended Visual Studio Code plugin
+## Recommended Visual Studio Code plugin
 
 If you are using Visual Studio Code, it's recommended to install the following extension:
 
-## eslint (search for `dbaeumer.vscode-eslint`) for linting
+### eslint (search for `dbaeumer.vscode-eslint`) for linting
 
 This extension displays linting issues in the code. Also recommend turning on
 `"eslint.autoFixOnSave": true` in Visual Studio Code workspace settings. This runs `fix` for the
 current file when save.
 
-## tslint (search for `eg2.tslint`) for TypeScript linting
+### tslint (search for `eg2.tslint`) for TypeScript linting
 
 Also recommend enabling `tslint.autoFixOnSave` in vscode setting.
 
-## prettier (search for `esbenp.prettier-vscode`)
+### prettier (search for `esbenp.prettier-vscode`)
 
 Prettier formats the code. On editor setting, enable `editor.formatOnSave`

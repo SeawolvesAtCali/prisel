@@ -1,11 +1,19 @@
-# `server`
+# @prisel/server
 
-> TODO: description
+Multiplayer game server for Node.js
+
+# Install
+
+```
+> npm i @prisel/server
+```
 
 ## Usage
 
-```
-const server = require('server');
+```javascript
+import { Server } from '@prisel/server';
 
-// TODO: DEMONSTRATE API
+new Server().start();
 ```
+
+This project is still in a super early stage. We are still working on the API.

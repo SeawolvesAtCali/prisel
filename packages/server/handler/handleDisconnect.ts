@@ -1,6 +1,6 @@
 import { Context, Socket } from '../objects';
 import { handleLeaveImpl } from './handleRoomActions';
-import { updateClientWithRoomData } from '../updateUtils';
+import { updateClientWithRoomData } from '../utils/updateUtils';
 
 /**
  * Handles client disconnection when client disconnects unexpectedly

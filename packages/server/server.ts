@@ -1,23 +1,28 @@
-import { Context } from './objects';
+import { Context, Socket } from './objects';
 import createContext from './createContext';
-import { wsServer } from './objects';
 import debug from './debug';
 import './handler';
-import { createServer, watchForDisconnection, getConnectionToken, emit } from './networkUtils';
+import {
+    createServer,
+    watchForDisconnection,
+    getConnectionToken,
+    emit,
+    broadcast,
+} from './utils/networkUtils';
 import clientHandlerRegister, { Handler } from './clientHandlerRegister';
 import { parsePacket } from '@prisel/common';
 import { handleDisconnect } from './handler/handleDisconnect';
 import { getWelcome } from './message/room';
 
 class Server {
-    public ws: wsServer;
+    private context: Context;
 
     public start() {
         const server = createServer();
-        this.ws = server;
         const context: Context = createContext({
             server,
         });
+        this.context = context;
 
         server.on('connection', (socket) => {
             debug('client connected');
@@ -53,10 +58,22 @@ class Server {
         });
     }
 
+    public broadcast(roomId: any, messageType: string, data: any) {
+        if (this.context) {
+            broadcast(this.context, roomId, messageType, data);
+        }
+    }
+
+    public emit(client: Socket, messageType: string, data: any) {
+        if (this.context) {
+            emit(client, messageType, data);
+        }
+    }
+
     public close() {
-        if (this.ws) {
-            this.ws.close();
-            this.ws = undefined;
+        if (this.context) {
+            this.context.server.close();
+            this.context = undefined;
         }
     }
 }

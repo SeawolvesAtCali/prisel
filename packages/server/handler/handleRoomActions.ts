@@ -1,10 +1,10 @@
 import { Context, Room, Socket } from '../objects';
 import partial from 'lodash/partial';
-import { emit, closeSocket } from '../networkUtils';
+import { emit, closeSocket } from '../utils/networkUtils';
 import { MessageType } from '@prisel/common';
 import * as messages from '../message/room';
-import { newId } from '../idUtils';
-import { updateClientWithRoomData } from '../updateUtils';
+import { newId } from '../utils/idUtils';
+import { updateClientWithRoomData } from '../utils/updateUtils';
 import clientHandlerRegister from '../clientHandlerRegister';
 
 import debug from '../debug';

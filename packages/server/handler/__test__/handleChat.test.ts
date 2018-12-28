@@ -1,7 +1,7 @@
 import { handleChat } from '../handleChat';
 import createContext from '../../createContext';
 import { Socket } from '../../objects';
-import { broadcast } from '../../networkUtils';
+import { broadcast } from '../../utils/networkUtils';
 import { MessageType } from '@prisel/common';
 
 jest.mock('../../networkUtils');

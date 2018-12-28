@@ -2,7 +2,7 @@ import createContext from '../../createContext';
 import { Socket } from '../../objects';
 import { handleKick } from '../handleRoomActions';
 
-jest.mock('../../networkUtils');
+jest.mock('../../utils/networkUtils');
 
 describe('handleKick', () => {
     it('should kick', () => {

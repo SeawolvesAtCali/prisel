@@ -1,6 +1,6 @@
 import { Context, Socket } from '../objects';
-import { newId } from '../idUtils';
-import { emit } from '../networkUtils';
+import { newId } from '../utils/idUtils';
+import { emit } from '../utils/networkUtils';
 import * as roomMessages from '../message/room';
 import { MessageType } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';

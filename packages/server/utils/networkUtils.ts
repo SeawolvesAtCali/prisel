@@ -1,5 +1,5 @@
-import { wsServer, Context } from './objects';
-import debug from './debug';
+import { wsServer, Context } from '../objects';
+import debug from '../debug';
 import { createPacket, HEARTBEAT_INTERVAL } from '@prisel/common';
 import WebSocket from 'ws';
 import http from 'http';

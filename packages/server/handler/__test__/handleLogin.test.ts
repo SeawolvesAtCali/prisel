@@ -2,7 +2,7 @@ import { handleLogin } from '../handleLogin';
 import { Socket } from '../../objects';
 import createContext from '../../createContext';
 
-jest.mock('../../networkUtils');
+jest.mock('../../utils/networkUtils');
 
 describe('handleLogin', () => {
     it('should add the client to state', () => {

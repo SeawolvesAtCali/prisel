@@ -6,5 +6,7 @@ export interface Context {
     SocketManager: SocketManager;
     StateManager: StateManager;
     server: wsServer;
-    updateState: (updater: (draftState: StateManager, baseState: StateManager) => void) => void;
+    updateState: (
+        updater: (draftState: StateManager, baseState: StateManager) => void,
+    ) => StateManager;
 }

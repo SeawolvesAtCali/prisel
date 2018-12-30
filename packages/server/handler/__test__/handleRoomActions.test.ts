@@ -1,9 +1,9 @@
 import * as roomHandler from '../handleRoomActions';
 import createContext from '../../createContext';
 import { Socket, Context } from '../../objects';
-import { closeSocket } from '../../networkUtils';
+import { closeSocket } from '../../utils/networkUtils';
 
-jest.mock('../../networkUtils');
+jest.mock('../../utils/networkUtils');
 
 const contextWithOneUserInRoom: Partial<Context> = Object.freeze({
     StateManager: {

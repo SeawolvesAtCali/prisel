@@ -2,7 +2,7 @@ import createContext from '../../createContext';
 import { Socket, Context } from '../../objects';
 import { handleLeaveImpl } from '../handleRoomActions';
 
-jest.mock('../../networkUtils');
+jest.mock('../../utils/networkUtils');
 
 describe('handleLeave', () => {
     it('should does nothing if not in a room', () => {

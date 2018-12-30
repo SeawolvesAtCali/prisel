@@ -13,6 +13,7 @@ const createContext = (partial: Partial<Context> = {}): Context => {
             context.StateManager = produce(context.StateManager, (draftState) =>
                 updater(draftState, context.StateManager),
             );
+            return context.StateManager;
         },
     };
 

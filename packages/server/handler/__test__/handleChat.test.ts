@@ -1,10 +1,10 @@
 import { handleChat } from '../handleChat';
 import createContext from '../../createContext';
 import { Socket } from '../../objects';
-import { broadcast } from '../../networkUtils';
+import { broadcast } from '../../utils/networkUtils';
 import { MessageType } from '@prisel/common';
 
-jest.mock('../../networkUtils');
+jest.mock('../../utils/networkUtils');
 
 describe('handleChat', () => {
     it('should create correct broadcast message in a room', () => {

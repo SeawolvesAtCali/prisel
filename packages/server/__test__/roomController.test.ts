@@ -2,8 +2,8 @@ import * as roomController from '../handler/handleRoomActions';
 import { Client, Context, Socket } from '../objects';
 import createContext from '../createContext';
 
-jest.mock('../updateUtils');
-jest.mock('../networkUtils');
+jest.mock('../utils/updateUtils');
+jest.mock('../utils/networkUtils');
 
 const createMockClient: (id: string, mockContext: Context) => { client: Client; socket: Socket } = (
     id,

@@ -2,7 +2,7 @@ import { handleDisconnect } from '../handleDisconnect';
 import { Socket } from '../../objects';
 import createContext from '../../createContext';
 
-jest.mock('../../networkUtils');
+jest.mock('../../utils/networkUtils');
 
 describe('handleDisconnect', () => {
     it('should remove the client from socket and state', () => {

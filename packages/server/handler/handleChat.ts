@@ -1,5 +1,5 @@
 import { Context, Socket } from '../objects';
-import { broadcast } from '../networkUtils';
+import { broadcast } from '../utils/networkUtils';
 import * as messages from '../message/chat';
 import { MessageType } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';

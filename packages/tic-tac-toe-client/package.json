@@ -43,8 +43,8 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "start": "parcel serve index.html",
+        "build": "parcel build index.html",
         "test": "jest",
-        "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix",
         "storybook": "start-storybook -p 9001 -c .storybook"
     },

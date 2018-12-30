@@ -9,6 +9,10 @@ import { updateClientWithRoomData } from '../updateUtils';
  */
 export const handleDisconnect = (context: Context, socket: Socket) => (data: {}) => {
     const { SocketManager, updateState } = context;
+    if (!SocketManager.hasSocket(socket)) {
+        // client is not login yet, nothing to do
+        return;
+    }
     const roomId = handleLeaveImpl(context, socket)(data);
     updateClientWithRoomData(context, roomId);
     const clientId = SocketManager.getId(socket);

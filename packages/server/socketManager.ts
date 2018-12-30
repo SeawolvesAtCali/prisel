@@ -6,12 +6,24 @@ import debug from './debug';
  * Singleton class to manage sockets and their ids.
  */
 class SocketManager {
-    private socketMap: WeakMap<Socket, string>;
+    private socketMap: Map<Socket, string>;
     private idMap: Map<string, Socket>;
 
     constructor() {
-        this.socketMap = new WeakMap();
+        this.socketMap = new Map();
         this.idMap = new Map();
+    }
+
+    public size() {
+        return this.idMap.size;
+    }
+
+    public getIds() {
+        return this.idMap.keys();
+    }
+
+    public getSockets() {
+        return this.idMap.values();
     }
 
     public add(id: string, socket: Socket) {
@@ -62,6 +74,7 @@ class SocketManager {
     }
 
     public removeBySocket(socket: Socket) {
+        debug('removing socket');
         const id: string | void = this.socketMap.get(socket);
         if (id !== undefined) {
             this.idMap.delete(id);

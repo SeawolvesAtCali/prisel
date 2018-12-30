@@ -9,6 +9,7 @@ function createGameState() {
         player: [undefined, undefined],
         map: ['', '', '', '', '', '', '', '', ''],
         currentPlayer: 0,
+        winner: null,
     };
     return state;
 }
@@ -49,6 +50,11 @@ export const handleMoveImpl = (context: Context, roomId: string, moveData: any) 
         const { gameState } = draftState.rooms[roomId];
         const sign = gameState.currentPlayer === 0 ? 'O' : 'X';
         gameState.map[moveData.index] = sign;
+        if (checkWin(gameState)) {
+            gameState.winner = gameState.currentPlayer;
+        } else if (isEven(gameState.map)) {
+            gameState.winner = 'even';
+        }
         gameState.currentPlayer = 1 - gameState.currentPlayer;
     });
     return context.StateManager.rooms[roomId].gameState;
@@ -57,6 +63,10 @@ export const handleMove = (context: Context, client: Socket) => (data: any) => {
     const { SocketManager, StateManager, updateState } = context;
     const roomId = getRoomId(context, client);
     const state = StateManager.rooms[roomId].gameState;
+    if (state.winner !== null) {
+        // game already finished
+        return;
+    }
     const userId = SocketManager.getId(client);
     if (userId !== state.player[state.currentPlayer]) {
         return;
@@ -64,15 +74,6 @@ export const handleMove = (context: Context, client: Socket) => (data: any) => {
     const newState = handleMoveImpl(context, roomId, data);
 
     broadcast(context, roomId, ...Messages.getGameState(newState));
-
-    if (checkWin(newState)) {
-        process.stdout.write(userId + ' won the game');
-        return;
-    }
-
-    if (isEven(newState.map)) {
-        process.stdout.write('EVEN');
-    }
 };
 
 export function checkWin(state: any) {

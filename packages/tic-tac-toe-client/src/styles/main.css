@@ -1,0 +1,46 @@
+body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: #366370;
+}
+
+button {
+    padding: 3px 5px;
+    color: white;
+    background-color: #57bb01;
+    border-radius: 3px;
+    border: 1px solid #4e7d01;
+    box-shadow: 0 0.2em #4e7d01;
+    outline: none;
+    text-transform: uppercase;
+    transform: translateY(-0.2em);
+}
+
+button:active {
+    box-shadow: none;
+    position: relative;
+    top: 0.2em;
+}
+
+input {
+    background: #ffe3da;
+    border: none;
+    border-bottom: 2px solid #d27538;
+    outline: none;
+    color: #605451;
+    padding: 2px 10px;
+    box-sizing: border-box;
+}
+
+.field-container {
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+}
+
+.one-fourth-width {
+    width: 24%;
+}
+
+.half-width {
+    width: 49%;
+}

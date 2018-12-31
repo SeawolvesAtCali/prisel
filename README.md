@@ -22,9 +22,62 @@ This project is being developed with the following principle in mind:
    user should have the freedom to use it with either JavaScript or TypeScript.
 5. **Testing and debugging support** It should provide good testing and debugging utilities.
 
+# Usage
+
+## Server
+
+```bash
+> npm i @prisel/server
+```
+
+```javascript
+import { Server } from '@prisel/server';
+
+const server = new Server();
+server.start(); // server will start at ws://localhost:3000
+```
+
+More server docs see @prisel/server
+[README](https://github.com/SeawolvesAtCali/prisel/tree/master/packages/server)
+
+## Client
+
+```bash
+> npm i @prisel/client
+```
+
+```javascript
+import { Client, Messages, MessageType } from '@prisel/client';
+
+const client = new Client('ws://localhost:3000');
+
+(async function() {
+    await client.connect();
+    const { userId } = await client.login('my-username'));
+    client.emit(...Messages.getCreateRoom('room-name'));
+    await client.once(MessageType.SUCCESS);
+    console.log('we are in a room');
+})();
+```
+
 ---
 
-# Contributor guide
+# Contributing guide
+
+## Project overview
+
+This project uses lerna to manage multiple sub packages inside `/packages` folder.
+
+-   **server** hosts the code for server engine, published as
+    [`@prisel/server`](https://www.npmjs.com/package/@prisel/server)
+-   **client** hosts the code for client library, published as
+    [`@prisel/client`](https://www.npmjs.com/package/@prisel/client)
+-   **common** shared code used by server and client, published as
+    [`@prisel/common`](https://www.npmjs.com/package/@prisel/common)
+-   **template** template for creating a new package in this monorepo
+-   **e2e** end to end test for server and client
+-   **tic-tac-toe** an example tic-tac-toe server implementation
+-   **tic-tac-toe-client** an example tic-tac-toe client implementation
 
 ## Install
 
@@ -36,6 +89,9 @@ To install dependencies, run the following command in project root directory:
 npm install
 ```
 
+All the sub packages' dependencies and devDependencies are recorded in top level package-lock.json.
+Installing in the top level will make sure all of them are installed.
+
 ## Test
 
 This project uses [jest](https://facebook.github.io/jest/) as the testing framework.
@@ -43,7 +99,7 @@ This project uses [jest](https://facebook.github.io/jest/) as the testing framew
 All the test should be inside `__test__` folder next to the source file. For example, if we have a
 file `directory/testMe.ts`, its test should be at `directory/__test__/testMe.test.ts`
 
-test file should use the same name as the source file, plus `.test.js` ending.
+test file should use the same name as the source file, plus `.test.ts` ending.
 
 To run all the test
 
@@ -132,13 +188,26 @@ npm run lint
 ## Continous Intergration
 
 This project uses Travis CI as continous intergration service. Travis will pick up our project
-whenever we have a new commit, our build will run both `npm test` and `npm run lint`. Either one of
-them fail will result in a failed build.
+whenever we have a new commit, our build will run through all the checks listed in `.travis.yml`.
+Any of them fails will result in a failed build.
 
 ## Deploying
 
-The server package is deployed to heroku at
-[https://game-server-monopoly.herokuapp.com/](https://game-server-monopoly.herokuapp.com/).
+An example server that serves tic-tac-toe is deployed at
+[Heroku](https://game-server-monopoly.herokuapp.com/).
+
+Heroku goes to sleep once in a while, until someone access it. When the server is running, we should
+see
+
+```
+Server is running
+```
+
+on the page.
+
+The corresponding client side is deployed at [Netlify](https://prisel-tic-tac-toe.netlify.com/)
+
+![tic-tac-toe-client](https://user-images.githubusercontent.com/5957726/50565663-f7720680-0ce5-11e9-912f-eab1baee6b93.png)
 
 When a pull request gets merged into master branch, heroku will automatically redeploy. We have the
 following configuration set for Heroku
@@ -156,7 +225,8 @@ get installed.
 
 This make sure that Heroku doesn't cache node_modules.
 
-If you need to make change to Heroku, ask @yiochen for credential.
+If you need to make change to Heroku or Netlify, ask [@yiochen](https://github.com/yiochen) for
+credential.
 
 ## Recommended Visual Studio Code plugin
 

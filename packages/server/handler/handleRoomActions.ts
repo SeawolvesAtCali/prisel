@@ -23,6 +23,11 @@ export const setClientRoomAttributes = (context: Context, clientId: ClientId, ro
 
 export const handleExit = (context: Context, socket: Socket) => (data: {}) => {
     const { SocketManager, updateState } = context;
+    closeSocket(socket);
+    if (!SocketManager.hasSocket(socket)) {
+        // client has not logged in yet. Nothing to clean up.
+        return;
+    }
     const room = getRoom(context, socket);
     if (room) {
         handleLeaveImpl(context, socket)(data);
@@ -30,7 +35,6 @@ export const handleExit = (context: Context, socket: Socket) => (data: {}) => {
     }
     const clientId = SocketManager.getId(socket);
     SocketManager.removeBySocket(socket);
-    closeSocket(socket);
     updateState((draft) => {
         delete draft.connections[clientId];
     });

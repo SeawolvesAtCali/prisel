@@ -70,3 +70,4 @@ typings/
 dist
 .cache
 lib
+.DS_Store

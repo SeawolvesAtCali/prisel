@@ -10,6 +10,10 @@ import { getRoom } from '../utils/stateUtils';
  */
 export const handleDisconnect = (context: Context, socket: Socket) => (data: {}) => {
     const { SocketManager, updateState } = context;
+    if (!SocketManager.hasSocket(socket)) {
+        // client is not login yet, nothing to do
+        return;
+    }
     const room = getRoom(context, socket);
     if (room) {
         handleLeaveImpl(context, socket)(data);

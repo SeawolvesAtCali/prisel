@@ -47,12 +47,6 @@ export function getUnready(): Message {
 }
 
 /**
- *  Host start the game
- */
-export function getStart(): Message {
-    return [MessageType.GAME_START, {}];
-}
-/**
  * Host kick a user out of the room
  * @param {String} targetUserId
  */

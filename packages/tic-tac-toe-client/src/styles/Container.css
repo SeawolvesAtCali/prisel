@@ -1,0 +1,30 @@
+.container {
+    max-width: 500px;
+    border: 3px solid #d0702e;
+    background: #ffb57a;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    border-radius: 10px;
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100px;
+    padding: 30px;
+    padding-top: 70px;
+
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+}
+
+.container > .title {
+    color: white;
+    text-transform: uppercase;
+    color: white;
+    background: #db0501;
+    padding: 5px 20px;
+    box-sizing: border-box;
+    box-shadow: 0 0.2em #8c0102;
+    border: 2px solid #8c0102;
+    position: absolute;
+    top: 10px;
+    left: -10px;
+}

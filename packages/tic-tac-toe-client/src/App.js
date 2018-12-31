@@ -23,7 +23,7 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        this.client = new Client();
+        this.client = new Client(process.env.SERVER);
         this.client.connect().then(() => {
             this.connected = true;
             window.addEventListener('beforeunload', () => {

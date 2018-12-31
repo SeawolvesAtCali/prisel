@@ -1,7 +1,3 @@
-import hello from '../index';
-
-describe('@prisel/template', () => {
-    it('should say hello', () => {
-        expect(hello).toBe('Hello world');
-    });
+test('sample', () => {
+    expect(1).toBe(1);
 });

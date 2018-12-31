@@ -9,7 +9,6 @@
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "postinstall": "npm run build",
         "build": "lerna run build --stream",
-        "now-build": "npm run build",
         "deploy:server": "node packages/server/lib/demo.js",
         "test": "lerna run --no-bail test --ignore @prisel/e2e --stream",
         "automation": "lerna run test --scope @prisel/e2e --stream",

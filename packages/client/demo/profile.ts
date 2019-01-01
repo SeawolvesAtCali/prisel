@@ -64,7 +64,7 @@ const defaultProfile: Profile = {
             },
         },
         {
-            title: 'enter indies of cards you want to play, sperated by space',
+            title: 'move(indies seperated by space)',
             fields: [{ label: 'position', key: 'index', type: Fields.TEXT }],
             handler: (client: Client, fields: any) => {
                 client.emit(...getMove({ cards: parseToArray(fields.index) }));

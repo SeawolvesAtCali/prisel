@@ -3,7 +3,7 @@ import { broadcast, emit } from '@monopoly/server/networkUtils';
 import { Messages } from '@monopoly/server';
 import { RoomType, GameType } from '@monopoly/common';
 import { State, Card, generateDeck, Status, Pattern } from './components';
-import clientHandlerRegister from '@monopoly/server/lib/clientHandlerRegister';
+import clientHandlerRegister from '@monopoly/server/clientHandlerRegister';
 
 function createGameState() {
     const state: State = {

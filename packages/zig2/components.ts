@@ -5,16 +5,17 @@ enum Suits {
     SPADE = 'SPADE',
 }
 
-enum Pattern {
+export enum Pattern {
+    INVALID = 'INVALID',
     SINGLE = 'SINGLE',
     PAIR = 'PAIR',
     THREE = 'THREE',
     FIVE = 'FIVE',
-    STRAIGHT = 'STRAIGHT',
-    FLUSH = 'FLUSH',
-    FULLHOUSE = 'FULLHOUSE',
-    FOUR = 'FOUR',
-    STRAIGHTFLUSH = 'STRAIGHTFLUSH',
+    // STRAIGHT = 'STRAIGHT',
+    // FLUSH = 'FLUSH',
+    // FULLHOUSE = 'FULLHOUSE',
+    // FOUR = 'FOUR',
+    // STRAIGHTFLUSH = 'STRAIGHTFLUSH',
 }
 
 export enum Status {

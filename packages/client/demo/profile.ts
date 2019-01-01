@@ -64,14 +64,24 @@ const defaultProfile: Profile = {
             },
         },
         {
-            title: 'move',
+            title: 'enter indies of cards you want to play, sperated by space',
             fields: [{ label: 'position', key: 'index', type: Fields.TEXT }],
             handler: (client: Client, fields: any) => {
-                console.log(Number(fields.index));
-                client.emit(...getMove({ cards: [Number(fields.index)] }));
+                client.emit(...getMove({ cards: parseToArray(fields.index) }));
             },
         },
     ],
 };
 
+function parseToArray(data: string) {
+    if (data === '') {
+        return [];
+    }
+    const array = data.split(' ');
+    const output = [];
+    for (const str of array) {
+        output.push(Number(str));
+    }
+    return output;
+}
 export default defaultProfile;

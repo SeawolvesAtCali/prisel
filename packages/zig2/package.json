@@ -1,0 +1,30 @@
+{
+    "name": "@monopoly/zig2",
+    "version": "0.0.0",
+    "description": "> TODO: description",
+    "author": "",
+    "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/template#readme",
+    "license": "MIT",
+    "main": "lib/index.js",
+    "directories": {
+        "lib": "./",
+        "test": "__test__"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+    },
+    "scripts": {
+        "build": "tsc",
+        "start": "echo HI",
+        "test": "jest",
+        "lint": "tslint --project tsconfig.json",
+        "fix": "tslint --project tsconfig.json --fix"
+    },
+    "bugs": {
+        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+    }
+}

@@ -68,7 +68,7 @@ const defaultProfile: Profile = {
             fields: [{ label: 'position', key: 'index', type: Fields.TEXT }],
             handler: (client: Client, fields: any) => {
                 console.log(Number(fields.index));
-                client.emit(...getMove({ index: Number(fields.index) }));
+                client.emit(...getMove({ cards: [Number(fields.index)] }));
             },
         },
     ],

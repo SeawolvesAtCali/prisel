@@ -1,26 +1,34 @@
 {
-    "name": "@monopoly/common",
-    "version": "0.0.0",
+    "name": "@prisel/common",
+    "version": "0.1.1",
+    "publishConfig": {
+        "access": "public"
+    },
     "description": "> TODO: description",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
-    "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/common#readme",
+    "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/common#readme",
     "license": "MIT",
-    "main": "lib/index.js",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
     },
+    "files": [
+        "lib"
+    ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+        "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
+        "prebuild": "rm -rf ./lib",
         "build": "tsc",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },
     "bugs": {
-        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+        "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
         "debug": "^4.1.0",

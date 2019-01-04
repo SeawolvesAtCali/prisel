@@ -1,9 +1,9 @@
 import * as roomController from '../handler/handleRoomActions';
-import { Client, ClientType, Context, Socket } from '../objects';
+import { Client, Context, Socket } from '../objects';
 import createContext from '../createContext';
 
-jest.mock('../updateUtils');
-jest.mock('../networkUtils');
+jest.mock('../utils/updateUtils');
+jest.mock('../utils/networkUtils');
 
 const createMockClient: (id: string, mockContext: Context) => { client: Client; socket: Socket } = (
     id,
@@ -14,7 +14,6 @@ const createMockClient: (id: string, mockContext: Context) => { client: Client; 
     mockContext.updateState((draftState) => {
         draftState.connections[id] = {
             id,
-            type: ClientType.Controller,
             username: 'username',
         };
     });

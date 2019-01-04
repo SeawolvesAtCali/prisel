@@ -1,11 +1,13 @@
 {
-    "name": "@monopoly/tic-tac-toe",
-    "version": "0.0.0",
+    "name": "@prisel/tic-tac-toe",
+    "version": "0.1.1",
+    "private": true,
     "description": "> TODO: description",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
-    "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/template#readme",
+    "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/template#readme",
     "license": "MIT",
-    "main": "lib/index.js",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
@@ -15,21 +17,22 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+        "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
+        "prebuild": "rm -rf ./lib",
         "build": "tsc",
-        "start": "echo HI",
+        "start": "env DEBUG=debug ts-node index.ts",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },
     "bugs": {
-        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+        "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
-        "@monopoly/client": "file:../client",
-        "@monopoly/server": "file:../server",
+        "@prisel/client": "file:../client",
+        "@prisel/server": "file:../server",
         "debug": "^4.1.1"
     }
 }

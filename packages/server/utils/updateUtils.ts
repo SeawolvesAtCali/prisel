@@ -1,8 +1,8 @@
-import { Context, Room, StateManager as StateManagerT } from './objects';
+import { Context, Room, StateManager as StateManagerT } from '../objects';
 
 import pick from 'lodash/pick';
 import { broadcast } from './networkUtils';
-import * as roomMessages from './message/room';
+import * as roomMessages from '../message/room';
 
 const denormalizeRoom = (StateManager: StateManagerT, room: Room) => ({
     ...room,

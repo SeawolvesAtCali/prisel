@@ -1,17 +1,17 @@
 import { handleChat } from '../handleChat';
 import createContext from '../../createContext';
-import { Socket, ClientType } from '../../objects';
-import { broadcast } from '../../networkUtils';
-import { ChatType } from '@monopoly/common';
+import { Socket } from '../../objects';
+import { broadcast } from '../../utils/networkUtils';
+import { MessageType } from '@prisel/common';
 
-jest.mock('../../networkUtils');
+jest.mock('../../utils/networkUtils');
 
 describe('handleChat', () => {
     it('should create correct broadcast message in a room', () => {
         const mockContext = createContext({
             StateManager: {
                 connections: {
-                    user1: { id: 'user1', username: 'userA', type: ClientType.Controller },
+                    user1: { id: 'user1', username: 'userA' },
                 },
                 messages: [],
                 rooms: { 'Room-1': { id: 'Room-1', name: 'roomA', host: 'user1', guests: [] } },
@@ -24,7 +24,7 @@ describe('handleChat', () => {
             roomId: 'Room-1',
         });
 
-        expect(broadcast).toHaveBeenCalledWith(mockContext, 'Room-1', ChatType.BROADCAST, {
+        expect(broadcast).toHaveBeenCalledWith(mockContext, 'Room-1', MessageType.BROADCAST, {
             username: 'userA',
             message: 'testing',
             roomId: 'Room-1',

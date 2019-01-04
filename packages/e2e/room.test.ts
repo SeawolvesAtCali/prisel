@@ -1,16 +1,17 @@
 import debug from './debug';
-import { createClients, untilSuccess } from './testHelper';
-import { Messages } from '@monopoly/client';
-import { RoomType } from '@monopoly/common';
+import { createClients, untilSuccess, createRoomWithGuests } from './testHelper';
+import { Messages } from '@prisel/client';
+import { MessageType } from '@prisel/common';
 
-jest.setTimeout(30000);
+const receivedRoomUpdate = (messageType: string) => MessageType.ROOM_UPDATE === messageType;
+
 describe('create room', () => {
     it('create a room', async () => {
         const [client] = createClients();
         await client.connect();
         await client.login('batman');
         client.emit(...Messages.getCreateRoom('party room'));
-        const data = await untilSuccess(client, RoomType.CREATE_ROOM);
+        const data = await untilSuccess(client, MessageType.CREATE_ROOM);
         expect(typeof data.roomId).toBe('string');
         client.exit();
     });
@@ -20,9 +21,9 @@ describe('create room', () => {
         await client.connect();
         await client.login('batman');
         client.emit(...Messages.getCreateRoom('room'));
-        await untilSuccess(client, RoomType.CREATE_ROOM);
+        await untilSuccess(client, MessageType.CREATE_ROOM);
         client.emit(...Messages.getLeave());
-        await untilSuccess(client, RoomType.LEAVE);
+        await untilSuccess(client, MessageType.LEAVE);
         client.exit();
     });
 
@@ -36,18 +37,18 @@ describe('create room', () => {
         const clientData = await client.login('client');
         const clientId = clientData.userId;
         host.emit(...Messages.getCreateRoom('party room'));
-        const roomData = await untilSuccess(host, RoomType.CREATE_ROOM);
+        const roomData = await untilSuccess(host, MessageType.CREATE_ROOM);
         const { roomId } = roomData;
         client.emit(...Messages.getJoin(roomId));
         const [, hostRoomUpdateResult, clientRoomUpdateResult] = await Promise.all([
-            untilSuccess(client, RoomType.JOIN),
+            untilSuccess(client, MessageType.JOIN),
             host.once(
                 (messageType, data) =>
-                    RoomType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
             ),
             client.once(
                 (messageType, data) =>
-                    RoomType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
             ),
         ]);
 
@@ -59,5 +60,34 @@ describe('create room', () => {
         expect(hostRoomUpdateResult.guests).toEqual(expect.arrayContaining([clientId]));
         host.exit();
         client.exit();
+    });
+
+    it('in a room everyone leaves', async () => {
+        const clients = await createRoomWithGuests(2);
+        const [host, guest1, guest2] = clients.map(([userId, client]) => client);
+        guest1.emit(...Messages.getLeave());
+        await Promise.all([
+            untilSuccess(guest1, MessageType.LEAVE),
+            host.once(receivedRoomUpdate),
+            guest2.once(receivedRoomUpdate),
+        ]);
+        host.emit(...Messages.getLeave());
+        await Promise.all([untilSuccess(host, MessageType.LEAVE), guest2.once(receivedRoomUpdate)]);
+        guest2.emit(...Messages.getLeave());
+        await untilSuccess(guest2, MessageType.LEAVE);
+        clients.map(([userId, client]) => client.exit());
+    });
+
+    it('in a room host kicks someone', async () => {
+        const clients = await createRoomWithGuests(1);
+        const [[hostId, host], [guestId, guest]] = clients;
+        host.emit(...Messages.getKick(guestId));
+        await Promise.all([
+            untilSuccess(host, MessageType.KICK),
+            untilSuccess(guest, MessageType.LEAVE),
+        ]);
+
+        host.exit();
+        guest.exit();
     });
 });

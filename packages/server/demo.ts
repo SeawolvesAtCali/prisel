@@ -5,7 +5,7 @@ const server = new Server();
 server.start();
 process.stdout.write('starting server');
 
-process.title = 'monopoly-server';
+process.title = 'prisel-server';
 
 process.on('exit', () => {
     debug('on exit');

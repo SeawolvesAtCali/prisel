@@ -1,9 +1,9 @@
-import { Context, Socket } from '@monopoly/server';
-import { broadcast, emit } from '@monopoly/server/networkUtils';
-import { Messages } from '@monopoly/server';
-import { RoomType, GameType } from '@monopoly/common';
+import { Context, Socket } from '@prisel/server';
+import { broadcast, emit } from '@prisel/server/networkUtils';
+import { Messages } from '@prisel/server';
+import { RoomType, GameType } from '@prisel/common';
 import { State, Card, generateDeck, Status, Pattern } from './components';
-import clientHandlerRegister from '@monopoly/server/clientHandlerRegister';
+import clientHandlerRegister from '@prisel/server/clientHandlerRegister';
 
 function createGameState() {
     const state: State = {

@@ -1,9 +1,9 @@
 import { Message } from '../objects';
-import { GameType } from '@monopoly/common';
+import { MessageType } from '@prisel/common';
 /**
  * Update client on current game state
  * @param {object} gameState
  */
 export function getGameState(gameState: object): Message {
-    return [GameType.GAME_STATE, gameState];
+    return [MessageType.GAME_STATE, gameState];
 }

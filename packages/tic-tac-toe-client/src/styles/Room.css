@@ -1,0 +1,19 @@
+.player-container {
+    border: 1px solid #d27538;
+    border-bottom: 2px solid #d27538;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.self-player-container {
+    border: none;
+    border-bottom: 2px solid #d27538;
+
+    background: #ffe3da;
+}
+
+.players-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 5px;
+    column-gap: 5px;
+}

@@ -1,4 +1,4 @@
-export { Client, ClientType } from './client';
+export { Client } from './client';
 export { Context } from './context';
 export { Room } from './room';
 export { Socket } from './socket';

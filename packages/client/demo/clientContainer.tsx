@@ -23,7 +23,13 @@ function stringify(...rest: any[]): string {
         )
         .join(', ');
 }
-
+type offEvent = () => void;
+type MessageWatcher = (messageType: string, data: any) => void;
+export interface CustomFieldProps {
+    onEvent: (handler: MessageWatcher) => offEvent;
+    onChange: (value: any) => void;
+    value: any;
+}
 class ClientContainer extends React.Component<ClientContainerProps, ClientContainerStates> {
     private static getResolvedFieldsFromProfile(profile: Profile) {
         const fields: any = {};
@@ -33,6 +39,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         return fields;
     }
     private client: Client;
+    private messageWatchers = new Set<MessageWatcher>();
 
     constructor(props: any) {
         super(props);
@@ -54,6 +61,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                         draft.output.push(stringify(messageType, data));
                     }),
                 );
+                this.messageWatchers.forEach((messageWatcher) => messageWatcher(messageType, data));
             },
         );
 
@@ -63,6 +71,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             });
         });
     }
+
     public render() {
         const { profile } = this.props;
         const { actions } = profile;
@@ -112,10 +121,17 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         );
     }
 
+    private addOnEvent = (handle: MessageWatcher) => {
+        this.messageWatchers.add(handle);
+        return () => {
+            this.messageWatchers.delete(handle);
+        };
+    };
+
     private getField(field: FieldType) {
-        const getOnChange = (fieldKey: string) => (value: any) => {
+        const handleChange = (fieldKey: string, value: any) => {
             const nextState = produce(this.state, (draft) => {
-                draft.fields[fieldKey] = value.target.value;
+                draft.fields[fieldKey] = value;
             });
             this.setState(nextState);
         };
@@ -125,14 +141,23 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                 case Fields.NUMBER:
                     return (
                         <InputNumber
-                            onChange={getOnChange(field.key)}
+                            onChange={(value: number) => handleChange(field.key, value)}
                             value={this.state.fields[field.key]}
                         />
                     );
                 case Fields.TEXT:
                     return (
                         <Input
-                            onChange={getOnChange(field.key)}
+                            onChange={(event: any) => handleChange(field.key, event.target.value)}
+                            value={this.state.fields[field.key]}
+                        />
+                    );
+                case Fields.CUSTOM:
+                    const Component = field.render;
+                    return (
+                        <Component
+                            onChange={(value: number) => handleChange(field.key, value)}
+                            onEvent={this.addOnEvent}
                             value={this.state.fields[field.key]}
                         />
                     );

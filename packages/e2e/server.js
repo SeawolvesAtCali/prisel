@@ -1,1 +1,1 @@
-require('@monopoly/server/lib/demo');
+require('@prisel/server/lib/demo');

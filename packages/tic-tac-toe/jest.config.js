@@ -1,15 +1,15 @@
 module.exports = {
-    name: 'client',
-    displayName: 'client',
+    name: 'tic-tac-toe',
+    displayName: 'tic-tac-toe',
     verbose: true,
     globals: {
         'ts-jest': {
             tsConfig: 'tsconfig.json',
         },
     },
-    moduleFileExtensions: ['ts', 'js'],
+    moduleFileExtensions: ['ts', 'tsx', 'js'],
     transform: {
-        '^.+\\.(ts|js)?$': 'ts-jest',
+        '^.+\\.ts(x)?$': 'ts-jest',
     },
     testRegex: '.test\\.ts$',
     restoreMocks: true,

@@ -1,16 +1,16 @@
-import WebSocket from 'ws';
 import { Context, Room, Socket } from '../objects';
 import partial from 'lodash/partial';
-import { emit, closeSocket } from '../networkUtils';
-import { RoomType } from '@monopoly/common';
+import { emit, closeSocket } from '../utils/networkUtils';
+import { MessageType } from '@prisel/common';
 import * as messages from '../message/room';
-import { newId } from '../idUtils';
-import { updateClientWithRoomData } from '../updateUtils';
+import { newId } from '../utils/idUtils';
+import { updateClientWithRoomData } from '../utils/updateUtils';
 import clientHandlerRegister from '../clientHandlerRegister';
 
 import debug from '../debug';
 import { RoomId } from '../objects/room';
 import { ClientId } from '../objects/client';
+import { getRoom, getClient } from '../utils/stateUtils';
 
 export const setClientRoomAttributes = (context: Context, clientId: ClientId, roomId: RoomId) => {
     const { updateState } = context;
@@ -23,11 +23,18 @@ export const setClientRoomAttributes = (context: Context, clientId: ClientId, ro
 
 export const handleExit = (context: Context, socket: Socket) => (data: {}) => {
     const { SocketManager, updateState } = context;
-    const roomId = handleLeaveImpl(context, socket)(data);
-    updateClientWithRoomData(context, roomId);
+    closeSocket(socket);
+    if (!SocketManager.hasSocket(socket)) {
+        // client has not logged in yet. Nothing to clean up.
+        return;
+    }
+    const room = getRoom(context, socket);
+    if (room) {
+        handleLeaveImpl(context, socket)(data);
+        updateClientWithRoomData(context, room.id);
+    }
     const clientId = SocketManager.getId(socket);
     SocketManager.removeBySocket(socket);
-    closeSocket(socket);
     updateState((draft) => {
         delete draft.connections[clientId];
     });
@@ -39,6 +46,15 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (data: {
     const { roomName } = data;
     const { SocketManager, updateState } = context;
     const hostId = SocketManager.getId(socket);
+    const currentRoom = getRoom(context, socket);
+    if (currentRoom) {
+        // already in a room
+        emit(
+            socket,
+            ...messages.getFailure(MessageType.CREATE_ROOM, `ALREADY IN A ROOM ${currentRoom.id}`),
+        );
+        return;
+    }
     const roomId = newId<RoomId>('ROOM');
     const room: Room = {
         id: roomId,
@@ -55,33 +71,31 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (data: {
 
 type ErrorMessage = string;
 
-const attemptJoinRoom = (context: Context, clientId: ClientId, roomId: ClientId): ErrorMessage => {
-    const { updateState } = context;
-    const room = context.StateManager.rooms[roomId];
-    if (room === undefined) {
+const attemptJoinRoom = (context: Context, socket: Socket, roomId: ClientId): ErrorMessage => {
+    const { updateState, StateManager } = context;
+    const currentRoom = getRoom(context, socket);
+    const client = getClient(context, socket);
+    if (currentRoom) {
+        return `ALREADY IN A ROOM ${currentRoom.id}`;
+    }
+    if (!StateManager.rooms[roomId]) {
         return 'ROOM DOES NOT EXIST';
     }
 
-    if (room.host === clientId || room.guests.includes(clientId)) {
-        return 'ALREADY JOINED ROOM';
+    if (client) {
+        updateState((draftState) => void draftState.rooms[roomId].guests.push(client.id));
+        setClientRoomAttributes(context, client.id, roomId);
     }
-
-    updateState((draftState) => void draftState.rooms[roomId].guests.push(clientId));
-    setClientRoomAttributes(context, clientId, roomId);
-
     return '';
 };
 
-const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string }) => {
+export const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string }) => {
     const { roomId } = data;
-
-    const { SocketManager } = context;
-    const clientId = SocketManager.getId(socket);
-    const attempJoinRoomError = attemptJoinRoom(context, clientId, roomId);
+    const attempJoinRoomError = attemptJoinRoom(context, socket, roomId);
     if (attempJoinRoomError === '') {
         emit(socket, ...messages.getJoinSuccess());
     } else {
-        emit(socket, ...messages.getFailure(RoomType.JOIN, attempJoinRoomError));
+        emit(socket, ...messages.getFailure(MessageType.JOIN, attempJoinRoomError));
     }
     updateClientWithRoomData(context, roomId);
 };
@@ -92,6 +106,9 @@ export const handleLeaveImpl = (context: Context, socket: Socket) => (data: {}) 
     let roomId: string;
     updateState((draftState) => {
         const client = draftState.connections[clientId];
+        if (!client) {
+            return;
+        }
         roomId = client.roomId;
         delete client.roomId;
         delete client.isReady;
@@ -99,11 +116,11 @@ export const handleLeaveImpl = (context: Context, socket: Socket) => (data: {}) 
             return;
         }
         const room = draftState.rooms[roomId];
-        if (room.host === clientId) {
+        if (room.host === client.id) {
             // handle host leaving
             // host is leaving, promote another guest to host
             const nextHost = room.guests.shift();
-            if (nextHost !== undefined) {
+            if (nextHost) {
                 room.host = nextHost;
             } else {
                 // no one is in the room, remove the room
@@ -112,48 +129,58 @@ export const handleLeaveImpl = (context: Context, socket: Socket) => (data: {}) 
         } else {
             // handle guest leaving
             const { guests } = room;
-            guests.splice(guests.indexOf(clientId), 1);
+            guests.splice(guests.indexOf(client.id), 1);
         }
     });
-    return roomId;
 };
 
 export const handleLeave = (context: Context, socket: Socket) => (data: {}) => {
-    const roomId = handleLeaveImpl(context, socket)(data);
-    if (roomId) {
+    const currentRoom = getRoom(context, socket);
+    handleLeaveImpl(context, socket)(data);
+    if (currentRoom) {
         emit(socket, ...messages.getLeaveSuccess());
-        updateClientWithRoomData(context, roomId);
+        updateClientWithRoomData(context, currentRoom.id);
     }
 };
 
 export const handleKick = (context: Context, socket: Socket) => (data: { userId: ClientId }) => {
     const { SocketManager, StateManager } = context;
     const { userId } = data;
-    const hostId = SocketManager.getId(socket);
-    const getKickFailure = partial(messages.getFailure, RoomType.KICK);
-    if (hostId === userId) {
+    const getKickFailure = partial(messages.getFailure, MessageType.KICK);
+    const host = getClient(context, socket);
+    if (!host) {
+        return;
+    }
+    const guest = StateManager.connections[userId];
+    if (!guest) {
+        emit(socket, ...getKickFailure('User not exist'));
+        return;
+    }
+    if (host.id === guest.id) {
         emit(socket, ...getKickFailure('Cannot self kick'));
         return;
     }
-    const client = StateManager.connections[hostId];
-    const { roomId } = client;
-    if (!roomId) {
+    if (guest.roomId !== host.roomId) {
+        emit(socket, ...getKickFailure('Not in the same room'));
+        return;
+    }
+    const room = getRoom(context, socket);
+    if (!room) {
         emit(socket, ...getKickFailure('Not in a room'));
         return;
     }
-    const room = StateManager.rooms[roomId];
-    if (room.host !== hostId) {
+    if (room.host !== host.id) {
         emit(socket, ...getKickFailure('Not enough privilage'));
         return;
     }
 
-    handleLeave(context, SocketManager.getSocket(userId))({});
+    handleLeave(context, SocketManager.getSocket(guest.id))({});
     emit(socket, ...messages.getKickSuccess());
-    updateClientWithRoomData(context, roomId);
+    updateClientWithRoomData(context, room.id);
 };
 
-clientHandlerRegister.push([RoomType.CREATE_ROOM, handleCreateRoom]);
-clientHandlerRegister.push([RoomType.JOIN, handleJoin]);
-clientHandlerRegister.push([RoomType.LEAVE, handleLeave]);
-clientHandlerRegister.push([RoomType.KICK, handleKick]);
-clientHandlerRegister.push([RoomType.EXIT, handleExit]);
+clientHandlerRegister.push([MessageType.CREATE_ROOM, handleCreateRoom]);
+clientHandlerRegister.push([MessageType.JOIN, handleJoin]);
+clientHandlerRegister.push([MessageType.LEAVE, handleLeave]);
+clientHandlerRegister.push([MessageType.KICK, handleKick]);
+clientHandlerRegister.push([MessageType.EXIT, handleExit]);

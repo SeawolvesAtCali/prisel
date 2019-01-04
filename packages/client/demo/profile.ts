@@ -2,10 +2,10 @@ import Client from '../client';
 import { getCreateRoom, getJoin } from '../message/room';
 import { getChat } from '../message/chat';
 import { getGameStart, getMove } from '../message';
-
 export enum Fields {
     TEXT,
     NUMBER,
+    CUSTOM,
 }
 
 export interface FieldType {
@@ -13,6 +13,7 @@ export interface FieldType {
     key: string;
     type: Fields;
     default?: any;
+    render?: any;
 }
 
 interface ResolvedFields {

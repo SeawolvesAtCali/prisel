@@ -1,11 +1,13 @@
 {
-    "name": "@monopoly/template",
-    "version": "0.0.0",
+    "name": "@prisel/template",
+    "version": "0.1.1",
+    "private": true,
     "description": "> TODO: description",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
-    "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/template#readme",
+    "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/template#readme",
     "license": "MIT",
-    "main": "lib/index.js",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
@@ -15,9 +17,10 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+        "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
+        "prebuild": "rm -rf ./lib",
         "build": "tsc",
         "start": "echo HI",
         "test": "jest",
@@ -25,6 +28,6 @@
         "fix": "tslint --project tsconfig.json --fix"
     },
     "bugs": {
-        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+        "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     }
 }

@@ -26,5 +26,9 @@
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+    },
+    "dependencies": {
+        "@prisel/common": "file:../common",
+        "@prisel/server": "file:../server"
     }
 }

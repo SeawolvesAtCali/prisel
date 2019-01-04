@@ -69,10 +69,10 @@ function broadcastBig2State(context: Context, messageType: string, state: State)
 }
 
 const handleGameStart = (context: Context, client: Socket) => (data: any) => {
-    const state = createGameState();
     const roomId = getRoomId(context, client);
     const { updateState } = context;
     updateState((draftState) => {
+        const state = createGameState();
         const clients = [draftState.rooms[roomId].host, ...draftState.rooms[roomId].guests];
         const playerCardSets = dialCards(state.deck, clients.length);
         // tslint:disable-next-line:prefer-for-of
@@ -95,7 +95,7 @@ const handleGameStart = (context: Context, client: Socket) => (data: any) => {
 
 function playCard(state: State, playIndies: number[]) {
     const playerCardSet = state.players[state.currentPlayer].cardSet;
-    if (playIndies.length === 0 || playIndies[0] === null) {
+    if (playIndies.length === 0) {
         return [];
     }
     playIndies = [].slice.call(playIndies).sort((a: number, b: number) => {
@@ -142,7 +142,7 @@ const handleMove = (context: Context, client: any) => (data: any) => {
     }
 
     // currentPlayer skip the turn, update only the currentPlayer of gameState to next
-    if (data.cards.length === 0 || data.cards[0] === null) {
+    if (data.cards.length === 0) {
         // round starter can't skip the turn
         if (state.currentPlayer === state.prevPlayer) {
             return;
@@ -150,7 +150,11 @@ const handleMove = (context: Context, client: any) => (data: any) => {
         updateState((draftState) => {
             setNextPlayer(draftState, roomId);
         });
-        broadcastBig2State(context, 'GameState', context.StateManager.rooms[roomId].gameState);
+        broadcastBig2State(
+            context,
+            MessageType.GAME_STATE,
+            context.StateManager.rooms[roomId].gameState,
+        );
         return;
     }
 
@@ -159,8 +163,8 @@ const handleMove = (context: Context, client: any) => (data: any) => {
         return;
     }
 
-    const playcard = playCard(state, data.cards);
     updateState((draftState) => {
+        const playcard = playCard(state, data.cards);
         const { gameState } = draftState.rooms[roomId];
         gameState.playedCard = playcard;
         gameState.players[gameState.currentPlayer].cardSet =
@@ -169,7 +173,7 @@ const handleMove = (context: Context, client: any) => (data: any) => {
         setNextPlayer(draftState, roomId);
     });
     const newState = context.StateManager.rooms[roomId].gameState;
-    broadcastBig2State(context, 'GameState', newState);
+    broadcastBig2State(context, MessageType.GAME_STATE, newState);
     if (checkWin(state.players[state.prevPlayer].cardSet)) {
         process.stdout.write(state.players[state.prevPlayer].client + ' won the game');
     }
@@ -184,10 +188,10 @@ function isValidPlay(state: State, playIndies: number[]) {
         }
     }
     const candidates = [];
-    playIndies = [].slice.call(playIndies).sort((a: number, b: number) => {
+    const orderedPlayIndies = [].slice.call(playIndies).sort((a: number, b: number) => {
         return b - a;
     });
-    for (const i of playIndies) {
+    for (const i of orderedPlayIndies) {
         candidates.push(playerCardSet[i]);
     }
     const currentPattern = getPattern(candidates);
@@ -225,7 +229,7 @@ function getPattern(cards: Card[]) {
     } else if (cards.length === 2) {
         if (cards[0].rank === cards[1].rank) {
             return {
-                type: Pattern.SINGLE,
+                type: Pattern.PAIR,
                 priority: hierarchy,
             };
         }

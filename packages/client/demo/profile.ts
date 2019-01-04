@@ -79,10 +79,6 @@ function parseToArray(data: string) {
         return [];
     }
     const array = data.split(' ');
-    const output = [];
-    for (const str of array) {
-        output.push(Number(str));
-    }
-    return output;
+    return array.map(Number);
 }
 export default defaultProfile;

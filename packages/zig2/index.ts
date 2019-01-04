@@ -1,4 +1,4 @@
-import { Server } from '@monopoly/server';
+import { Server } from '@prisel/server';
 import './game';
 
 const server = new Server();

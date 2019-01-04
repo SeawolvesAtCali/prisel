@@ -83,7 +83,8 @@
         "@prisel/server": "file:packages/server",
         "@prisel/template": "file:packages/template",
         "@prisel/tic-tac-toe": "file:packages/tic-tac-toe",
-        "@prisel/tic-tac-toe-client": "file:packages/tic-tac-toe-client"
+        "@prisel/tic-tac-toe-client": "file:packages/tic-tac-toe-client",
+        "@prisel/zig2": "file:packages/zig2"
     },
     "devDependencies": {
         "@babel/core": "^7.2.2",

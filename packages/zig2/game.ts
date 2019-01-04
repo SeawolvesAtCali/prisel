@@ -1,9 +1,8 @@
-import { Context, Socket } from '@prisel/server';
-import { broadcast, emit } from '@prisel/server/networkUtils';
-import { Messages } from '@prisel/server';
-import { RoomType, GameType } from '@prisel/common';
+import { Context, Socket, Messages } from '@prisel/server';
+import { broadcast, emit } from '@prisel/server/lib/utils/networkUtils';
+import { MessageType } from '@prisel/common';
 import { State, Card, generateDeck, Status, Pattern } from './components';
-import clientHandlerRegister from '@prisel/server/clientHandlerRegister';
+import clientHandlerRegister from '@prisel/server/lib/clientHandlerRegister';
 
 function createGameState() {
     const state: State = {
@@ -24,7 +23,6 @@ const getRoomId = (context: Context, client: Socket) => {
 };
 
 function dialCards(cardPool: Card[], playerNum: number) {
-    // Math.floor(Math.random() * Math.floor(max)
     const playerCardSet: any = [];
     const dialCount = 13 * playerNum;
     for (let i = 0; i < dialCount; i++) {
@@ -90,7 +88,7 @@ const handleGameStart = (context: Context, client: Socket) => (data: any) => {
         state.prevPlayer = currPlayer;
         draftState.rooms[roomId].gameState = state;
     });
-    broadcast(context, roomId, ...Messages.getSuccess(RoomType.GAME_START, {}));
+    broadcast(context, roomId, ...Messages.getSuccess(MessageType.GAME_START, {}));
     const newState = context.StateManager.rooms[roomId].gameState;
     broadcastBig2State(context, roomId, newState);
 };
@@ -321,5 +319,5 @@ function checkWin(playerCardSet: Card[]) {
     return false;
 }
 
-clientHandlerRegister.push([RoomType.GAME_START, handleGameStart]);
-clientHandlerRegister.push([GameType.MOVE, handleMove]);
+clientHandlerRegister.push([MessageType.GAME_START, handleGameStart]);
+clientHandlerRegister.push([MessageType.MOVE, handleMove]);

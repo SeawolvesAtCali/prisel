@@ -1,5 +1,5 @@
 import { Server } from '@prisel/server';
-import './state';
+import './game';
 
 const server = new Server();
 server.start();

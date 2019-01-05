@@ -45,7 +45,7 @@ export const isEven = (map: string[]) => {
     return !hasEmpty;
 };
 
-export const handleMoveImpl = (context: Context, roomId: string, moveData: any) => {
+const handleMoveImpl = (context: Context, roomId: string, moveData: any) => {
     context.updateState((draftState) => {
         const { gameState } = draftState.rooms[roomId];
         const sign = gameState.currentPlayer === 0 ? 'O' : 'X';
@@ -59,7 +59,7 @@ export const handleMoveImpl = (context: Context, roomId: string, moveData: any) 
     });
     return context.StateManager.rooms[roomId].gameState;
 };
-export const handleMove = (context: Context, client: Socket) => (data: any) => {
+const handleMove = (context: Context, client: Socket) => (data: any) => {
     const { SocketManager, StateManager, updateState } = context;
     const roomId = getRoomId(context, client);
     const state = StateManager.rooms[roomId].gameState;

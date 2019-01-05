@@ -1,9 +1,14 @@
 language: node_js
 node_js:
     - '10'
+install:
+    # npm ci removes node_modules and make sure package-lock.json matches package.json
+    - npm ci
 cache:
     directories:
-        - 'node_modules'
+        # caching .npm instead of node_modules because .npm doesn't store compiled native modules,
+        # while node_modules does https://stackoverflow.com/a/42523517
+        - '$HOME/.npm'
 script:
     - npm run lint
     - npm run build

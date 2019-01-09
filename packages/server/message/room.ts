@@ -70,3 +70,7 @@ export function getCreateRoomSuccess(roomId: string) {
 export function getRoomUpdate(roomData: object): Message {
     return [MessageType.ROOM_UPDATE, roomData];
 }
+
+export function getMessage(data: any): Message {
+    return [MessageType.MESSAGE, data];
+}

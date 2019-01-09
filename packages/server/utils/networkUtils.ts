@@ -60,12 +60,12 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
  * Utility functions to perform network calls.
  */
 
-export function emit(client: WebSocket, messageType: string, data: object) {
+export function emit(client: WebSocket, messageType: string, data: any) {
     debug(`SERVER: ${messageType} ${JSON.stringify(data)}`);
     client.send(createPacket(messageType, data));
 }
 
-export function broadcast(context: Context, roomId: string, messageType: string, data: object) {
+export function broadcast(context: Context, roomId: string, messageType: string, data: any) {
     const { StateManager, SocketManager } = context;
     const room = StateManager.rooms[roomId];
     const hostSocket = SocketManager.getSocket(room.host);

@@ -11,6 +11,7 @@ import debug from '../debug';
 import { RoomId } from '../objects/room';
 import { ClientId } from '../objects/client';
 import { getRoom, getClient } from '../utils/stateUtils';
+import { GAME_PHASE } from '../objects/gamePhase';
 
 export const setClientRoomAttributes = (context: Context, clientId: ClientId, roomId: RoomId) => {
     const { updateState } = context;
@@ -61,6 +62,8 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (data: {
         name: roomName,
         host: hostId,
         guests: [],
+        clients: [],
+        gamePhase: GAME_PHASE.WAITING,
     };
     updateState((draftState) => void (draftState.rooms[roomId] = room));
     setClientRoomAttributes(context, hostId, roomId);

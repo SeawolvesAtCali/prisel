@@ -5,3 +5,4 @@ export { Socket } from './socket';
 export { StateManager } from './stateManager';
 export { Message } from './message';
 export { wsServer } from './server';
+export * from './anyObject';

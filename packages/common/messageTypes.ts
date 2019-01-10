@@ -28,8 +28,14 @@ enum MessageType {
     GAME_STATE = 'GAME_STATE',
     /**
      * A player move
+     * @deprecated use MESSAGE instead
      */
     MOVE = 'MOVE',
+
+    /**
+     * Customizable message for developer to extend
+     */
+    MESSAGE = 'MESSAGE',
 }
 
 export default MessageType;

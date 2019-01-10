@@ -1,6 +1,7 @@
 import * as roomController from '../handler/handleRoomActions';
 import { Client, Context, Socket } from '../objects';
 import createContext from '../createContext';
+import { GAME_PHASE } from '../objects/gamePhase';
 
 jest.mock('../utils/updateUtils');
 jest.mock('../utils/networkUtils');
@@ -52,6 +53,8 @@ describe('roomController', () => {
                     name: 'roomName',
                     host: mockClientId,
                     guests: [mockGuestId],
+                    clients: [mockClientId, mockGuestId],
+                    gamePhase: GAME_PHASE.WAITING,
                 };
             });
 

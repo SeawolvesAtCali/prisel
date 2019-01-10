@@ -1,6 +1,7 @@
 import createContext from '../../createContext';
 import { Socket, Context } from '../../objects';
 import { handleLeaveImpl } from '../handleRoomActions';
+import { GAME_PHASE } from '../../objects/gamePhase';
 
 jest.mock('../../utils/networkUtils');
 
@@ -43,6 +44,8 @@ describe('handleLeave', () => {
                         name: 'big room',
                         host: 'host1',
                         guests: ['jack', 'jenny', 'client1', 'amy', 'ben'],
+                        clients: ['host1', 'jack', 'jenny', 'client1', 'amy', 'ben'],
+                        gamePhase: GAME_PHASE.WAITING,
                     },
                 },
             },
@@ -74,6 +77,8 @@ describe('handleLeave', () => {
                         name: 'big room',
                         host: 'client1',
                         guests: ['jack', 'jenny', 'amy', 'ben'],
+                        clients: ['client1', 'jack', 'jenny', 'amy', 'ben'],
+                        gamePhase: GAME_PHASE.WAITING,
                     },
                 },
             },
@@ -107,6 +112,8 @@ describe('handleLeave', () => {
                         name: 'room',
                         host: 'client1',
                         guests: [],
+                        clients: ['client1'],
+                        gamePhase: GAME_PHASE.WAITING,
                     },
                 },
             },

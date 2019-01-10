@@ -2,6 +2,7 @@ import * as roomHandler from '../handleRoomActions';
 import createContext from '../../createContext';
 import { Socket, Context } from '../../objects';
 import { closeSocket } from '../../utils/networkUtils';
+import { GAME_PHASE } from '../../objects/gamePhase';
 
 jest.mock('../../utils/networkUtils');
 
@@ -11,7 +12,16 @@ const contextWithOneUserInRoom: Partial<Context> = Object.freeze({
             user1: { id: 'user1', username: 'userA' },
         },
         messages: [],
-        rooms: { 'Room-1': { id: 'Room-1', name: 'roomA', host: 'user1', guests: [] } },
+        rooms: {
+            'Room-1': {
+                id: 'Room-1',
+                name: 'roomA',
+                host: 'user1',
+                guests: [],
+                clients: ['user1'],
+                gamePhase: GAME_PHASE.WAITING,
+            },
+        },
     },
 });
 
@@ -83,6 +93,8 @@ describe('handleRoomActions', () => {
                             name: 'nice bedroom',
                             host: 'host1',
                             guests: ['guest1'],
+                            clients: ['host1', 'guest1'],
+                            gamePhase: GAME_PHASE.WAITING,
                         },
                     },
                 },
@@ -113,6 +125,8 @@ describe('handleRoomActions', () => {
                             name: 'bathroom',
                             host: 'host1',
                             guests: [],
+                            clients: ['host1'],
+                            gamePhase: GAME_PHASE.WAITING,
                         },
                     },
                 },
@@ -140,12 +154,16 @@ describe('handleRoomActions', () => {
                             name: 'bathroom',
                             host: 'host1',
                             guests: ['guest1'],
+                            clients: ['host1', 'guest1'],
+                            gamePhase: GAME_PHASE.WAITING,
                         },
                         [mockOtherRoomId]: {
                             id: mockOtherRoomId,
                             name: 'kitchen',
                             host: 'anotherhost',
                             guests: [],
+                            clients: ['anotherhost'],
+                            gamePhase: GAME_PHASE.WAITING,
                         },
                     },
                 },
@@ -183,6 +201,8 @@ describe('handleRoomActions', () => {
                             name: 'bathroom',
                             host: 'host1',
                             guests: [],
+                            clients: ['host1'],
+                            gamePhase: GAME_PHASE.WAITING,
                         },
                     },
                 },

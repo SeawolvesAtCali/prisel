@@ -4,11 +4,11 @@ import { GAME_PHASE } from './gamePhase';
 export interface Room {
     id: RoomId;
     name: string;
-    host: ClientId;
+    host?: ClientId;
     /**
      * @deprecated
      */
-    guests: ClientId[];
+    guests?: ClientId[];
     clients: ClientId[];
     gamePhase: GAME_PHASE;
     gameState?: any;

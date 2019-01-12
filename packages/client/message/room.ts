@@ -57,6 +57,6 @@ export function getKick(targetUserId: string): Message {
  * Create a room
  * @param {String} roomName
  */
-export function getCreateRoom(roomName: string): Message {
-    return [MessageType.CREATE_ROOM, { roomName }];
+export function getCreateRoom(roomName: string, gameType?: string, roomType?: string): Message {
+    return [MessageType.CREATE_ROOM, { roomName, gameType, roomType }];
 }

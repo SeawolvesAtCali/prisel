@@ -8,6 +8,7 @@ const createContext = (partial: Partial<Context> = {}): Context => {
         StateManager: createStateManager(),
         SocketManager: new SocketManager(),
         server: null,
+        handles: {},
         ...partial,
         updateState: (updater) => {
             context.StateManager = produce(context.StateManager, (draftState) =>

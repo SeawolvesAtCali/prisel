@@ -7,11 +7,9 @@ export interface GameConfig {
      */
     type: string;
     /**
-     * The number of players supported. If one number is given,
-     * the game needs exact number of players. If two numbers are given, the number of player
-     * needs to be between the two number inclusively.
+     * The maximum number of players supported.
      */
-    playerRange: [number] | [number, number];
+    maxPlayers: number;
     /**
      * Function invoked at room creation time and after a game ends.
      * This is a good place to initialize pre game state.
@@ -47,7 +45,7 @@ export interface GameConfig {
 
 export const BaseGameConfig: GameConfig = {
     type: 'game',
-    playerRange: [2],
+    maxPlayers: 10,
     init(handle) {},
     start(handle) {
         return true;

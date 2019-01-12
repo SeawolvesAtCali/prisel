@@ -121,6 +121,9 @@ class Handle {
     }
 
     public addClient(clientId: ClientId) {
+        this.context.updateState((draftState) => {
+            draftState.connections[clientId].roomId = this.roomId;
+        });
         this.updateRoomState((draftRoom) => {
             if (!draftRoom.clients.includes(clientId)) {
                 draftRoom.clients.push(clientId);
@@ -129,8 +132,11 @@ class Handle {
     }
 
     public removeClient(clientId: ClientId) {
+        this.context.updateState((draftState) => {
+            delete draftState.connections[clientId].roomId;
+        });
         this.updateRoomState((draftRoom) => {
-            draftRoom.clients.splice(draftRoom.clients.indexOf(clientId));
+            draftRoom.clients.splice(draftRoom.clients.indexOf(clientId), 1);
             if (draftRoom.host === clientId) {
                 delete draftRoom.host;
             }
@@ -149,6 +155,7 @@ class Handle {
         this.context.updateState((draftState) => {
             delete draftState.rooms[this.roomId];
         });
+        this.roomId = undefined;
         // TODO: how do we notify outside that room is removed.
     }
 

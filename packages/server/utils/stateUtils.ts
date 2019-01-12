@@ -1,4 +1,8 @@
 import { Context, Socket, Room, Client } from '../objects';
+import Handle from './handle';
+import { newId } from './idUtils';
+import { RoomId } from '../objects/room';
+import { GAME_PHASE } from '../objects/gamePhase';
 
 // Some utility functions for working with state
 
@@ -7,7 +11,7 @@ import { Context, Socket, Room, Client } from '../objects';
  * @param context
  * @param client
  */
-export function getClient(context: Context, client: Socket): Client | void {
+export function getClient(context: Context, client: Socket): Client {
     if (!context || !client) {
         return;
     }
@@ -23,7 +27,7 @@ export function getClient(context: Context, client: Socket): Client | void {
  * @param context
  * @param client
  */
-export function getRoom(context: Context, client: Socket): Room | void {
+export function getRoom(context: Context, client: Socket): Room {
     if (!context || !client) {
         return;
     }
@@ -35,4 +39,25 @@ export function getRoom(context: Context, client: Socket): Room | void {
             return StateManager.rooms[roomId];
         }
     }
+}
+
+export function getHandle(context: Context, client: Socket): Handle {
+    const room = getRoom(context, client);
+    if (room) {
+        return context.handles[room.id];
+    }
+}
+
+export function addRoom(context: Context, roomName: string): Room {
+    let id: RoomId;
+    return context.updateState((draftState) => {
+        id = newId<RoomId>('ROOM');
+        const room: Room = {
+            id,
+            name: roomName,
+            clients: [],
+            gamePhase: GAME_PHASE.WAITING,
+        };
+        draftState.rooms[id] = room;
+    }).rooms[id];
 }

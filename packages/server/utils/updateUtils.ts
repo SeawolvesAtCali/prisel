@@ -6,12 +6,12 @@ import * as roomMessages from '../message/room';
 
 const denormalizeRoom = (StateManager: StateManagerT, room: Room) => ({
     ...room,
-    clients: pick(StateManager.connections, [room.host, ...room.guests]),
+    clientMap: pick(StateManager.connections, room.clients),
 });
 
 export const updateClientWithRoomData = (context: Context, roomId: string) => {
     Promise.resolve().then(() => {
-        const { StateManager, server } = context;
+        const { StateManager } = context;
         const room = StateManager.rooms[roomId];
         if (room) {
             const roomData = denormalizeRoom(StateManager, room);

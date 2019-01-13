@@ -34,6 +34,7 @@ const addClientToRoom = (handle: Handle, client: ClientId) => {
 export const BaseRoomConfig: RoomConfig = {
     type: 'room',
     onCreate(handle, client, data) {
+        // TODO: move createRoomSuccess to framework
         handle.emit(client, ...getCreateRoomSuccess(handle.roomId));
         addClientToRoom(handle, client);
         handle.emit(client, ...getJoinSuccess());
@@ -49,6 +50,7 @@ export const BaseRoomConfig: RoomConfig = {
         handle.game.removePlayer(handle, client);
         handle.emit(client, ...getLeaveSuccess());
         const remainingClients = handle.clients;
+        // TODO: automatically do this.
         if (remainingClients.length === 0) {
             handle.removeRoom();
             return;

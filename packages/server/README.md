@@ -202,7 +202,7 @@ host, we can implement use the following configuration:
 const room = {
     type: 'host-can-promote',
     onMessage: (handle, client, data) => {
-        if (client === handle.host) {
+        if ((data.type = 'PROMOTE' && client === handle.host)) {
             const targetPlayer = data.targetPlayer;
             if (handle.players.includes(targetPlayer)) {
                 handle.setHost(targetPlayer);

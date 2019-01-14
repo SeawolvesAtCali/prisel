@@ -5,7 +5,7 @@
 [![version](https://img.shields.io/npm/v/@prisel/server.svg)](https://www.npmjs.com/package/@prisel/server)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-WebSocket game engine with a focus on room management.
+Node.js game server for your next multiplayer game.
 
 # Guiding principles
 
@@ -13,8 +13,8 @@ This project is being developed with the following principle in mind:
 
 1. **Robust and opinionated room system** It should provide a room system with reasonable defaults,
    but also customizable.
-2. **Total freedom of game logic implementation** It should be totally unopinionated on how/when to
-   store state and how/when to synchronize with the client.
+2. **Freedom of game logic implementation** It should be totally unopinionated on how/when to store
+   state and how/when to synchronize with the client.
 3. **Client side technology agnostic** It should not require a corresponding client engine. Client
    server communication should be based on raw WebSocket with clearly defined messages, so that
    client can be built in any language with ease.
@@ -22,12 +22,14 @@ This project is being developed with the following principle in mind:
    user should have the freedom to use it with either JavaScript or TypeScript.
 5. **Testing and debugging support** It should provide good testing and debugging utilities.
 
-# Usage
+# Get Started
 
-## Server
+## Install
+
+### Server
 
 ```bash
-> npm i @prisel/server
+$ npm i @prisel/server
 ```
 
 ```javascript
@@ -37,13 +39,13 @@ const server = new Server();
 server.start(); // server will start at ws://localhost:3000
 ```
 
-More server docs see @prisel/server
+More server docs see `@prisel/server`
 [README](https://github.com/SeawolvesAtCali/prisel/tree/master/packages/server)
 
-## Client
+### Client
 
 ```bash
-> npm i @prisel/client
+$ npm i @prisel/client
 ```
 
 ```javascript
@@ -59,6 +61,163 @@ const client = new Client('ws://localhost:3000');
     console.log('we are in a room');
 })();
 ```
+
+# Concept
+
+`prisel` is built with room based online game in mind. It's great for games that are short and
+played by a small group of players, such as board games, fighting games. It is not suitable for
+games allowing massive online players or long play times across multiple sessions.
+
+### Player
+
+player represent a user connected to our server. After connection user needs to login with username
+(We are working on the detail of authentication). Player not currently in a room can create a room
+or join a room. A player can only be in one room at a time. To join another room, the player needs
+to leave the current room first.
+
+### Room
+
+Room is a group of players that plays game together. All the players in the room are participating
+in the game. A room can have a host. Host is one of the player with privilege to start a game. Room
+is a transient object. When all the players leave a room, the room will be closed.
+
+### Game
+
+Game is the most important concept in prisel. Players need to be inside a room to play a game. Each
+game has the following lifecycle methods that we can override to describe our game logics:
+
+#### Preparing
+
+-   [**`onSetup`**](#onSetup)
+-   [**`canStart`**](#canStart)
+
+#### Running
+
+-   [**`onStart`**](#onStart)
+
+#### Ending
+
+-   [**`onEnd`**](#onEnd)
+
+Some common APIs for all lifecycles that we can implement are
+
+-   [**`onMessage`**](#onMessage)
+-   [**`onAddPlayer`**](#onAddPlayer)
+-   [**`onRemovePlayer`**](#onRemovePlayer)
+
+# API
+
+## Game
+
+Game logic are described using a game configuration. Game configuration is a plain JavaScript
+object. We can implement the fields we need for our game and leave the other fields out. fields we
+don't implement will use default implementation.
+
+### type: `string`
+
+### onSetup: `(handle) => object`
+
+| Param  | Type   | description                                    |
+| ------ | ------ | ---------------------------------------------- |
+| handle | Handle | Utility for accessing and modifying game state |
+
+**Default** Does nothing
+
+`onSetup` is called before a game starts. It is called when a room is created, and when the previous
+game ends. `onSetup` is a good place to to prepare for each game, such as loading player's
+information from database, prompting players for character and map selections and etc.
+
+If `onSetup` returns an object, it will be used as the initial state. This has the same effect of
+calling `handle.setState(<myInitialState>)` in `onSetup`.
+
+`handle.setup()` triggers `onSetup`.
+
+### canStart: `(handle) => boolean`
+
+| Param  | Type   | description                                    |
+| ------ | ------ | ---------------------------------------------- |
+| handle | Handle | Utility for accessing and modifying game state |
+
+**Default** returns true
+
+`canStart` is used to check if all the preparation are done in order to start a new game. It is
+called when the host of the room sends a GAME_START message to server. Return true to indicate game
+can be started. False otherwise.
+
+`handle.canStart()` triggers `canStart`.
+
+### onStart: `(handle) => void`
+
+| Param  | Type   | description                                    |
+| ------ | ------ | ---------------------------------------------- |
+| handle | Handle | Utility for accessing and modifying game state |
+
+**Default** Does nothing
+
+`onStart` is used to set up initial game state. `onStart` is called after game starts. It's also an
+ideal place to setup game loops if the game require server run some function every interval.
+
+`handle.startGame()` triggers `onStart`.
+
+### onMessage: `(handle, player, data) => void`
+
+| Param  | Type   | description                                    |
+| ------ | ------ | ---------------------------------------------- |
+| handle | Handle | Utility for accessing and modifying game state |
+| player | string | ID of the player sending the message           |
+| data   | any    | Content of the message                         |
+
+**Default** Does nothing
+
+`onMessage` is called when we receive a message from a player. `onMessage` is an ideal candidate for
+implementing game logics triggered by player inputs.
+
+`onMessage` is triggered by prisel's internal event emitter.
+
+### onAddPlayer: `(handle, player) => void`
+
+| Param  | Type   | description                                    |
+| ------ | ------ | ---------------------------------------------- |
+| handle | Handle | Utility for accessing and modifying game state |
+| player | string | ID of the player sending the message           |
+
+**Default** Does nothing
+
+`onAddPlayer` is called when a player is added to the room. By default, room will accept any player
+as long as the room capacity (defined by `maxPlayer` of game configuration) has not been reach and
+no game is running in the room. If the room is full or a game is already started, Join request will
+be automatically declined, and `onAddPlayer` will not be called.
+
+`handle.addPlayer(player)` triggers `onAddPlayer`.
+
+### onRemovePlayer: `(handle, player) => void`
+
+| Param  | Type   | description                                    |
+| ------ | ------ | ---------------------------------------------- |
+| handle | Handle | Utility for accessing and modifying game state |
+| player | string | ID of the player sending the message           |
+
+**Default** Does nothing
+
+`onRemovePlayer` is called when a player is removed from the room. Because we have no control over
+when a player leave, this function can be called during any lifecycle of game.
+
+`handle.removePlayer(player)` triggers `onRemovePlayer`.
+
+### onEnd: `(handle) => void`
+
+| Param  | Type   | description                                    |
+| ------ | ------ | ---------------------------------------------- |
+| handle | Handle | Utility for accessing and modifying game state |
+
+**Default** Does nothing
+
+`onEnd` is called when game over is declared. Use this function to announce game result and preserve
+some game state. Game state will be cleared after this function.
+
+`handle.endGame()` triggers `onEnd`.
+
+### Game
 
 ---
 

@@ -7,20 +7,19 @@
 
 Node.js game server for your next multiplayer game.
 
-# Guiding principles
+# Features
 
-This project is being developed with the following principle in mind:
-
-1. **Robust and opinionated room system** It should provide a room system with reasonable defaults,
-   but also customizable.
-2. **Freedom of game logic implementation** It should be totally unopinionated on how/when to store
-   state and how/when to synchronize with the client.
-3. **Client side technology agnostic** It should not require a corresponding client engine. Client
-   server communication should be based on raw WebSocket with clearly defined messages, so that
-   client can be built in any language with ease.
-4. **Develop server in JavaScript or TypeScript** Although the project is developed in TypeScript,
-   user should have the freedom to use it with either JavaScript or TypeScript.
-5. **Testing and debugging support** It should provide good testing and debugging utilities.
+-   **Opinionated room system** Prisel comes with a default room system with reasonable that handles
+    player joining/leaving, room capacity and game phase. It also allows us to customize the room
+    behavior.
+-   **Freedom of game logic implementation** Prisel doesn't make assumption about the types of games
+    we are making. It leaves the game logic implementation and state synchronization to developers.
+-   **Client side technology agnostic** Prisel aims at providing a robust server side solution while
+    maintaining a simple server-client communication protocal. Prisel speaks WebSocket using simple
+    JSON. It should be fairly easy to build a client using any languages with WebSocket support.
+-   **Develop server in JavaScript or TypeScript** Although the prisel is developed in TypeScript,
+    it is built with pure JavaScript intergration in mind.
+-   **Testing and debugging support** Prisel provides utility for testing and debugging our games.
 
 # Get Started
 
@@ -62,7 +61,7 @@ const client = new Client('ws://localhost:3000');
 })();
 ```
 
-# Concept
+# Concept
 
 `prisel` is built with room based online game in mind. It's great for games that are short and
 played by a small group of players, such as board games, fighting games. It is not suitable for
@@ -88,22 +87,29 @@ game has the following lifecycle methods that we can override to describe our ga
 
 #### Preparing
 
--   [**`onSetup`**](#onSetup)
--   [**`canStart`**](#canStart)
+-   [**`onSetup`**](#onsetup-handle--object)
+-   [**`canStart`**](#canstart-handle--boolean)
 
 #### Running
 
--   [**`onStart`**](#onStart)
+-   [**`onStart`**](#onstart-handle--void)
 
 #### Ending
 
--   [**`onEnd`**](#onEnd)
+-   [**`onEnd`**](#onend-handle--void)
 
 Some common APIs for all lifecycles that we can implement are
 
--   [**`onMessage`**](#onMessage)
--   [**`onAddPlayer`**](#onAddPlayer)
--   [**`onRemovePlayer`**](#onRemovePlayer)
+-   [**`onMessage`**](#onmessage-handle-player-data--void)
+-   [**`onAddPlayer`**](##onaddplayer-handle-player--void)
+-   [**`onRemovePlayer`**](#onremoveplayer-handle-player--void)
+
+Detail usage of each lifecycle method is [below](#game-1)
+
+### Handle
+
+`Handle` is a collection of utilities we can use to access/modify the game/room state and send
+messages to clients. All game and room functions have access to `Handle`.
 
 # API
 
@@ -115,13 +121,24 @@ don't implement will use default implementation.
 
 ### type: `string`
 
+**Required**
+
+Every game configuration should have an unique type. Player needs to specify the game type when
+creating a room and the corresponding game configuration will be associated with the room.
+
+### maxPlayer: `number`
+
+**Default** 10
+
+`maxPlayer` specifies the maximum number of players. It is also used as the room capacity.
+
 ### onSetup: `(handle) => object`
 
 | Param  | Type   | description                                    |
 | ------ | ------ | ---------------------------------------------- |
 | handle | Handle | Utility for accessing and modifying game state |
 
-**Default** Does nothing
+**Default** noop
 
 `onSetup` is called before a game starts. It is called when a room is created, and when the previous
 game ends. `onSetup` is a good place to to prepare for each game, such as loading player's
@@ -152,7 +169,7 @@ can be started. False otherwise.
 | ------ | ------ | ---------------------------------------------- |
 | handle | Handle | Utility for accessing and modifying game state |
 
-**Default** Does nothing
+**Default** noop
 
 `onStart` is used to set up initial game state. `onStart` is called after game starts. It's also an
 ideal place to setup game loops if the game require server run some function every interval.
@@ -167,7 +184,7 @@ ideal place to setup game loops if the game require server run some function eve
 | player | string | ID of the player sending the message           |
 | data   | any    | Content of the message                         |
 
-**Default** Does nothing
+**Default** noop
 
 `onMessage` is called when we receive a message from a player. `onMessage` is an ideal candidate for
 implementing game logics triggered by player inputs.
@@ -181,7 +198,7 @@ implementing game logics triggered by player inputs.
 | handle | Handle | Utility for accessing and modifying game state |
 | player | string | ID of the player sending the message           |
 
-**Default** Does nothing
+**Default** noop
 
 `onAddPlayer` is called when a player is added to the room. By default, room will accept any player
 as long as the room capacity (defined by `maxPlayer` of game configuration) has not been reach and
@@ -197,7 +214,7 @@ be automatically declined, and `onAddPlayer` will not be called.
 | handle | Handle | Utility for accessing and modifying game state |
 | player | string | ID of the player sending the message           |
 
-**Default** Does nothing
+**Default** noop
 
 `onRemovePlayer` is called when a player is removed from the room. Because we have no control over
 when a player leave, this function can be called during any lifecycle of game.
@@ -210,197 +227,11 @@ when a player leave, this function can be called during any lifecycle of game.
 | ------ | ------ | ---------------------------------------------- |
 | handle | Handle | Utility for accessing and modifying game state |
 
-**Default** Does nothing
+**Default** noop
 
 `onEnd` is called when game over is declared. Use this function to announce game result and preserve
 some game state. Game state will be cleared after this function.
 
 `handle.endGame()` triggers `onEnd`.
 
-### Game
-
 ---
-
-# Contributing guide
-
-## Project overview
-
-This project uses lerna to manage multiple sub packages inside `/packages` folder.
-
--   **server** hosts the code for server engine, published as
-    [`@prisel/server`](https://www.npmjs.com/package/@prisel/server)
--   **client** hosts the code for client library, published as
-    [`@prisel/client`](https://www.npmjs.com/package/@prisel/client)
--   **common** shared code used by server and client, published as
-    [`@prisel/common`](https://www.npmjs.com/package/@prisel/common)
--   **template** template for creating a new package in this monorepo
--   **e2e** end to end test for server and client
--   **tic-tac-toe** an example tic-tac-toe server implementation
--   **tic-tac-toe-client** an example tic-tac-toe client implementation
-
-## Install
-
-make sure you have [node](https://nodejs.org/en/) installed, the recommended version is 10.x and up.
-
-To install dependencies, run the following command in project root directory:
-
-```
-npm install
-```
-
-All the sub packages' dependencies and devDependencies are recorded in top level package-lock.json.
-Installing in the top level will make sure all of them are installed.
-
-## Test
-
-This project uses [jest](https://facebook.github.io/jest/) as the testing framework.
-
-All the test should be inside `__test__` folder next to the source file. For example, if we have a
-file `directory/testMe.ts`, its test should be at `directory/__test__/testMe.test.ts`
-
-test file should use the same name as the source file, plus `.test.ts` ending.
-
-To run all the test
-
-```
-npm test
-```
-
-To run a test in a package
-
-```
-npm test --scope <package-name>
-```
-
-for example:
-
-```
-npm test --scope @prisel/server
-```
-
-To run a single test file
-
-```
-npx jest <test-file-name>
-```
-
-for example
-
-```
-npx jest handleRoomActions.test.ts
-```
-
-## Debugging
-
-This project uses [debug](https://github.com/visionmedia/debug), the same logging library that
-Socket.io uses. To enable debugging, set `DEBUG` environment variables before running the script.
-
-For example
-
-```
-env DEBUG=debug npm run start:server
-```
-
-In the code, we should use `debug` instead of `console.log` for debug messages.
-
-```
-const debug = require('debug')('debug'); // Import debug and set the debug message label to `debug`
-
-debug('Hello world'); // This will print "debug: Hello world"
-```
-
-Debugging using Visual Studio Code is super easy.
-
-1.  In the debug panel, click on the gear icon to create a `launch.json`.
-2.  The content of the json file could be as simple as
-    ```
-    {
-        "version": "0.2.0",
-        "configurations": [
-            {
-                "type": "node",
-                "request": "launch",
-                "name": "debug server",
-                "program": "${workspaceFolder}/server/index.ts"
-            }
-        ]
-    }
-    ```
-3.  Set a breakpoint in editor
-4.  Click on the green run button to start debugging.
-
-## Linting
-
-Linting makes sure that the source code follows the same coding style. It's recommend to run linting
-with fix to automatically fix fixable linting issues.
-
-```
-npm run fix
-```
-
-If you just want to see the issues without automatically fixing, you can run
-
-```
-npm run lint
-```
-
-## Continous Intergration
-
-This project uses Travis CI as continous intergration service. Travis will pick up our project
-whenever we have a new commit, our build will run through all the checks listed in `.travis.yml`.
-Any of them fails will result in a failed build.
-
-## Deploying
-
-An example server that serves tic-tac-toe is deployed at
-[Heroku](https://game-server-monopoly.herokuapp.com/).
-
-Heroku goes to sleep once in a while, until someone access it. When the server is running, we should
-see
-
-```
-Server is running
-```
-
-on the page.
-
-The corresponding client side is deployed at [Netlify](https://prisel-tic-tac-toe.netlify.com/)
-
-![tic-tac-toe-client](https://user-images.githubusercontent.com/5957726/50565663-f7720680-0ce5-11e9-912f-eab1baee6b93.png)
-
-When a pull request gets merged into master branch, heroku will automatically redeploy. We have the
-following configuration set for Heroku
-
-```bash
-> heroku config:set NPM_CONFIG_PRODUCTION=false --app game-server-monopoly
-```
-
-This make sure that Heroku doesn't do `npm install --production` which causes devDependencies to not
-get installed.
-
-```bash
-> heroku config:set NODEMODULESCACHE=false --app game-server-monopoly
-```
-
-This make sure that Heroku doesn't cache node_modules.
-
-If you need to make change to Heroku or Netlify, ask [@yiochen](https://github.com/yiochen) for
-credential.
-
-## Recommended Visual Studio Code plugin
-
-If you are using Visual Studio Code, it's recommended to install the following extension:
-
-### eslint (search for `dbaeumer.vscode-eslint`) for linting
-
-This extension displays linting issues in the code. Also recommend turning on
-`"eslint.autoFixOnSave": true` in Visual Studio Code workspace settings. This runs `fix` for the
-current file when save.
-
-### tslint (search for `eg2.tslint`) for TypeScript linting
-
-Also recommend enabling `tslint.autoFixOnSave` in vscode setting.
-
-### prettier (search for `esbenp.prettier-vscode`)
-
-Prettier formats the code. On editor setting, enable `editor.formatOnSave`

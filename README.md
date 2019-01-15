@@ -64,7 +64,7 @@ const client = new Client('ws://localhost:3000');
 # Concept
 
 `prisel` is built with room based online game in mind. It's great for games that are short and
-played by a small group of players, such as board games, fighting games. It is not suitable for
+played by a small group of players, such as board games, fighting games. It is not suitable for
 games allowing massive online players or long play times across multiple sessions.
 
 ### Player
@@ -108,8 +108,10 @@ Detail usage of each lifecycle method is [below](#game-1)
 
 ### Handle
 
-`Handle` is a collection of utilities we can use to access/modify the game/room state and send
-messages to clients. All game and room functions have access to `Handle`.
+`Handle` is a collection of utilities to access/modify the game/room state and send messages to
+clients. All game and room functions have access to `Handle`.
+
+More detail on [Handle's API doc](#handle-1)
 
 # API
 
@@ -234,4 +236,163 @@ some game state. Game state will be cleared after this function.
 
 `handle.endGame()` triggers `onEnd`.
 
----
+## Handle
+
+Handle is an object created by prisel and supplied to each room. Use handle to access the state of
+room and communicate with client. Handle is stateless and immutable. We shouldn't modify the
+properties on a handle.
+
+Handle has the following properties:
+
+### `emit`
+
+`handle.emit(playerId: string, data: any) => void`
+
+Emit a message to a player with `MESSAGE` type. `MESSAGE` type is not used by prisel internally. We
+can use it to implement our communication protocol.
+
+`handle.emit(playerId: string, messageType: string, data: any) => void`
+
+Emit a message to a player with the given message type. Check the message list for all available
+message types and when to emit them.
+
+### `broadcast`
+
+`handle.broadcast(playerIds: string[], data: any) => void`
+
+Broadcast a message to every player in the playerIds array with `MESSAGE` type. `MESSAGE` type is
+not used by prisel internally. We can use it to implement our communication protocol.
+
+`handle.broadcast(playerIds: string[], messageType: string, data: any) => void`
+
+Broadcast a message to every player in the playerIds array with the given message type. Check the
+message list for all available message types and when to emit them.
+
+### `broadcastRoomUpdate`
+
+`handle.broadcastRoomUpdate() => void`
+
+Broadcast to every player in the room the latest state of room. Room state includes basic room
+information and players' information. Use this
+
+### `state`
+
+`handle.state`
+
+`state` is the game state. `state` is immutable, meaning, if we assign `handle.state` to a variable,
+whenever state changes throgh `setState`, the variable still holds the old state. Modifying state
+directly will cause unexpected result. All modification to state should go through `setState`.
+
+### `setState`
+
+`handle.setState(partialState: object) => object`
+
+Set the current game state with a new state. New state will be shallowly merged with the current
+state. The result state is also returned.
+
+| original state        | new state               | result state                  |
+| --------------------- | ----------------------- | ----------------------------- |
+| `{color: 'yellow'}`   | `{value: 1}`            | `{color: 'yellow', value: 1}` |
+| `{life: 50}`          | `{life: 'alive'}`       | `{life: 'alive'}`             |
+| `{weapon: { gun: 1}}` | `{weapon: { knife: 2}}` | `{weapon: {knife: 2}}`        |
+
+`handle.setState((draftState) => void) => object`
+
+`setState` can also takes a producer function. Producer function will receive a draft of the current
+game state. Any modification to the draft will be recorded and the state will be updated after
+`setState`. state won't be updated inside the producer. `setState` internally uses
+[immer](https://github.com/mweststrate/immer) so any
+[limitation with immer](https://github.com/mweststrate/immer#pitfalls) also applies.
+
+### `clearState`
+
+`handle.clearState() => void`
+
+Clear the game state. This essentially sets state to empty object `{}`.
+
+### `canStart`
+
+`handle.canStart() => boolean`
+
+Calls `canStart` method on the game configuration and return true/false for if we can start a game.
+
+### `startGame`
+
+`handle.startGame() => void`
+
+Update room's game phase to `GAME_PHASE.GAME`. `startGame` also calls `start` method on the game
+configuration.
+
+### `endGame`
+
+`handle.endGame() => void`
+
+Update room's game phase to `GAME_PHASE.WAITING`. `endGame` also calls `end` method on the game
+configuration.
+
+### `gamePhase`
+
+`handle.gamePhase`
+
+Get the game phase of the room. Game phase is an enum that can be `GAME_PHASE.GAME` or
+`GAME_PHASE.WAITING`.
+
+`GAME_PHASE.GAME`: A game is running.
+
+`GAME_PHASE.WAITING`: No game is running.
+
+### `addPlayer`
+
+`handle.addPlayer(playerId: string) => void`
+
+Add a player to the room. Calls `onAddPlayer` on the game configuration after the player is added.
+
+### `removePlayer`
+
+`handle.removePlayer(playerId: string) => void`
+
+Remove a player from the room. Calls `onRemovePlayer` on the game configuration after the player is
+removed.
+
+### `players`
+
+`handle.players`
+
+An array of player IDs for all players in the room.
+
+### `removeRoom`
+
+`handle.removeRoom() => void`
+
+Remove the current room. When room is removed, the handle become unusable.
+
+### `host`
+
+`handle.host`
+
+The player Id of the host in the room. Host has the priviledge to start a game.
+
+### `setHost`
+
+`handle.setHost(hostId: string) => void`
+
+Set the host of the room using the host's player Id.
+
+## Room
+
+Prisel provides a default room implementation. If we need to extend or override the default logic,
+we can provide a room configuration. Similar to game configuration. Room's configuration is also a
+plain JavaScript objects. We can implement the fields we need for our room and leave the other
+fields out. fields we don't implement will use default implementation.
+
+Room configuration are modelled after the message types player sends. Upon receiving a message from
+an authorized player, the corresponding method on the room configuration will be called.
+
+Room configuration has following fields:
+
+### type: `string`
+
+**Required**
+
+Every room configuration should have an unique type. When player specifies a room type when creating
+a room. The corresponding room configuration will be associated with the room.

@@ -3,6 +3,7 @@ import { MessageType } from '@prisel/common';
 
 /**
  * Send a public message
+ * TODO don't need to send userId and roomId
  * @param {String} userId
  * @param {String} message
  */

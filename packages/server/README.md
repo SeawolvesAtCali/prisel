@@ -27,7 +27,7 @@ To create a game, we need to implement a game configuration and add to the serve
 const game = {
     type: 'my-awesome-game',
     maxPlayers: 4, // Limits the room capacity
-    onInit: (handle) => {
+    onSetup: (handle) => {
         // Preparing for the upcoming game.
         // Call when room is created and when previous game ends.
     }
@@ -42,7 +42,6 @@ const game = {
     },
     onMessage: (handle, player, data) => {
         // Handle a game message (player's move).
-        // Message should include the game type.
         // Called when receiving a player message.
     },
     onAddPlayer: (handle, player) => {
@@ -152,10 +151,9 @@ const room = {
         // Check if we can start the game and start the game if we can.
         // Called when receiving a GAME_START event from a player in the room.
     },
-    onMessage: (handle, client, data) => {
+    onMessage: (handle, player, data) => {
         // Handle a room message.
-        // Message should include the room type.
-        // Called when receiving a MESSAGE event from a player in the room.
+        // Called when receiving a ROOM_MESSAGE event from a player in the room.
     },
 };
 
@@ -201,8 +199,8 @@ host, we can implement use the following configuration:
 ```javascript
 const room = {
     type: 'host-can-promote',
-    onMessage: (handle, client, data) => {
-        if (data.type === 'PROMOTE' && client === handle.host) {
+    onMessage: (handle, player, data) => {
+        if (data.type === 'PROMOTE' && player === handle.host) {
             const targetPlayer = data.targetPlayer;
             if (handle.players.includes(targetPlayer)) {
                 handle.setHost(targetPlayer);

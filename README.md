@@ -112,3 +112,9 @@ Detail usage of each lifecycle method is [below](#game-1)
 clients. All game and room functions have access to `Handle`.
 
 More detail on [Handle's API doc](docs/API.md#handle)
+
+# What's next
+
+-   Check out our [API documentation](docs/API.md).
+-   If you want to build a client, check out the [message types](docs/MESSAGE_TYPES.md).
+-   [Tutorial](docs/TUTORIAL.md) is comming soon.

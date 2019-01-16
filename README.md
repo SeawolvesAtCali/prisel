@@ -396,3 +396,57 @@ Room configuration has following fields:
 
 Every room configuration should have an unique type. When player specifies a room type when creating
 a room. The corresponding room configuration will be associated with the room.
+
+### onCreate: `(handle: Handle, playerId: string, data: any) => void`
+
+`onCreate` is called upon receiving `CREATE_ROOM` message from a player. Prisel verifies that the
+player is not already in a room.
+
+#### default
+
+-   Add the player to the room as a host
+-   Reply the player with message type `SUCCESS` and payload `{action: 'JOIN'}`
+-   Broadcast to everyone in the room the updated room state.
+
+### onJoin: `(handle: Handle, playerId: string, data: any) => void`
+
+`onJoin` is called upon receiving `JOIN` message from a player. Prisel verifies that the player is
+not already in a room.
+
+#### default
+
+-   Add the player to the room as a guest
+-   Reply the player with message type `SUCCESS` and payload `{action: 'JOIN'}`
+-   Broadcast to everyone in the room the the updated room state.
+
+### onLeave: `(handle: Handle, playerId: string, data: any) => void`
+
+`onLeave` is called when player sends a `LEAVE` message. Prisel verifies that the player is in a
+room. If the last player leaves a room, the room will be destroyed.
+
+#### default
+
+-   Remove the player from the room.
+-   If host left, set the first player in the room as the new host.
+-   Reply the player with message type `SUCCESS` and payload `{action: 'LEAVE'}`
+-   Broadcast to everyone in the room with the updated room state.
+
+### onGameStart: `(handle: Handle, playerId: string, data: any) => void`
+
+`onGameStart` is called when a player sends a `GAME_START` message. Prisel verifies that the player
+is in a room and a game has not started in the room.
+
+#### default
+
+-   Reply the player with message type `FAILURE` and payload `{action: 'GAME_START'}` if the player
+    is not the host of the room.
+-   Broadcast to everyone in the room with message type `SUCCESS` and payload
+    `{action: 'GAME_START'}`
+
+### onMessage: `(handle: Handle, playerId: string, data: any) => void`
+
+`onMessage` is called when receiving `ROOM_MESSAGE` type message.
+
+#### default
+
+-   Do nothing.

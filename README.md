@@ -188,8 +188,8 @@ ideal place to setup game loops if the game require server run some function eve
 
 **Default** noop
 
-`onMessage` is called when we receive a message from a player. `onMessage` is an ideal candidate for
-implementing game logics triggered by player inputs.
+`onMessage` is called when we receive a `MESSAGE` type message from a player. `onMessage` is an
+ideal candidate for implementing game logics triggered by player inputs.
 
 `onMessage` is triggered by prisel's internal event emitter.
 
@@ -450,3 +450,21 @@ is in a room and a game has not started in the room.
 #### default
 
 -   Do nothing.
+
+# Message types
+
+## Server to client message types
+
+| type          | payload                                                        | message creator                                                                   | description                                        |
+| ------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `WELCOME`     | `{}`                                                           | `Messages.getWelcome()`                                                           | Greeting sent automatically when a player connects |
+| `SUCCESS`     | `{action: <messageType>, ...data}`                             | `Messages.getSuccess(messageType: string, data: object)`                          | An action succeeded                                |
+| `FAILURE`     | `{action: <messageType>, ...data}`                             | `Messages.getFailure(messageType: string, data: object)`                          | An action failed                                   |
+| `ROOM_UPDATE` | See room update defails below                                  | N/A                                                                               | Updated room state                                 |
+| `BROADCAST`   | `{username: <username>, message: <message>, roomId: <roomId>}` | `Messages.getBroadcastMessage(username: string, message: string, roomId: string)` | Broadcast chat message to everyone in the room     |
+
+### Client to server message types
+
+| type    | payload                  | message creator                       | description         |
+| ------- | ------------------------ | ------------------------------------- | ------------------- |
+| `LOGIN` | `{username: <username>}` | `Messages.getLogin(username: string)` | Login with username |

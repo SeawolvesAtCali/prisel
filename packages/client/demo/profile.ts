@@ -1,7 +1,7 @@
 import Client from '../client';
 import { getCreateRoom, getJoin } from '../message/room';
 import { getChat } from '../message/chat';
-import { getGameStart, getMove } from '../message';
+import { getGameStart, getMessage } from '../message';
 export enum Fields {
     TEXT,
     NUMBER,
@@ -47,14 +47,10 @@ const defaultProfile: Profile = {
             },
         },
         {
-            title: 'send',
-            fields: [
-                { label: '', key: 'msg', type: Fields.TEXT },
-                { label: 'user id', key: 'uid', type: Fields.TEXT },
-                { label: 'room id', key: 'rid', type: Fields.TEXT },
-            ],
+            title: 'chat',
+            fields: [{ label: 'message', key: 'msg', type: Fields.TEXT }],
             handler: (client: Client, fields: any) => {
-                client.emit(...getChat(fields.uid, fields.msg, fields.rid));
+                client.emit(...getChat(fields.msg));
             },
         },
         {
@@ -68,7 +64,7 @@ const defaultProfile: Profile = {
             title: 'move(indies seperated by space)',
             fields: [{ label: 'position', key: 'index', type: Fields.TEXT }],
             handler: (client: Client, fields: any) => {
-                client.emit(...getMove({ cards: parseToArray(fields.index) }));
+                client.emit(...getMessage({ cards: parseToArray(fields.index) }));
             },
         },
     ],

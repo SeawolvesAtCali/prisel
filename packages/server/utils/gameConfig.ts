@@ -1,7 +1,8 @@
 import Handle from './handle';
 import { ClientId } from '../objects/client';
+import { AnyObject } from '../objects';
 
-export interface GameConfig {
+interface FullGameConfig {
     /**
      * A unique identifier for this game in the server.
      */
@@ -14,44 +15,50 @@ export interface GameConfig {
      * Function invoked at room creation time and after a game ends.
      * This is a good place to initialize pre game state.
      */
-    init: (handle: Handle) => void;
+    onSetup: (handle: Handle) => AnyObject | void;
     /**
-     * Function invoked upon a request to start the game.
-     * This is a good place to check if all pre game preparation is complete.
-     * Return true to indicate game can start, false otherwise.
-     * Game state initialization should also happen in this function.
+     * Check if all the preparation are done in order to start a new game.
      */
-    start: (handle: Handle) => boolean;
+    canStart: (handle: Handle) => boolean;
+    /**
+     * Function invoked when game starts. This function is used to initialize game states.
+     */
+    onStart: (handle: Handle) => void;
     /**
      * Function invoked when a game is over. This is a good place
      * to persist some game state and present game results.
      * Game state will be automatically cleared after this function.
      */
-    end: (handle: Handle) => void;
+    onEnd: (handle: Handle) => void;
     /**
      * Function invoked when receiving a message from client. This is a good
      * place to update game state based on client input.
      */
-    handleMessage: (handle: Handle, player: ClientId, data: any) => void;
+    onMessage: (handle: Handle, player: ClientId, data: any) => void;
     /**
      * Function invoked when a new player is added to the game.
      */
-    addPlayer: (handle: Handle, player: ClientId) => void;
+    onAddPlayer: (handle: Handle, player: ClientId) => void;
     /**
      * Function invoke when a player is removed from the game.
      */
-    removePlayer: (handle: Handle, player: ClientId) => void;
+    onRemovePlayer: (handle: Handle, player: ClientId) => void;
 }
+
+export type GameConfig = Partial<FullGameConfig>;
 
 export const BaseGameConfig: GameConfig = {
     type: 'game',
     maxPlayers: 10,
-    init(handle) {},
-    start(handle) {
+    onSetup(handle) {
+        return {};
+    },
+    canStart(handle) {
         return true;
     },
-    end(handle) {},
-    handleMessage(handle, player, data) {},
-    addPlayer(handle, player) {},
-    removePlayer(handle, player) {},
+    onStart(handle) {},
+    onEnd(handle) {},
+    onMessage(handle, player, data) {},
+    onAddPlayer(handle, player) {},
+    onRemovePlayer(handle, player) {},
 };

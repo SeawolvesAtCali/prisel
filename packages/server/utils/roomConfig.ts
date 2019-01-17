@@ -1,18 +1,12 @@
+import { MessageType } from '@prisel/common';
 import Handle from './handle';
 import { ClientId } from '../objects/client';
-import {
-    getFailure,
-    getJoinSuccess,
-    getCreateRoomSuccess,
-    getLeaveSuccess,
-    getGameStartSuccess,
-} from '../message';
-import { MessageType } from '@prisel/common';
+import { getFailure, getJoinSuccess, getLeaveSuccess, getGameStartSuccess } from '../message';
 import { GAME_PHASE } from '../objects/gamePhase';
 
 type EventHandler = (handle: Handle, client: ClientId, data: any) => void;
 
-export interface RoomConfig {
+interface FullRoomConfig {
     type: string;
     onCreate: EventHandler;
     onJoin: EventHandler;
@@ -21,41 +15,33 @@ export interface RoomConfig {
     onMessage: EventHandler;
 }
 
-const addClientToRoom = (handle: Handle, client: ClientId) => {
-    if (handle.gamePhase === GAME_PHASE.WAITING) {
-        handle.addClient(client);
-        handle.game.addPlayer(handle, client);
-        if (!handle.host) {
-            handle.setHost(client);
-        }
-    }
-};
+export type RoomConfig = Partial<FullRoomConfig>;
 
 export const BaseRoomConfig: RoomConfig = {
     type: 'room',
     onCreate(handle, client, data) {
-        // TODO: move createRoomSuccess to framework
-        handle.emit(client, ...getCreateRoomSuccess(handle.roomId));
-        addClientToRoom(handle, client);
+        handle.addPlayer(client);
+        handle.setHost(client);
         handle.emit(client, ...getJoinSuccess());
         handle.broadcastRoomUpdate();
     },
     onJoin(handle, client, data) {
-        addClientToRoom(handle, client);
-        handle.emit(client, ...getJoinSuccess());
-        handle.broadcastRoomUpdate();
+        if (handle.gamePhase === GAME_PHASE.WAITING) {
+            handle.addPlayer(client);
+            handle.emit(client, ...getJoinSuccess());
+            handle.broadcastRoomUpdate();
+        } else {
+            handle.emit(
+                client,
+                ...getFailure(MessageType.JOIN, 'Cannot join when game is already started'),
+            );
+        }
     },
     onLeave(handle, client, data) {
-        handle.removeClient(client);
-        handle.game.removePlayer(handle, client);
+        handle.removePlayer(client);
         handle.emit(client, ...getLeaveSuccess());
-        const remainingClients = handle.clients;
-        // TODO: automatically do this.
-        if (remainingClients.length === 0) {
-            handle.removeRoom();
-            return;
-        }
-        if (!handle.host) {
+        const remainingClients = handle.players;
+        if (remainingClients.length > 0 && !handle.host) {
             handle.setHost(remainingClients[0]);
         }
         handle.broadcastRoomUpdate();
@@ -64,17 +50,14 @@ export const BaseRoomConfig: RoomConfig = {
         if (client !== handle.host) {
             handle.emit(
                 client,
-                ...getFailure(MessageType.GAME_START, 'not enough privilege to start game'),
+                ...getFailure(MessageType.GAME_START, 'Not enough privilege to start game'),
             );
+            return;
         }
-        if (handle.game.start(handle)) {
+        if (handle.canStart()) {
             handle.startGame();
-            handle.broadcast(handle.clients, ...getGameStartSuccess());
+            handle.broadcast(handle.players, ...getGameStartSuccess());
         }
     },
-    onMessage(handle, client, data) {
-        // TODO: assume this only process messages from current room.
-        // Cross room messaging is unusual, we will have another mechanism for that.
-        handle.game.handleMessage(handle, client, data);
-    },
+    onMessage(handle, client, data) {},
 };

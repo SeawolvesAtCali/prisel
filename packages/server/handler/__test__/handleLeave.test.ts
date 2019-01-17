@@ -2,6 +2,7 @@ import createContext from '../../createContext';
 import { handleLeave } from '../handleLeave';
 import * as StateUtils from '../../utils/stateUtils';
 import { mockClient, mockSocket } from '../../utils/testUtils';
+import { ClientId } from '../../objects/client';
 
 describe('handleLeave', () => {
     it('should call room config onLeave', () => {
@@ -10,6 +11,9 @@ describe('handleLeave', () => {
         const socket = mockSocket();
         const mockContext = createContext({});
         const mockHandle = {
+            get players() {
+                return ['456'] as ClientId[];
+            },
             room: {
                 onLeave,
             },

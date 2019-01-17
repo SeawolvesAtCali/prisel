@@ -43,20 +43,20 @@ describe('create room', () => {
             untilSuccess(client, MessageType.JOIN),
             host.once(
                 (messageType, data) =>
-                    MessageType.ROOM_UPDATE === messageType && data.clients.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && data.players.includes(clientId),
             ),
             client.once(
                 (messageType, data) =>
-                    MessageType.ROOM_UPDATE === messageType && data.clients.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && data.players.includes(clientId),
             ),
         ]);
 
         expect(clientRoomUpdateResult.id).toBe(roomId);
         expect(clientRoomUpdateResult.host).toBe(hostId);
-        expect(clientRoomUpdateResult.clients).toEqual([hostId, clientId]);
+        expect(clientRoomUpdateResult.players).toEqual([hostId, clientId]);
         expect(hostRoomUpdateResult.id).toBe(roomId);
         expect(hostRoomUpdateResult.host).toBe(hostId);
-        expect(hostRoomUpdateResult.clients).toEqual([hostId, clientId]);
+        expect(hostRoomUpdateResult.players).toEqual([hostId, clientId]);
         host.exit();
         client.exit();
     });

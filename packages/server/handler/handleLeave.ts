@@ -11,6 +11,9 @@ export const handleLeave = (context: Context, socket: Socket) => (data: {}) => {
     if (handle && client) {
         handle.room.onLeave(handle, client.id, data);
     }
+    if (handle.players.length === 0) {
+        handle.removeRoom();
+    }
 };
 
 clientHandlerRegister.push([MessageType.LEAVE, handleLeave]);

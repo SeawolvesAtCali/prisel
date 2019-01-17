@@ -32,12 +32,13 @@ export function mockGameConfig(partial?: Partial<GameConfig>): GameConfig {
     return {
         type: 'game',
         maxPlayers: 10,
-        init: noop,
-        start: () => true,
-        handleMessage: noop,
-        addPlayer: noop,
-        removePlayer: noop,
-        end: noop,
+        onSetup: noop,
+        canStart: () => true,
+        onStart: noop,
+        onMessage: noop,
+        onAddPlayer: noop,
+        onRemovePlayer: noop,
+        onEnd: noop,
         ...partial,
     };
 }

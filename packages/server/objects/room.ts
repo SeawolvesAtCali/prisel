@@ -5,11 +5,7 @@ export interface Room {
     id: RoomId;
     name: string;
     host?: ClientId;
-    /**
-     * @deprecated
-     */
-    guests?: ClientId[];
-    clients: ClientId[];
+    players: ClientId[];
     gamePhase: GAME_PHASE;
     gameState?: any;
 }

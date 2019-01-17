@@ -6,6 +6,7 @@ import clientHandlerRegister from '../clientHandlerRegister';
 
 import { getRoom, getClient, addRoom } from '../utils/stateUtils';
 import Handle from '../utils/handle';
+import { getCreateRoomSuccess } from '../message/room';
 
 const emitCreateRoomError = (socket: Socket, errorMessage: string) => {
     emit(socket, ...messages.getFailure(MessageType.CREATE_ROOM, errorMessage));
@@ -34,6 +35,12 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (data: {
     const handle = new Handle({ context, roomId: room.id, gameConfig, roomConfig });
     context.handles[room.id] = handle;
     const hostId = getClient(context, socket).id;
+    handle.emit(hostId, ...getCreateRoomSuccess(room.id));
+
+    const initialState = handle.game.onSetup(handle);
+    if (initialState) {
+        handle.setState(initialState);
+    }
     handle.room.onCreate(handle, hostId, data);
 };
 

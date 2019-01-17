@@ -6,16 +6,18 @@ import * as roomMessages from '../message/room';
 
 const denormalizeRoom = (StateManager: StateManagerT, room: Room) => ({
     ...room,
-    clientMap: pick(StateManager.connections, room.clients),
+    clientMap: pick(StateManager.connections, room.players),
 });
 
 export const updateClientWithRoomData = (context: Context, roomId: string) => {
-    Promise.resolve().then(() => {
-        const { StateManager } = context;
-        const room = StateManager.rooms[roomId];
-        if (room) {
-            const roomData = denormalizeRoom(StateManager, room);
-            broadcast(context, room.id, ...roomMessages.getRoomUpdate(roomData));
-        }
-    });
+    if (context.StateManager.rooms[roomId].players.length > 0) {
+        Promise.resolve().then(() => {
+            const { StateManager } = context;
+            const room = StateManager.rooms[roomId];
+            if (room) {
+                const roomData = denormalizeRoom(StateManager, room);
+                broadcast(context, room.id, ...roomMessages.getRoomUpdate(roomData));
+            }
+        });
+    }
 };

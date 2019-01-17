@@ -68,12 +68,14 @@ export function emit(client: WebSocket, messageType: string, data: any) {
 export function broadcast(context: Context, roomId: string, messageType: string, data: any) {
     const { StateManager, SocketManager } = context;
     const room = StateManager.rooms[roomId];
-    room.clients.forEach((client) => {
-        const socket = SocketManager.getSocket(client);
-        if (socket) {
-            emit(socket, messageType, data);
-        }
-    });
+    if (room) {
+        room.players.forEach((player) => {
+            const socket = SocketManager.getSocket(player);
+            if (socket) {
+                emit(socket, messageType, data);
+            }
+        });
+    }
 }
 
 export function closeSocket(socket: WebSocket) {

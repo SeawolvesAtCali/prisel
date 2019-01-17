@@ -3,6 +3,7 @@ import Handle from './handle';
 import { ClientId } from '../objects/client';
 import { getFailure, getJoinSuccess, getLeaveSuccess, getGameStartSuccess } from '../message';
 import { GAME_PHASE } from '../objects/gamePhase';
+import debug from '../debug';
 
 type EventHandler = (handle: Handle, client: ClientId, data: any) => void;
 
@@ -55,8 +56,9 @@ export const BaseRoomConfig: RoomConfig = {
             return;
         }
         if (handle.canStart()) {
-            handle.startGame();
+            debug('Starting game!', handle.game.type, handle.room.type);
             handle.broadcast(handle.players, ...getGameStartSuccess());
+            handle.startGame();
         }
     },
     onMessage(handle, client, data) {},

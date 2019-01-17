@@ -14,7 +14,7 @@ import { parsePacket } from '@prisel/common';
 import { handleDisconnect } from './handler/handleDisconnect';
 import { getWelcome } from './message/room';
 import { GameConfig } from './utils/gameConfig';
-import { RoomConfig } from './utils/roomConfig';
+import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
 import ConfigManager from './utils/configManager';
 
 class Server {
@@ -36,11 +36,16 @@ class Server {
                 debug(data);
                 if (data) {
                     const packet = parsePacket(data);
+                    let handled = false;
                     clientHandlerRegister.forEach(([event, handler]) => {
                         if (event === packet.type) {
                             handler(context, socket)(packet.payload);
+                            handled = true;
                         }
                     });
+                    if (!handled) {
+                        debug(`Cannot find handler for ${packet.type}`);
+                    }
                 }
             });
 
@@ -63,7 +68,7 @@ class Server {
         });
     }
 
-    public register(game: GameConfig, room?: RoomConfig) {
+    public register(game: GameConfig, room: RoomConfig = BaseRoomConfig) {
         this.configManager.add(game, room);
     }
 

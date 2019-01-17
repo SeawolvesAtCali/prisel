@@ -62,7 +62,9 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
 
 export function emit(client: WebSocket, messageType: string, data: any) {
     debug(`SERVER: ${messageType} ${JSON.stringify(data)}`);
-    client.send(createPacket(messageType, data));
+    if (client && client.readyState === WebSocket.OPEN) {
+        client.send(createPacket(messageType, data));
+    }
 }
 
 export function broadcast(context: Context, roomId: string, messageType: string, data: any) {
@@ -71,7 +73,7 @@ export function broadcast(context: Context, roomId: string, messageType: string,
     if (room) {
         room.players.forEach((player) => {
             const socket = SocketManager.getSocket(player);
-            if (socket) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
                 emit(socket, messageType, data);
             }
         });

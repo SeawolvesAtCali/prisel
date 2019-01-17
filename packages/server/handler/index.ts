@@ -5,3 +5,5 @@ import './handleCreateRoom';
 import './handleExit';
 import './handleJoin';
 import './handleLeave';
+import './handleGameStart';
+import './handleMessage';

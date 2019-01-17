@@ -6,7 +6,7 @@ import { RoomId, Room } from '../objects/room';
 import { MessageType } from '@prisel/common';
 import { GAME_PHASE } from '../objects/gamePhase';
 import { GameConfig, BaseGameConfig } from './gameConfig';
-import { RoomConfig } from './roomConfig';
+import { RoomConfig, BaseRoomConfig } from './roomConfig';
 import { updateClientWithRoomData } from './updateUtils';
 
 interface HandleProps {
@@ -30,8 +30,8 @@ class Handle {
     constructor({ context, roomId, gameConfig, roomConfig }: HandleProps) {
         this.context = context;
         this.roomId = roomId;
-        this.game = gameConfig;
-        this.room = roomConfig;
+        this.game = { ...BaseGameConfig, ...gameConfig };
+        this.room = { ...BaseRoomConfig, ...roomConfig };
     }
 
     /**
@@ -102,21 +102,21 @@ class Handle {
     }
 
     public canStart() {
-        return (this.game.canStart || BaseGameConfig.canStart)(this);
+        return this.game.canStart(this);
     }
 
     public startGame() {
         this.updateRoomState((draftRoom) => {
             draftRoom.gamePhase = GAME_PHASE.GAME;
         });
-        (this.game.onStart || BaseGameConfig.onStart)(this);
+        this.game.onStart(this);
     }
 
     public endGame() {
         this.updateRoomState((draftRoom) => {
             draftRoom.gamePhase = GAME_PHASE.WAITING;
         });
-        (this.game.onEnd || BaseGameConfig.onEnd)(this);
+        this.game.onEnd(this);
     }
 
     public get gamePhase() {
@@ -135,7 +135,7 @@ class Handle {
                 draftRoom.players.push(playerId);
             }
         });
-        (this.game.onAddPlayer || BaseGameConfig.onAddPlayer)(this, playerId);
+        this.game.onAddPlayer(this, playerId);
     }
 
     public removePlayer(playerId: ClientId) {
@@ -148,7 +148,7 @@ class Handle {
                 delete draftRoom.host;
             }
         });
-        (this.game.onRemovePlayer || BaseGameConfig.onRemovePlayer)(this, playerId);
+        this.game.onRemovePlayer(this, playerId);
     }
 
     public get players() {

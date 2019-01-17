@@ -32,7 +32,6 @@
     },
     "dependencies": {
         "@prisel/client": "file:../client",
-        "@prisel/server": "file:../server",
-        "debug": "^4.1.1"
+        "@prisel/server": "file:../server"
     }
 }

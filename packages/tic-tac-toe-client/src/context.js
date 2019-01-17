@@ -6,13 +6,11 @@ const Context = React.createContext({
         id: 'id',
         name: 'room name',
         host: '123',
-        guests: [],
         gameState: {},
-        clients: [
+        players: [
             {
                 username: 'jack',
                 id: '123',
-                isReady: false,
                 roomId: '345',
             },
         ],

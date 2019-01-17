@@ -6,6 +6,8 @@
     "scripts": {
         "start:server": "lerna run start --scope @prisel/server --stream",
         "start:client": "lerna run start --scope @prisel/client --stream",
+        "start:tic-tac-toe-server": "lerna run start --scope @prisel/tic-tac-toe --stream",
+        "start:tic-tac-toe-client": "lerna run start --scope @prisel/tic-tac-toe-client --stream",
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "postinstall": "npm run build",
         "build": "lerna run build --stream",

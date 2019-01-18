@@ -19,7 +19,7 @@
     },
     "scripts": {
         "build": "tsc",
-        "start": "echo HI",
+        "start": "env DEBUG=debug ts-node index.ts",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"

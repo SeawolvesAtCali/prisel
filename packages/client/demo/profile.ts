@@ -34,9 +34,17 @@ const defaultProfile: Profile = {
     actions: [
         {
             title: 'create room',
-            fields: [{ label: 'room name', key: 'roomName', type: Fields.TEXT, default: 'room-1' }],
+            fields: [
+                { label: 'room name', key: 'roomName', type: Fields.TEXT, default: 'room-1' },
+                {
+                    label: 'game',
+                    key: 'game',
+                    type: Fields.TEXT,
+                    default: 'big2',
+                },
+            ],
             handler: (client: Client, fields: any) => {
-                client.emit(...getCreateRoom(fields.roomName));
+                client.emit(...getCreateRoom(fields.roomName, fields.game));
             },
         },
         {

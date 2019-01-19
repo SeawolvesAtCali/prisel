@@ -81,14 +81,15 @@
         "proseWrap": "always"
     },
     "dependencies": {
+        "@prisel/big2": "file:packages/big2",
         "@prisel/client": "file:packages/client",
         "@prisel/common": "file:packages/common",
+        "@prisel/dashboard": "file:packages/dashboard",
         "@prisel/e2e": "file:packages/e2e",
         "@prisel/server": "file:packages/server",
         "@prisel/template": "file:packages/template",
         "@prisel/tic-tac-toe": "file:packages/tic-tac-toe",
-        "@prisel/tic-tac-toe-client": "file:packages/tic-tac-toe-client",
-        "@prisel/big2": "file:packages/big2"
+        "@prisel/tic-tac-toe-client": "file:packages/tic-tac-toe-client"
     },
     "devDependencies": {
         "@babel/core": "^7.2.2",

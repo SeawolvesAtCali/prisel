@@ -1,11 +1,13 @@
 {
     "name": "@prisel/big2",
     "version": "0.0.0",
+    "private": true,
     "description": "> TODO: description",
     "author": "",
-    "homepage": "https://github.com/SeawolvesAtCali/Monopoly/tree/master/packages/template#readme",
+    "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/template#readme",
     "license": "MIT",
     "main": "lib/index.js",
+    "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
@@ -15,7 +17,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/SeawolvesAtCali/Monopoly.git"
+        "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
         "build": "tsc",
@@ -25,7 +27,7 @@
         "fix": "tslint --project tsconfig.json --fix"
     },
     "bugs": {
-        "url": "https://github.com/SeawolvesAtCali/Monopoly/issues"
+        "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
         "@prisel/common": "file:../common",

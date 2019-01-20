@@ -120,7 +120,7 @@ class App extends React.Component {
         if (!this.connected) {
             return;
         }
-        this.client.emit(...Messages.getCreateRoom(roomName));
+        this.client.emit(...Messages.getCreateRoom(roomName, 'tic-tac-toe'));
 
         await this.client.once(
             (messageType, data) =>
@@ -172,7 +172,7 @@ class App extends React.Component {
         if (!this.connected) {
             return;
         }
-        this.client.emit(...Messages.getMove({ index }));
+        this.client.emit(...Messages.getMessage({ index }));
     };
 
     render() {

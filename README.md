@@ -5,29 +5,30 @@
 [![version](https://img.shields.io/npm/v/@prisel/server.svg)](https://www.npmjs.com/package/@prisel/server)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-WebSocket game engine with a focus on room management.
+Node.js game server for your next multiplayer game.
 
-# Guiding principles
+# Features
 
-This project is being developed with the following principle in mind:
+-   **Opinionated room system** Prisel comes with a default room system with reasonable that handles
+    player joining/leaving, room capacity and game phase. It also allows us to customize the room
+    behavior.
+-   **Freedom of game logic implementation** Prisel doesn't make assumption about the types of games
+    we are making. It leaves the game logic implementation and state synchronization to developers.
+-   **Client side technology agnostic** Prisel aims at providing a robust server side solution while
+    maintaining a simple server-client communication protocal. Prisel speaks WebSocket using simple
+    JSON. It should be fairly easy to build a client using any languages with WebSocket support.
+-   **Develop server in JavaScript or TypeScript** Although the prisel is developed in TypeScript,
+    it is built with pure JavaScript intergration in mind.
+-   **Testing and debugging support** Prisel provides utility for testing and debugging our games.
 
-1. **Robust and opinionated room system** It should provide a room system with reasonable defaults,
-   but also customizable.
-2. **Total freedom of game logic implementation** It should be totally unopinionated on how/when to
-   store state and how/when to synchronize with the client.
-3. **Client side technology agnostic** It should not require a corresponding client engine. Client
-   server communication should be based on raw WebSocket with clearly defined messages, so that
-   client can be built in any language with ease.
-4. **Develop server in JavaScript or TypeScript** Although the project is developed in TypeScript,
-   user should have the freedom to use it with either JavaScript or TypeScript.
-5. **Testing and debugging support** It should provide good testing and debugging utilities.
+# Get Started
 
-# Usage
+## Install
 
-## Server
+### Server
 
 ```bash
-> npm i @prisel/server
+$ npm i @prisel/server
 ```
 
 ```javascript
@@ -37,13 +38,13 @@ const server = new Server();
 server.start(); // server will start at ws://localhost:3000
 ```
 
-More server docs see @prisel/server
+More server docs see `@prisel/server`
 [README](https://github.com/SeawolvesAtCali/prisel/tree/master/packages/server)
 
-## Client
+### Client
 
 ```bash
-> npm i @prisel/client
+$ npm i @prisel/client
 ```
 
 ```javascript
@@ -60,188 +61,60 @@ const client = new Client('ws://localhost:3000');
 })();
 ```
 
----
+# Concept
 
-# Contributing guide
+`prisel` is built with room based online game in mind. It's great for games that are short and
+played by a small group of players, such as board games, fighting games. It is not suitable for
+games allowing massive online players or long play times across multiple sessions.
 
-## Project overview
+### Player
 
-This project uses lerna to manage multiple sub packages inside `/packages` folder.
+player represent a user connected to our server. After connection user needs to login with username
+(We are working on the detail of authentication). Player not currently in a room can create a room
+or join a room. A player can only be in one room at a time. To join another room, the player needs
+to leave the current room first.
 
--   **server** hosts the code for server engine, published as
-    [`@prisel/server`](https://www.npmjs.com/package/@prisel/server)
--   **client** hosts the code for client library, published as
-    [`@prisel/client`](https://www.npmjs.com/package/@prisel/client)
--   **common** shared code used by server and client, published as
-    [`@prisel/common`](https://www.npmjs.com/package/@prisel/common)
--   **template** template for creating a new package in this monorepo
--   **e2e** end to end test for server and client
--   **tic-tac-toe** an example tic-tac-toe server implementation
--   **tic-tac-toe-client** an example tic-tac-toe client implementation
+### Room
 
-## Install
+Room is a group of players that plays game together. All the players in the room are participating
+in the game. A room can have a host. Host is one of the player with privilege to start a game. Room
+is a transient object. When all the players leave a room, the room will be closed.
 
-make sure you have [node](https://nodejs.org/en/) installed, the recommended version is 10.x and up.
+### Game
 
-To install dependencies, run the following command in project root directory:
+Game is the most important concept in prisel. Players need to be inside a room to play a game. Each
+game has the following lifecycle methods that we can override to describe our game logics:
 
-```
-npm install
-```
+#### Preparing
 
-All the sub packages' dependencies and devDependencies are recorded in top level package-lock.json.
-Installing in the top level will make sure all of them are installed.
+-   [**`onSetup`**](docs/API.md#onsetup-handle--object)
+-   [**`canStart`**](docs/API.md#canstart-handle--boolean)
 
-## Test
+#### Running
 
-This project uses [jest](https://facebook.github.io/jest/) as the testing framework.
+-   [**`onStart`**](docs/API.md#onstart-handle--void)
 
-All the test should be inside `__test__` folder next to the source file. For example, if we have a
-file `directory/testMe.ts`, its test should be at `directory/__test__/testMe.test.ts`
+#### Ending
 
-test file should use the same name as the source file, plus `.test.ts` ending.
+-   [**`onEnd`**](docs/API.md#onend-handle--void)
 
-To run all the test
+Some common APIs for all lifecycles that we can implement are
 
-```
-npm test
-```
+-   [**`onMessage`**](docs/API.md#onmessage-handle-player-data--void)
+-   [**`onAddPlayer`**](docs/API.md#onaddplayer-handle-player--void)
+-   [**`onRemovePlayer`**](docs/API.md#onremoveplayer-handle-player--void)
 
-To run a test in a package
+Detail usage of each lifecycle method is [below](#game-1)
 
-```
-npm test --scope <package-name>
-```
+### Handle
 
-for example:
+`Handle` is a collection of utilities to access/modify the game/room state and send messages to
+clients. All game and room functions have access to `Handle`.
 
-```
-npm test --scope @prisel/server
-```
+More detail on [Handle's API doc](docs/API.md#handle)
 
-To run a single test file
+# What's next
 
-```
-npx jest <test-file-name>
-```
-
-for example
-
-```
-npx jest handleRoomActions.test.ts
-```
-
-## Debugging
-
-This project uses [debug](https://github.com/visionmedia/debug), the same logging library that
-Socket.io uses. To enable debugging, set `DEBUG` environment variables before running the script.
-
-For example
-
-```
-env DEBUG=debug npm run start:server
-```
-
-In the code, we should use `debug` instead of `console.log` for debug messages.
-
-```
-const debug = require('debug')('debug'); // Import debug and set the debug message label to `debug`
-
-debug('Hello world'); // This will print "debug: Hello world"
-```
-
-Debugging using Visual Studio Code is super easy.
-
-1.  In the debug panel, click on the gear icon to create a `launch.json`.
-2.  The content of the json file could be as simple as
-    ```
-    {
-        "version": "0.2.0",
-        "configurations": [
-            {
-                "type": "node",
-                "request": "launch",
-                "name": "debug server",
-                "program": "${workspaceFolder}/server/index.ts"
-            }
-        ]
-    }
-    ```
-3.  Set a breakpoint in editor
-4.  Click on the green run button to start debugging.
-
-## Linting
-
-Linting makes sure that the source code follows the same coding style. It's recommend to run linting
-with fix to automatically fix fixable linting issues.
-
-```
-npm run fix
-```
-
-If you just want to see the issues without automatically fixing, you can run
-
-```
-npm run lint
-```
-
-## Continous Intergration
-
-This project uses Travis CI as continous intergration service. Travis will pick up our project
-whenever we have a new commit, our build will run through all the checks listed in `.travis.yml`.
-Any of them fails will result in a failed build.
-
-## Deploying
-
-An example server that serves tic-tac-toe is deployed at
-[Heroku](https://game-server-monopoly.herokuapp.com/).
-
-Heroku goes to sleep once in a while, until someone access it. When the server is running, we should
-see
-
-```
-Server is running
-```
-
-on the page.
-
-The corresponding client side is deployed at [Netlify](https://prisel-tic-tac-toe.netlify.com/)
-
-![tic-tac-toe-client](https://user-images.githubusercontent.com/5957726/50565663-f7720680-0ce5-11e9-912f-eab1baee6b93.png)
-
-When a pull request gets merged into master branch, heroku will automatically redeploy. We have the
-following configuration set for Heroku
-
-```bash
-> heroku config:set NPM_CONFIG_PRODUCTION=false --app game-server-monopoly
-```
-
-This make sure that Heroku doesn't do `npm install --production` which causes devDependencies to not
-get installed.
-
-```bash
-> heroku config:set NODEMODULESCACHE=false --app game-server-monopoly
-```
-
-This make sure that Heroku doesn't cache node_modules.
-
-If you need to make change to Heroku or Netlify, ask [@yiochen](https://github.com/yiochen) for
-credential.
-
-## Recommended Visual Studio Code plugin
-
-If you are using Visual Studio Code, it's recommended to install the following extension:
-
-### eslint (search for `dbaeumer.vscode-eslint`) for linting
-
-This extension displays linting issues in the code. Also recommend turning on
-`"eslint.autoFixOnSave": true` in Visual Studio Code workspace settings. This runs `fix` for the
-current file when save.
-
-### tslint (search for `eg2.tslint`) for TypeScript linting
-
-Also recommend enabling `tslint.autoFixOnSave` in vscode setting.
-
-### prettier (search for `esbenp.prettier-vscode`)
-
-Prettier formats the code. On editor setting, enable `editor.formatOnSave`
+-   Check out our [API documentation](docs/API.md).
+-   If you want to build a client, check out the [message types](docs/MESSAGE_TYPES.md).
+-   [Tutorial](docs/TUTORIAL.md) is comming soon.

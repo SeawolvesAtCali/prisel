@@ -6,6 +6,9 @@
     "scripts": {
         "start:server": "lerna run start --scope @prisel/server --stream",
         "start:client": "lerna run start --scope @prisel/client --stream",
+        "start:tic-tac-toe-server": "lerna run start --scope @prisel/tic-tac-toe --stream",
+        "start:tic-tac-toe-client": "lerna run start --scope @prisel/tic-tac-toe-client --stream",
+        "start:big2": "lerna run start --scope @prisel/big2 --stream",
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "postinstall": "npm run build",
         "build": "lerna run build --stream",
@@ -84,7 +87,7 @@
         "@prisel/template": "file:packages/template",
         "@prisel/tic-tac-toe": "file:packages/tic-tac-toe",
         "@prisel/tic-tac-toe-client": "file:packages/tic-tac-toe-client",
-        "@prisel/zig2": "file:packages/zig2"
+        "@prisel/big2": "file:packages/big2"
     },
     "devDependencies": {
         "@babel/core": "^7.2.2",

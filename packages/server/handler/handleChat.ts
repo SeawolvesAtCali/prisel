@@ -3,21 +3,20 @@ import { broadcast } from '../utils/networkUtils';
 import * as messages from '../message/chat';
 import { MessageType } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';
+import { getClient, getRoom } from '../utils/stateUtils';
 
 export const handleChat = (context: Context, client: Socket) => (data: {
-    userId: string;
     message: string;
-    roomId: string;
 }): void => {
-    const { StateManager } = context;
-    const { userId, message, roomId } = data;
-    const { username } = StateManager.connections[userId];
+    const { message } = data;
+    const player = getClient(context, client);
+    const room = getRoom(context, client);
 
-    if (roomId) {
+    if (player && room) {
         return void broadcast(
             context,
-            roomId,
-            ...messages.getBroadcastMessage(username, message, roomId),
+            room.id,
+            ...messages.getBroadcastMessage(player.username, message),
         );
     }
 };

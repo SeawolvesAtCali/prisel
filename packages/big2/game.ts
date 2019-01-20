@@ -1,26 +1,5 @@
-import { Context, Socket, Messages } from '@prisel/server';
-import { broadcast, emit } from '@prisel/server/lib/utils/networkUtils';
-import { MessageType } from '@prisel/common';
+import { GameConfig, Handle, debug } from '@prisel/server';
 import { State, Card, generateDeck, Status, Pattern } from './components';
-import clientHandlerRegister from '@prisel/server/lib/clientHandlerRegister';
-
-function createGameState() {
-    const state: State = {
-        prevPlayer: 0,
-        currentPlayer: 0,
-        playedCard: [],
-        players: [],
-        deck: generateDeck(),
-    };
-    return state;
-}
-
-const getRoomId = (context: Context, client: Socket) => {
-    const { SocketManager, StateManager } = context;
-    const userId = SocketManager.getId(client);
-    const roomId = StateManager.connections[userId].roomId;
-    return roomId;
-};
 
 function dialCards(cardPool: Card[], playerNum: number) {
     const playerCardSet: any = [];
@@ -53,45 +32,16 @@ function getFirstPlayer(playerCardSets: [Card[]]) {
     return firstPlayerIdx;
 }
 
-function broadcastBig2State(context: Context, messageType: string, state: State) {
-    const { SocketManager } = context;
+function broadcastBig2State(handle: Handle, state: State) {
     const currentPlayer = state.currentPlayer;
-    for (const player of state.players) {
-        const playerSocket = SocketManager.getSocket(player.client);
-        if (playerSocket) {
-            emit(playerSocket, messageType, {
-                currentPlayer,
-                playedCard: state.playedCard,
-                cardSet: player.cardSet,
-            });
-        }
-    }
-}
-
-const handleGameStart = (context: Context, client: Socket) => (data: any) => {
-    const roomId = getRoomId(context, client);
-    const { updateState } = context;
-    updateState((draftState) => {
-        const state = createGameState();
-        const clients = [draftState.rooms[roomId].host, ...draftState.rooms[roomId].guests];
-        const playerCardSets = dialCards(state.deck, clients.length);
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < clients.length; i++) {
-            state.players.push({
-                client: clients[i],
-                cardSet: playerCardSets[i],
-                status: Status.ONPLAY,
-            });
-        }
-        const currPlayer = getFirstPlayer(playerCardSets);
-        state.currentPlayer = currPlayer;
-        state.prevPlayer = currPlayer;
-        draftState.rooms[roomId].gameState = state;
+    state.players.forEach((player) => {
+        handle.emit(player.client, {
+            currentPlayer,
+            playedCard: state.playedCard,
+            cardSet: player.cardSet,
+        });
     });
-    broadcast(context, roomId, ...Messages.getSuccess(MessageType.GAME_START, {}));
-    const newState = context.StateManager.rooms[roomId].gameState;
-    broadcastBig2State(context, roomId, newState);
-};
+}
 
 function playCard(state: State, playIndies: number[]) {
     const playerCardSet = state.players[state.currentPlayer].cardSet;
@@ -108,8 +58,7 @@ function playCard(state: State, playIndies: number[]) {
     return playedCard;
 }
 
-function setNextPlayer(draftState: any, roomId: string) {
-    const { gameState } = draftState.rooms[roomId];
+function setNextPlayer(gameState: State) {
     let nextPlayer = gameState.currentPlayer;
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < gameState.players.length; i++) {
@@ -126,18 +75,13 @@ function setNextPlayer(draftState: any, roomId: string) {
         cards : [<cards' indies of the cardSet array>],
     }
 */
-const handleMove = (context: Context, client: any) => (data: any) => {
-    const { SocketManager, StateManager, updateState } = context;
-    const roomId = getRoomId(context, client);
-    const state = StateManager.rooms[roomId].gameState;
-    const userId = SocketManager.getId(client);
+const handleMove = (handle: Handle, userId: string, data: any) => {
+    const state = handle.state;
 
-    process.stdout.write(
-        ' !! ---- curr: ' + state.currentPlayer + 'prev: ' + state.prevPlayer + ' ---- !!',
-    );
+    debug(' !! ---- curr: ' + state.currentPlayer + 'prev: ' + state.prevPlayer + ' ---- !!');
     // only currentPlayer can make move
     if (userId !== state.players[state.currentPlayer].client) {
-        process.stdout.write(" !! ---- it's not your turn ---- !!");
+        debug(" !! ---- it's not your turn ---- !!");
         return;
     }
 
@@ -147,35 +91,30 @@ const handleMove = (context: Context, client: any) => (data: any) => {
         if (state.currentPlayer === state.prevPlayer) {
             return;
         }
-        updateState((draftState) => {
-            setNextPlayer(draftState, roomId);
+        const newGameState = handle.setState<State>((draftState) => {
+            setNextPlayer(draftState);
         });
-        broadcastBig2State(
-            context,
-            MessageType.GAME_STATE,
-            context.StateManager.rooms[roomId].gameState,
-        );
+
+        broadcastBig2State(handle, newGameState);
         return;
     }
 
-    if (!isValidPlay(state, data.cards)) {
-        process.stdout.write(' !!! --- not a valid play --- !!!');
+    if (!isValidPlay(handle.state as State, data.cards)) {
+        debug(' !!! --- not a valid play --- !!!');
         return;
     }
 
-    updateState((draftState) => {
-        const playcard = playCard(state, data.cards);
-        const { gameState } = draftState.rooms[roomId];
+    const new2GameState = handle.setState<State>((gameState) => {
+        const playcard = playCard(gameState, data.cards);
         gameState.playedCard = playcard;
         gameState.players[gameState.currentPlayer].cardSet =
             state.players[state.currentPlayer].cardSet;
         gameState.prevPlayer = gameState.currentPlayer;
-        setNextPlayer(draftState, roomId);
+        setNextPlayer(gameState);
     });
-    const newState = context.StateManager.rooms[roomId].gameState;
-    broadcastBig2State(context, MessageType.GAME_STATE, newState);
-    if (checkWin(state.players[state.prevPlayer].cardSet)) {
-        process.stdout.write(state.players[state.prevPlayer].client + ' won the game');
+    broadcastBig2State(handle, new2GameState);
+    if (checkWin(new2GameState.players[new2GameState.prevPlayer].cardSet)) {
+        debug(new2GameState.players[new2GameState.prevPlayer].client + ' won the game');
     }
 };
 
@@ -183,7 +122,7 @@ function isValidPlay(state: State, playIndies: number[]) {
     const playerCardSet = state.players[state.currentPlayer].cardSet;
     for (const i of playIndies) {
         if (i > playerCardSet.length - 1) {
-            process.stdout.write('!! --- player does not have the card --- !!');
+            debug('!! --- player does not have the card --- !!');
             return false;
         }
     }
@@ -196,7 +135,7 @@ function isValidPlay(state: State, playIndies: number[]) {
     }
     const currentPattern = getPattern(candidates);
     if (currentPattern.type === Pattern.INVALID) {
-        process.stdout.write('!! --- not a valid pattern --- !!');
+        debug('!! --- not a valid pattern --- !!');
         return false;
     }
     if (state.currentPlayer === state.prevPlayer) {
@@ -323,5 +262,26 @@ function checkWin(playerCardSet: Card[]) {
     return false;
 }
 
-clientHandlerRegister.push([MessageType.GAME_START, handleGameStart]);
-clientHandlerRegister.push([MessageType.MOVE, handleMove]);
+const Big2: GameConfig = {
+    type: 'big2',
+    onStart(handle) {
+        const gameState = handle.setState<State>((draftState) => {
+            draftState.playedCard = [];
+            draftState.deck = generateDeck();
+            const playerCardSets = dialCards(draftState.deck, handle.players.length);
+            draftState.players = handle.players.map((player, index) => {
+                return {
+                    client: player,
+                    cardSet: playerCardSets[index],
+                    status: Status.ONPLAY,
+                };
+            });
+            draftState.currentPlayer = getFirstPlayer(playerCardSets);
+            draftState.prevPlayer = draftState.currentPlayer;
+        });
+        broadcastBig2State(handle, gameState);
+    },
+    onMessage: handleMove,
+};
+
+export default Big2;

@@ -1,12 +1,12 @@
-import { Context, AnyObject, StateManager } from '../objects';
+import { Context, AnyObject } from '../objects';
 import { emit } from './networkUtils';
 import { getMessage } from '../message';
 import { ClientId } from '../objects/client';
 import { RoomId, Room } from '../objects/room';
 import { MessageType } from '@prisel/common';
 import { GAME_PHASE } from '../objects/gamePhase';
-import { GameConfig } from './gameConfig';
-import { RoomConfig } from './roomConfig';
+import { GameConfig, BaseGameConfig } from './gameConfig';
+import { RoomConfig, BaseRoomConfig } from './roomConfig';
 import { updateClientWithRoomData } from './updateUtils';
 
 interface HandleProps {
@@ -21,41 +21,41 @@ interface HandleProps {
  * as well as performing network calls.
  */
 class Handle {
+    public roomId: RoomId;
     public game: GameConfig;
     public room: RoomConfig;
 
-    public roomId: RoomId;
     private context: Context;
 
     constructor({ context, roomId, gameConfig, roomConfig }: HandleProps) {
         this.context = context;
         this.roomId = roomId;
-        this.game = gameConfig;
-        this.room = roomConfig;
+        this.game = { ...BaseGameConfig, ...gameConfig };
+        this.room = { ...BaseRoomConfig, ...roomConfig };
     }
 
     /**
      * Emit a MESSAGE event to client
-     * @param clientId
+     * @param playerId
      * @param data
      */
-    public emit(clientId: ClientId, data: any): void;
+    public emit(playerId: ClientId, data: any): void;
     /**
      * Emit an event to client
-     * @param clientId
+     * @param playerId
      * @param messageType
      * @param data
      */
-    public emit(clientId: ClientId, messageType: MessageType, data: any): void;
-    public emit(clientId: ClientId, ...rest: any[]) {
-        emitWithClientId(this.context, clientId, rest[0], rest[1]);
+    public emit(playerId: ClientId, messageType: MessageType, data: any): void;
+    public emit(playerId: ClientId, ...rest: any[]) {
+        emitWithPlayerId(this.context, playerId, rest[0], rest[1]);
     }
 
-    public broadcast(clientIds: ClientId[], data: any): void;
-    public broadcast(clientIds: ClientId[], messageType: MessageType, data: any): void;
-    public broadcast(clientIds: ClientId[], ...rest: any[]) {
-        clientIds.forEach((clientId) => {
-            emitWithClientId(this.context, clientId, rest[0], rest[1]);
+    public broadcast(playerIds: ClientId[], data: any): void;
+    public broadcast(playerIds: ClientId[], messageType: MessageType, data: any): void;
+    public broadcast(playerIds: ClientId[], ...rest: any[]) {
+        playerIds.forEach((playerId) => {
+            emitWithPlayerId(this.context, playerId, rest[0], rest[1]);
         });
     }
 
@@ -67,7 +67,7 @@ class Handle {
      * Update game state.
      * @param producerOrState
      */
-    public setState<T extends object>(producerOrState: (draftState: T) => void | Partial<T>): T {
+    public setState<T extends object>(producerOrState: ((draftState: T) => void) | Partial<T>): T {
         return this.updateRoomState((draftRoom) => {
             if (typeof producerOrState === 'function') {
                 const producer = producerOrState;
@@ -101,16 +101,22 @@ class Handle {
         });
     }
 
+    public canStart() {
+        return this.game.canStart(this);
+    }
+
     public startGame() {
         this.updateRoomState((draftRoom) => {
             draftRoom.gamePhase = GAME_PHASE.GAME;
         });
+        this.game.onStart(this);
     }
 
     public endGame() {
         this.updateRoomState((draftRoom) => {
             draftRoom.gamePhase = GAME_PHASE.WAITING;
         });
+        this.game.onEnd(this);
     }
 
     public get gamePhase() {
@@ -120,27 +126,35 @@ class Handle {
         }
     }
 
-    public addClient(clientId: ClientId) {
+    public addPlayer(playerId: ClientId) {
+        this.context.updateState((draftState) => {
+            draftState.connections[playerId].roomId = this.roomId;
+        });
         this.updateRoomState((draftRoom) => {
-            if (!draftRoom.clients.includes(clientId)) {
-                draftRoom.clients.push(clientId);
+            if (!draftRoom.players.includes(playerId)) {
+                draftRoom.players.push(playerId);
             }
         });
+        this.game.onAddPlayer(this, playerId);
     }
 
-    public removeClient(clientId: ClientId) {
+    public removePlayer(playerId: ClientId) {
+        this.context.updateState((draftState) => {
+            delete draftState.connections[playerId].roomId;
+        });
         this.updateRoomState((draftRoom) => {
-            draftRoom.clients.splice(draftRoom.clients.indexOf(clientId));
-            if (draftRoom.host === clientId) {
+            draftRoom.players.splice(draftRoom.players.indexOf(playerId), 1);
+            if (draftRoom.host === playerId) {
                 delete draftRoom.host;
             }
         });
+        this.game.onRemovePlayer(this, playerId);
     }
 
-    public get clients() {
+    public get players() {
         const room = this.getRoom();
         if (room) {
-            return room.clients;
+            return room.players;
         }
         return [];
     }
@@ -149,13 +163,14 @@ class Handle {
         this.context.updateState((draftState) => {
             delete draftState.rooms[this.roomId];
         });
+        this.roomId = undefined;
         // TODO: how do we notify outside that room is removed.
     }
 
-    public setHost(clientId: ClientId) {
+    public setHost(playerId: ClientId) {
         this.updateRoomState((draftRoom) => {
-            if (draftRoom.clients.includes(clientId)) {
-                draftRoom.host = clientId;
+            if (draftRoom.players.includes(playerId)) {
+                draftRoom.host = playerId;
             }
         });
     }
@@ -193,16 +208,17 @@ class Handle {
             }
         }).rooms[this.roomId];
     }
+
     private getRoom() {
         return this.context.StateManager.rooms[this.roomId];
     }
 }
 
-function emitWithClientId(context: Context, clientId: ClientId, ...rest: any[]): void {
+function emitWithPlayerId(context: Context, playerId: ClientId, ...rest: any[]): void {
     const message: [MessageType, any] =
         rest.length === 1 ? getMessage(rest[0]) : (rest as [MessageType, any]);
     const { SocketManager } = context;
-    const clientSocket = SocketManager.getSocket(clientId);
+    const clientSocket = SocketManager.getSocket(playerId);
     if (clientSocket) {
         emit(clientSocket, ...message);
     }

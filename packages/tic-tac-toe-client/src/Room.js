@@ -3,23 +3,18 @@ import Context from './context';
 import './styles/Room.css';
 import Container from './Container';
 
-const ReadyButton = ({ isReady, onClick }) => (
-    <button onClick={onClick}>{isReady ? 'UNREADY' : 'READY'}</button>
-);
 const StartButton = ({ onClick }) => <button onClick={onClick}>START</button>;
 
-const Player = ({ username, isReady, id, isHost, isSelf, onReady, onStart }) => {
+const Player = ({ username, id, isHost, isSelf, onStart }) => {
     return (
         <div className={isSelf ? 'self-player-container player-container' : 'player-container'}>
             <h2>{username}</h2>
-            {!isHost && <p>{isReady ? 'READY' : 'NOT READY'}</p>}
             {isSelf && isHost && <StartButton onClick={onStart} />}
-            {isSelf && !isHost && <ReadyButton onClick={onReady} />}
         </div>
     );
 };
 
-const Room = ({ onReady, onStart }) => (
+const Room = ({ onStart }) => (
     <Context.Consumer>
         {({ userId, roomState, result }) => {
             if (!roomState) {
@@ -29,18 +24,20 @@ const Room = ({ onReady, onStart }) => (
                 <Container title={roomState.name}>
                     <span>ROOM ID: {roomState.id}</span>
                     <div className="players-container">
-                        {Object.values(roomState.clients).map((client) => (
-                            <Player
-                                key={client.id}
-                                username={client.username}
-                                isReady={client.isReady}
-                                id={client.id}
-                                isHost={client.id === roomState.host}
-                                isSelf={userId === client.id}
-                                onReady={onReady}
-                                onStart={onStart}
-                            />
-                        ))}
+                        {Object.values(roomState.players).map((player) => {
+                            const playerInfo = roomState.clientMap[player];
+                            return (
+                                <Player
+                                    key={player}
+                                    username={playerInfo.username}
+                                    id={player}
+                                    isHost={player === roomState.host}
+                                    isSelf={userId === player}
+                                    onStart={onStart}
+                                />
+                            );
+                        })}
+
                         <div />
                     </div>
                     {result}

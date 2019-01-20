@@ -4,7 +4,6 @@ import { Messages } from '@prisel/client';
 import { MessageType } from '@prisel/common';
 
 const receivedRoomUpdate = (messageType: string) => MessageType.ROOM_UPDATE === messageType;
-
 describe('create room', () => {
     it('create a room', async () => {
         const [client] = createClients();
@@ -44,20 +43,20 @@ describe('create room', () => {
             untilSuccess(client, MessageType.JOIN),
             host.once(
                 (messageType, data) =>
-                    MessageType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && data.players.includes(clientId),
             ),
             client.once(
                 (messageType, data) =>
-                    MessageType.ROOM_UPDATE === messageType && data.guests.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && data.players.includes(clientId),
             ),
         ]);
 
         expect(clientRoomUpdateResult.id).toBe(roomId);
         expect(clientRoomUpdateResult.host).toBe(hostId);
-        expect(clientRoomUpdateResult.guests).toEqual(expect.arrayContaining([clientId]));
+        expect(clientRoomUpdateResult.players).toEqual([hostId, clientId]);
         expect(hostRoomUpdateResult.id).toBe(roomId);
         expect(hostRoomUpdateResult.host).toBe(hostId);
-        expect(hostRoomUpdateResult.guests).toEqual(expect.arrayContaining([clientId]));
+        expect(hostRoomUpdateResult.players).toEqual([hostId, clientId]);
         host.exit();
         client.exit();
     });
@@ -76,18 +75,5 @@ describe('create room', () => {
         guest2.emit(...Messages.getLeave());
         await untilSuccess(guest2, MessageType.LEAVE);
         clients.map(([userId, client]) => client.exit());
-    });
-
-    it('in a room host kicks someone', async () => {
-        const clients = await createRoomWithGuests(1);
-        const [[hostId, host], [guestId, guest]] = clients;
-        host.emit(...Messages.getKick(guestId));
-        await Promise.all([
-            untilSuccess(host, MessageType.KICK),
-            untilSuccess(guest, MessageType.LEAVE),
-        ]);
-
-        host.exit();
-        guest.exit();
     });
 });

@@ -6,7 +6,7 @@ class TestEnvironment extends JSDomEnvironment {
     async setup() {
         await super.setup();
         await setupDevServer({
-            command: `node ${path.resolve('./server.js')}`,
+            command: `node ${path.resolve(__dirname, './server.js')}`,
             launchTimeout: 5000,
             port: 3000,
         });

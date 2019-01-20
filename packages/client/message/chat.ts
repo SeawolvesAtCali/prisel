@@ -6,8 +6,8 @@ import { MessageType } from '@prisel/common';
  * @param {String} userId
  * @param {String} message
  */
-export function getChat(userId: string, message: string, roomId: string = null): Message {
-    return [MessageType.CHAT, { userId, message, roomId }];
+export function getChat(message: string): Message {
+    return [MessageType.CHAT, { message }];
 }
 
 /**

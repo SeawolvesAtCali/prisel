@@ -1,5 +1,6 @@
 import { Server } from '@prisel/server';
-import './state';
+import TicTacToe from './state';
 
 const server = new Server();
+server.register(TicTacToe);
 server.start();

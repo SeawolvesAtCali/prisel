@@ -1,41 +1,43 @@
-import clientHandlerRegister from '@prisel/server/lib/clientHandlerRegister';
-import { Context, Socket } from '@prisel/server';
-import { broadcast } from '@prisel/server/lib/utils/networkUtils';
+import { GameConfig, AnyObject, debug } from '@prisel/server';
 import { Messages } from '@prisel/server';
-import { MessageType } from '@prisel/common';
-import debug from 'debug';
-function createGameState() {
-    const state: any = {
-        player: [undefined, undefined],
-        map: ['', '', '', '', '', '', '', '', ''],
-        currentPlayer: 0,
-        winner: null,
-    };
-    return state;
-}
 
-const getRoomId = (context: Context, client: Socket) => {
-    const { SocketManager, StateManager } = context;
-    const userId = SocketManager.getId(client);
-    const roomId = StateManager.connections[userId].roomId;
-    return roomId;
-};
+const TicTacToe: Partial<GameConfig> = {
+    type: 'tic-tac-toe',
+    canStart(handle) {
+        debug('checking canStart, the players are ', handle.players);
+        return handle.players.length === 2;
+    },
+    onStart(handle) {
+        const gameState = handle.setState({
+            player: handle.players,
+            map: ['', '', '', '', '', '', '', '', ''],
+            currentPlayer: 0,
+            winner: null,
+        });
+        handle.broadcast(handle.players, ...Messages.getGameState(gameState));
+    },
+    onMessage(handle, player, data) {
+        const gameState = handle.state;
+        if (gameState.winner !== null) {
+            // game already finished
+            return;
+        }
+        if (player !== gameState.player[gameState.currentPlayer]) {
+            return;
+        }
+        const newGameState = handle.setState<AnyObject>((draftState) => {
+            const sign = draftState.currentPlayer === 0 ? 'O' : 'X';
+            draftState.map[data.index] = sign;
+            if (checkWin(draftState)) {
+                draftState.winner = draftState.currentPlayer;
+            } else if (isEven(draftState.map)) {
+                draftState.winner = 'even';
+            }
+            draftState.currentPlayer = 1 - draftState.currentPlayer;
+        });
 
-const handleGameStart = (context: Context, client: Socket) => (data: any) => {
-    const state = createGameState();
-    const roomId = getRoomId(context, client);
-    const { updateState } = context;
-    updateState((draftState) => {
-        state.player[0] = draftState.rooms[roomId].host;
-        state.player[1] = draftState.rooms[roomId].guests[0];
-        draftState.rooms[roomId].gameState = state;
-    });
-    broadcast(context, roomId, ...Messages.getSuccess(MessageType.GAME_START, {}));
-    broadcast(
-        context,
-        roomId,
-        ...Messages.getGameState(context.StateManager.rooms[roomId].gameState),
-    );
+        handle.broadcast(handle.players, ...Messages.getGameState(newGameState));
+    },
 };
 
 export const isEven = (map: string[]) => {
@@ -45,37 +47,6 @@ export const isEven = (map: string[]) => {
     return !hasEmpty;
 };
 
-const handleMoveImpl = (context: Context, roomId: string, moveData: any) => {
-    context.updateState((draftState) => {
-        const { gameState } = draftState.rooms[roomId];
-        const sign = gameState.currentPlayer === 0 ? 'O' : 'X';
-        gameState.map[moveData.index] = sign;
-        if (checkWin(gameState)) {
-            gameState.winner = gameState.currentPlayer;
-        } else if (isEven(gameState.map)) {
-            gameState.winner = 'even';
-        }
-        gameState.currentPlayer = 1 - gameState.currentPlayer;
-    });
-    return context.StateManager.rooms[roomId].gameState;
-};
-const handleMove = (context: Context, client: Socket) => (data: any) => {
-    const { SocketManager, StateManager, updateState } = context;
-    const roomId = getRoomId(context, client);
-    const state = StateManager.rooms[roomId].gameState;
-    if (state.winner !== null) {
-        // game already finished
-        return;
-    }
-    const userId = SocketManager.getId(client);
-    if (userId !== state.player[state.currentPlayer]) {
-        return;
-    }
-    const newState = handleMoveImpl(context, roomId, data);
-
-    broadcast(context, roomId, ...Messages.getGameState(newState));
-};
-
 export function checkWin(state: any) {
     for (let i = 0; i < 3; i++) {
         if (
@@ -83,7 +54,7 @@ export function checkWin(state: any) {
             state.map[3 * i] === state.map[3 * i + 1] &&
             state.map[3 * i] === state.map[3 * i + 2]
         ) {
-            debug('debug')('yes');
+            debug('win');
             return true;
         }
         if (
@@ -91,7 +62,7 @@ export function checkWin(state: any) {
             state.map[i] === state.map[i + 3] &&
             state.map[i] === state.map[i + 6]
         ) {
-            debug('debug')('yes');
+            debug('win');
             return true;
         }
     }
@@ -104,5 +75,4 @@ export function checkWin(state: any) {
     return false;
 }
 
-clientHandlerRegister.push([MessageType.GAME_START, handleGameStart]);
-clientHandlerRegister.push([MessageType.MOVE, handleMove]);
+export default TicTacToe;

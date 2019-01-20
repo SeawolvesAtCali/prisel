@@ -1,19 +1,39 @@
 {
     "name": "@prisel/dashboard",
     "version": "0.1.1",
-    "private": true,
     "description": "> TODO: description",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/template#readme",
     "license": "MIT",
-    "main": "./lib/index.js",
-    "types": "./lib/index.d.ts",
+    "main": "./lib/main.js",
+    "types": "./lib/main.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
     },
     "publishConfig": {
         "access": "public"
+    },
+    "eslintConfig": {
+        "extends": [
+            "eslint:recommended",
+            "plugin:react/recommended"
+        ],
+        "parserOptions": {
+            "ecmaFeatures": {
+                "jsx": true
+            }
+        },
+        "rules": {
+            "react/prop-types": 0,
+            "no-console": 0
+        },
+        "env": {
+            "browser": true
+        },
+        "plugins": [
+            "react"
+        ]
     },
     "repository": {
         "type": "git",
@@ -22,12 +42,31 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "build": "tsc",
-        "start": "echo HI",
+        "build:renderer": "parcel build renderer/index.html --public-url ./",
+        "start:renderer": "parcel serve renderer/index.html --port 1124",
+        "prestart:main": "npm run build",
+        "start:main": "env NODE_ENV=development electron .",
+        "watch:main": "nodemon --watch main --ext ts --exec npm run start:main",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
+    },
+    "dependencies": {
+        "electron": "^4.0.1",
+        "react": "^16.6.3",
+        "react-dom": "^16.6.3"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.2.2",
+        "@babel/plugin-transform-runtime": "^7.2.0",
+        "@babel/preset-env": "^7.2.3",
+        "@babel/preset-react": "^7.0.0",
+        "babel-loader": "^8.0.4",
+        "eslint-plugin-react": "^7.12.0",
+        "nodemon": "^1.18.9",
+        "parcel-bundler": "^1.10.3"
     }
 }

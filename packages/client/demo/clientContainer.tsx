@@ -1,9 +1,9 @@
 import * as React from 'react';
 import pick from 'lodash/pick';
 import { produce } from 'immer';
-import { Card, InputNumber, Input, Button, Row, Col } from 'antd';
+import { Card, InputNumber, Input, Button, Row, Col, Tag } from 'antd';
 import { Profile, FieldType, Fields, ActionType } from './profile';
-import Client from '../client';
+import Client, { AnyObject } from '../client';
 import LoadingButton from './loadingButton';
 
 interface ClientContainerProps {
@@ -12,7 +12,7 @@ interface ClientContainerProps {
 }
 interface ClientContainerStates {
     fields: any;
-    output: string[];
+    logs: any[];
     connected: boolean;
     loggedIn: boolean;
     userId: string;
@@ -33,7 +33,17 @@ export interface CustomFieldProps {
     value: any;
 }
 
-const ClientContext = React.createContext({ client: undefined, id: '', username: '' });
+export type addToLog = (
+    label: string,
+    data: AnyObject,
+    origin: 'server' | 'client' | 'N/A',
+) => void;
+const ClientContext = React.createContext({
+    client: undefined,
+    userId: '',
+    username: '',
+    log: undefined,
+});
 ClientContext.displayName = 'ClientContext';
 
 export const ClientContextConsumer = ClientContext.Consumer;
@@ -53,7 +63,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         super(props);
         this.state = {
             fields: ClientContainer.getResolvedFieldsFromProfile(this.props.profile),
-            output: [],
+            logs: [],
             connected: false,
             loggedIn: false,
             userId: '',
@@ -67,7 +77,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             (data, messageType) => {
                 this.setState(
                     produce(this.state, (draft) => {
-                        draft.output.push(stringify(messageType, data));
+                        draft.logs.push(stringify(messageType, data));
                     }),
                 );
                 this.messageWatchers.forEach((messageWatcher) => messageWatcher(messageType, data));
@@ -90,6 +100,22 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             });
     }
 
+    public handleAddToLog = (
+        label: string,
+        data: AnyObject,
+        origin: 'server' | 'client' | 'none',
+    ) => {
+        this.setState({
+            logs: this.state.logs.concat([
+                {
+                    label,
+                    data,
+                    origin,
+                },
+            ]),
+        });
+    };
+
     public render() {
         const { profile } = this.props;
         const { actions } = profile;
@@ -100,14 +126,15 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             <Card
                 title={`Player: ${this.props.username}`}
                 style={{ width: 400, display: 'inline-block', margin: '5px', verticalAlign: 'top' }}
-                extra={<span>ID: {this.state.userId}</span>}
+                extra={<Tag color="blue">{this.state.userId}</Tag>}
             >
                 {connected && loggedIn && (
                     <ClientContext.Provider
                         value={{
                             client: this.client,
-                            id: this.state.userId,
+                            userId: this.state.userId,
                             username: this.props.username,
+                            log: this.handleAddToLog,
                         }}
                     >
                         {this.props.children}
@@ -122,7 +149,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                                     whiteSpace: 'normal',
                                 }}
                             >
-                                {this.state.output.map((line, index) => (
+                                {this.state.logs.map((line, index) => (
                                     <p key={index}>{line}</p>
                                 ))}
                             </div>
@@ -201,7 +228,6 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             <div
                 key={action.title}
                 style={{
-                    borderBottom: '1px solid lightgrey',
                     padding: '10px 0',
                 }}
             >

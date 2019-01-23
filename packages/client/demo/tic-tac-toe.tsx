@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CustomFieldProps } from './clientContainer';
+import { CustomFieldProps } from './ClientContainer';
 const indice = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 interface TicTacToeProps extends CustomFieldProps {
     onChange: (value: number) => void;

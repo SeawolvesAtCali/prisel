@@ -33,13 +33,6 @@ export interface Profile {
 const defaultProfile: Profile = {
     actions: [
         {
-            title: 'gameStart',
-            fields: [],
-            handler: (client: Client, fields: any) => {
-                client.emit(...getGameStart());
-            },
-        },
-        {
             title: 'move(indies seperated by space)',
             fields: [{ label: 'position', key: 'index', type: Fields.TEXT }],
             handler: (client: Client, fields: any) => {

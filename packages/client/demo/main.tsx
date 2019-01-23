@@ -1,8 +1,10 @@
 import * as React from 'react';
-import ClientContainer from './clientContainer';
+import ClientContainer from './ClientContainer';
 import defaultProfile from './profile';
 import RoomManager from './RoomManager';
 import { produce } from 'immer';
+import GameStartButton from './GameStartButton';
+import LogDisplay from './LogDisplay';
 
 interface AppState {
     clients: number[];
@@ -47,6 +49,8 @@ class App extends React.Component<{}, AppState> {
                         username={generateUsername(index)}
                     >
                         <RoomManager gameTypes={['tic-tac-toe', 'big-2']} />
+                        <GameStartButton />
+                        <LogDisplay />
                     </ClientContainer>
                 ))}
                 <button
@@ -60,6 +64,7 @@ class App extends React.Component<{}, AppState> {
                         fontSize: '30px',
                         verticalAlign: 'top',
                         outline: 'none',
+                        margin: '5px',
                     }}
                 >
                     Add Client

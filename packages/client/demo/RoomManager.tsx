@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Collapse, Input, Icon, Select, Button } from 'antd';
-import { ClientContextConsumer } from './clientContainer';
+import { Collapse, Input, Icon, Select, Button, Tag } from 'antd';
+import { ClientContextConsumer } from './ClientContainer';
 import Client from '../client';
 import { getCreateRoom, getJoin } from '../message';
 import { MessageType } from '@prisel/common';
@@ -111,42 +111,45 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
         const PanelHeader = (
             <div>
                 {roomInfo && (
-                    <React.Fragment>
-                        <h3 style={{ display: 'inline-block' }}>
-                            {` ${roomInfo.name} - ${roomInfo.id} `}
-                            {roomInfo.players.map((player: string) => (
-                                <UserIcon isHost={player === roomInfo.host} key={player} />
-                            ))}
-                        </h3>
-                    </React.Fragment>
+                    <h3 style={{ display: 'inline-block' }}>
+                        <span style={{ marginRight: '10px' }}>Room: {roomInfo.name}</span>
+                        <Tag color="blue">{roomInfo.id}</Tag>
+                        {roomInfo.players.map((player: string) => (
+                            <UserIcon isHost={player === roomInfo.host} key={player} />
+                        ))}
+                    </h3>
                 )}
-                {!roomInfo && <h3>Room Manager</h3>}
+                {!roomInfo && <h3>Room</h3>}
             </div>
         );
         return (
-            <Collapse bordered={false} defaultActiveKey={['1']}>
-                <Panel header={PanelHeader} key="1" showArrow={false}>
+            <Collapse bordered={false} defaultActiveKey={['1']} style={{ marginBottom: '10px' }}>
+                <Panel
+                    header={PanelHeader}
+                    key="1"
+                    style={{
+                        background: '#f7f7f7',
+                        borderRadius: 4,
+                        border: 0,
+                        overflow: 'hidden',
+                    }}
+                >
                     {roomInfo && (
-                        <ClientContextConsumer>
-                            {({ id }) => (
-                                <React.Fragment>
-                                    {roomInfo.players.map((player: string) => (
-                                        <p key={player}>
-                                            <UserIcon isHost={player === roomInfo.host} />
-                                            <span
-                                                style={{
-                                                    border:
-                                                        id === player ? '1px solid blue' : 'none',
-                                                }}
-                                            >
-                                                {roomInfo.clientMap[player].username}
-                                            </span>{' '}
-                                            {player}{' '}
-                                        </p>
-                                    ))}
-                                </React.Fragment>
-                            )}
-                        </ClientContextConsumer>
+                        <React.Fragment>
+                            {roomInfo.players.map((player: string) => (
+                                <p key={player}>
+                                    <UserIcon isHost={player === roomInfo.host} />
+                                    <span
+                                        style={{
+                                            margin: '0 10px',
+                                        }}
+                                    >
+                                        {roomInfo.clientMap[player].username}
+                                    </span>
+                                    <Tag color="blue">{player}</Tag>
+                                </p>
+                            ))}
+                        </React.Fragment>
                     )}
                     {!roomInfo && (
                         <ClientContextConsumer>
@@ -158,7 +161,10 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                                             <Select
                                                 style={{ flex: 1 }}
                                                 onChange={this.handleGameTypeChange}
-                                                placeholder="game type"
+                                                placeholder="game"
+                                                defaultValue={
+                                                    gameTypes.length > 0 ? gameTypes[0] : undefined
+                                                }
                                             >
                                                 {gameTypes.map((gameTypeOption: string) => (
                                                     <Select.Option
@@ -172,7 +178,10 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                                             <Select
                                                 style={{ flex: 1 }}
                                                 onChange={this.handleRoomTypeChange}
-                                                placeholder="room type"
+                                                placeholder="room"
+                                                defaultValue={
+                                                    roomTypes.length > 0 ? roomTypes[0] : undefined
+                                                }
                                             >
                                                 {roomTypes.map((roomTypeOption) => (
                                                     <Select.Option

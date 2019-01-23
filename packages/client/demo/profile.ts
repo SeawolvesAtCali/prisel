@@ -33,35 +33,6 @@ export interface Profile {
 const defaultProfile: Profile = {
     actions: [
         {
-            title: 'create room',
-            fields: [
-                { label: 'room name', key: 'roomName', type: Fields.TEXT, default: 'room-1' },
-                {
-                    label: 'game',
-                    key: 'game',
-                    type: Fields.TEXT,
-                    default: 'big2',
-                },
-            ],
-            handler: (client: Client, fields: any) => {
-                client.emit(...getCreateRoom(fields.roomName, fields.game));
-            },
-        },
-        {
-            title: 'join',
-            fields: [{ label: 'room id', key: 'roomid', type: Fields.TEXT, default: 'ROOM-1' }],
-            handler: (client: Client, fields: any) => {
-                client.emit(...getJoin(fields.roomid));
-            },
-        },
-        {
-            title: 'chat',
-            fields: [{ label: 'message', key: 'msg', type: Fields.TEXT }],
-            handler: (client: Client, fields: any) => {
-                client.emit(...getChat(fields.msg));
-            },
-        },
-        {
             title: 'gameStart',
             fields: [],
             handler: (client: Client, fields: any) => {

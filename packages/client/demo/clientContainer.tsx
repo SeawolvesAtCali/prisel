@@ -8,12 +8,14 @@ import LoadingButton from './loadingButton';
 
 interface ClientContainerProps {
     profile: Profile;
+    username: string;
 }
 interface ClientContainerStates {
     fields: any;
     output: string[];
     connected: boolean;
     loggedIn: boolean;
+    userId: string;
 }
 
 function stringify(...rest: any[]): string {
@@ -30,6 +32,12 @@ export interface CustomFieldProps {
     onChange: (value: any) => void;
     value: any;
 }
+
+const ClientContext = React.createContext({ client: undefined, id: '', username: '' });
+ClientContext.displayName = 'ClientContext';
+
+export const ClientContextConsumer = ClientContext.Consumer;
+
 class ClientContainer extends React.Component<ClientContainerProps, ClientContainerStates> {
     private static getResolvedFieldsFromProfile(profile: Profile) {
         const fields: any = {};
@@ -48,6 +56,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             output: [],
             connected: false,
             loggedIn: false,
+            userId: '',
         };
     }
 
@@ -65,11 +74,20 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             },
         );
 
-        this.client.connect().then(() => {
-            this.setState({
-                connected: true,
+        this.client
+            .connect()
+            .then(() => {
+                this.setState({
+                    connected: true,
+                });
+                return this.client.login(this.props.username);
+            })
+            .then((data) => {
+                this.setState({
+                    loggedIn: true,
+                    userId: data.userId,
+                });
             });
-        });
     }
 
     public render() {
@@ -78,44 +96,38 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         const actionTiles = actions.map(this.getActionTile.bind(this));
         const { connected, loggedIn } = this.state;
 
-        const loginBox = connected && !loggedIn && (
-            <Input.Search
-                placeholder="username"
-                defaultValue="batman"
-                onSearch={(value) =>
-                    this.client.login(value).then(() => {
-                        this.setState({
-                            loggedIn: true,
-                        });
-                    })
-                }
-                enterButton="Login"
-            />
-        );
-
         return (
             <Card
-                title="Client"
+                title={`Player: ${this.props.username}`}
                 style={{ width: 400, display: 'inline-block', margin: '5px', verticalAlign: 'top' }}
-                extra={loginBox}
+                extra={<span>ID: {this.state.userId}</span>}
             >
                 {connected && loggedIn && (
-                    <React.Fragment>
-                        {actionTiles}
-                        <div
-                            style={{
-                                minHeight: '10px',
-                                background: '#000066',
-                                color: 'white',
-                                wordBreak: 'break-all',
-                                whiteSpace: 'normal',
-                            }}
-                        >
-                            {this.state.output.map((line, index) => (
-                                <p key={index}>{line}</p>
-                            ))}
-                        </div>
-                    </React.Fragment>
+                    <ClientContext.Provider
+                        value={{
+                            client: this.client,
+                            id: this.state.userId,
+                            username: this.props.username,
+                        }}
+                    >
+                        {this.props.children}
+                        <React.Fragment>
+                            {actionTiles}
+                            <div
+                                style={{
+                                    minHeight: '10px',
+                                    background: '#000066',
+                                    color: 'white',
+                                    wordBreak: 'break-all',
+                                    whiteSpace: 'normal',
+                                }}
+                            >
+                                {this.state.output.map((line, index) => (
+                                    <p key={index}>{line}</p>
+                                ))}
+                            </div>
+                        </React.Fragment>
+                    </ClientContext.Provider>
                 )}
             </Card>
         );

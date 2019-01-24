@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Collapse, Input, Icon, Select, Button, Tag } from 'antd';
-import { ClientContextConsumer } from './ClientContainer';
+import { ClientContextConsumer, addToLog } from './ClientContainer';
 import Client from '../client';
 import { getCreateRoom, getJoin } from '../message';
 import { MessageType } from '@prisel/common';
@@ -81,20 +81,22 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
         });
     }
 
-    public handleCreateRoom = (client: Client) => {
+    public handleCreateRoom = (client: Client, log: addToLog) => {
         this.listenToRoomUpdate(client);
-        client.emit(
-            ...getCreateRoom(
-                this.state.roomName,
-                this.state.gameType || undefined,
-                this.state.roomType || undefined,
-            ),
+        const [messageType, payload] = getCreateRoom(
+            this.state.roomName,
+            this.state.gameType || undefined,
+            this.state.roomType || undefined,
         );
+        client.emit(messageType, payload);
+        log(messageType, payload, 'client');
     };
 
-    public handleJoinRoom = (client: Client) => {
+    public handleJoinRoom = (client: Client, log: addToLog) => {
         this.listenToRoomUpdate(client);
-        client.emit(...getJoin(this.state.joinRoomId));
+        const [messageType, payload] = getJoin(this.state.joinRoomId);
+        client.emit(messageType, payload);
+        log(messageType, payload, 'client');
     };
 
     public componentWillUnmount() {
@@ -153,7 +155,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                     )}
                     {!roomInfo && (
                         <ClientContextConsumer>
-                            {({ client }) => (
+                            {({ client, log }) => (
                                 <React.Fragment>
                                     <div>
                                         <h3>CreateRoom</h3>
@@ -197,12 +199,14 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                                                 value={roomName}
                                                 onChange={this.handleRoomNameChange}
                                                 style={{ flex: 1 }}
-                                                onPressEnter={() => this.handleCreateRoom(client)}
+                                                onPressEnter={() =>
+                                                    this.handleCreateRoom(client, log)
+                                                }
                                             />
                                             <Button
                                                 type="primary"
                                                 icon="caret-right"
-                                                onClick={() => this.handleCreateRoom(client)}
+                                                onClick={() => this.handleCreateRoom(client, log)}
                                             />
                                         </Input.Group>
                                     </div>
@@ -213,13 +217,15 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                                                 placeholder="roomId"
                                                 value={joinRoomId}
                                                 onChange={this.handleJoinRoomIdChange}
-                                                onPressEnter={() => this.handleJoinRoom(client)}
+                                                onPressEnter={() =>
+                                                    this.handleJoinRoom(client, log)
+                                                }
                                                 style={{ flex: 1 }}
                                             />
                                             <Button
                                                 type="primary"
                                                 icon="caret-right"
-                                                onClick={() => this.handleJoinRoom(client)}
+                                                onClick={() => this.handleJoinRoom(client, log)}
                                             />
                                         </Input.Group>
                                     </div>

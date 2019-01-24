@@ -10,21 +10,20 @@ interface ClientContainerProps {
     profile: Profile;
     username: string;
 }
+export interface Log {
+    type: string;
+    payload: AnyObject;
+    origin: 'server' | 'client' | 'none';
+}
+
 interface ClientContainerStates {
     fields: any;
-    logs: any[];
+    logs: Log[];
     connected: boolean;
     loggedIn: boolean;
     userId: string;
 }
 
-function stringify(...rest: any[]): string {
-    return rest
-        .map((arg) =>
-            arg === undefined ? 'undefined' : JSON.stringify([arg]).replace(/\[(.*)\]/, '$1'),
-        )
-        .join(', ');
-}
 type offEvent = () => void;
 type MessageWatcher = (messageType: string, data: any) => void;
 export interface CustomFieldProps {
@@ -34,17 +33,25 @@ export interface CustomFieldProps {
 }
 
 export type addToLog = (
-    label: string,
-    data: AnyObject,
-    origin: 'server' | 'client' | 'N/A',
+    messageType: string,
+    payload: AnyObject,
+    origin: 'server' | 'client' | 'none',
 ) => void;
-const ClientContext = React.createContext({
+
+const ClientContext = React.createContext<{
+    client: Client;
+    userId: string;
+    username: string;
+    log: addToLog;
+    logs: Log[];
+}>({
     client: undefined,
     userId: '',
     username: '',
     log: undefined,
     logs: [],
 });
+
 ClientContext.displayName = 'ClientContext';
 
 export const ClientContextConsumer = ClientContext.Consumer;
@@ -78,7 +85,11 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             (data, messageType) => {
                 this.setState(
                     produce(this.state, (draft) => {
-                        draft.logs.push(stringify(messageType, data));
+                        draft.logs.push({
+                            type: messageType,
+                            payload: data,
+                            origin: 'server',
+                        });
                     }),
                 );
                 this.messageWatchers.forEach((messageWatcher) => messageWatcher(messageType, data));
@@ -102,18 +113,17 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
     }
 
     public handleAddToLog = (
-        label: string,
-        data: AnyObject = {},
+        type: string,
+        payload: AnyObject = {},
         origin: 'server' | 'client' | 'none' = 'none',
     ) => {
+        const newLog: Log = {
+            type,
+            payload,
+            origin,
+        };
         this.setState({
-            logs: this.state.logs.concat([
-                {
-                    label,
-                    data,
-                    origin,
-                },
-            ]),
+            logs: this.state.logs.concat([newLog]),
         });
     };
 
@@ -140,22 +150,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                         }}
                     >
                         {this.props.children}
-                        <React.Fragment>
-                            {actionTiles}
-                            <div
-                                style={{
-                                    minHeight: '10px',
-                                    background: '#000066',
-                                    color: 'white',
-                                    wordBreak: 'break-all',
-                                    whiteSpace: 'normal',
-                                }}
-                            >
-                                {this.state.logs.map((line, index) => (
-                                    <p key={index}>{line}</p>
-                                ))}
-                            </div>
-                        </React.Fragment>
+                        <React.Fragment>{actionTiles}</React.Fragment>
                     </ClientContext.Provider>
                 )}
             </Card>

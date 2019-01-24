@@ -43,6 +43,7 @@
     "devDependencies": {
         "antd": "^3.11.2",
         "react": "^16.6.3",
-        "react-dom": "^16.6.3"
+        "react-dom": "^16.6.3",
+        "react-json-view": "^1.19.1"
     }
 }

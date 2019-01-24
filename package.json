@@ -121,6 +121,7 @@
         "prettier": "^1.12.1",
         "react": "^16.6.3",
         "react-dom": "^16.6.3",
+        "react-json-view": "^1.19.1",
         "ts-jest": "^23.1.4",
         "ts-node": "^7.0.1",
         "tslint": "~5.11.0",

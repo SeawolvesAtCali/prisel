@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { ClientContextConsumer } from './clientContainer';
+import { ClientContextConsumer, Log } from './ClientContainer';
+import { Tag, List } from 'antd';
+import ReactJson from 'react-json-view';
 
 class LogDisplay extends React.Component {
     public render() {
@@ -7,13 +9,31 @@ class LogDisplay extends React.Component {
             <ClientContextConsumer>
                 {({ logs }) => {
                     return (
-                        <React.Fragment>
-                            {logs.map((log) => (
-                                <div>
-                                    <span>{log}</span>
-                                </div>
-                            ))}
-                        </React.Fragment>
+                        <List
+                            itemLayout="vertical"
+                            dataSource={logs}
+                            bordered
+                            renderItem={(log: Log) => (
+                                <List.Item>
+                                    <List.Item.Meta
+                                        title={
+                                            <div>
+                                                <span
+                                                    style={{
+                                                        marginRight: '10px',
+                                                        verticalAlign: 'bottom',
+                                                    }}
+                                                >
+                                                    {log.type}
+                                                </span>
+                                                <Tag>{log.origin}</Tag>
+                                            </div>
+                                        }
+                                    />
+                                    <ReactJson src={log.payload} collapsed name="payload" />
+                                </List.Item>
+                            )}
+                        />
                     );
                 }}
             </ClientContextConsumer>

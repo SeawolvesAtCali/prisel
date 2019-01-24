@@ -5,8 +5,16 @@ class LogDisplay extends React.Component {
     public render() {
         return (
             <ClientContextConsumer>
-                {(client) => {
-                    return <div />;
+                {({ logs }) => {
+                    return (
+                        <React.Fragment>
+                            {logs.map((log) => (
+                                <div>
+                                    <span>{log}</span>
+                                </div>
+                            ))}
+                        </React.Fragment>
+                    );
                 }}
             </ClientContextConsumer>
         );

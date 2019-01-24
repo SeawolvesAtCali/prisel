@@ -43,6 +43,7 @@ const ClientContext = React.createContext({
     userId: '',
     username: '',
     log: undefined,
+    logs: [],
 });
 ClientContext.displayName = 'ClientContext';
 
@@ -102,8 +103,8 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
 
     public handleAddToLog = (
         label: string,
-        data: AnyObject,
-        origin: 'server' | 'client' | 'none',
+        data: AnyObject = {},
+        origin: 'server' | 'client' | 'none' = 'none',
     ) => {
         this.setState({
             logs: this.state.logs.concat([
@@ -135,6 +136,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                             userId: this.state.userId,
                             username: this.props.username,
                             log: this.handleAddToLog,
+                            logs: this.state.logs,
                         }}
                     >
                         {this.props.children}

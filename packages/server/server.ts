@@ -17,7 +17,7 @@ import { GameConfig } from './utils/gameConfig';
 import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
 import ConfigManager from './utils/configManager';
 
-class Server {
+export class Server {
     private context: Context;
     private configManager = new ConfigManager();
 

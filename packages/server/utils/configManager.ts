@@ -1,6 +1,9 @@
 import { GameConfig, BaseGameConfig } from './gameConfig';
 import { RoomConfig, BaseRoomConfig } from './roomConfig';
 
+/**
+ * @external
+ */
 export default class ConfigManager {
     private gameConfigs: { [gameType: string]: GameConfig } = {
         [BaseGameConfig.type]: BaseGameConfig,

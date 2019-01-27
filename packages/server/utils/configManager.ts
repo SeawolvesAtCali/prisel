@@ -1,7 +1,7 @@
 import { GameConfig, BaseGameConfig } from './gameConfig';
 import { RoomConfig, BaseRoomConfig } from './roomConfig';
 
-export default class ConfigManager {
+class ConfigManager {
     private gameConfigs: { [gameType: string]: GameConfig } = {
         [BaseGameConfig.type]: BaseGameConfig,
     };
@@ -33,3 +33,5 @@ export default class ConfigManager {
         }
     }
 }
+
+export default ConfigManager;

@@ -29,7 +29,8 @@
         "start": "env DEBUG=debug ts-node demo.ts",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
-        "fix": "tslint --project tsconfig.json --fix"
+        "fix": "tslint --project tsconfig.json --fix",
+        "docgen": "typedoc index.ts"
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
@@ -45,6 +46,8 @@
         "ws": "^6.1.2"
     },
     "devDependencies": {
-        "@types/koa": "^2.0.47"
+        "@types/koa": "^2.0.47",
+        "typedoc": "^0.14.2",
+        "typedoc-plugin-markdown": "^1.1.25"
     }
 }

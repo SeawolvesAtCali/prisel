@@ -7,7 +7,6 @@ import {
     watchForDisconnection,
     getConnectionToken,
     emit,
-    broadcast,
 } from './utils/networkUtils';
 import clientHandlerRegister, { Handler } from './clientHandlerRegister';
 import { parsePacket } from '@prisel/common';
@@ -16,11 +15,28 @@ import { getWelcome } from './message/room';
 import { GameConfig } from './utils/gameConfig';
 import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
 import ConfigManager from './utils/configManager';
+import { RoomId } from './objects/room';
 
-class Server {
+/**
+ * Server is a wrapper on top of the websocket server.
+ * It provides utilities to control the server lifecycle.
+ *
+ * To create a server, simply call the constructor
+ *
+ * ```js
+ * import { Server } from '@prisel/server';
+ * const server = new Server();
+ * // Calling server.start() starts the server
+ * server.start();
+ * ```
+ */
+export class Server {
     private context: Context;
     private configManager = new ConfigManager();
 
+    /**
+     * Start the server and setup listeners for websocket events.
+     */
     public start() {
         const server = createServer();
         const context: Context = createContext({
@@ -68,22 +84,20 @@ class Server {
         });
     }
 
+    /**
+     * Register a game to the server. If the game requires special room configuration,
+     * a room configuration can also be provided.
+     * @param game game configuration.
+     * @param room room configuration, if not provided, the base room configuration will be used.
+     */
     public register(game: GameConfig, room: RoomConfig = BaseRoomConfig) {
         this.configManager.add(game, room);
     }
 
-    public broadcast(roomId: any, messageType: string, data: any) {
-        if (this.context) {
-            broadcast(this.context, roomId, messageType, data);
-        }
-    }
-
-    public emit(client: Socket, messageType: string, data: any) {
-        if (this.context) {
-            emit(client, messageType, data);
-        }
-    }
-
+    /**
+     * Close the server. After a server is closed, it cannot be restarted.
+     * If we need to start a new server, a new Server instance needs to be created.
+     */
     public close() {
         if (this.context) {
             this.context.server.close();

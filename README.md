@@ -34,8 +34,7 @@ $ npm i @prisel/server
 ```javascript
 import { Server } from '@prisel/server';
 
-const server = new Server();
-server.start(); // server will start at ws://localhost:3000
+const server = new Server(); // server will start at ws://localhost:3000
 ```
 
 More server docs see `@prisel/server`

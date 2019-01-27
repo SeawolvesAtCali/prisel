@@ -24,7 +24,7 @@
 
 **● connections**: *`object`*
 
-*Defined in [objects/stateManager.ts:5](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/stateManager.ts#L5)*
+*Defined in [objects/stateManager.ts:5](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/stateManager.ts#L5)*
 
 #### Type declaration
 
@@ -37,7 +37,7 @@ ___
 
 **● messages**: *`string`[]*
 
-*Defined in [objects/stateManager.ts:6](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/stateManager.ts#L6)*
+*Defined in [objects/stateManager.ts:6](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/stateManager.ts#L6)*
 
 ___
 <a id="rooms"></a>
@@ -46,7 +46,7 @@ ___
 
 **● rooms**: *`object`*
 
-*Defined in [objects/stateManager.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/stateManager.ts#L7)*
+*Defined in [objects/stateManager.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/stateManager.ts#L7)*
 
 #### Type declaration
 

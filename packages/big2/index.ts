@@ -3,4 +3,3 @@ import Big2 from './game';
 
 const server = new Server();
 server.register(Big2);
-server.start();

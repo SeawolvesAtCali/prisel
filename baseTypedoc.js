@@ -4,7 +4,6 @@ module.exports = {
     theme: 'markdown',
     ignoreCompilerErrors: 'true',
     excludeNotExported: 'true',
-    excludeExternal: 'true',
     excludePrivate: 'true',
     tsconfig: 'tsconfig.json',
 };

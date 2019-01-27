@@ -27,7 +27,7 @@
 
 **● SocketManager**: *`SocketManager`*
 
-*Defined in [objects/context.ts:10](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/context.ts#L10)*
+*Defined in [objects/context.ts:10](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/context.ts#L10)*
 
 ___
 <a id="statemanager"></a>
@@ -36,7 +36,7 @@ ___
 
 **● StateManager**: *[StateManager](statemanager.md)*
 
-*Defined in [objects/context.ts:11](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/context.ts#L11)*
+*Defined in [objects/context.ts:11](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/context.ts#L11)*
 
 ___
 <a id="getconfigs"></a>
@@ -45,7 +45,7 @@ ___
 
 **● getConfigs**: *`function`*
 
-*Defined in [objects/context.ts:19](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/context.ts#L19)*
+*Defined in [objects/context.ts:19](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/context.ts#L19)*
 
 #### Type declaration
 ▸(gameType: *`string`*, roomType?: *`string`*): `object`
@@ -66,7 +66,7 @@ ___
 
 **● handles**: *`object`*
 
-*Defined in [objects/context.ts:13](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/context.ts#L13)*
+*Defined in [objects/context.ts:13](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/context.ts#L13)*
 
 #### Type declaration
 
@@ -79,7 +79,7 @@ ___
 
 **● server**: *[wsServer](../#wsserver)*
 
-*Defined in [objects/context.ts:12](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/context.ts#L12)*
+*Defined in [objects/context.ts:12](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/context.ts#L12)*
 
 ___
 <a id="updatestate"></a>
@@ -88,7 +88,7 @@ ___
 
 **● updateState**: *`function`*
 
-*Defined in [objects/context.ts:16](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/context.ts#L16)*
+*Defined in [objects/context.ts:16](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/context.ts#L16)*
 
 #### Type declaration
 ▸(updater: *`function`*): [StateManager](statemanager.md)

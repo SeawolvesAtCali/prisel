@@ -19,7 +19,7 @@
 
 **GAME**: 
 
-*Defined in [objects/gamePhase.ts:2](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/gamePhase.ts#L2)*
+*Defined in [objects/gamePhase.ts:2](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/gamePhase.ts#L2)*
 
 ___
 <a id="waiting"></a>
@@ -28,7 +28,7 @@ ___
 
 **WAITING**: 
 
-*Defined in [objects/gamePhase.ts:3](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/gamePhase.ts#L3)*
+*Defined in [objects/gamePhase.ts:3](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/gamePhase.ts#L3)*
 
 ___
 

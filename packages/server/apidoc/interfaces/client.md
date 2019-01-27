@@ -25,7 +25,7 @@
 
 **● id**: *[ClientId](../#clientid)*
 
-*Defined in [objects/client.ts:4](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/client.ts#L4)*
+*Defined in [objects/client.ts:4](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/client.ts#L4)*
 
 ___
 <a id="isready"></a>
@@ -34,7 +34,7 @@ ___
 
 **● isReady**: *`boolean`*
 
-*Defined in [objects/client.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/client.ts#L7)*
+*Defined in [objects/client.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/client.ts#L7)*
 
 ___
 <a id="roomid"></a>
@@ -43,7 +43,7 @@ ___
 
 **● roomId**: *`string`*
 
-*Defined in [objects/client.ts:6](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/client.ts#L6)*
+*Defined in [objects/client.ts:6](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/client.ts#L6)*
 
 ___
 <a id="username"></a>
@@ -52,7 +52,7 @@ ___
 
 **● username**: *`string`*
 
-*Defined in [objects/client.ts:5](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/client.ts#L5)*
+*Defined in [objects/client.ts:5](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/client.ts#L5)*
 
 ___
 

@@ -8,7 +8,6 @@
 
 ### Classes
 
-* [ConfigManager](classes/configmanager.md)
 * [Server](classes/server.md)
 
 ### Interfaces
@@ -81,7 +80,7 @@
 
 **Ƭ ClientId**: *`string`*
 
-*Defined in [objects/client.ts:1](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/client.ts#L1)*
+*Defined in [objects/client.ts:1](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/client.ts#L1)*
 
 ___
 <a id="gameconfig"></a>
@@ -90,7 +89,7 @@ ___
 
 **Ƭ GameConfig**: *`Partial`<`FullGameConfig`>*
 
-*Defined in [utils/gameConfig.ts:48](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L48)*
+*Defined in [utils/gameConfig.ts:48](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L48)*
 
 ___
 <a id="handler"></a>
@@ -99,7 +98,7 @@ ___
 
 **Ƭ Handler**: *`function`*
 
-*Defined in [clientHandlerRegister.ts:3](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/clientHandlerRegister.ts#L3)*
+*Defined in [clientHandlerRegister.ts:3](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/clientHandlerRegister.ts#L3)*
 
 #### Type declaration
 ▸(context: *[Context](interfaces/context.md)*, socket: *`Socket`*): `function`
@@ -120,7 +119,7 @@ ___
 
 **Ƭ Message**: *[`MessageType`, `object`]*
 
-*Defined in [objects/message.ts:3](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/message.ts#L3)*
+*Defined in [objects/message.ts:3](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/message.ts#L3)*
 
 ___
 <a id="roomconfig"></a>
@@ -129,7 +128,7 @@ ___
 
 **Ƭ RoomConfig**: *`Partial`<`FullRoomConfig`>*
 
-*Defined in [utils/roomConfig.ts:19](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/roomConfig.ts#L19)*
+*Defined in [utils/roomConfig.ts:19](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/roomConfig.ts#L19)*
 
 ___
 <a id="roomid"></a>
@@ -138,7 +137,7 @@ ___
 
 **Ƭ RoomId**: *`string`*
 
-*Defined in [objects/room.ts:1](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/room.ts#L1)*
+*Defined in [objects/room.ts:1](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/room.ts#L1)*
 
 ___
 <a id="wsserver"></a>
@@ -147,7 +146,7 @@ ___
 
 **Ƭ wsServer**: *`Server`*
 
-*Defined in [objects/server.ts:3](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/objects/server.ts#L3)*
+*Defined in [objects/server.ts:3](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/objects/server.ts#L3)*
 
 ___
 
@@ -159,7 +158,7 @@ ___
 
 ▸ **addRoom**(context: *[Context](interfaces/context.md)*, roomName: *`string`*): [Room](interfaces/room.md)
 
-*Defined in [utils/stateUtils.ts:51](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/stateUtils.ts#L51)*
+*Defined in [utils/stateUtils.ts:51](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/stateUtils.ts#L51)*
 
 **Parameters:**
 
@@ -177,7 +176,7 @@ ___
 
 ▸ **broadcast**(context: *[Context](interfaces/context.md)*, roomId: *`string`*, messageType: *`string`*, data: *`any`*): `void`
 
-*Defined in [utils/networkUtils.ts:70](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/networkUtils.ts#L70)*
+*Defined in [utils/networkUtils.ts:70](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/networkUtils.ts#L70)*
 
 **Parameters:**
 
@@ -197,7 +196,7 @@ ___
 
 ▸ **closeSocket**(socket: *`WebSocket`*): `void`
 
-*Defined in [utils/networkUtils.ts:83](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/networkUtils.ts#L83)*
+*Defined in [utils/networkUtils.ts:83](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/networkUtils.ts#L83)*
 
 **Parameters:**
 
@@ -214,7 +213,7 @@ ___
 
 ▸ **createServer**(__namedParameters?: *`object`*): [wsServer](#wsserver)
 
-*Defined in [utils/networkUtils.ts:8](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/networkUtils.ts#L8)*
+*Defined in [utils/networkUtils.ts:8](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/networkUtils.ts#L8)*
 
 **Parameters:**
 
@@ -231,7 +230,7 @@ ___
 
 ▸ **emit**(client: *`WebSocket`*, messageType: *`string`*, data: *`any`*): `void`
 
-*Defined in [utils/networkUtils.ts:63](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/networkUtils.ts#L63)*
+*Defined in [utils/networkUtils.ts:63](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/networkUtils.ts#L63)*
 
 Utility functions to perform network calls.
 
@@ -252,7 +251,7 @@ ___
 
 ▸ **getBroadcastMessage**(username: *`string`*, message: *`string`*): [Message](#message)
 
-*Defined in [message/chat.ts:4](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/chat.ts#L4)*
+*Defined in [message/chat.ts:4](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/chat.ts#L4)*
 
 **Parameters:**
 
@@ -270,7 +269,7 @@ ___
 
 ▸ **getClient**(context: *[Context](interfaces/context.md)*, client: *`Socket`*): [Client](interfaces/client.md)
 
-*Defined in [utils/stateUtils.ts:14](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/stateUtils.ts#L14)*
+*Defined in [utils/stateUtils.ts:14](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/stateUtils.ts#L14)*
 
 Get the client from the StateManager using client's socket connection.
 
@@ -290,7 +289,7 @@ ___
 
 ▸ **getConnectionToken**(): `ConnectionToken`
 
-*Defined in [utils/networkUtils.ts:29](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/networkUtils.ts#L29)*
+*Defined in [utils/networkUtils.ts:29](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/networkUtils.ts#L29)*
 
 **Returns:** `ConnectionToken`
 
@@ -301,7 +300,7 @@ ___
 
 ▸ **getCreateRoomSuccess**(roomId: *`string`*): [`MessageType`, `object`]
 
-*Defined in [message/room.ts:66](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L66)*
+*Defined in [message/room.ts:66](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L66)*
 
 Success response for client creating room
 
@@ -320,7 +319,7 @@ ___
 
 ▸ **getFailure**(action: *`MessageType`*, error: *`string`*): [Message](#message)
 
-*Defined in [message/room.ts:19](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L19)*
+*Defined in [message/room.ts:19](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L19)*
 
 **Parameters:**
 
@@ -338,7 +337,7 @@ ___
 
 ▸ **getGameStartSuccess**(): [`MessageType`, `object`]
 
-*Defined in [message/room.ts:59](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L59)*
+*Defined in [message/room.ts:59](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L59)*
 
 Host start the game
 
@@ -351,7 +350,7 @@ ___
 
 ▸ **getGameState**(gameState: *`object`*): [Message](#message)
 
-*Defined in [message/game.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/game.ts#L7)*
+*Defined in [message/game.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/game.ts#L7)*
 
 Update client on current game state
 
@@ -370,7 +369,7 @@ ___
 
 ▸ **getHandle**(context: *[Context](interfaces/context.md)*, client: *`Socket`*): `Handle`
 
-*Defined in [utils/stateUtils.ts:44](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/stateUtils.ts#L44)*
+*Defined in [utils/stateUtils.ts:44](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/stateUtils.ts#L44)*
 
 **Parameters:**
 
@@ -388,7 +387,7 @@ ___
 
 ▸ **getJoinSuccess**(): [`MessageType`, `object`]
 
-*Defined in [message/room.ts:33](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L33)*
+*Defined in [message/room.ts:33](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L33)*
 
 Success response for client joining room
 
@@ -401,7 +400,7 @@ ___
 
 ▸ **getKickSuccess**(): [`MessageType`, `object`]
 
-*Defined in [message/room.ts:46](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L46)*
+*Defined in [message/room.ts:46](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L46)*
 
 Host successfully kick a user out of the room
 
@@ -414,7 +413,7 @@ ___
 
 ▸ **getLeaveSuccess**(): [`MessageType`, `object`]
 
-*Defined in [message/room.ts:40](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L40)*
+*Defined in [message/room.ts:40](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L40)*
 
 Success response for client leaving room
 
@@ -427,7 +426,7 @@ ___
 
 ▸ **getLoginSuccess**(userId: *`string`*): [`MessageType`, `object`]
 
-*Defined in [message/room.ts:27](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L27)*
+*Defined in [message/room.ts:27](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L27)*
 
 Success response for client login
 
@@ -446,7 +445,7 @@ ___
 
 ▸ **getMessage**(data: *`any`*): [Message](#message)
 
-*Defined in [message/room.ts:74](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L74)*
+*Defined in [message/room.ts:74](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L74)*
 
 **Parameters:**
 
@@ -463,7 +462,7 @@ ___
 
 ▸ **getReadySuccess**(): [`MessageType`, `object`]
 
-*Defined in [message/room.ts:53](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L53)*
+*Defined in [message/room.ts:53](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L53)*
 
 Success response for client ready
 
@@ -476,7 +475,7 @@ ___
 
 ▸ **getRoom**(context: *[Context](interfaces/context.md)*, client: *`Socket`*): [Room](interfaces/room.md)
 
-*Defined in [utils/stateUtils.ts:30](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/stateUtils.ts#L30)*
+*Defined in [utils/stateUtils.ts:30](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/stateUtils.ts#L30)*
 
 Get the client's room from the StateManager using client's socket connection.
 
@@ -496,7 +495,7 @@ ___
 
 ▸ **getRoomUpdate**(roomData: *`object`*): [Message](#message)
 
-*Defined in [message/room.ts:70](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L70)*
+*Defined in [message/room.ts:70](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L70)*
 
 **Parameters:**
 
@@ -513,7 +512,7 @@ ___
 
 ▸ **getSuccess**(action: *`MessageType`*, data: *`object`*): [Message](#message)
 
-*Defined in [message/room.ts:15](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L15)*
+*Defined in [message/room.ts:15](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L15)*
 
 **Parameters:**
 
@@ -531,7 +530,7 @@ ___
 
 ▸ **getWelcome**(): [Message](#message)
 
-*Defined in [message/room.ts:11](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/message/room.ts#L11)*
+*Defined in [message/room.ts:11](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/message/room.ts#L11)*
 
 functions to create messages. Each function should return an array. The first parameter of the array is the type of the message, the rest are the content
 
@@ -544,7 +543,7 @@ ___
 
 ▸ **handleChat**(context: *[Context](interfaces/context.md)*, client: *`Socket`*): `(Anonymous function)`
 
-*Defined in [handler/handleChat.ts:8](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/handler/handleChat.ts#L8)*
+*Defined in [handler/handleChat.ts:8](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/handler/handleChat.ts#L8)*
 
 **Parameters:**
 
@@ -562,7 +561,7 @@ ___
 
 ▸ **handleCreateRoom**(context: *[Context](interfaces/context.md)*, socket: *`Socket`*): `(Anonymous function)`
 
-*Defined in [handler/handleCreateRoom.ts:15](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/handler/handleCreateRoom.ts#L15)*
+*Defined in [handler/handleCreateRoom.ts:15](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/handler/handleCreateRoom.ts#L15)*
 
 **Parameters:**
 
@@ -580,7 +579,7 @@ ___
 
 ▸ **handleDisconnect**(context: *[Context](interfaces/context.md)*, socket: *`Socket`*): `(Anonymous function)`
 
-*Defined in [handler/handleDisconnect.ts:9](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/handler/handleDisconnect.ts#L9)*
+*Defined in [handler/handleDisconnect.ts:9](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/handler/handleDisconnect.ts#L9)*
 
 Handles client disconnection when client disconnects unexpectedly
 
@@ -600,7 +599,7 @@ ___
 
 ▸ **handleExit**(context: *[Context](interfaces/context.md)*, socket: *`Socket`*): `(Anonymous function)`
 
-*Defined in [handler/handleExit.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/handler/handleExit.ts#L7)*
+*Defined in [handler/handleExit.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/handler/handleExit.ts#L7)*
 
 **Parameters:**
 
@@ -618,7 +617,7 @@ ___
 
 ▸ **handleJoin**(context: *[Context](interfaces/context.md)*, socket: *`Socket`*): `(Anonymous function)`
 
-*Defined in [handler/handleJoin.ts:12](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/handler/handleJoin.ts#L12)*
+*Defined in [handler/handleJoin.ts:12](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/handler/handleJoin.ts#L12)*
 
 **Parameters:**
 
@@ -636,7 +635,7 @@ ___
 
 ▸ **handleLeave**(context: *[Context](interfaces/context.md)*, socket: *`Socket`*): `(Anonymous function)`
 
-*Defined in [handler/handleLeave.ts:8](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/handler/handleLeave.ts#L8)*
+*Defined in [handler/handleLeave.ts:8](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/handler/handleLeave.ts#L8)*
 
 **Parameters:**
 
@@ -654,7 +653,7 @@ ___
 
 ▸ **handleLogin**(context: *[Context](interfaces/context.md)*, client: *`Socket`*): `(Anonymous function)`
 
-*Defined in [handler/handleLogin.ts:11](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/handler/handleLogin.ts#L11)*
+*Defined in [handler/handleLogin.ts:11](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/handler/handleLogin.ts#L11)*
 
 **Parameters:**
 
@@ -672,7 +671,7 @@ ___
 
 ▸ **newId**<`T`>(type: *`string`*): `T`
 
-*Defined in [utils/idUtils.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/idUtils.ts#L7)*
+*Defined in [utils/idUtils.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/idUtils.ts#L7)*
 
 **Type parameters:**
 
@@ -692,7 +691,7 @@ ___
 
 ▸ **parseId**<`T`>(id: *`T`*): `object`
 
-*Defined in [utils/idUtils.ts:16](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/idUtils.ts#L16)*
+*Defined in [utils/idUtils.ts:16](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/idUtils.ts#L16)*
 
 **Type parameters:**
 
@@ -712,7 +711,7 @@ ___
 
 ▸ **updateClientWithRoomData**(context: *[Context](interfaces/context.md)*, roomId: *`string`*): `void`
 
-*Defined in [utils/updateUtils.ts:12](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/updateUtils.ts#L12)*
+*Defined in [utils/updateUtils.ts:12](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/updateUtils.ts#L12)*
 
 **Parameters:**
 
@@ -730,7 +729,7 @@ ___
 
 ▸ **watchForDisconnection**(socket: *`WebSocket`*, connectionToken: *`ConnectionToken`*): `Promise`<`Object`>
 
-*Defined in [utils/networkUtils.ts:41](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/networkUtils.ts#L41)*
+*Defined in [utils/networkUtils.ts:41](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/networkUtils.ts#L41)*
 
 **Parameters:**
 
@@ -751,7 +750,7 @@ ___
 
 **BaseGameConfig**: *`object`*
 
-*Defined in [utils/gameConfig.ts:50](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L50)*
+*Defined in [utils/gameConfig.ts:50](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L50)*
 
 <a id="basegameconfig.maxplayers"></a>
 
@@ -759,7 +758,7 @@ ___
 
 **● maxPlayers**: *`number`* = 10
 
-*Defined in [utils/gameConfig.ts:52](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L52)*
+*Defined in [utils/gameConfig.ts:52](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L52)*
 
 ___
 <a id="basegameconfig.type"></a>
@@ -768,7 +767,7 @@ ___
 
 **● type**: *`string`* = "game"
 
-*Defined in [utils/gameConfig.ts:51](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L51)*
+*Defined in [utils/gameConfig.ts:51](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L51)*
 
 ___
 <a id="basegameconfig.canstart"></a>
@@ -777,7 +776,7 @@ ___
 
 ▸ **canStart**(handle: *`Handle`*): `true`
 
-*Defined in [utils/gameConfig.ts:56](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L56)*
+*Defined in [utils/gameConfig.ts:56](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L56)*
 
 **Parameters:**
 
@@ -794,7 +793,7 @@ ___
 
 ▸ **onAddPlayer**(handle: *`Handle`*, player: *`string`*): `void`
 
-*Defined in [utils/gameConfig.ts:62](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L62)*
+*Defined in [utils/gameConfig.ts:62](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L62)*
 
 **Parameters:**
 
@@ -812,7 +811,7 @@ ___
 
 ▸ **onEnd**(handle: *`Handle`*): `void`
 
-*Defined in [utils/gameConfig.ts:60](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L60)*
+*Defined in [utils/gameConfig.ts:60](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L60)*
 
 **Parameters:**
 
@@ -829,7 +828,7 @@ ___
 
 ▸ **onMessage**(handle: *`Handle`*, player: *`string`*, data: *`any`*): `void`
 
-*Defined in [utils/gameConfig.ts:61](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L61)*
+*Defined in [utils/gameConfig.ts:61](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L61)*
 
 **Parameters:**
 
@@ -848,7 +847,7 @@ ___
 
 ▸ **onRemovePlayer**(handle: *`Handle`*, player: *`string`*): `void`
 
-*Defined in [utils/gameConfig.ts:63](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L63)*
+*Defined in [utils/gameConfig.ts:63](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L63)*
 
 **Parameters:**
 
@@ -866,7 +865,7 @@ ___
 
 ▸ **onSetup**(handle: *`Handle`*): `object`
 
-*Defined in [utils/gameConfig.ts:53](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L53)*
+*Defined in [utils/gameConfig.ts:53](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L53)*
 
 **Parameters:**
 
@@ -883,7 +882,7 @@ ___
 
 ▸ **onStart**(handle: *`Handle`*): `void`
 
-*Defined in [utils/gameConfig.ts:59](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/gameConfig.ts#L59)*
+*Defined in [utils/gameConfig.ts:59](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/gameConfig.ts#L59)*
 
 **Parameters:**
 
@@ -902,7 +901,7 @@ ___
 
 **BaseRoomConfig**: *`object`*
 
-*Defined in [utils/roomConfig.ts:21](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/roomConfig.ts#L21)*
+*Defined in [utils/roomConfig.ts:21](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/roomConfig.ts#L21)*
 
 <a id="baseroomconfig.type"></a>
 
@@ -910,7 +909,7 @@ ___
 
 **● type**: *`string`* = "room"
 
-*Defined in [utils/roomConfig.ts:22](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/roomConfig.ts#L22)*
+*Defined in [utils/roomConfig.ts:22](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/roomConfig.ts#L22)*
 
 ___
 <a id="baseroomconfig.oncreate"></a>
@@ -919,7 +918,7 @@ ___
 
 ▸ **onCreate**(handle: *`Handle`*, client: *`string`*, data: *`any`*): `void`
 
-*Defined in [utils/roomConfig.ts:23](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/roomConfig.ts#L23)*
+*Defined in [utils/roomConfig.ts:23](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/roomConfig.ts#L23)*
 
 **Parameters:**
 
@@ -938,7 +937,7 @@ ___
 
 ▸ **onGameStart**(handle: *`Handle`*, client: *`string`*, data: *`any`*): `void`
 
-*Defined in [utils/roomConfig.ts:50](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/roomConfig.ts#L50)*
+*Defined in [utils/roomConfig.ts:50](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/roomConfig.ts#L50)*
 
 **Parameters:**
 
@@ -957,7 +956,7 @@ ___
 
 ▸ **onJoin**(handle: *`Handle`*, client: *`string`*, data: *`any`*): `void`
 
-*Defined in [utils/roomConfig.ts:29](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/roomConfig.ts#L29)*
+*Defined in [utils/roomConfig.ts:29](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/roomConfig.ts#L29)*
 
 **Parameters:**
 
@@ -976,7 +975,7 @@ ___
 
 ▸ **onLeave**(handle: *`Handle`*, client: *`string`*, data: *`any`*): `void`
 
-*Defined in [utils/roomConfig.ts:41](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/roomConfig.ts#L41)*
+*Defined in [utils/roomConfig.ts:41](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/roomConfig.ts#L41)*
 
 **Parameters:**
 
@@ -995,7 +994,7 @@ ___
 
 ▸ **onMessage**(handle: *`Handle`*, client: *`string`*, data: *`any`*): `void`
 
-*Defined in [utils/roomConfig.ts:64](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/utils/roomConfig.ts#L64)*
+*Defined in [utils/roomConfig.ts:64](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/utils/roomConfig.ts#L64)*
 
 **Parameters:**
 

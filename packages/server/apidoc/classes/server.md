@@ -26,7 +26,7 @@
 
 ▸ **broadcast**(roomId: *`any`*, messageType: *`string`*, data: *`any`*): `void`
 
-*Defined in [server.ts:75](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/server.ts#L75)*
+*Defined in [server.ts:75](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L75)*
 
 **Parameters:**
 
@@ -45,7 +45,7 @@ ___
 
 ▸ **close**(): `void`
 
-*Defined in [server.ts:87](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/server.ts#L87)*
+*Defined in [server.ts:87](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L87)*
 
 **Returns:** `void`
 
@@ -56,7 +56,7 @@ ___
 
 ▸ **emit**(client: *`Socket`*, messageType: *`string`*, data: *`any`*): `void`
 
-*Defined in [server.ts:81](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/server.ts#L81)*
+*Defined in [server.ts:81](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L81)*
 
 **Parameters:**
 
@@ -75,7 +75,7 @@ ___
 
 ▸ **register**(game: *[GameConfig](../#gameconfig)*, room?: *[RoomConfig](../#roomconfig)*): `void`
 
-*Defined in [server.ts:71](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/server.ts#L71)*
+*Defined in [server.ts:71](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L71)*
 
 **Parameters:**
 
@@ -93,7 +93,7 @@ ___
 
 ▸ **start**(): `void`
 
-*Defined in [server.ts:24](https://github.com/SeawolvesAtCali/prisel/blob/363ed4a/packages/server/server.ts#L24)*
+*Defined in [server.ts:24](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L24)*
 
 **Returns:** `void`
 

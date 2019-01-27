@@ -27,7 +27,7 @@
 
 **● gamePhase**: *[GAME_PHASE](../enums/game_phase.md)*
 
-*Defined in [objects/room.ts:9](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/room.ts#L9)*
+*Defined in [objects/room.ts:9](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/room.ts#L9)*
 
 ___
 <a id="gamestate"></a>
@@ -36,7 +36,7 @@ ___
 
 **● gameState**: *`any`*
 
-*Defined in [objects/room.ts:10](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/room.ts#L10)*
+*Defined in [objects/room.ts:10](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/room.ts#L10)*
 
 ___
 <a id="host"></a>
@@ -45,7 +45,7 @@ ___
 
 **● host**: *[ClientId](../#clientid)*
 
-*Defined in [objects/room.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/room.ts#L7)*
+*Defined in [objects/room.ts:7](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/room.ts#L7)*
 
 ___
 <a id="id"></a>
@@ -54,7 +54,7 @@ ___
 
 **● id**: *[RoomId](../#roomid)*
 
-*Defined in [objects/room.ts:5](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/room.ts#L5)*
+*Defined in [objects/room.ts:5](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/room.ts#L5)*
 
 ___
 <a id="name"></a>
@@ -63,7 +63,7 @@ ___
 
 **● name**: *`string`*
 
-*Defined in [objects/room.ts:6](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/room.ts#L6)*
+*Defined in [objects/room.ts:6](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/room.ts#L6)*
 
 ___
 <a id="players"></a>
@@ -72,7 +72,7 @@ ___
 
 **● players**: *[ClientId](../#clientid)[]*
 
-*Defined in [objects/room.ts:8](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/objects/room.ts#L8)*
+*Defined in [objects/room.ts:8](https://github.com/SeawolvesAtCali/prisel/blob/4f2b043/packages/server/objects/room.ts#L8)*
 
 ___
 

@@ -2,6 +2,17 @@
 
 # Class: Server
 
+Server is a wrapper on top of the websocket server. It provides utilities to control the server lifecycle.
+
+To create a server, simply call the constructor
+
+```js
+import { Server } from '@prisel/server';
+const server = new Server();
+// Calling server.start() starts the server
+server.start();
+```
+
 ## Hierarchy
 
 **Server**
@@ -10,9 +21,7 @@
 
 ### Methods
 
-* [broadcast](server.md#broadcast)
 * [close](server.md#close)
-* [emit](server.md#emit)
 * [register](server.md#register)
 * [start](server.md#start)
 
@@ -20,51 +29,15 @@
 
 ## Methods
 
-<a id="broadcast"></a>
-
-###  broadcast
-
-▸ **broadcast**(roomId: *`any`*, messageType: *`string`*, data: *`any`*): `void`
-
-*Defined in [server.ts:75](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L75)*
-
-**Parameters:**
-
-| Name | Type |
-| ------ | ------ |
-| roomId | `any` |
-| messageType | `string` |
-| data | `any` |
-
-**Returns:** `void`
-
-___
 <a id="close"></a>
 
 ###  close
 
 ▸ **close**(): `void`
 
-*Defined in [server.ts:87](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L87)*
+*Defined in [server.ts:101](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/server.ts#L101)*
 
-**Returns:** `void`
-
-___
-<a id="emit"></a>
-
-###  emit
-
-▸ **emit**(client: *`Socket`*, messageType: *`string`*, data: *`any`*): `void`
-
-*Defined in [server.ts:81](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L81)*
-
-**Parameters:**
-
-| Name | Type |
-| ------ | ------ |
-| client | `Socket` |
-| messageType | `string` |
-| data | `any` |
+Close the server. After a server is closed, it cannot be restarted. If we need to start a new server, a new Server instance needs to be created.
 
 **Returns:** `void`
 
@@ -75,14 +48,16 @@ ___
 
 ▸ **register**(game: *[GameConfig](../#gameconfig)*, room?: *[RoomConfig](../#roomconfig)*): `void`
 
-*Defined in [server.ts:71](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L71)*
+*Defined in [server.ts:93](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/server.ts#L93)*
+
+Register a game to the server. If the game requires special room configuration, a room configuration can also be provided.
 
 **Parameters:**
 
-| Name | Type | Default value |
-| ------ | ------ | ------ |
-| game | [GameConfig](../#gameconfig) | - |
-| `Default value` room | [RoomConfig](../#roomconfig) |  BaseRoomConfig |
+| Name | Type | Default value | Description |
+| ------ | ------ | ------ | ------ |
+| game | [GameConfig](../#gameconfig) | - |  game configuration. |
+| `Default value` room | [RoomConfig](../#roomconfig) |  BaseRoomConfig |  room configuration, if not provided, the base room configuration will be used. |
 
 **Returns:** `void`
 
@@ -93,7 +68,9 @@ ___
 
 ▸ **start**(): `void`
 
-*Defined in [server.ts:24](https://github.com/SeawolvesAtCali/prisel/blob/4c45c20/packages/server/server.ts#L24)*
+*Defined in [server.ts:40](https://github.com/SeawolvesAtCali/prisel/blob/cb69e5a/packages/server/server.ts#L40)*
+
+Start the server and setup listeners for websocket events.
 
 **Returns:** `void`
 

@@ -4,7 +4,6 @@ import defaultProfile from './profile';
 import RoomManager from './RoomManager';
 import { produce } from 'immer';
 import GameStartButton from './GameStartButton';
-import LogDisplay from './LogDisplay';
 
 interface AppState {
     clients: number[];

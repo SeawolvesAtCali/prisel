@@ -36,14 +36,18 @@
     },
     "dependencies": {
         "@prisel/common": "file:../common",
+        "antd": "^3.11.2",
         "debug": "^4.1.0",
         "immer": "^1.8.2",
-        "lodash": "^4.17.11"
+        "lodash": "^4.17.11",
+        "react-json-view": "^1.19.1"
     },
     "devDependencies": {
-        "antd": "^3.11.2",
         "react": "^16.6.3",
-        "react-dom": "^16.6.3",
-        "react-json-view": "^1.19.1"
+        "react-dom": "^16.6.3"
+    },
+    "peerDependencies": {
+        "react": "^16.6.3",
+        "react-dom": "^16.6.3"
     }
 }

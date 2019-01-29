@@ -1,14 +1,13 @@
 import * as React from 'react';
 import pick from 'lodash/pick';
 import { produce } from 'immer';
-import { Card, InputNumber, Input, Button, Row, Col, Tag, Icon } from 'antd';
+import { Card, InputNumber, Input, Row, Col, Tag } from 'antd';
 import { Profile, FieldType, Fields, ActionType } from './profile';
 import Client, { AnyObject } from '../client';
 import LoadingButton from './loadingButton';
 import LogDisplay from './LogDisplay';
 
 interface ClientContainerProps {
-    profile: Profile;
     username: string;
 }
 export interface Log {
@@ -46,13 +45,11 @@ const ClientContext = React.createContext<{
     userId: string;
     username: string;
     log: addToLog;
-    logs: Log[];
 }>({
     client: undefined,
     userId: '',
     username: '',
     log: undefined,
-    logs: [],
 });
 
 ClientContext.displayName = 'ClientContext';
@@ -144,9 +141,6 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
     };
 
     public render() {
-        const { profile } = this.props;
-        const { actions } = profile;
-        const actionTiles = actions.map(this.getActionTile.bind(this));
         const { connected, loggedIn, tab } = this.state;
 
         return (
@@ -165,11 +159,14 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                             userId: this.state.userId,
                             username: this.props.username,
                             log: this.handleAddToLog,
-                            logs: this.state.logs,
                         }}
                     >
-                        {tab === 'detail' && this.props.children}
-                        {tab === 'log' && <LogDisplay />}
+                        <div style={{ display: tab === 'detail' ? 'block' : 'none' }}>
+                            {this.props.children}
+                        </div>
+                        <div style={{ display: tab === 'log' ? 'block' : 'none' }}>
+                            <LogDisplay logs={this.state.logs} />
+                        </div>
                     </ClientContext.Provider>
                 )}
             </Card>
@@ -188,88 +185,6 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             this.messageWatchers.delete(handle);
         };
     };
-
-    private getField(field: FieldType) {
-        const handleChange = (fieldKey: string, value: any) => {
-            const nextState = produce(this.state, (draft) => {
-                draft.fields[fieldKey] = value;
-            });
-            this.setState(nextState);
-        };
-
-        const input = (() => {
-            switch (field.type) {
-                case Fields.NUMBER:
-                    return (
-                        <InputNumber
-                            onChange={(value: number) => handleChange(field.key, value)}
-                            value={this.state.fields[field.key]}
-                        />
-                    );
-                case Fields.TEXT:
-                    return (
-                        <Input
-                            onChange={(event: any) => handleChange(field.key, event.target.value)}
-                            value={this.state.fields[field.key]}
-                        />
-                    );
-                case Fields.CUSTOM:
-                    const Component = field.render;
-                    return (
-                        <Component
-                            onChange={(value: number) => handleChange(field.key, value)}
-                            onEvent={this.addOnEvent}
-                            value={this.state.fields[field.key]}
-                        />
-                    );
-            }
-        })();
-        return (
-            <div key={field.key}>
-                <Row
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Col span={8}>{field.label}</Col>
-                    <Col span={16}>{input}</Col>
-                </Row>
-            </div>
-        );
-    }
-
-    private getResolvedFields(action: ActionType) {
-        return pick(this.state.fields, (action.fields || []).map((field) => field.key));
-    }
-
-    private getActionTile(action: ActionType) {
-        const fields = (action.fields || []).map(this.getField.bind(this));
-
-        return (
-            <div
-                key={action.title}
-                style={{
-                    padding: '10px 0',
-                }}
-            >
-                <h3
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                    }}
-                >
-                    {action.title}
-                    <LoadingButton
-                        icon="caret-right"
-                        onClick={() => action.handler(this.client, this.getResolvedFields(action))}
-                    />
-                </h3>
-                {fields}
-            </div>
-        );
-    }
 }
 
 export default ClientContainer;

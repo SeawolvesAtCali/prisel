@@ -1,6 +1,5 @@
 import * as React from 'react';
 import ClientContainer from './ClientContainer';
-import defaultProfile from './profile';
 import RoomManager from './RoomManager';
 import { produce } from 'immer';
 import GameStartButton from './GameStartButton';
@@ -42,11 +41,7 @@ class App extends React.Component<{}, AppState> {
         return (
             <div style={{ overflow: 'auto', whiteSpace: 'nowrap', height: '100vh' }}>
                 {this.state.clients.map((client, index) => (
-                    <ClientContainer
-                        profile={defaultProfile}
-                        key={client}
-                        username={generateUsername(index)}
-                    >
+                    <ClientContainer key={client} username={generateUsername(index)}>
                         <RoomManager gameTypes={['tic-tac-toe', 'big-2']} />
                         <GameStartButton />
                     </ClientContainer>

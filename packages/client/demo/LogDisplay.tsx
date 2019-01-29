@@ -13,26 +13,42 @@ class LogDisplay extends React.Component {
                             itemLayout="vertical"
                             dataSource={logs}
                             bordered
-                            renderItem={(log: Log) => (
-                                <List.Item>
-                                    <List.Item.Meta
-                                        title={
-                                            <div>
-                                                <span
+                            renderItem={(log: Log) => {
+                                const timeString = new Date(log.timestamp).toLocaleTimeString();
+                                return (
+                                    <List.Item>
+                                        <List.Item.Meta
+                                            title={
+                                                <div
                                                     style={{
-                                                        marginRight: '10px',
-                                                        verticalAlign: 'bottom',
+                                                        display: 'flex',
                                                     }}
                                                 >
-                                                    {log.type}
-                                                </span>
-                                                <Tag>{log.origin}</Tag>
-                                            </div>
-                                        }
-                                    />
-                                    <ReactJson src={log.payload} collapsed name="payload" />
-                                </List.Item>
-                            )}
+                                                    <span
+                                                        style={{
+                                                            marginRight: '10px',
+                                                            verticalAlign: 'bottom',
+                                                        }}
+                                                    >
+                                                        {log.type}
+                                                    </span>
+                                                    <Tag>{log.origin}</Tag>
+                                                    <span
+                                                        style={{
+                                                            flex: 1,
+                                                            textAlign: 'end',
+                                                            fontWeight: 'normal',
+                                                        }}
+                                                    >
+                                                        {timeString}
+                                                    </span>
+                                                </div>
+                                            }
+                                        />
+                                        <ReactJson src={log.payload} collapsed name="payload" />
+                                    </List.Item>
+                                );
+                            }}
                         />
                     );
                 }}

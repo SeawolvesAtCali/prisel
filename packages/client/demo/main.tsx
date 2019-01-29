@@ -50,7 +50,6 @@ class App extends React.Component<{}, AppState> {
                     >
                         <RoomManager gameTypes={['tic-tac-toe', 'big-2']} />
                         <GameStartButton />
-                        <LogDisplay />
                     </ClientContainer>
                 ))}
                 <button

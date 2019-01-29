@@ -1,10 +1,11 @@
 import * as React from 'react';
 import pick from 'lodash/pick';
 import { produce } from 'immer';
-import { Card, InputNumber, Input, Button, Row, Col, Tag } from 'antd';
+import { Card, InputNumber, Input, Button, Row, Col, Tag, Icon } from 'antd';
 import { Profile, FieldType, Fields, ActionType } from './profile';
 import Client, { AnyObject } from '../client';
 import LoadingButton from './loadingButton';
+import LogDisplay from './LogDisplay';
 
 interface ClientContainerProps {
     profile: Profile;
@@ -14,6 +15,7 @@ export interface Log {
     type: string;
     payload: AnyObject;
     origin: 'server' | 'client' | 'none';
+    timestamp: number;
 }
 
 interface ClientContainerStates {
@@ -22,6 +24,7 @@ interface ClientContainerStates {
     connected: boolean;
     loggedIn: boolean;
     userId: string;
+    tab: string;
 }
 
 type offEvent = () => void;
@@ -56,6 +59,16 @@ ClientContext.displayName = 'ClientContext';
 
 export const ClientContextConsumer = ClientContext.Consumer;
 
+const tabList = [
+    {
+        key: 'detail',
+        tab: 'detail',
+    },
+    {
+        key: 'log',
+        tab: 'log',
+    },
+];
 class ClientContainer extends React.Component<ClientContainerProps, ClientContainerStates> {
     private static getResolvedFieldsFromProfile(profile: Profile) {
         const fields: any = {};
@@ -75,6 +88,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             connected: false,
             loggedIn: false,
             userId: '',
+            tab: 'detail',
         };
     }
 
@@ -89,6 +103,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                             type: messageType,
                             payload: data,
                             origin: 'server',
+                            timestamp: new Date().getTime(),
                         });
                     }),
                 );
@@ -121,6 +136,7 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             type,
             payload,
             origin,
+            timestamp: new Date().getTime(),
         };
         this.setState({
             logs: this.state.logs.concat([newLog]),
@@ -131,10 +147,13 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
         const { profile } = this.props;
         const { actions } = profile;
         const actionTiles = actions.map(this.getActionTile.bind(this));
-        const { connected, loggedIn } = this.state;
+        const { connected, loggedIn, tab } = this.state;
 
         return (
             <Card
+                tabList={tabList}
+                activeTabKey={tab}
+                onTabChange={this.handleTabChange}
                 title={`Player: ${this.props.username}`}
                 style={{ width: 400, display: 'inline-block', margin: '5px', verticalAlign: 'top' }}
                 extra={<Tag color="blue">{this.state.userId}</Tag>}
@@ -149,13 +168,19 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                             logs: this.state.logs,
                         }}
                     >
-                        {this.props.children}
-                        <React.Fragment>{actionTiles}</React.Fragment>
+                        {tab === 'detail' && this.props.children}
+                        {tab === 'log' && <LogDisplay />}
                     </ClientContext.Provider>
                 )}
             </Card>
         );
     }
+
+    private handleTabChange = (key: string) => {
+        this.setState({
+            tab: key,
+        });
+    };
 
     private addOnEvent = (handle: MessageWatcher) => {
         this.messageWatchers.add(handle);

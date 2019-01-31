@@ -1,4 +1,3 @@
-import debug from './debug';
 import once from 'lodash/once';
 import { SERVER } from '@prisel/common';
 import { createPacket } from '@prisel/common';
@@ -64,12 +63,12 @@ class Client {
         const connection = new WebSocket(this.serverUri);
 
         connection.onclose = () => {
-            debug('client disconnected');
             this.messageQueue.close();
         };
 
         connection.onerror = (e: any) => {
-            debug('client error', e);
+            // tslint:disable-next-line
+            console.log(e);
         };
         connection.onmessage = (message) => {
             this.handleMessage(message.data);

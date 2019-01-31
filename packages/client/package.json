@@ -8,16 +8,16 @@
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/client#readme",
     "license": "MIT",
-    "main": "./lib/index.js",
+    "main": "./lib/index.cjs.js",
+    "module": "./lib/index.esm.js",
+    "browser": "./lib/index.umd.js",
     "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
     },
     "files": [
-        "lib",
-        "!**/__test__",
-        "!**/demo"
+        "lib"
     ],
     "repository": {
         "type": "git",
@@ -25,7 +25,8 @@
     },
     "scripts": {
         "prebuild": "rm -rf ./lib",
-        "build": "tsc",
+        "build": "rollup -c",
+        "postbuild": "tsc --emitDeclarationOnly",
         "test": "jest",
         "start": "parcel serve index.html",
         "lint": "tslint --project tsconfig.json",
@@ -36,13 +37,16 @@
     },
     "dependencies": {
         "@prisel/common": "file:../common",
-        "debug": "^4.1.0",
         "immer": "^1.8.2",
         "lodash": "^4.17.11"
     },
     "devDependencies": {
         "antd": "^3.11.2",
         "react": "^16.6.3",
-        "react-dom": "^16.6.3"
+        "react-dom": "^16.6.3",
+        "rollup": "^1.1.2",
+        "rollup-plugin-commonjs": "^9.2.0",
+        "rollup-plugin-node-resolve": "^4.0.0",
+        "rollup-plugin-typescript2": "^0.19.2"
     }
 }

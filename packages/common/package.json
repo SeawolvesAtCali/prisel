@@ -8,7 +8,9 @@
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/common#readme",
     "license": "MIT",
-    "main": "./lib/index.js",
+    "main": "./lib/index.cjs.js",
+    "module": "./lib/index.esm.js",
+    "browser": "./lib/index.umd.js",
     "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
@@ -23,7 +25,8 @@
     },
     "scripts": {
         "prebuild": "rm -rf ./lib",
-        "build": "tsc",
+        "build": "rollup -c",
+        "postbuild": "tsc --emitDeclarationOnly",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },
@@ -34,5 +37,9 @@
         "debug": "^4.1.0",
         "immer": "^1.8.2",
         "lodash": "^4.17.11"
+    },
+    "devDependencies": {
+        "rollup": "^1.1.2",
+        "rollup-plugin-typescript2": "^0.19.2"
     }
 }

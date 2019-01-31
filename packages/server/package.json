@@ -8,16 +8,15 @@
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/server#readme",
     "license": "MIT",
-    "main": "./lib/index.js",
+    "main": "./lib/index.cjs.js",
+    "module": "./lib/index.esm.js",
     "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
     },
     "files": [
-        "lib",
-        "!**/__test__",
-        "!**/demo.*"
+        "lib"
     ],
     "repository": {
         "type": "git",
@@ -25,7 +24,8 @@
     },
     "scripts": {
         "prebuild": "rm -rf ./lib",
-        "build": "tsc",
+        "build": "rollup -c",
+        "postbuild": "tsc --emitDeclarationOnly",
         "start": "env DEBUG=debug ts-node demo.ts",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
@@ -46,8 +46,11 @@
         "ws": "^6.1.2"
     },
     "devDependencies": {
-        "@types/koa": "^2.0.47",
         "typedoc": "^0.14.2",
-        "typedoc-plugin-markdown": "^1.1.25"
+        "typedoc-plugin-markdown": "^1.1.25",
+        "typescript": "^3.0.3",
+        "tslib": "^1.9.3",
+        "rollup": "^1.1.2",
+        "rollup-plugin-typescript2": "^0.19.2"
     }
 }

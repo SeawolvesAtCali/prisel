@@ -71,3 +71,4 @@ dist
 .cache
 lib
 .DS_Store
+.rpt2_cache

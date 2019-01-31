@@ -4,6 +4,7 @@
     "private": true,
     "description": "Online prisel game",
     "scripts": {
+        "bootstrap": "lerna bootstrap --hoist",
         "start:server": "lerna run start --scope @prisel/server --stream",
         "start:client": "lerna run start --scope @prisel/client --stream",
         "start:tic-tac-toe-server": "lerna run start --scope @prisel/tic-tac-toe --stream",

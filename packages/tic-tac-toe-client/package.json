@@ -7,7 +7,6 @@
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/tic-tac-toe-client#readme",
     "license": "MIT",
     "main": "./lib/index.js",
-    "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"

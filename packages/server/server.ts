@@ -7,7 +7,7 @@ import {
     watchForDisconnection,
     getConnectionToken,
     emit,
-    broadcast,
+    createServerFromHTTPServer,
 } from './utils/networkUtils';
 import clientHandlerRegister, { Handler } from './clientHandlerRegister';
 import { parsePacket } from '@prisel/common';
@@ -16,13 +16,61 @@ import { getWelcome } from './message/room';
 import { GameConfig } from './utils/gameConfig';
 import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
 import ConfigManager from './utils/configManager';
+import { RoomId } from './objects/room';
+import { string } from 'prop-types';
+import http from 'http';
 
-class Server {
+interface ServerConfig {
+    host: string;
+    port: number;
+    server: http.Server;
+}
+/**
+ * Server is a wrapper on top of the websocket server.
+ * It provides utilities to control the server lifecycle.
+ *
+ * To create a server, simply call the constructor.
+ *
+ * ```js
+ * import { Server } from '@prisel/server';
+ * const server = new Server(); // By default a new server is started at localhost:3000
+ * ```
+ *
+ * We can also specify the hostname and port number.
+ *
+ * ```js
+ * const server = new Server({host: '0.0.0.0', port: 3000});
+ * ```
+ *
+ * By default, prisel uses [koa](https://koajs.com/) for the underlying HTTP server, to use an existing server instead, we can specify the server property.
+ *
+ * ```js
+ * // use an express server.
+ * import express from 'express';
+ * import http from 'http';
+ *
+ * const app = express();
+ * const expressServer = http.createServer(express);
+ * const server = new Server({server: expressServer});
+ * ```
+ */
+export class Server {
     private context: Context;
     private configManager = new ConfigManager();
 
-    public start() {
-        const server = createServer();
+    /**
+     * Create and start the server and setup listeners for websocket events.
+     *
+     * @param config configuration for the underlying HTTP Server. If not provided, a [koa](https://koajs.com/) server will be created at localhost:3000.
+     */
+    constructor(
+        config: Pick<ServerConfig, 'host' | 'port'> | Pick<ServerConfig, 'server'> = {
+            host: 'localhost',
+            port: 3000,
+        },
+    ) {
+        const server =
+            'server' in config ? createServerFromHTTPServer(config.server) : createServer(config);
         const context: Context = createContext({
             server,
             getConfigs: this.configManager.get.bind(this.configManager),
@@ -68,22 +116,20 @@ class Server {
         });
     }
 
+    /**
+     * Register a game to the server. If the game requires special room configuration,
+     * a room configuration can also be provided.
+     * @param game game configuration.
+     * @param room room configuration, if not provided, the base room configuration will be used.
+     */
     public register(game: GameConfig, room: RoomConfig = BaseRoomConfig) {
         this.configManager.add(game, room);
     }
 
-    public broadcast(roomId: any, messageType: string, data: any) {
-        if (this.context) {
-            broadcast(this.context, roomId, messageType, data);
-        }
-    }
-
-    public emit(client: Socket, messageType: string, data: any) {
-        if (this.context) {
-            emit(client, messageType, data);
-        }
-    }
-
+    /**
+     * Close the server. After a server is closed, it cannot be restarted.
+     * If we need to start a new server, instantiate a new Server.
+     */
     public close() {
         if (this.context) {
             this.context.server.close();

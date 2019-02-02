@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Collapse, Input, Icon, Select, Button, Tag } from 'antd';
-import { ClientContextConsumer, addToLog } from './ClientContainer';
+import ClientContainer, { addToLog } from './ClientContainer';
 import Client from '../client';
 import { getCreateRoom, getJoin } from '../message';
 import { MessageType } from '@prisel/common';
@@ -8,14 +8,14 @@ import { MessageType } from '@prisel/common';
 const Panel = Collapse.Panel;
 
 interface RoomManagerProps {
-    roomInfo?: any;
+    roomInfo?: unknown;
     onJoinRoom?: () => void;
     gameTypes?: string[];
     roomTypes?: string[];
 }
 
 interface RoomManagerStates {
-    roomInfo: any;
+    roomInfo: unknown;
     roomName: string;
     gameType: string;
     roomType: string;
@@ -31,6 +31,19 @@ const UserIcon = ({ isHost }: UserIconProps) =>
     ) : (
         <Icon type="user" style={{ fontSize: '1.17em' }} />
     );
+
+interface RoomInfo {
+    id: string;
+    name: string;
+    host: string;
+    players: string[];
+    clientMap: any;
+}
+
+function isRoomInfo(roomInfo: unknown): roomInfo is RoomInfo {
+    const assumeRoomInfo = roomInfo as RoomInfo;
+    return 'name' in assumeRoomInfo && 'id' in assumeRoomInfo && 'host' in assumeRoomInfo;
+}
 
 class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
     private cancelListeningToRoomUpdate: () => void;
@@ -108,11 +121,11 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
 
     public render() {
         const { gameTypes = [], roomTypes = [] } = this.props;
-        const { roomInfo, roomName, roomType, gameType, joinRoomId } = this.state;
+        const { roomInfo, roomName, joinRoomId } = this.state;
 
         const PanelHeader = (
             <div>
-                {roomInfo && (
+                {isRoomInfo(roomInfo) && (
                     <h3 style={{ display: 'inline-block' }}>
                         <span style={{ marginRight: '10px' }}>Room: {roomInfo.name}</span>
                         <Tag color="blue">{roomInfo.id}</Tag>
@@ -136,7 +149,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                         overflow: 'hidden',
                     }}
                 >
-                    {roomInfo && (
+                    {isRoomInfo(roomInfo) && (
                         <React.Fragment>
                             {roomInfo.players.map((player: string) => (
                                 <p key={player}>
@@ -154,7 +167,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                         </React.Fragment>
                     )}
                     {!roomInfo && (
-                        <ClientContextConsumer>
+                        <ClientContainer.ClientContextConsumer>
                             {({ client, log }) => (
                                 <React.Fragment>
                                     <div>
@@ -231,7 +244,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                                     </div>
                                 </React.Fragment>
                             )}
-                        </ClientContextConsumer>
+                        </ClientContainer.ClientContextConsumer>
                     )}
                 </Panel>
             </Collapse>

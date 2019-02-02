@@ -1,7 +1,13 @@
 import * as React from 'react';
-import { ClientContextConsumer, Log } from './ClientContainer';
 import { Tag, List } from 'antd';
 import ReactJson from 'react-json-view';
+
+export interface Log {
+    type: string;
+    payload: { [prop: string]: unknown };
+    origin: 'server' | 'client' | 'none';
+    timestamp: number;
+}
 
 interface LogDisplayProps {
     logs: Log[];

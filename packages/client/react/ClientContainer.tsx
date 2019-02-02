@@ -1,24 +1,14 @@
 import * as React from 'react';
-import pick from 'lodash/pick';
 import { produce } from 'immer';
-import { Card, InputNumber, Input, Row, Col, Tag } from 'antd';
-import { Profile, FieldType, Fields, ActionType } from './profile';
-import Client, { AnyObject } from '../client';
-import LoadingButton from './loadingButton';
-import LogDisplay from './LogDisplay';
+import { Card, Tag } from 'antd';
+import Client from '../client';
+import LogDisplay, { Log } from './Log';
 
 interface ClientContainerProps {
     username: string;
 }
-export interface Log {
-    type: string;
-    payload: AnyObject;
-    origin: 'server' | 'client' | 'none';
-    timestamp: number;
-}
 
 interface ClientContainerStates {
-    fields: any;
     logs: Log[];
     connected: boolean;
     loggedIn: boolean;
@@ -26,17 +16,9 @@ interface ClientContainerStates {
     tab: string;
 }
 
-type offEvent = () => void;
-type MessageWatcher = (messageType: string, data: any) => void;
-export interface CustomFieldProps {
-    onEvent: (handler: MessageWatcher) => offEvent;
-    onChange: (value: any) => void;
-    value: any;
-}
-
 export type addToLog = (
     messageType: string,
-    payload: AnyObject,
+    payload: { [prop: string]: unknown },
     origin: 'server' | 'client' | 'none',
 ) => void;
 
@@ -54,8 +36,6 @@ const ClientContext = React.createContext<{
 
 ClientContext.displayName = 'ClientContext';
 
-export const ClientContextConsumer = ClientContext.Consumer;
-
 const tabList = [
     {
         key: 'detail',
@@ -66,21 +46,16 @@ const tabList = [
         tab: 'log',
     },
 ];
-class ClientContainer extends React.Component<ClientContainerProps, ClientContainerStates> {
-    private static getResolvedFieldsFromProfile(profile: Profile) {
-        const fields: any = {};
-        profile.actions.forEach((action) =>
-            (action.fields || []).forEach((field) => (fields[field.key] = field.default)),
-        );
-        return fields;
-    }
+export default class ClientContainer extends React.Component<
+    ClientContainerProps,
+    ClientContainerStates
+> {
+    public static ClientContextConsumer = ClientContext.Consumer;
     private client: Client;
-    private messageWatchers = new Set<MessageWatcher>();
 
-    constructor(props: any) {
+    constructor(props: ClientContainerProps) {
         super(props);
         this.state = {
-            fields: ClientContainer.getResolvedFieldsFromProfile(this.props.profile),
             logs: [],
             connected: false,
             loggedIn: false,
@@ -104,7 +79,6 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
                         });
                     }),
                 );
-                this.messageWatchers.forEach((messageWatcher) => messageWatcher(messageType, data));
             },
         );
 
@@ -119,14 +93,14 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             .then((data) => {
                 this.setState({
                     loggedIn: true,
-                    userId: data.userId,
+                    userId: data.userId as string,
                 });
             });
     }
 
     public handleAddToLog = (
         type: string,
-        payload: AnyObject = {},
+        payload: { [prop: string]: unknown } = {},
         origin: 'server' | 'client' | 'none' = 'none',
     ) => {
         const newLog: Log = {
@@ -178,13 +152,4 @@ class ClientContainer extends React.Component<ClientContainerProps, ClientContai
             tab: key,
         });
     };
-
-    private addOnEvent = (handle: MessageWatcher) => {
-        this.messageWatchers.add(handle);
-        return () => {
-            this.messageWatchers.delete(handle);
-        };
-    };
 }
-
-export default ClientContainer;

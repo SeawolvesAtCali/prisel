@@ -9,10 +9,6 @@ import withTimer from './withTimer';
 
 const DEFAULT_USERNAME = 'user';
 
-interface MessageData {
-    [prop: string]: unknown;
-}
-
 type RemoveListenerFunc = () => void;
 
 const DEFAULT_TIMEOUT = 5000;
@@ -103,7 +99,7 @@ class Client {
      * Throw error if not connected, or don't have controller namespace.
      * @param {string} username username to login with
      */
-    public login(username: string = DEFAULT_USERNAME): Promise<MessageData> {
+    public login(username: string = DEFAULT_USERNAME): Promise<{ [prop: string]: unknown }> {
         this.emit(...getLogin(username));
         return withTimer(
             this.once(
@@ -153,7 +149,7 @@ class Client {
      * Listen for message until receive the message once.
      * @param {HandlerKey} messageTypeOrFilter message type to listen to
      */
-    public once(messageTypeOrFilter: HandlerKey): Promise<MessageData> {
+    public once(messageTypeOrFilter: HandlerKey): Promise<{ [prop: string]: unknown }> {
         return new Promise((resolve) => {
             this.messageQueue.once(messageTypeOrFilter, resolve);
         });

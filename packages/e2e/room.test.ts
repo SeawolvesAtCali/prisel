@@ -34,20 +34,20 @@ describe('create room', () => {
         const hostId = hostData.userId;
         await client.connect();
         const clientData = await client.login('client');
-        const clientId = clientData.userId;
+        const clientId = clientData.userId as string;
         host.emit(...Messages.getCreateRoom('party room'));
         const roomData = await untilSuccess(host, MessageType.CREATE_ROOM);
         const { roomId } = roomData;
-        client.emit(...Messages.getJoin(roomId));
+        client.emit(...Messages.getJoin(roomId as string));
         const [, hostRoomUpdateResult, clientRoomUpdateResult] = await Promise.all([
             untilSuccess(client, MessageType.JOIN),
             host.once(
                 (messageType, data) =>
-                    MessageType.ROOM_UPDATE === messageType && data.players.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && (data.players as string[]).includes(clientId),
             ),
             client.once(
                 (messageType, data) =>
-                    MessageType.ROOM_UPDATE === messageType && data.players.includes(clientId),
+                    MessageType.ROOM_UPDATE === messageType && (data.players as string[]).includes(clientId),
             ),
         ]);
 

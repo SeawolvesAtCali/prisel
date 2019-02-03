@@ -19,6 +19,7 @@
     },
     "scripts": {
         "test": "env DEBUG=debug CI=true jest --runInBand",
+        "build": "tsc --noEmit",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },

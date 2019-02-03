@@ -1,17 +1,16 @@
 import * as React from 'react';
 
 import { Button } from 'antd';
-import { ClientContextConsumer, addToLog } from './ClientContainer';
-import Client from '../client';
-import { getGameStart } from '../message';
+import ClientContainer, { addToLog } from './ClientContainer';
+import { Messages, Client } from '@prisel/client';
 
 const handleStart = (client: Client, log: addToLog) => () => {
-    const [messageType, payload] = getGameStart();
+    const [messageType, payload] = Messages.getGameStart();
     client.emit(messageType, payload);
     log(messageType, payload, 'client');
 };
-const GameStartButton = ({}) => (
-    <ClientContextConsumer>
+const GameStartButton = () => (
+    <ClientContainer.ClientContextConsumer>
         {({ client, log }) => (
             <Button
                 onClick={handleStart(client, log)}
@@ -22,7 +21,7 @@ const GameStartButton = ({}) => (
                 Start Game
             </Button>
         )}
-    </ClientContextConsumer>
+    </ClientContainer.ClientContextConsumer>
 );
 
 export default GameStartButton;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { produce } from 'immer';
 import { Card, Tag } from 'antd';
-import Client from '../client';
+import { Client } from '@prisel/client';
 import LogDisplay, { Log } from './Log';
 
 interface ClientContainerProps {
@@ -49,7 +49,7 @@ const tabList = [
 export default class ClientContainer extends React.Component<
     ClientContainerProps,
     ClientContainerStates
-> {
+    > {
     public static ClientContextConsumer = ClientContext.Consumer;
     private client: Client;
 

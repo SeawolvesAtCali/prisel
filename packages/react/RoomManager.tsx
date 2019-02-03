@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { Collapse, Input, Icon, Select, Button, Tag } from 'antd';
 import ClientContainer, { addToLog } from './ClientContainer';
-import Client from '../client';
-import { getCreateRoom, getJoin } from '../message';
-import { MessageType } from '@prisel/common';
+import { Messages, MessageType, Client } from '@prisel/client';
 
 const Panel = Collapse.Panel;
 
@@ -29,8 +27,8 @@ const UserIcon = ({ isHost }: UserIconProps) =>
     isHost ? (
         <Icon type="crown" style={{ color: 'goldenrod', fontSize: '1.17em' }} />
     ) : (
-        <Icon type="user" style={{ fontSize: '1.17em' }} />
-    );
+            <Icon type="user" style={{ fontSize: '1.17em' }} />
+        );
 
 interface RoomInfo {
     id: string;
@@ -96,7 +94,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
 
     public handleCreateRoom = (client: Client, log: addToLog) => {
         this.listenToRoomUpdate(client);
-        const [messageType, payload] = getCreateRoom(
+        const [messageType, payload] = Messages.getCreateRoom(
             this.state.roomName,
             this.state.gameType || undefined,
             this.state.roomType || undefined,
@@ -107,7 +105,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
 
     public handleJoinRoom = (client: Client, log: addToLog) => {
         this.listenToRoomUpdate(client);
-        const [messageType, payload] = getJoin(this.state.joinRoomId);
+        const [messageType, payload] = Messages.getJoin(this.state.joinRoomId);
         client.emit(messageType, payload);
         log(messageType, payload, 'client');
     };

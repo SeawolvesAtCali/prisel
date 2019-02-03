@@ -1,11 +1,15 @@
 import { State } from './objects';
-import { AnyObject } from './client';
 
 type Handler = (data: object, messageType?: string) => State;
 
-export type MessageFilter = (messageType: string, data: AnyObject) => boolean;
+export type MessageFilter = (messageType: string, data: { [prop: string]: unknown }) => boolean;
 
 export type HandlerKey = string | MessageFilter;
+
+function isMessageFilter(handlerKey: HandlerKey): handlerKey is MessageFilter {
+    return typeof handlerKey === 'function';
+}
+
 export default class PubSub {
     private subscription = new Map<HandlerKey, Set<Handler>>();
     private filters = new Set<MessageFilter>();
@@ -17,7 +21,7 @@ export default class PubSub {
         const handlerSet = this.subscription.get(messageTypeOrFilter) || new Set();
         handlerSet.add(handler);
         this.subscription.set(messageTypeOrFilter, handlerSet);
-        if (typeof messageTypeOrFilter === 'function') {
+        if (isMessageFilter(messageTypeOrFilter)) {
             this.filters.add(messageTypeOrFilter);
         }
         return () => {

@@ -3,7 +3,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import pkg from './package.json';
 
-const externalDependencyList = [...Object.keys(pkg.dependencies)];
+const externalDependencyList = [...Object.keys(pkg.dependencies), 'react', 'react-dom'];
 
 export default [
     // browser-friendly UMD build

@@ -8,11 +8,6 @@ import PubSub, { HandlerKey } from './pubSub';
 import withTimer from './withTimer';
 
 const DEFAULT_USERNAME = 'user';
-export interface AnyObject {
-    [prop: string]: any;
-}
-
-type MessageData = AnyObject;
 
 type RemoveListenerFunc = () => void;
 
@@ -45,7 +40,7 @@ class Client {
     public get isConnected(): boolean {
         return !!this.conn;
     }
-    public state: AnyObject;
+    public state: { [prop: string]: unknown };
     private conn: WebSocket;
     private serverUri: string;
     private messageQueue = new PubSub();
@@ -104,7 +99,7 @@ class Client {
      * Throw error if not connected, or don't have controller namespace.
      * @param {string} username username to login with
      */
-    public login(username: string = DEFAULT_USERNAME): Promise<MessageData> {
+    public login(username: string = DEFAULT_USERNAME): Promise<{ [prop: string]: unknown }> {
         this.emit(...getLogin(username));
         return withTimer(
             this.once(
@@ -117,34 +112,36 @@ class Client {
 
     /**
      * Emit to server
-     * @param {String} namespace
-     * @param {type and data} data
+     * @param messageType
+     * @param data
      */
-    public emit(messageType: string, data: AnyObject) {
+    public emit(messageType: string, data: { [prop: string]: unknown }) {
         this.connection.send(createPacket(messageType, data));
     }
 
     /**
      * Attach handler for messages from server
-     * @param {HandlerKey} messageTypeOrFilter message type
-     * @param {(state, emit) => (data) => newState} handler listener
+     * @param messageTypeOrFilter
+     * @param callback
      */
     public on(
         messageTypeOrFilter: HandlerKey,
-        callback: (data: AnyObject, messageType?: string) => AnyObject | void,
+        callback: (
+            data: { [prop: string]: unknown },
+            messageType?: string,
+        ) => { [prop: string]: unknown } | void,
     ): RemoveListenerFunc {
-        const handler = (data: AnyObject, messageType: string) => {
+        return this.messageQueue.on(messageTypeOrFilter, (data, messageType) => {
             const updatedState = callback(data, messageType) || this.state;
             this.state = updatedState;
-        };
-        return this.messageQueue.on(messageTypeOrFilter, handler);
+        });
     }
 
     /**
      * Set the client state
      * @param {Object} newState new state object to replace the old state
      */
-    public setState(newState: AnyObject) {
+    public setState(newState: { [prop: string]: unknown }) {
         this.state = newState;
     }
 
@@ -152,7 +149,7 @@ class Client {
      * Listen for message until receive the message once.
      * @param {HandlerKey} messageTypeOrFilter message type to listen to
      */
-    public once(messageTypeOrFilter: HandlerKey): Promise<MessageData> {
+    public once(messageTypeOrFilter: HandlerKey): Promise<{ [prop: string]: unknown }> {
         return new Promise((resolve) => {
             this.messageQueue.once(messageTypeOrFilter, resolve);
         });

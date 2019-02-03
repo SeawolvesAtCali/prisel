@@ -1,6 +1,5 @@
 import { Client } from '@prisel/client';
-import { MessageType } from '@prisel/common';
-import { Messages } from '@prisel/client';
+import { Messages, MessageType } from '@prisel/client';
 
 export function createClients(num = 1) {
     return Array.from({ length: num }).map(() => new Client());
@@ -26,7 +25,7 @@ export async function createRoomWithGuests(num = 0): Promise<ClientTuple[]> {
     const [host, ...guests] = clients;
     host.emit(...Messages.getCreateRoom('roomname'));
     const createRoomInfo = await untilSuccess(host, MessageType.CREATE_ROOM);
-    guests.map((guest) => guest.emit(...Messages.getJoin(createRoomInfo.roomId)));
+    guests.map((guest) => guest.emit(...Messages.getJoin(createRoomInfo.roomId as string)));
     await Promise.all(guests.map((guest) => untilSuccess(guest, MessageType.JOIN)));
     return loginResults as ClientTuple[];
 }

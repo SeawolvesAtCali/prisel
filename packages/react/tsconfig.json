@@ -1,7 +1,7 @@
 {
     "extends": "../../tsconfig",
     "files": [
-        "index.ts",
+        "index.ts"
     ],
     "compilerOptions": {
         "outDir": "./lib",

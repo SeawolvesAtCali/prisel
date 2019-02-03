@@ -1,24 +1,20 @@
 {
-    "name": "@prisel/client",
+    "name": "@prisel/react",
     "version": "0.1.2",
-    "publishConfig": {
-        "access": "public"
-    },
     "description": "> TODO: description",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
-    "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/client#readme",
+    "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/template#readme",
     "license": "MIT",
     "main": "./lib/index.cjs.js",
     "module": "./lib/index.esm.js",
-    "browser": "./lib/index.umd.js",
     "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
     },
-    "files": [
-        "lib"
-    ],
+    "publishConfig": {
+        "access": "public"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
@@ -27,8 +23,8 @@
         "prebuild": "rm -rf ./lib",
         "build": "rollup -c",
         "postbuild": "tsc --emitDeclarationOnly",
+        "start": "echo HI",
         "test": "jest",
-        "start": "parcel serve index.html",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },
@@ -36,13 +32,22 @@
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
-        "@prisel/common": "file:../common",
-        "lodash": "^4.17.11"
+        "@prisel/client": "file:../client",
+        "antd": "^3.11.2",
+        "immer": "^1.8.2",
+        "lodash": "^4.17.11",
+        "react-json-view": "^1.19.1"
     },
     "devDependencies": {
+        "react": "^16.6.3",
+        "react-dom": "^16.6.3",
         "rollup": "^1.1.2",
         "rollup-plugin-commonjs": "^9.2.0",
         "rollup-plugin-node-resolve": "^4.0.0",
         "rollup-plugin-typescript2": "^0.19.2"
+    },
+    "peerDependencies": {
+        "react": "^16.6.3",
+        "react-dom": "^16.6.3"
     }
 }

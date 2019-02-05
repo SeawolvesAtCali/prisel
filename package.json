@@ -14,7 +14,7 @@
         "postinstall": "npm run build",
         "publish": "lerna publish",
         "build": "lerna run build --stream",
-        "deploy:server": "node packages/tic-tac-toe/lib/index.js",
+        "deploy:server": "env DEBUG=debug node packages/tic-tac-toe/lib/index.js",
         "test": "lerna run --no-bail test --ignore @prisel/e2e --stream",
         "automation": "lerna run test --scope @prisel/e2e --stream",
         "storybook": "lerna run storybook --stream",

@@ -6,6 +6,7 @@ import LogDisplay, { Log } from './Log';
 
 interface ClientContainerProps {
     username: string;
+    client: Client;
 }
 
 interface ClientContainerStates {
@@ -65,7 +66,11 @@ export default class ClientContainer extends React.Component<
     }
 
     public componentDidMount() {
-        this.client = new Client();
+        if (this.props.client) {
+            this.client = this.props.client;
+        } else {
+            this.client = new Client();
+        }
         this.client.on(
             () => true,
             (data, messageType) => {

@@ -40,7 +40,7 @@ interface RoomInfo {
 
 function isRoomInfo(roomInfo: unknown): roomInfo is RoomInfo {
     const assumeRoomInfo = roomInfo as RoomInfo;
-    return 'name' in assumeRoomInfo && 'id' in assumeRoomInfo && 'host' in assumeRoomInfo;
+    return assumeRoomInfo && 'name' in assumeRoomInfo && 'id' in assumeRoomInfo && 'host' in assumeRoomInfo;
 }
 
 class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {

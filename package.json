@@ -13,6 +13,7 @@
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "postinstall": "npm run build",
         "publish": "lerna publish",
+        "prepublishOnly": "npm ci && npm run build && npm run lint",
         "build": "lerna run build --stream",
         "deploy:server": "env DEBUG=debug node packages/tic-tac-toe/lib/index.js",
         "test": "lerna run --no-bail test --ignore @prisel/e2e --stream",

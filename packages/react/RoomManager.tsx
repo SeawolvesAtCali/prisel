@@ -27,8 +27,8 @@ const UserIcon = ({ isHost }: UserIconProps) =>
     isHost ? (
         <Icon type="crown" style={{ color: 'goldenrod', fontSize: '1.17em' }} />
     ) : (
-            <Icon type="user" style={{ fontSize: '1.17em' }} />
-        );
+        <Icon type="user" style={{ fontSize: '1.17em' }} />
+    );
 
 interface RoomInfo {
     id: string;
@@ -40,7 +40,12 @@ interface RoomInfo {
 
 function isRoomInfo(roomInfo: unknown): roomInfo is RoomInfo {
     const assumeRoomInfo = roomInfo as RoomInfo;
-    return assumeRoomInfo && 'name' in assumeRoomInfo && 'id' in assumeRoomInfo && 'host' in assumeRoomInfo;
+    return (
+        assumeRoomInfo &&
+        'name' in assumeRoomInfo &&
+        'id' in assumeRoomInfo &&
+        'host' in assumeRoomInfo
+    );
 }
 
 class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
@@ -51,8 +56,8 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
         this.state = {
             roomInfo: props.roomInfo,
             roomName: '',
-            gameType: '',
-            roomType: '',
+            gameType: props.gameTypes.length > 0 ? props.gameTypes[0] : '',
+            roomType: props.roomTypes.length > 0 ? props.roomTypes[0] : '',
             joinRoomId: '',
         };
     }
@@ -119,7 +124,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
 
     public render() {
         const { gameTypes = [], roomTypes = [] } = this.props;
-        const { roomInfo, roomName, joinRoomId } = this.state;
+        const { roomInfo, roomName, joinRoomId, gameType, roomType } = this.state;
 
         const PanelHeader = (
             <div>
@@ -175,9 +180,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                                                 style={{ flex: 1 }}
                                                 onChange={this.handleGameTypeChange}
                                                 placeholder="game"
-                                                defaultValue={
-                                                    gameTypes.length > 0 ? gameTypes[0] : undefined
-                                                }
+                                                defaultValue={gameType}
                                             >
                                                 {gameTypes.map((gameTypeOption: string) => (
                                                     <Select.Option
@@ -192,9 +195,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                                                 style={{ flex: 1 }}
                                                 onChange={this.handleRoomTypeChange}
                                                 placeholder="room"
-                                                defaultValue={
-                                                    roomTypes.length > 0 ? roomTypes[0] : undefined
-                                                }
+                                                defaultValue={roomType}
                                             >
                                                 {roomTypes.map((roomTypeOption) => (
                                                     <Select.Option

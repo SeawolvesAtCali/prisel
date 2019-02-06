@@ -4,7 +4,7 @@ import { GAME_PHASE } from '../objects/gamePhase';
 import clientHandlerRegister from '../clientHandlerRegister';
 import { MessageType } from '@prisel/common';
 
-const handleGameStart = (context: Context, socket: Socket) => (data: {}) => {
+export const handleGameStart = (context: Context, socket: Socket) => (data: {}) => {
     const handle = getHandle(context, socket);
     const client = getClient(context, socket);
     if (handle && handle.gamePhase === GAME_PHASE.WAITING) {

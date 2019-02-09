@@ -27,7 +27,7 @@
         "prebuild": "rm -rf ./lib",
         "build": "rollup -c",
         "postbuild": "tsc --emitDeclarationOnly",
-        "start": "env DEBUG=debug ts-node demo.ts",
+        "start": "env DEBUG=debug ts-node --project demo.tsconfig.json demo.ts",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix",

@@ -19,6 +19,7 @@ import ConfigManager from './utils/configManager';
 import { RoomId } from './objects/room';
 import { string } from 'prop-types';
 import http from 'http';
+import { getClient } from './utils/stateUtils';
 
 interface ServerConfig {
     host: string;
@@ -108,7 +109,12 @@ export class Server {
                 if (!connectionToken.safeDisconnected) {
                     // client is not responding
                     // forcefully terminate connection
-                    debug(`client ${context.SocketManager.getId(socket)} lost connection`);
+                    const client = getClient(context, socket);
+                    if (client) {
+                        debug(`client ${client.id} lost connection`);
+                    } else {
+                        debug('a not logged-in user lost connection');
+                    }
                     socket.terminate();
                     handleDisconnect(context, socket);
                 }

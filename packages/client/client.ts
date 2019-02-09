@@ -30,16 +30,21 @@ const LOGIN_TIMEOUT = DEFAULT_TIMEOUT;
  * After a client is connected, we can attach message handler using `client.on`
  */
 class Client {
+    static get CONNECTION_CLOSED() {
+        return new Error('connection closed');
+    }
+
     public get connection(): WebSocket {
         if (this.conn) {
             return this.conn;
         }
-        throw new Error('Please call client.connect(username) first');
+        throw Client.CONNECTION_CLOSED;
     }
 
     public get isConnected(): boolean {
         return !!this.conn;
     }
+
     public state: { [prop: string]: unknown };
     private conn: WebSocket;
     private serverUri: string;
@@ -55,10 +60,13 @@ class Client {
      * Connect to server
      */
     public async connect(): Promise<WebSocket> {
+        if (this.isConnected) {
+            return;
+        }
         const connection = new WebSocket(this.serverUri);
 
         connection.onclose = () => {
-            this.messageQueue.close();
+            this.disconnect();
         };
 
         connection.onerror = (e: any) => {
@@ -68,10 +76,10 @@ class Client {
         connection.onmessage = (message) => {
             this.handleMessage(message.data);
         };
-        this.conn = connection;
         await withTimer(
-            new Promise((resolve) => {
+            new Promise((resolve, reject) => {
                 const onOpen = () => {
+                    this.conn = connection;
                     resolve();
                     connection.onopen = null;
                 };
@@ -80,18 +88,14 @@ class Client {
             CONNECTION_TIMEOUT,
         );
 
-        // connection.
         return connection;
     }
 
     public exit() {
-        this.emit(...getExit());
-        this.disconnect();
-    }
-
-    public handleMessage(rawMessage: string) {
-        const message = JSON.parse(rawMessage);
-        this.messageQueue.dispatch(message.type, message.payload);
+        if (this.isConnected) {
+            this.emit(...getExit());
+            this.disconnect();
+        }
     }
 
     /**
@@ -100,14 +104,22 @@ class Client {
      * @param {string} username username to login with
      */
     public login(username: string = DEFAULT_USERNAME): Promise<{ [prop: string]: unknown }> {
-        this.emit(...getLogin(username));
-        return withTimer(
-            this.once(
-                (messageType, data) =>
-                    messageType === MessageType.SUCCESS && data.action === MessageType.LOGIN,
-            ),
-            LOGIN_TIMEOUT,
-        );
+        if (this.isConnected) {
+            this.emit(...getLogin(username));
+            return withTimer(
+                this.once(
+                    (messageType, data) =>
+                        messageType === MessageType.SUCCESS && data.action === MessageType.LOGIN,
+                ),
+                LOGIN_TIMEOUT,
+            ).then((data) => {
+                if (this.isConnected) {
+                    return data;
+                }
+                throw Client.CONNECTION_CLOSED;
+            });
+        }
+        return Promise.reject(Client.CONNECTION_CLOSED);
     }
 
     /**
@@ -116,7 +128,11 @@ class Client {
      * @param data
      */
     public emit(messageType: string, data: { [prop: string]: unknown }) {
-        this.connection.send(createPacket(messageType, data));
+        if (this.isConnected) {
+            this.connection.send(createPacket(messageType, data));
+        } else {
+            throw Client.CONNECTION_CLOSED;
+        }
     }
 
     /**
@@ -154,8 +170,22 @@ class Client {
             this.messageQueue.once(messageTypeOrFilter, resolve);
         });
     }
+
+    private handleMessage(rawMessage: string) {
+        if (this.isConnected) {
+            const message = JSON.parse(rawMessage);
+            this.messageQueue.dispatch(message.type, message.payload);
+        }
+    }
+
     private disconnect() {
-        this.connection.close();
+        if (this.isConnected) {
+            this.connection.onclose = undefined;
+            this.connection.close();
+            this.conn = undefined;
+        }
+        this.messageQueue.close();
+        this.messageQueue = undefined;
     }
 }
 

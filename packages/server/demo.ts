@@ -1,5 +1,4 @@
-import Server from './server';
-import debug from './debug';
+import { Server, debug } from './index';
 
 const server = new Server();
 process.stdout.write('starting server');

@@ -26,7 +26,7 @@
         "prebuild": "rm -rf ./lib",
         "build": "rollup -c",
         "postbuild": "tsc --emitDeclarationOnly",
-        "start": "echo HI",
+        "start": "parcel serve index.html",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
@@ -42,15 +42,15 @@
         "react-json-view": "^1.19.1"
     },
     "devDependencies": {
-        "react": "^16.6.3",
-        "react-dom": "^16.6.3",
+        "react": "^16.8.1",
+        "react-dom": "^16.8.1",
         "rollup": "^1.1.2",
         "rollup-plugin-commonjs": "^9.2.0",
         "rollup-plugin-node-resolve": "^4.0.0",
         "rollup-plugin-typescript2": "^0.19.2"
     },
     "peerDependencies": {
-        "react": "^16.6.3",
-        "react-dom": "^16.6.3"
+        "react": "^16.8.1",
+        "react-dom": "^16.8.1"
     }
 }

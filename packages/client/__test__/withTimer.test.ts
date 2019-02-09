@@ -34,5 +34,19 @@ test('if resolved after timeout, should reject', async () => {
     });
     const withTimerPromise = withTimer(promise, 5000);
     jest.advanceTimersByTime(6000);
-    await expect(withTimerPromise).rejects.toThrow('timeout after 5000 ms');
+    await expect(withTimerPromise).rejects.toThrowError('timeout after 5000 ms');
+});
+
+test('if promise rejects before timeout, should reject', async () => {
+    const promise = Promise.reject('error');
+    await expect(withTimer(promise, 5000)).rejects.toEqual('error');
+});
+
+test('if promise rejects after timeout, should reject with timeout error', async () => {
+    const promise = new Promise((resolve, reject) => {
+        setTimeout(reject, 10000, 'error');
+    });
+    const withTimerPromise = withTimer(promise, 5000);
+    jest.advanceTimersByTime(6000);
+    await expect(withTimerPromise).rejects.toThrowError('timeout after 5000 ms');
 });

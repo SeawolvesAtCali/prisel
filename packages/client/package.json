@@ -28,7 +28,6 @@
         "build": "rollup -c",
         "postbuild": "tsc --emitDeclarationOnly",
         "test": "jest",
-        "start": "parcel serve index.html",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },

@@ -1,6 +1,7 @@
 import Client from '../client';
 import { createPacket } from '@prisel/common';
 import { Server } from 'mock-socket';
+import { MessageType } from '@prisel/common';
 
 describe('Client', () => {
     const fakeURL = 'ws://localhost:3000';
@@ -10,7 +11,7 @@ describe('Client', () => {
     });
 
     afterEach(() => {
-        mockServer.close();
+        mockServer.stop();
     });
 
     describe('constructor', () => {
@@ -35,6 +36,72 @@ describe('Client', () => {
         });
     });
 
+    describe('login', () => {
+        it('should login with username', async () => {
+            const client = new Client(fakeURL);
+            mockServer.on('connection', (socket) => {
+                (socket as any).on('message', (data: unknown) => {
+                    expect(data).toBe(
+                        createPacket(MessageType.LOGIN, {
+                            username: 'batman',
+                        }),
+                    );
+                    socket.send(
+                        createPacket(MessageType.SUCCESS, {
+                            action: MessageType.LOGIN,
+                            userId: '123',
+                        }),
+                    );
+                });
+            });
+            await client.connect();
+            const data = await client.login('batman');
+            expect(data.userId).toBe('123');
+        });
+        it('should reject if timeout', async () => {
+            const client = new Client(fakeURL);
+            await client.connect();
+            jest.useFakeTimers();
+            const loginPromise = client.login('batman');
+            jest.advanceTimersByTime(6000);
+            expect(loginPromise).rejects.toThrowError();
+            jest.useRealTimers();
+        });
+        it('should reject if connection closes before login', async () => {
+            const client = new Client(fakeURL);
+            mockServer.on('connection', (socket) => {
+                (socket as any).on('message', (data: unknown) => {
+                    socket.send(
+                        createPacket(MessageType.SUCCESS, {
+                            action: MessageType.LOGIN,
+                            userId: '123',
+                        }),
+                    );
+                });
+            });
+            await client.connect();
+            client.exit();
+            expect(client.login('batman')).rejects.toThrowError('connection closed');
+        });
+        it('should reject if connection closes during login', async () => {
+            const client = new Client(fakeURL);
+            mockServer.on('connection', (socket) => {
+                (socket as any).on('message', (data: unknown) => {
+                    socket.send(
+                        createPacket(MessageType.SUCCESS, {
+                            action: MessageType.LOGIN,
+                            userId: '123',
+                        }),
+                    );
+                });
+            });
+            await client.connect();
+            const loginPromise = client.login('batman');
+            client.exit();
+            expect(loginPromise).rejects.toThrowError('connection closed');
+        });
+    });
+
     describe('on', () => {
         it('can start listening before connection', async () => {
             const client = new Client(fakeURL);
@@ -42,12 +109,12 @@ describe('Client', () => {
                 socket.send(createPacket('HI', { value: 3 }));
             });
             const waitForHi = new Promise((resolve) => {
-                const mockCallback = jest.fn((data) => {
+                const mockCallback = (data: unknown) => {
                     expect(data).toMatchObject({
                         value: 3,
                     });
                     resolve();
-                });
+                };
                 client.on('HI', mockCallback);
             });
             await client.connect();

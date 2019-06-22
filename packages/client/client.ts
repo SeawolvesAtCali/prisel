@@ -1,6 +1,6 @@
 import once from 'lodash/once';
-import { SERVER } from '@prisel/common';
-import { createPacket } from '@prisel/common';
+import { SERVER, PayloadType } from '@prisel/common';
+import { createPacket, isFeedback } from '@prisel/common';
 
 import { getLogin, getExit } from './message/room';
 import { MessageType } from '@prisel/common';
@@ -15,6 +15,9 @@ const DEFAULT_TIMEOUT = 5000;
 const CONNECTION_TIMEOUT = DEFAULT_TIMEOUT;
 const LOGIN_TIMEOUT = DEFAULT_TIMEOUT;
 
+interface State {
+    [property: string]: unknown;
+}
 /**
  * Client class
  *
@@ -45,7 +48,7 @@ class Client {
         return !!this.conn;
     }
 
-    public state: { [prop: string]: unknown };
+    public state: State;
     private conn: WebSocket;
     private serverUri: string;
     private messageQueue = new PubSub();
@@ -103,13 +106,15 @@ class Client {
      * Throw error if not connected, or don't have controller namespace.
      * @param {string} username username to login with
      */
-    public login(username: string = DEFAULT_USERNAME): Promise<{ [prop: string]: unknown }> {
+    public login(username: string = DEFAULT_USERNAME): Promise<PayloadType> {
         if (this.isConnected) {
             this.emit(...getLogin(username));
             return withTimer(
                 this.once(
                     (messageType, data) =>
-                        messageType === MessageType.SUCCESS && data.action === MessageType.LOGIN,
+                        messageType === MessageType.SUCCESS &&
+                        isFeedback(data) &&
+                        data.action === MessageType.LOGIN,
                 ),
                 LOGIN_TIMEOUT,
             ).then((data) => {
@@ -127,7 +132,7 @@ class Client {
      * @param messageType
      * @param data
      */
-    public emit(messageType: string, data: { [prop: string]: unknown }) {
+    public emit(messageType: string, data: PayloadType) {
         if (this.isConnected) {
             this.connection.send(createPacket(messageType, data));
         } else {
@@ -142,10 +147,7 @@ class Client {
      */
     public on(
         messageTypeOrFilter: HandlerKey,
-        callback: (
-            data: { [prop: string]: unknown },
-            messageType?: string,
-        ) => { [prop: string]: unknown } | void,
+        callback: (data: PayloadType, messageType?: string) => State | void,
     ): RemoveListenerFunc {
         return this.messageQueue.on(messageTypeOrFilter, (data, messageType) => {
             const updatedState = callback(data, messageType) || this.state;
@@ -155,17 +157,17 @@ class Client {
 
     /**
      * Set the client state
-     * @param {Object} newState new state object to replace the old state
+     * @param newState new state object to replace the old state
      */
-    public setState(newState: { [prop: string]: unknown }) {
+    public setState(newState: State) {
         this.state = newState;
     }
 
     /**
      * Listen for message until receive the message once.
-     * @param {HandlerKey} messageTypeOrFilter message type to listen to
+     * @param messageTypeOrFilter message type to listen to
      */
-    public once(messageTypeOrFilter: HandlerKey): Promise<{ [prop: string]: unknown }> {
+    public once(messageTypeOrFilter: HandlerKey): Promise<PayloadType> {
         return new Promise((resolve) => {
             this.messageQueue.once(messageTypeOrFilter, resolve);
         });

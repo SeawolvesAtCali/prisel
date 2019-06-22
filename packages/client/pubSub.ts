@@ -1,8 +1,9 @@
 import { State } from './objects';
+import { PayloadType } from '@prisel/common';
 
-type Handler = (data: object, messageType?: string) => State;
+type Handler = (data: PayloadType, messageType?: string) => State;
 
-export type MessageFilter = (messageType: string, data: { [prop: string]: unknown }) => boolean;
+export type MessageFilter = (messageType: string, data: PayloadType) => boolean;
 
 export type HandlerKey = string | MessageFilter;
 
@@ -33,7 +34,7 @@ export default class PubSub {
         if (!this.subscription) {
             return;
         }
-        const onceHandler = (data: object, messageType: string) => {
+        const onceHandler = (data: PayloadType, messageType: string) => {
             handler(data, messageType);
             off();
         };
@@ -42,7 +43,7 @@ export default class PubSub {
         return off;
     }
 
-    public dispatch(messageType: string, data: object) {
+    public dispatch(messageType: string, data: PayloadType) {
         if (!this.subscription) {
             return;
         }

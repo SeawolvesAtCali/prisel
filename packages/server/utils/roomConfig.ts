@@ -1,5 +1,5 @@
 import { MessageType } from '@prisel/common';
-import Handle from './handle';
+import { Handle } from './handle';
 import { ClientId } from '../objects/client';
 import { getFailure, getJoinSuccess, getLeaveSuccess, getGameStartSuccess } from '../message';
 import { GAME_PHASE } from '../objects/gamePhase';

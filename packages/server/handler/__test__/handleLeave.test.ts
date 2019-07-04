@@ -3,6 +3,9 @@ import { handleLeave } from '../handleLeave';
 import * as StateUtils from '../../utils/stateUtils';
 import { mockClient, mockSocket } from '../../utils/testUtils';
 import { ClientId } from '../../objects/client';
+import createHandle, { Handle } from '../../utils/handle';
+
+jest.mock('../../utils/handle');
 
 describe('handleLeave', () => {
     it('should call room config onLeave', () => {
@@ -10,14 +13,14 @@ describe('handleLeave', () => {
         const client = mockClient({ id: '123' });
         const socket = mockSocket();
         const mockContext = createContext({});
-        const mockHandle = {
-            get players() {
-                return ['456'] as ClientId[];
-            },
-            room: {
+        const mockHandle = createHandle({
+            context: mockContext,
+            roomId: '123',
+            gameConfig: {},
+            roomConfig: {
                 onLeave,
             },
-        };
+        });
         const mockData = {};
         jest.spyOn(StateUtils, 'getClient').mockReturnValue(client);
         jest.spyOn(StateUtils, 'getHandle').mockReturnValue(mockHandle);

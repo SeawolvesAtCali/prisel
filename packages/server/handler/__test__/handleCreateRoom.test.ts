@@ -1,6 +1,6 @@
 import { handleCreateRoom } from '../handleCreateRoom';
 import { mockSocket, mockContext, mockRoomConfig } from '../../utils/testUtils';
-import Handle from '../../utils/handle';
+import { Handle } from '../../utils/handle';
 import find from 'lodash/find';
 import { GAME_PHASE } from '../../objects/gamePhase';
 jest.mock('../../utils/networkUtils');

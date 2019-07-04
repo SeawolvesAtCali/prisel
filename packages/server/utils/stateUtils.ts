@@ -1,5 +1,5 @@
 import { Context, Socket, Room, Client } from '../objects';
-import Handle from './handle';
+import { Handle } from './handle';
 import { newId } from './idUtils';
 import { RoomId } from '../objects/room';
 import { GAME_PHASE } from '../objects/gamePhase';

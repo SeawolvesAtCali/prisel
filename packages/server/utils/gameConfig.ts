@@ -1,4 +1,4 @@
-import Handle from './handle';
+import createHandle, { Handle } from './handle';
 import { ClientId } from '../objects/client';
 import { AnyObject } from '../objects';
 

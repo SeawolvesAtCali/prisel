@@ -1,10 +1,11 @@
 import { mockSocket, mockRoomConfig, mockContext, mockGameConfig } from '../../utils/testUtils';
 import { GAME_PHASE } from '../../objects/gamePhase';
-import Handle from '../../utils/handle';
+import createHandle, { Handle } from '../../utils/handle';
 import { handleExit } from '../handleExit';
 import { closeSocket } from '../../utils/networkUtils';
 
 jest.mock('../../utils/networkUtils');
+jest.mock('../../utils/handle');
 
 describe('handleExit', () => {
     it('should remove client', () => {
@@ -34,7 +35,7 @@ describe('handleExit', () => {
             undefined,
             roomConfig,
         );
-        context.handles[mockRoomId] = new Handle({
+        context.handles[mockRoomId] = createHandle({
             context,
             roomId: mockRoomId,
             roomConfig,

@@ -1,8 +1,9 @@
 import { mockSocket, mockContext, mockRoomConfig, mockGameConfig } from '../../utils/testUtils';
 import { GAME_PHASE } from '../../objects/gamePhase';
 import { handleJoin } from '../handleJoin';
-import Handle from '../../utils/handle';
+import createHandle, { Handle } from '../../utils/handle';
 
+jest.mock('../../utils/handle');
 jest.mock('../../utils/networkUtils');
 
 describe('handleJoin', () => {
@@ -34,7 +35,7 @@ describe('handleJoin', () => {
             undefined,
             roomConfig,
         );
-        context.handles[mockRoomId] = new Handle({
+        context.handles[mockRoomId] = createHandle({
             context,
             roomId: mockRoomId,
             roomConfig,
@@ -79,7 +80,7 @@ describe('handleJoin', () => {
         const roomConfig = mockRoomConfig({
             onJoin: jest.fn(),
         });
-        context.handles[mockRoomId] = new Handle({
+        context.handles[mockRoomId] = createHandle({
             context,
             roomId: mockRoomId,
             gameConfig: mockGameConfig(),

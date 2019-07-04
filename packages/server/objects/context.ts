@@ -1,7 +1,7 @@
 import { StateManager } from './stateManager';
 import SocketManager from '../socketManager';
 import { wsServer } from './server';
-import Handle from '../utils/handle';
+import { Handle } from '../utils/handle';
 import { GameConfig } from '../utils/gameConfig';
 import { RoomConfig } from '../utils/roomConfig';
 

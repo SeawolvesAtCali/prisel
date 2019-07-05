@@ -88,6 +88,7 @@
         "@prisel/client": "file:packages/client",
         "@prisel/common": "file:packages/common",
         "@prisel/e2e": "file:packages/e2e",
+        "@prisel/monopoly": "file:packages/monopoly",
         "@prisel/react": "file:packages/react",
         "@prisel/server": "file:packages/server",
         "@prisel/template": "file:packages/template",

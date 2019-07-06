@@ -2,6 +2,7 @@
     "extends": "../../tsconfig",
     "compilerOptions": {
         "rootDir": "./",
-        "outDir": "./lib"
+        "outDir": "./lib",
+        "downlevelIteration": true
     }
 }

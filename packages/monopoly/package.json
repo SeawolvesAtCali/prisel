@@ -22,7 +22,7 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "build": "tsc",
-        "start": "echo HI",
+        "start": "env DEBUG=debug ts-node index.ts",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
@@ -31,6 +31,7 @@
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
-        "@prisel/server": "file:../server"
+        "@prisel/server": "file:../server",
+        "jsonwebtoken": "^8.5.1"
     }
 }

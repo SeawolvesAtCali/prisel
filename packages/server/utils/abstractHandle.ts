@@ -18,6 +18,10 @@ export abstract class Handle {
     public game: GameConfig;
     public room: RoomConfig;
 
+    // Use this as an attachment point to attach some game state object.
+    // TODO: find a cleaner abstraction;
+    public attached: any;
+
     protected context: Context;
 
     constructor({ context, roomId, gameConfig, roomConfig }: HandleProps) {

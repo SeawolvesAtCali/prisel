@@ -1,5 +1,6 @@
-import { GameConfig, Messages } from '@prisel/server';
-import { createIntialState, flattenState } from './state';
+import { GameConfig } from '@prisel/server';
+import { createIntialState } from './state';
+import Game from './Game';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
@@ -9,11 +10,13 @@ const MonopolyGameConfig: GameConfig = {
         return handle.players.length > 1;
     },
     onStart(handle) {
-        const gameState = handle.setState(createIntialState(handle.players));
-        handle.broadcast(handle.players, ...Messages.getGameState(flattenState(gameState)));
+        handle.attached = createIntialState(handle.players, handle);
     },
     onEnd(handle) {},
-    onMessage(handle, player, data) {},
+    onMessage(handle, player, data) {
+        const game = handle.attached as Game;
+        game.processMessage(handle, player, data);
+    },
     onRemovePlayer(handle, player) {},
 };
 

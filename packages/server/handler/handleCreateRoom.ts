@@ -44,4 +44,4 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (data: {
     handle.room.onCreate(handle, hostId, data);
 };
 
-clientHandlerRegister.push([MessageType.CREATE_ROOM, handleCreateRoom]);
+clientHandlerRegister.push(MessageType.CREATE_ROOM, handleCreateRoom);

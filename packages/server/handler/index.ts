@@ -7,3 +7,4 @@ import './handleJoin';
 import './handleLeave';
 import './handleGameStart';
 import './handleMessage';
+import './handleGameAndRoomTypes';

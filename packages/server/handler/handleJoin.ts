@@ -28,4 +28,4 @@ export const handleJoin = (context: Context, socket: Socket) => (data: { roomId:
     }
 };
 
-clientHandlerRegister.push([MessageType.JOIN, handleJoin]);
+clientHandlerRegister.push(MessageType.JOIN, handleJoin);

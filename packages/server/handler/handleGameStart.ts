@@ -12,4 +12,4 @@ const handleGameStart = (context: Context, socket: Socket) => (data: {}) => {
     }
 };
 
-clientHandlerRegister.push([MessageType.GAME_START, handleGameStart]);
+clientHandlerRegister.push(MessageType.GAME_START, handleGameStart);

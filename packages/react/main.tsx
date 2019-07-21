@@ -29,18 +29,15 @@ const generateUsername = (index: number) => {
 
 export default function App() {
     const [clients, setClients] = React.useState([0]);
-    const addClient = React.useCallback(
-        () => {
-            setClients((prevClients) => [...clients, clients.length]);
-        },
-        [clients, setClients],
-    );
+    const addClient = React.useCallback(() => {
+        setClients((prevClients) => [...clients, clients.length]);
+    }, [clients]);
 
     return (
         <div style={{ overflow: 'auto', whiteSpace: 'nowrap', height: '100vh' }}>
             {clients.map((client, index) => (
                 <ClientContainer key={client} username={generateUsername(index)}>
-                    <RoomManager gameTypes={['tic-tac-toe', 'big-2']} />
+                    <RoomManager />
                     <GameStartButton />
                 </ClientContainer>
             ))}

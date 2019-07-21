@@ -21,4 +21,4 @@ export const handleChat = (context: Context, client: Socket) => (data: {
     }
 };
 
-clientHandlerRegister.push([MessageType.CHAT, handleChat]);
+clientHandlerRegister.push(MessageType.CHAT, handleChat);

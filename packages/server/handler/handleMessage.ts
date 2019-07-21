@@ -11,4 +11,4 @@ const handleMessage = (context: Context, socket: Socket) => (data: any) => {
     }
 };
 
-clientHandlerRegister.push([MessageType.MESSAGE, handleMessage]);
+clientHandlerRegister.push(MessageType.MESSAGE, handleMessage);

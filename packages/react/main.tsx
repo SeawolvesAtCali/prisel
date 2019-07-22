@@ -2,6 +2,30 @@ import * as React from 'react';
 import ClientContainer from './ClientContainer';
 import RoomManager from './RoomManager';
 import GameStartButton from './GameStartButton';
+import CommandInput from './commandInput/CommandInput';
+import { ChipEdit } from './commandInput/Chip';
+import CommandSuggestionProvider from './commandInput/CommandSuggestionProvider';
+import StringProvider from './commandInput/StringProvider';
+import NumberProvider from './commandInput/NumberProvider';
+import BooleanProvider from './commandInput/BooleanProvider';
+import NullProvider from './commandInput/NullProvider';
+import VariableProvider from './commandInput/VariableProvider';
+
+const commandProvider = new CommandSuggestionProvider(['chat', 'send', 'tell']);
+const stringProvider = new StringProvider();
+const numberProvider = new NumberProvider();
+const booleanProvider = new BooleanProvider();
+const nullProvider = new NullProvider();
+const variableProvider = new VariableProvider(['cat', 'dog', 'null']);
+
+const providers = [
+    commandProvider,
+    variableProvider,
+    numberProvider,
+    nullProvider,
+    booleanProvider,
+    stringProvider,
+];
 
 const generateUsername = (index: number) => {
     const usernameList = [
@@ -39,6 +63,7 @@ export default function App() {
                 <ClientContainer key={client} username={generateUsername(index)}>
                     <RoomManager />
                     <GameStartButton />
+                    <CommandInput suggestionProviders={providers} expand />
                 </ClientContainer>
             ))}
             <button

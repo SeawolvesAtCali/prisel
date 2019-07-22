@@ -42,6 +42,7 @@
         "react-json-view": "^1.19.1"
     },
     "devDependencies": {
+        "parcel-bundler": "^1.12.3",
         "react": "^16.8.1",
         "react-dom": "^16.8.1",
         "rollup": "^1.1.2",

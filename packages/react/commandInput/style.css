@@ -1,0 +1,61 @@
+.command-input-chip-edit {
+    display: inline-block;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+    font-size: 14px;
+    padding: 1px 4px;
+    box-sizing: border-box;
+    align-self: center;
+}
+
+.command-input-chip-edit.command {
+    background: #ffeeff;
+    border-color: #f8bbd0;
+    color: #c48b9f;
+}
+
+.command-input-chip-edit.param {
+    background: #fbfffc;
+    border-color: #c8e6c9;
+    color: #97b498;
+}
+
+.command-input-suggestion-item.highlight {
+    background: lightgrey;
+}
+
+.command-input-input {
+    outline: none;
+    border: none;
+}
+
+.command-input-container {
+    border: 1px solid lightgrey;
+    box-sizing: border-box;
+    display: inline-block;
+    width: 200px;
+}
+
+.command-input-container.expand {
+    display: block;
+    width: auto;
+}
+
+.command-input-container.focused {
+    outline: 1px solid blue;
+}
+
+.command-input-dropdown-container {
+    position: absolute;
+    width: 200px;
+    box-sizing: border-box;
+}
+
+.command-input-suggestion-list {
+    background: white;
+    border: 1px solid lightgrey;
+    box-sizing: border-box;
+    list-style: none;
+    padding: 0;
+}

@@ -1,4 +1,4 @@
-.command-input-chip-edit {
+.command-input-chip {
     display: inline-block;
     border-width: 1px;
     border-style: solid;
@@ -7,18 +7,25 @@
     padding: 1px 4px;
     box-sizing: border-box;
     align-self: center;
+    cursor: pointer;
+    white-space: normal;
+    margin: 1px;
 }
 
-.command-input-chip-edit.command {
+.command-input-chip.command {
     background: #ffeeff;
     border-color: #f8bbd0;
     color: #c48b9f;
 }
 
-.command-input-chip-edit.param {
+.command-input-chip.param {
     background: #fbfffc;
     border-color: #c8e6c9;
     color: #97b498;
+}
+
+.command-input-chip.highlight {
+    font-weight: bold;
 }
 
 .command-input-suggestion-item.highlight {
@@ -26,19 +33,31 @@
 }
 
 .command-input-input {
+    flex-grow: 1;
     outline: none;
     border: none;
+    margin: 1px;
 }
 
 .command-input-container {
     border: 1px solid lightgrey;
+    padding: 2px;
     box-sizing: border-box;
-    display: inline-block;
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    align-items: center;
+    flex-direction: row;
+    margin-right: 2px;
+}
+
+.command-input-outer-container {
+    display: inline-flex;
     width: 200px;
 }
 
-.command-input-container.expand {
-    display: block;
+.command-input-outer-container.expand {
+    display: flex;
     width: auto;
 }
 
@@ -48,6 +67,7 @@
 
 .command-input-dropdown-container {
     position: absolute;
+    z-index: 1;
     width: 200px;
     box-sizing: border-box;
 }
@@ -56,6 +76,40 @@
     background: white;
     border: 1px solid lightgrey;
     box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
     list-style: none;
     padding: 0;
+}
+
+.command-editor-dialog-container {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+.command-editor-drop-shadow {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: lightblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.command-editor-dialog-footer {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    padding-top: 10px;
+}
+
+.command-editor-param-section {
+    box-sizing: border-box;
+    border-radius: 1px solid lightgrey;
 }

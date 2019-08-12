@@ -1,22 +1,46 @@
 import * as React from 'react';
-import 'style.css';
+import cn from '../utils/classname';
+import './style.css';
 
 export interface Suggestion {
-    type: 'command' | 'param' | 'variableParam';
+    type: 'command' | 'param' | 'variableParam' | 'placeholderParam';
     label: string;
     value: any;
+    providerKey: string;
+}
+interface ChipProps extends Suggestion {
+    onClick?: (e: MouseEvent) => void;
+    editMode?: boolean;
+    onDelete?: (e: MouseEvent) => void;
 }
 
-export function ChipEdit(props: Suggestion) {
-    const { type, label, value } = props;
+const classNameForType: { [key in Suggestion['type']]: string } = {
+    command: 'command',
+    variableParam: 'param',
+    param: 'param',
+    placeholderParam: 'placeholder',
+};
 
-    switch (type) {
-        case 'command':
-            return <span className="command-input-chip-edit command">{label}</span>;
-        case 'variableParam':
-        case 'param':
-            return <span className="command-input-chip-edit param">{label}</span>;
-        default:
-            return null;
-    }
+export function Chip(props: ChipProps) {
+    const { type, label, editMode = false, onClick, onDelete } = props;
+    const closeRef = React.useRef(null);
+    const handleClick = React.useCallback(
+        (e) => {
+            if (e.target === closeRef.current && onDelete) {
+                onDelete(e);
+            } else if (onClick) {
+                onClick(e);
+            }
+        },
+        [onClick, onDelete],
+    );
+
+    const className = cn('command-input-chip', classNameForType[type], {
+        highlight: editMode,
+    });
+    return (
+        <span className={className} onClick={handleClick}>
+            {label} <i ref={closeRef}>X</i>
+        </span>
+    );
 }

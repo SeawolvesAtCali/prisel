@@ -1,25 +1,21 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import debounce from 'lodash/debounce';
+import useContainer from '../utils/useContainer';
 import './style.css';
 
 interface DropdownProps {
     open?: boolean;
     children?: any;
     target?: React.MutableRefObject<HTMLDivElement>;
+    onClickOutside?: (e, clickedOnTarget: boolean) => void;
     sameWidth?: boolean;
 }
 
-function useDomContainer() {
-    const container = React.useMemo(() => {
-        const div = document.createElement('div');
-        div.className = 'command-input-dropdown-container';
-        return div;
-    }, []);
-    return container;
-}
-
 function rawAlignDropdown(target: HTMLDivElement, self: HTMLDivElement, sameWidth: boolean) {
+    if (!target || !self) {
+        return;
+    }
     const { bottom, left } = target.getBoundingClientRect();
     self.style.top = `${bottom}px`;
     self.style.left = `${left}px`;
@@ -31,31 +27,45 @@ function rawAlignDropdown(target: HTMLDivElement, self: HTMLDivElement, sameWidt
 }
 const alignDropdown = debounce(rawAlignDropdown, 100);
 
-function Dropdown(props: DropdownProps) {
-    const { target, sameWidth = false, children = null, open } = props;
-    const dropdownContainer = useDomContainer();
-
+function Dropdown(props: DropdownProps, ref) {
+    const { target, sameWidth = false, children = null, open, onClickOutside } = props;
+    const dropdownContainer = useContainer('command-input-dropdown-container');
     React.useEffect(() => {
-        document.body.appendChild(dropdownContainer);
-        return () => {
-            document.body.removeChild(dropdownContainer);
-        };
-    });
-
+        if (open) {
+            const updatePosition = () => {
+                if (target.current) {
+                    alignDropdown(target.current, dropdownContainer, sameWidth);
+                }
+            };
+            updatePosition();
+            window.addEventListener('resize', updatePosition);
+            document.addEventListener('scroll', updatePosition);
+            return () => {
+                window.removeEventListener('resize', updatePosition);
+                document.removeEventListener('scroll', updatePosition);
+            };
+        }
+    }, [open]);
     React.useEffect(() => {
-        const updatePosition = () => {
-            if (target.current) {
-                alignDropdown(target.current, dropdownContainer, sameWidth);
-            }
-        };
-        updatePosition();
-        window.addEventListener('resize', updatePosition);
-        document.addEventListener('scroll', updatePosition);
-        return () => {
-            window.removeEventListener('resize', updatePosition);
-            document.removeEventListener('scroll', updatePosition);
-        };
-    });
+        if (open && onClickOutside) {
+            const listenClickOutside = (e: MouseEvent) => {
+                const clickedOutsideContainer = !dropdownContainer.contains(e.target as Node);
+                const clickedOnTarget = target.current && target.current.contains(e.target as Node);
+                if (clickedOutsideContainer) {
+                    onClickOutside(e, clickedOnTarget);
+                }
+            };
+            document.addEventListener('click', listenClickOutside);
+            return () => {
+                document.removeEventListener('click', listenClickOutside);
+            };
+        }
+    }, [onClickOutside, target, open]);
+    React.useImperativeHandle(ref, () => ({
+        align: () => {
+            alignDropdown(target.current, dropdownContainer, sameWidth);
+        },
+    }));
     return open ? ReactDOM.createPortal(children, dropdownContainer) : null;
 }
-export default Dropdown;
+export default React.forwardRef(Dropdown);

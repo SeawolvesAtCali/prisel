@@ -3,29 +3,9 @@ import ClientContainer from './ClientContainer';
 import RoomManager from './RoomManager';
 import GameStartButton from './GameStartButton';
 import CommandInput from './commandInput/CommandInput';
-import { ChipEdit } from './commandInput/Chip';
-import CommandSuggestionProvider from './commandInput/CommandSuggestionProvider';
-import StringProvider from './commandInput/StringProvider';
-import NumberProvider from './commandInput/NumberProvider';
-import BooleanProvider from './commandInput/BooleanProvider';
-import NullProvider from './commandInput/NullProvider';
-import VariableProvider from './commandInput/VariableProvider';
-
-const commandProvider = new CommandSuggestionProvider(['chat', 'send', 'tell']);
-const stringProvider = new StringProvider();
-const numberProvider = new NumberProvider();
-const booleanProvider = new BooleanProvider();
-const nullProvider = new NullProvider();
-const variableProvider = new VariableProvider(['cat', 'dog', 'null']);
-
-const providers = [
-    commandProvider,
-    variableProvider,
-    numberProvider,
-    nullProvider,
-    booleanProvider,
-    stringProvider,
-];
+import CommandEditor from './commandEditor/CommandEditor';
+import providers from './suggestionProviders';
+import CommandManager from './commandEditor/commandManager';
 
 const generateUsername = (index: number) => {
     const usernameList = [
@@ -57,13 +37,16 @@ export default function App() {
         setClients((prevClients) => [...clients, clients.length]);
     }, [clients]);
 
+    const handleSaveCommand = React.useCallback((title, script, tokens) => {
+        CommandManager.add(title, script, tokens);
+    }, []);
     return (
         <div style={{ overflow: 'auto', whiteSpace: 'nowrap', height: '100vh' }}>
+            <CommandEditor onSave={handleSaveCommand} />
             {clients.map((client, index) => (
                 <ClientContainer key={client} username={generateUsername(index)}>
                     <RoomManager />
                     <GameStartButton />
-                    <CommandInput suggestionProviders={providers} expand />
                 </ClientContainer>
             ))}
             <button

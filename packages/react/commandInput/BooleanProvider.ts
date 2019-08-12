@@ -2,6 +2,9 @@ import { SuggestionProvider } from './SuggestionProvider';
 import { Suggestion } from './Chip';
 
 export default class BooleanProvider extends SuggestionProvider {
+    constructor() {
+        super('booleanProvider');
+    }
     public getSuggestion(chips: Suggestion[], currentInput: string): Suggestion[] {
         if (chips.length < 1) {
             return [];
@@ -11,22 +14,10 @@ export default class BooleanProvider extends SuggestionProvider {
         }
         const lowercaseInput = currentInput.toLocaleLowerCase();
         if ('true'.startsWith(lowercaseInput)) {
-            return [
-                {
-                    type: 'param',
-                    value: true,
-                    label: 'true',
-                },
-            ];
+            return [this.createParam('true', true)];
         }
         if ('false'.startsWith(lowercaseInput)) {
-            return [
-                {
-                    type: 'param',
-                    value: false,
-                    label: 'false',
-                },
-            ];
+            return [this.createParam('false', false)];
         }
         return [];
     }

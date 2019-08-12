@@ -3,6 +3,8 @@ import { Card, Tag } from 'antd';
 import { Client } from '@prisel/client';
 import useGameAndRoomTypes from './useGameAndRoomTypes';
 import LogDisplay, { Log } from './Log';
+import CommandInput from './commandInput/CommandInput';
+import providers from './suggestionProviders';
 
 const { useState, useEffect, useCallback, useMemo } = React;
 interface ClientContainerProps {
@@ -133,6 +135,13 @@ export default function ClientContainer(props: ClientContainerProps) {
                 >
                     <div style={{ display: tab === 'detail' ? 'block' : 'none' }}>
                         {props.children}
+                        <CommandInput
+                            suggestionProviders={providers}
+                            expand
+                            onRun={(json: any) => {
+                                client.emit(json.messageType, json.data);
+                            }}
+                        />
                     </div>
                     <div style={{ display: tab === 'log' ? 'block' : 'none' }}>
                         <LogDisplay logs={logs} />

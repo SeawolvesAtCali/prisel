@@ -2,12 +2,16 @@ import * as React from 'react';
 import { SuggestionProvider } from './SuggestionProvider';
 import './style.css';
 import Dropdown from './Dropdown';
-import { Suggestion, ChipEdit } from './Chip';
+import { Suggestion, Chip } from './Chip';
 import SuggestionList from './SuggestionList';
+import cn from '../utils/classname';
+import { Button } from 'antd';
+import run from './runCommand';
 
 interface CommandInputProps {
     suggestionProviders?: SuggestionProvider[];
     expand: boolean;
+    onRun?: (jsonObject: object) => void;
 }
 
 function stopEvent(e: Event) {
@@ -16,10 +20,10 @@ function stopEvent(e: Event) {
 }
 
 function useKeyControll(
-    hoverPrevSuggestion,
-    hoverNextSuggestion,
-    selectSuggestion,
-    setDropdownOpen,
+    hoverPrevSuggestion: () => void,
+    hoverNextSuggestion: () => void,
+    selectSuggestion: () => void,
+    setDropdownOpen: (open: boolean) => void,
 ) {
     const handleKeyPress = React.useCallback(
         (e) => {
@@ -38,9 +42,6 @@ function useKeyControll(
                     break;
                 case 'ArrowUp':
                     hoverPrevSuggestion();
-                    stopEvent(e);
-                    break;
-                case 'Tab':
                     stopEvent(e);
                     break;
                 default:
@@ -72,21 +73,24 @@ function generateSuggestions(
 }
 
 function CommandInput(props: CommandInputProps) {
-    const { suggestionProviders = [], expand = false } = props;
+    const { suggestionProviders = [], expand = false, onRun } = props;
     const [input, rawSetInput] = React.useState('');
     const [chips, setChips] = React.useState([] as Suggestion[]);
     const [focused, setFocused] = React.useState(false);
+    const [highlightedChipIndex, setHighlightedChipIndex] = React.useState(-1);
     const [hoveredSuggestion, setHoveredSuggestion] = React.useState(0);
     const [suggestions, setSuggestions] = React.useState(
         generateSuggestions(suggestionProviders, chips, input),
     );
+    const inputRef = React.useRef(null);
+    const dropdownRef = React.useRef(null);
 
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const updateSuggestions = React.useCallback(
         (currentChips: Suggestion[], currentInput: string) => {
             setSuggestions(generateSuggestions(suggestionProviders, currentChips, currentInput));
         },
-        [suggestionProviders, chips],
+        [suggestionProviders],
     );
 
     const setInput = React.useCallback(
@@ -107,50 +111,107 @@ function CommandInput(props: CommandInputProps) {
         setHoveredSuggestion(moveIndex(hoveredSuggestion, suggestions.length, 1));
     }, [suggestions, hoveredSuggestion]);
 
-    const selectSuggestion = React.useCallback(() => {
-        if (suggestions[hoveredSuggestion]) {
-            const newChips = [...chips, suggestions[hoveredSuggestion]];
-            setChips(newChips);
-            rawSetInput('');
-            updateSuggestions(newChips, '');
-        }
-    }, [input, hoveredSuggestion, suggestions]);
+    const selectSuggestion = React.useCallback(
+        (selectedSuggestion?: Suggestion) => {
+            const suggestion = selectedSuggestion || suggestions[hoveredSuggestion];
+            if (suggestion) {
+                const { providerKey } = suggestion;
+                const selectedProvider = suggestionProviders.find(
+                    (provider) => provider.key === providerKey,
+                );
+                const newChips = selectedProvider
+                    ? selectedProvider.onSelected(suggestion, chips, input)
+                    : [];
+                const updatedChips = [...chips, ...newChips];
+                setChips(updatedChips);
+                rawSetInput('');
+                updateSuggestions(updatedChips, '');
+                inputRef.current.focus();
+            }
+            dropdownRef.current.align();
+        },
+        [input, chips, suggestions, hoveredSuggestion],
+    );
     const handleKeyPress = useKeyControll(
         hoverPrevSuggestion,
         hoverNextSuggestion,
         selectSuggestion,
         setDropdownOpen,
     );
+    const handleRun = React.useCallback(() => {
+        if (onRun) {
+            run(chips, () => {}, onRun);
+        }
+    }, [chips, onRun]);
 
-    const containerClass = [
-        'command-input-container',
-        focused ? 'focused' : '',
-        expand ? 'expand' : '',
-    ].join(' ');
+    const inputContainerClass = cn('command-input-container', { focused });
+    const containerClass = cn('command-input-outer-container', { expand });
     const ref = React.useRef(null as HTMLDivElement);
     return (
-        <div className={containerClass} ref={ref}>
-            {chips.map((chip, index) => (
-                <ChipEdit key={index} {...chip} />
-            ))}
-            <input
-                onFocus={() => {
-                    setFocused(true);
-                    setDropdownOpen(true);
+        <div className={containerClass}>
+            <div
+                className={inputContainerClass}
+                ref={ref}
+                onClick={(e) => {
+                    inputRef.current.focus();
                 }}
-                onBlur={() => {
-                    setFocused(false);
-                    setDropdownOpen(false);
-                }}
-                className="command-input-input"
-                onChange={setInput}
-                value={input}
-                onKeyDown={handleKeyPress}
-                autoFocus
-            />
-            <Dropdown open={dropdownOpen} target={ref} sameWidth>
-                <SuggestionList suggestions={suggestions} selected={hoveredSuggestion} />
-            </Dropdown>
+            >
+                {chips.map((chip, index) => (
+                    <Chip
+                        key={index}
+                        {...chip}
+                        editMode={highlightedChipIndex === index}
+                        onClick={() => {
+                            setHighlightedChipIndex(index);
+                        }}
+                        onDelete={() => {
+                            let newChips: Suggestion[] = [];
+                            // it's a command type, remove all the chips
+                            if (chips[index].type !== 'command') {
+                                newChips = chips.filter((_, chipIndex) => index !== chipIndex);
+                            }
+                            setChips(newChips);
+                            updateSuggestions(newChips, input);
+                            dropdownRef.current.align();
+                        }}
+                    />
+                ))}
+                <input
+                    onFocus={() => {
+                        setFocused(true);
+                        setDropdownOpen(true);
+                    }}
+                    onBlur={() => {
+                        setFocused(false);
+                    }}
+                    ref={inputRef}
+                    className="command-input-input"
+                    onChange={setInput}
+                    value={input}
+                    onKeyDown={handleKeyPress}
+                    autoFocus
+                />
+                <Dropdown
+                    open={dropdownOpen}
+                    target={ref}
+                    ref={dropdownRef}
+                    sameWidth
+                    onClickOutside={(e, clickedOnTarget) => {
+                        if (!clickedOnTarget) {
+                            setDropdownOpen(false);
+                        }
+                    }}
+                >
+                    <SuggestionList
+                        suggestions={suggestions}
+                        selected={hoveredSuggestion}
+                        onSelect={selectSuggestion}
+                    />
+                </Dropdown>
+            </div>
+            <Button type="primary" onClick={handleRun}>
+                RUN
+            </Button>
         </div>
     );
 }

@@ -1,13 +1,13 @@
 import { SuggestionProvider } from './SuggestionProvider';
 import { Suggestion } from './Chip';
-import { Command } from '../commandEditor/commandManager';
+import { Command, CommandManager } from '../commandEditor/commandManager';
 
 export default class CommandSuggestionProvider extends SuggestionProvider {
-    private commands: Command[];
+    private commandManager: CommandManager;
 
-    constructor(commands: Command[]) {
+    constructor(commandManager: CommandManager) {
         super('commandProvider');
-        this.commands = commands;
+        this.commandManager = commandManager;
     }
     private toSuggestions(commands: Command[]): Suggestion[] {
         return commands.map((command) => this.createCommand(command.title, command));
@@ -16,12 +16,13 @@ export default class CommandSuggestionProvider extends SuggestionProvider {
         if (chips.length > 0) {
             return [];
         }
+        const allCommands = this.commandManager.getAll();
         if (currentInput === '') {
-            return this.toSuggestions(this.commands);
+            return this.toSuggestions(allCommands);
         }
         const lowerCaseInput = currentInput.toLocaleLowerCase();
         return this.toSuggestions(
-            this.commands.filter((command) =>
+            allCommands.filter((command) =>
                 command.title.toLocaleLowerCase().startsWith(lowerCaseInput),
             ),
         );

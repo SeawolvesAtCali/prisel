@@ -10,13 +10,13 @@ interface CommandMap {
     [title: string]: Command;
 }
 
-class CommandManager {
+export class CommandManager {
     private commands: CommandMap = {};
     private storage: Storage;
 
     constructor(storage: Storage) {
         this.storage = storage;
-        this.commands = (JSON.parse(storage.getItem(STORAGE_KEY)) || {}) as CommandMap;
+        this.refresh();
     }
 
     private preserve() {
@@ -30,6 +30,10 @@ class CommandManager {
             tokens,
         };
         this.preserve();
+    }
+
+    public refresh() {
+        this.commands = (JSON.parse(this.storage.getItem(STORAGE_KEY)) || {}) as CommandMap;
     }
 
     public delete(title: string) {

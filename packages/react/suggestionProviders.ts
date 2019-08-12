@@ -6,7 +6,7 @@ import NullProvider from './commandInput/NullProvider';
 import VariableProvider from './commandInput/VariableProvider';
 import CommandManager from './commandEditor/commandManager';
 
-const commandProvider = new CommandSuggestionProvider(CommandManager.getAll());
+const commandProvider = new CommandSuggestionProvider(CommandManager);
 const stringProvider = new StringProvider();
 const numberProvider = new NumberProvider();
 const booleanProvider = new BooleanProvider();

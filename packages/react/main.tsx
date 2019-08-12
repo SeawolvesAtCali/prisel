@@ -39,10 +39,11 @@ export default function App() {
 
     const handleSaveCommand = React.useCallback((title, script, tokens) => {
         CommandManager.add(title, script, tokens);
+        CommandManager.refresh();
     }, []);
     return (
         <div style={{ overflow: 'auto', whiteSpace: 'nowrap', height: '100vh' }}>
-            <CommandEditor onSave={handleSaveCommand} />
+            <CommandEditor onSave={handleSaveCommand} savedCommands={CommandManager.getAll()} />
             {clients.map((client, index) => (
                 <ClientContainer key={client} username={generateUsername(index)}>
                     <RoomManager />

@@ -81,35 +81,3 @@
     list-style: none;
     padding: 0;
 }
-
-.command-editor-dialog-container {
-    position: absolute;
-    z-index: 2;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-}
-
-.command-editor-drop-shadow {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: lightblue;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.command-editor-dialog-footer {
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: flex-start;
-    padding-top: 10px;
-}
-
-.command-editor-param-section {
-    box-sizing: border-box;
-    border-radius: 1px solid lightgrey;
-}

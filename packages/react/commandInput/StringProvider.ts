@@ -13,7 +13,7 @@ export default class StringProvider extends SuggestionProvider {
         const trimmed = trim(currentInput, `'"`);
         return [this.createParam(this.getLabel(trimmed), trimmed)];
     }
-    private getLabel(value) {
+    private getLabel(value: string) {
         return `'${value}'`;
     }
 }

@@ -3,13 +3,12 @@ function toArray(item: any): string[] {
         return [item];
     }
     if (Array.isArray(item)) {
-        return (item.map(toArray) as any).flat();
+        return item.map(toArray).flat();
     }
     if (typeof item === 'object') {
         return toArray(
-            (Object as any)
-                .entries(item)
-                .filter(([key, value]) => value)
+            Object.entries(item)
+                .filter(([, value]) => value)
                 .map(([key]) => key),
         );
     }

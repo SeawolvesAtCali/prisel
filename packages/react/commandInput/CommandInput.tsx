@@ -66,10 +66,12 @@ function generateSuggestions(
     chips: Suggestion[],
     input: string,
 ): Suggestion[] {
-    return (suggestionProviders.map((provider) => {
-        const suggestions = provider.getSuggestion(chips, input);
-        return suggestions;
-    }) as any).flat();
+    return suggestionProviders
+        .map((provider) => {
+            const suggestions = provider.getSuggestion(chips, input);
+            return suggestions;
+        })
+        .flat();
 }
 
 function CommandInput(props: CommandInputProps) {

@@ -5,7 +5,7 @@ function get(target: Map<string, symbol>, key: string) {
     return target.get('' + key);
 }
 
-function has(target, key) {
+function has(target: any, key: string) {
     return true;
 }
 

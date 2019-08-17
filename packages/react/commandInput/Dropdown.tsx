@@ -8,7 +8,7 @@ interface DropdownProps {
     open?: boolean;
     children?: any;
     target?: React.MutableRefObject<HTMLDivElement>;
-    onClickOutside?: (e, clickedOnTarget: boolean) => void;
+    onClickOutside?: (e: MouseEvent, clickedOnTarget: boolean) => void;
     sameWidth?: boolean;
 }
 
@@ -27,7 +27,7 @@ function rawAlignDropdown(target: HTMLDivElement, self: HTMLDivElement, sameWidt
 }
 const alignDropdown = debounce(rawAlignDropdown, 100);
 
-function Dropdown(props: DropdownProps, ref) {
+function Dropdown(props: DropdownProps, ref: React.Ref<unknown>) {
     const { target, sameWidth = false, children = null, open, onClickOutside } = props;
     const dropdownContainer = useContainer('command-input-dropdown-container');
     React.useEffect(() => {

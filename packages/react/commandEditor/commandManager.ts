@@ -42,7 +42,7 @@ export class CommandManager {
     }
 
     public getAll(): Command[] {
-        return (Object as any).values(this.commands);
+        return Object.values(this.commands);
     }
 }
 

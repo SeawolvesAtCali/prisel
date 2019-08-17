@@ -4,6 +4,7 @@ import pkg from './package.json';
 
 const externalDependencyList = [...Object.keys(pkg.dependencies), 'react', 'react-dom'];
 
+// Deprecated
 export default [
     {
         input: 'index.ts',

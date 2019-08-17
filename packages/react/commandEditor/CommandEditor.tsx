@@ -3,7 +3,7 @@ import { Card, Input, Button, Mentions } from 'antd';
 import Dialog from './Dialog';
 import Editor from 'react-simple-code-editor';
 import compile from './InsecureEval';
-import { highlight, languages } from 'prismjs/components/prism-core';
+import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import './highlight.css';
@@ -92,7 +92,7 @@ function CommandEditor(props: CommandEditorProp) {
                     <Editor
                         value={json}
                         onValueChange={handleJson}
-                        highlight={(code) => highlight(code, languages.js)}
+                        highlight={(code) => highlight(code, languages.js, 'js')}
                         padding={10}
                         style={{
                             fontFamily: 'monospace',

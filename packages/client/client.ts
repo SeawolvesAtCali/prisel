@@ -59,6 +59,11 @@ class Client {
         this.connect = once(this.connect.bind(this));
     }
 
+    public log(...rest: any[]): void {
+        // tslint:disable-next-line:no-console
+        console.log(...rest);
+    }
+
     /**
      * Connect to server
      */

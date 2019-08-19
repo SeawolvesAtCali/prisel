@@ -1,8 +1,8 @@
-import GameObject from './GameObject';
+import GameObject, { IGameObject, FlatGameObject, Ref } from './GameObject';
 import Property from './Property';
 import { Handle } from '@prisel/server';
 
-interface NodeProps {
+interface NodeProps extends IGameObject {
     id: string;
     next?: Node;
     prev?: Node;
@@ -11,6 +11,12 @@ interface NodeProps {
 
 export default interface Node extends NodeProps {
     genPath(steps: number): Node[];
+}
+
+interface FlatNodeProject extends FlatGameObject {
+    next: Ref<Node>;
+    prev: Ref<Node>;
+    property: Ref<Property>;
 }
 
 class NodeImpl extends GameObject implements Node {
@@ -40,6 +46,15 @@ class NodeImpl extends GameObject implements Node {
             }
         }
         return path;
+    }
+
+    public flat(): FlatNodeProject {
+        return {
+            id: this.id,
+            prev: this.ref(this.prev),
+            next: this.ref(this.next),
+            property: this.ref(this.property),
+        };
     }
 }
 

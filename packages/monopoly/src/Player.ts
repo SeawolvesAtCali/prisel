@@ -1,20 +1,23 @@
 import { ClientId, Handle } from '@prisel/server';
 import Property from './Property';
 import Node from './Node';
-import GameObject from './GameObject';
+import { log } from './logGameObject';
+import GameObject, { FlatGameObject, Ref, IGameObject } from './GameObject';
 import Game from './Game';
 
-export enum PlayerPhase {
-    WAITING, // Not player's turn yet or Player hasn't roll dice yet.
-    ROLLED, // Player rolled a dice, maybe waiting for other action
-}
-
-interface PlayerProps {
+interface PlayerProps extends IGameObject {
     id: ClientId;
-    position?: Node;
+    position: Node;
     owning: Property[];
     cash: number;
-    phase: PlayerPhase;
+    rolled: boolean;
+}
+
+interface FlatPlayer extends FlatGameObject {
+    position: Ref<Node>;
+    owning: Array<Ref<Property>>;
+    cash: number;
+    rolled: boolean;
 }
 
 function roll() {
@@ -26,6 +29,7 @@ export default interface Player extends PlayerProps {
     roll(game: Game): void;
     purchase(game: Game): void;
     endTurn(game: Game): void;
+    gainMoney(amount: number): void;
 }
 
 enum PlayerAction {
@@ -41,19 +45,18 @@ const PlayerActionMap = {
 };
 
 class PlayerImpl extends GameObject implements Player {
-    public position?: Node;
+    public position: Node;
     public owning: Property[];
     public cash: number;
-    public phase: PlayerPhase;
+    public rolled: boolean;
 
     constructor(props: PlayerProps) {
         super();
-
         this.id = props.id;
         this.position = props.position;
-        this.owning = props.owning;
+        this.owning = props.owning || [];
         this.cash = props.cash;
-        this.phase = props.phase;
+        this.rolled = props.rolled;
     }
 
     public handleAction(type: string, game: Game) {
@@ -75,22 +78,29 @@ class PlayerImpl extends GameObject implements Player {
         }
     }
 
+    @log
     private payRent(player: Player, amount: number): number {
         const paid = Math.min(this.cash, amount);
         this.cash -= paid;
-        player.cash += paid;
+        player.gainMoney(paid);
         return paid;
     }
 
+    @log
+    public gainMoney(amount: number) {
+        this.cash += amount;
+    }
+
+    @log
     public roll(game: Game): void {
-        if (this.phase === PlayerPhase.WAITING) {
+        if (!this.rolled) {
             const steps = roll();
-            this.phase = PlayerPhase.ROLLED;
+            this.rolled = true;
             const path = this.position.genPath(steps);
             this.position = path[path.length - 1];
             const { property } = this.position;
             if (property) {
-                if (property.owner.id !== this.id) {
+                if (property.owner && property.owner.id !== this.id) {
                     this.payRent(property.owner, property.rent);
                 }
             }
@@ -103,22 +113,34 @@ class PlayerImpl extends GameObject implements Player {
         }
     }
 
+    @log
     public purchase(game: Game): void {
         const { property } = this.position;
         if (property && !property.owner && property.price <= this.cash) {
             this.cash = this.cash - property.price;
-            property.owner = this;
+            property.setOwner(this);
             this.owning.push(property);
         }
     }
 
+    @log
     public endTurn(game: Game): void {
-        if (this.phase === PlayerPhase.ROLLED) {
+        if (this.rolled) {
             // if not rolled, cannot end turn
-            this.phase = PlayerPhase.WAITING;
+            this.rolled = true;
             game.giveTurnToNext();
             // TODO: notify next player
         }
+    }
+
+    public flat(): FlatPlayer {
+        return {
+            id: this.id,
+            position: this.ref(this.position),
+            owning: this.owning.map(this.ref),
+            cash: this.cash,
+            rolled: this.rolled,
+        };
     }
 }
 

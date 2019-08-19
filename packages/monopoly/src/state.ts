@@ -1,8 +1,8 @@
 import { ClientId, Handle } from '@prisel/server';
 import Game from './Game';
-import { create as createPlayer, PlayerPhase } from './Player';
+import { create as createPlayer } from './Player';
 import { create as createGame } from './Game';
-import createBoard from './gameData/board';
+import createBoard, { genId } from './gameData/board';
 
 const CASH = 1000;
 
@@ -16,7 +16,7 @@ export function createIntialState(players: ClientId[], handle: Handle): Game {
                     cash: CASH,
                     id: player,
                     owning: [],
-                    phase: PlayerPhase.WAITING,
+                    rolled: false,
                     position: board,
                 },
                 handle,
@@ -24,14 +24,18 @@ export function createIntialState(players: ClientId[], handle: Handle): Game {
         ]),
     );
 
-    return createGame(
+    const game = createGame(
         {
+            id: genId(),
             players: playerMap,
             turnOrder: Array.from(playerMap.values()),
             map: board,
         },
         handle,
     );
+    // tslint:disable-next-line:no-console
+    console.log(game.flat());
+    return game;
 }
 
 export function flattenState(gameState: Game): object {

@@ -1,9 +1,9 @@
 import Player from './player';
 import { ClientId, Handle } from '@prisel/server';
-import GameObject from './GameObject';
+import GameObject, { IGameObject, FlatGameObject, Ref } from './GameObject';
 import Node from './Node';
 
-interface GameProps {
+interface GameProps extends IGameObject {
     players: Map<ClientId, Player>;
     turnOrder: Player[];
     map: Node;
@@ -15,13 +15,21 @@ export default interface Game extends GameProps {
     processMessage(handle: Handle, playerId: ClientId, data: any): void;
 }
 
+interface FlatGame extends FlatGameObject {
+    players: { [playerId: string]: Ref<Player> };
+    turnOrder: Array<Ref<Player>>;
+    map: Ref<Node>;
+}
+
 class GameImpl extends GameObject implements Game {
+    public id: string;
     public players: Map<string, Player>;
     public turnOrder: Player[];
     public map: Node;
 
     constructor(props: GameProps) {
         super();
+        this.id = props.id;
         this.players = props.players;
         this.turnOrder = props.turnOrder;
         this.map = props.map;
@@ -40,6 +48,19 @@ class GameImpl extends GameObject implements Game {
 
     public isCurrentPlayer(player: Player) {
         return this.turnOrder[0] === player;
+    }
+
+    public flat(): FlatGame {
+        const players: { [playerId: string]: Ref<Player> } = {};
+        this.players.forEach((player, key) => {
+            players[key] = this.ref(player);
+        });
+        return {
+            id: this.id,
+            players,
+            map: this.ref(this.map),
+            turnOrder: this.turnOrder.map(this.ref),
+        };
     }
 }
 

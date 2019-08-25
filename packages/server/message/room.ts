@@ -74,3 +74,10 @@ export function getRoomUpdate(roomData: object): Message {
 export function getMessage(data: any): Message {
     return [MessageType.MESSAGE, data];
 }
+
+export function getGameAndRoomTypesSuccess(gameTypes: string[], roomTypes: string[]): Message {
+    return getSuccess(MessageType.GET_GAME_AND_ROOM_TYPES, {
+        gameTypes,
+        roomTypes,
+    });
+}

@@ -32,6 +32,13 @@ class ConfigManager {
             };
         }
     }
+
+    public getAllTypes() {
+        return {
+            gameTypes: Object.keys(this.gameConfigs),
+            roomTypes: Object.keys(this.roomConfigs),
+        };
+    }
 }
 
 export default ConfigManager;

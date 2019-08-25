@@ -23,4 +23,4 @@ export const handleExit = (context: Context, socket: Socket) => (data: {}) => {
     });
 };
 
-clientHandlerRegister.push([MessageType.EXIT, handleExit]);
+clientHandlerRegister.push(MessageType.EXIT, handleExit);

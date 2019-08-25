@@ -27,12 +27,16 @@ class HandleImpl extends Handle {
     }
 
     public emit(playerId: ClientId, ...rest: any[]) {
-        emitWithPlayerId(this.context, playerId, rest[0], rest[1]);
+        if (rest.length === 2) {
+            emitWithPlayerId(this.context, playerId, rest[0], rest[1]);
+        } else {
+            emitWithPlayerId(this.context, playerId, MessageType.MESSAGE, rest[0]);
+        }
     }
 
     public broadcast(playerIds: ClientId[], ...rest: any[]) {
         playerIds.forEach((playerId) => {
-            emitWithPlayerId(this.context, playerId, rest[0], rest[1]);
+            this.emit(playerId, ...rest);
         });
     }
 

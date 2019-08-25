@@ -5,7 +5,7 @@ import { MessageType } from '@prisel/common';
 import { GAME_PHASE } from '../objects/gamePhase';
 import { GameConfig, BaseGameConfig } from './gameConfig';
 import { RoomConfig, BaseRoomConfig } from './roomConfig';
-
+import debug from '../debug';
 export interface HandleProps {
     context: Context;
     roomId: RoomId;
@@ -17,6 +17,10 @@ export abstract class Handle {
     public roomId: RoomId;
     public game: GameConfig;
     public room: RoomConfig;
+
+    // Use this as an attachment point to attach some game state object.
+    // TODO: find a cleaner abstraction;
+    public attached: any;
 
     protected context: Context;
 
@@ -180,6 +184,10 @@ export abstract class Handle {
      */
     public __dangerouslyUpdateRoom__(producer: (room: Room) => void) {
         return this.updateRoomState(producer);
+    }
+
+    public log(formatter: string, ...rest: any[]): void {
+        debug(formatter, ...rest);
     }
 
     private updateRoomState(producer: (room: Room) => void) {

@@ -2,6 +2,10 @@ import * as React from 'react';
 import ClientContainer from './ClientContainer';
 import RoomManager from './RoomManager';
 import GameStartButton from './GameStartButton';
+import CommandInput from './commandInput/CommandInput';
+import CommandEditor from './commandEditor/CommandEditor';
+import providers from './suggestionProviders';
+import CommandManager from './commandEditor/commandManager';
 
 const generateUsername = (index: number) => {
     const usernameList = [
@@ -29,18 +33,20 @@ const generateUsername = (index: number) => {
 
 export default function App() {
     const [clients, setClients] = React.useState([0]);
-    const addClient = React.useCallback(
-        () => {
-            setClients((prevClients) => [...clients, clients.length]);
-        },
-        [clients, setClients],
-    );
+    const addClient = React.useCallback(() => {
+        setClients((prevClients) => [...clients, clients.length]);
+    }, [clients]);
 
+    const handleSaveCommand = React.useCallback((title, script, tokens) => {
+        CommandManager.add(title, script, tokens);
+        CommandManager.refresh();
+    }, []);
     return (
         <div style={{ overflow: 'auto', whiteSpace: 'nowrap', height: '100vh' }}>
+            <CommandEditor onSave={handleSaveCommand} savedCommands={CommandManager.getAll()} />
             {clients.map((client, index) => (
                 <ClientContainer key={client} username={generateUsername(index)}>
-                    <RoomManager gameTypes={['tic-tac-toe', 'big-2']} />
+                    <RoomManager />
                     <GameStartButton />
                 </ClientContainer>
             ))}

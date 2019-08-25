@@ -36,6 +36,8 @@ enum MessageType {
      * Customizable message for developer to extend
      */
     MESSAGE = 'MESSAGE',
+
+    GET_GAME_AND_ROOM_TYPES = 'GET_GAME_AND_ROOM_TYPES',
 }
 
 export default MessageType;

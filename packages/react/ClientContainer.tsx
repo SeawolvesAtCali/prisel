@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { Card, Tag } from 'antd';
 import { Client } from '@prisel/client';
+import useGameAndRoomTypes from './useGameAndRoomTypes';
 import LogDisplay, { Log } from './Log';
+import CommandInput from './commandInput/CommandInput';
+import providers from './suggestionProviders';
 
 const { useState, useEffect, useCallback, useMemo } = React;
 interface ClientContainerProps {
@@ -21,11 +24,15 @@ const ClientContext = React.createContext<{
     userId: string;
     username: string;
     log: addToLog;
+    gameTypes: string[];
+    roomTypes: string[];
 }>({
     client: undefined,
     userId: '',
     username: '',
     log: undefined,
+    gameTypes: [],
+    roomTypes: [],
 });
 
 ClientContext.displayName = 'ClientContext';
@@ -47,7 +54,7 @@ export function useLogs(): [
         type: string,
         payload: { [prop: string]: unknown },
         origin: 'server' | 'client' | 'none',
-    ) => void
+    ) => void,
 ] {
     const [logs, setLogs] = useState([]);
     const addToLogs = useCallback(
@@ -76,39 +83,35 @@ export default function ClientContainer(props: ClientContainerProps) {
     const [userId, setUserId] = useState('');
     const [tab, setTab] = useState('detail');
 
-    const client = useMemo(
-        () => {
-            return props.client || new Client();
-        },
-        [props.client],
-    );
+    const client = useMemo(() => {
+        return props.client || new Client();
+    }, [props.client]);
 
-    useEffect(
-        () => {
-            client.on(
-                () => true,
-                (data, messageType) => {
-                    addToLogs(messageType, data, 'server');
-                },
-            );
-            client
-                .connect()
-                .then(() => {
-                    setConnected(true);
-                    if (client.isConnected) {
-                        return client.login(props.username);
-                    }
-                })
-                .then((data) => {
-                    if (data) {
-                        setLoggedIn(true);
-                        setUserId(data.userId as string);
-                    }
-                });
-            return client.exit.bind(client);
-        },
-        [client],
-    );
+    const { gameTypes, roomTypes } = useGameAndRoomTypes(connected ? client : null);
+
+    useEffect(() => {
+        client.on(
+            () => true,
+            (data, messageType) => {
+                addToLogs(messageType, data, 'server');
+            },
+        );
+        client
+            .connect()
+            .then(() => {
+                setConnected(true);
+                if (client.isConnected) {
+                    return client.login(props.username);
+                }
+            })
+            .then((data) => {
+                if (data) {
+                    setLoggedIn(true);
+                    setUserId(data.userId as string);
+                }
+            });
+        return client.exit.bind(client);
+    }, [client]);
 
     return (
         <Card
@@ -126,10 +129,19 @@ export default function ClientContainer(props: ClientContainerProps) {
                         userId,
                         username: props.username,
                         log: addToLogs,
+                        gameTypes,
+                        roomTypes,
                     }}
                 >
                     <div style={{ display: tab === 'detail' ? 'block' : 'none' }}>
                         {props.children}
+                        <CommandInput
+                            suggestionProviders={providers}
+                            expand
+                            onRun={(json: any) => {
+                                client.emit(json.messageType, json.data);
+                            }}
+                        />
                     </div>
                     <div style={{ display: tab === 'log' ? 'block' : 'none' }}>
                         <LogDisplay logs={logs} />

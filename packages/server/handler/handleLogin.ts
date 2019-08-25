@@ -22,4 +22,4 @@ export const handleLogin = (context: Context, client: Socket) => (data: { userna
     emit(client, ...roomMessages.getLoginSuccess(id));
 };
 
-clientHandlerRegister.push([MessageType.LOGIN, handleLogin]);
+clientHandlerRegister.push(MessageType.LOGIN, handleLogin);

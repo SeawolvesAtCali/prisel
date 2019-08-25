@@ -24,7 +24,7 @@
     },
     "scripts": {
         "prebuild": "rm -rf ./lib",
-        "build": "rollup -c",
+        "build": "parcel build index.html",
         "postbuild": "tsc --emitDeclarationOnly",
         "start": "parcel serve index.html",
         "test": "jest",
@@ -36,12 +36,16 @@
     },
     "dependencies": {
         "@prisel/client": "file:../client",
+        "@types/prismjs": "^1.16.0",
         "antd": "^3.11.2",
         "immer": "^1.8.2",
         "lodash": "^4.17.11",
-        "react-json-view": "^1.19.1"
+        "prismjs": "^1.17.1",
+        "react-json-view": "^1.19.1",
+        "react-simple-code-editor": "^0.9.14"
     },
     "devDependencies": {
+        "parcel-bundler": "^1.12.3",
         "react": "^16.8.1",
         "react-dom": "^16.8.1",
         "rollup": "^1.1.2",

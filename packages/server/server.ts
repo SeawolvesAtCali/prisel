@@ -77,6 +77,7 @@ export class Server {
             getConfigs: this.configManager.get.bind(this.configManager),
         });
         this.context = context;
+        context.configManager = this.configManager;
 
         server.on('connection', (socket) => {
             debug('client connected');
@@ -85,16 +86,14 @@ export class Server {
                 debug(data);
                 if (data) {
                     const packet = parsePacket(data);
-                    let handled = false;
-                    clientHandlerRegister.forEach(([event, handler]) => {
-                        if (event === packet.type) {
-                            handler(context, socket)(packet.payload);
-                            handled = true;
-                        }
-                    });
-                    if (!handled) {
-                        debug(`Cannot find handler for ${packet.type}`);
+                    const handler = clientHandlerRegister.get(packet.type);
+                    if (!handler) {
+                        debug(
+                            `Cannot find handler for ${packet.type}in ${clientHandlerRegister.messageList}`,
+                        );
+                        return;
                     }
+                    handler(context, socket)(packet.payload);
                 }
             });
 

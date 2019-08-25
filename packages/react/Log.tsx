@@ -23,6 +23,9 @@ class LogDisplay extends React.Component<LogDisplayProps> {
                 bordered
                 renderItem={(log: Log) => {
                     const timeString = new Date(log.timestamp).toLocaleTimeString();
+
+                    // tslint:disable-next-line:no-console
+                    console.log(log);
                     return (
                         <List.Item>
                             <List.Item.Meta

@@ -16,4 +16,4 @@ export const handleLeave = (context: Context, socket: Socket) => (data: {}) => {
     }
 };
 
-clientHandlerRegister.push([MessageType.LEAVE, handleLeave]);
+clientHandlerRegister.push(MessageType.LEAVE, handleLeave);

@@ -27,8 +27,8 @@ const UserIcon = ({ isHost }: UserIconProps) =>
     isHost ? (
         <Icon type="crown" style={{ color: 'goldenrod', fontSize: '1.17em' }} />
     ) : (
-            <Icon type="user" style={{ fontSize: '1.17em' }} />
-        );
+        <Icon type="user" style={{ fontSize: '1.17em' }} />
+    );
 
 interface RoomInfo {
     id: string;
@@ -40,7 +40,12 @@ interface RoomInfo {
 
 function isRoomInfo(roomInfo: unknown): roomInfo is RoomInfo {
     const assumeRoomInfo = roomInfo as RoomInfo;
-    return assumeRoomInfo && 'name' in assumeRoomInfo && 'id' in assumeRoomInfo && 'host' in assumeRoomInfo;
+    return (
+        assumeRoomInfo &&
+        'name' in assumeRoomInfo &&
+        'id' in assumeRoomInfo &&
+        'host' in assumeRoomInfo
+    );
 }
 
 class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
@@ -118,7 +123,6 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
     }
 
     public render() {
-        const { gameTypes = [], roomTypes = [] } = this.props;
         const { roomInfo, roomName, joinRoomId } = this.state;
 
         const PanelHeader = (
@@ -166,7 +170,7 @@ class RoomManager extends React.Component<RoomManagerProps, RoomManagerStates> {
                     )}
                     {!roomInfo && (
                         <ClientContainer.ClientContextConsumer>
-                            {({ client, log }) => (
+                            {({ client, log, gameTypes, roomTypes }) => (
                                 <React.Fragment>
                                     <div>
                                         <h3>CreateRoom</h3>

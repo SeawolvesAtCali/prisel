@@ -60,3 +60,7 @@ export function getKick(targetUserId: string): Message {
 export function getCreateRoom(roomName: string, gameType?: string, roomType?: string): Message {
     return [MessageType.CREATE_ROOM, { roomName, gameType, roomType }];
 }
+
+export function getGameAndRoomType(): Message {
+    return [MessageType.GET_GAME_AND_ROOM_TYPES, {}];
+}

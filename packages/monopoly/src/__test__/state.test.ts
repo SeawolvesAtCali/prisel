@@ -11,6 +11,7 @@ test('initial state', () => {
             expect(data).toMatchSnapshot();
             expect(JSON.stringify(data)).toMatchSnapshot();
         },
+        log: (formatter: string, ...rest: any[]) => {},
     } as Handle;
 
     const game = createIntialState(['player1', 'player2'], mockHandle);

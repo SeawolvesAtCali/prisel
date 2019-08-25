@@ -6,15 +6,11 @@ export interface FlatGameObject {
 
 const REF_SYMBOL = Symbol('refId');
 
-export interface IGameObject {
-    id: string;
-}
-
-export interface Ref<T extends IGameObject> {
+export interface Ref<T extends GameObject> {
     [REF_SYMBOL]: T['id'];
 }
 
-export default abstract class GameObject implements IGameObject {
+export default abstract class GameObject {
     public id: string;
     protected handle: Handle;
 
@@ -32,7 +28,7 @@ export default abstract class GameObject implements IGameObject {
 
     public abstract flat(): FlatGameObject;
 
-    protected ref<T extends IGameObject>(object: T): Ref<T> {
+    protected ref<T extends GameObject>(object: T): Ref<T> {
         if (!object) {
             return null;
         }

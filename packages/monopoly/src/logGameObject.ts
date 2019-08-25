@@ -6,8 +6,6 @@ export function log(target: GameObject, propertyKey: string, descriptor: Propert
     descriptor.value = function(...rest: any[]) {
         // tslint:disable-next-line:no-console
         console.log(`--${propertyKey}--`);
-        // tslint:disable-next-line:no-console
-        console.log(target.flat.apply(this));
         const result = originalMethod.apply(this, rest);
         // tslint:disable-next-line:no-console
         console.log(target.flat.apply(this));

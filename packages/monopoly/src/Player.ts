@@ -2,10 +2,10 @@ import { ClientId, Handle } from '@prisel/server';
 import Property from './Property';
 import Node from './Node';
 import { log } from './logGameObject';
-import GameObject, { FlatGameObject, Ref, IGameObject } from './GameObject';
+import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Game from './Game';
 
-interface PlayerProps extends IGameObject {
+interface Props {
     id: ClientId;
     position: Node;
     owning: Property[];
@@ -24,14 +24,6 @@ function roll() {
     return Math.trunc(Math.random() * 6) + 1;
 }
 
-export default interface Player extends PlayerProps {
-    handleAction(type: string, game: Game): void;
-    roll(game: Game): void;
-    purchase(game: Game): void;
-    endTurn(game: Game): void;
-    gainMoney(amount: number): void;
-}
-
 enum PlayerAction {
     ROLL,
     PURCHASE,
@@ -44,13 +36,13 @@ const PlayerActionMap = {
     endturn: PlayerAction.ENDTURN,
 };
 
-class PlayerImpl extends GameObject implements Player {
+export default class Player extends GameObject {
     public position: Node;
     public owning: Property[];
     public cash: number;
     public rolled: boolean;
 
-    constructor(props: PlayerProps) {
+    constructor(props: Props) {
         super();
         this.id = props.id;
         this.position = props.position;
@@ -100,8 +92,12 @@ class PlayerImpl extends GameObject implements Player {
             this.position = path[path.length - 1];
             const { property } = this.position;
             if (property) {
+                this.handle.log('there is a property %O', property.flat());
                 if (property.owner && property.owner.id !== this.id) {
                     this.payRent(property.owner, property.rent);
+                }
+                if (!property.owner) {
+                    this.handle.log('can purchase this property for ' + property.price);
                 }
             }
             this.handle.emit(this.id, {
@@ -144,8 +140,8 @@ class PlayerImpl extends GameObject implements Player {
     }
 }
 
-export function create(props: PlayerProps, handle: Handle): Player {
-    const player = new PlayerImpl(props);
+export function create(props: Props, handle: Handle): Player {
+    const player = new Player(props);
     player.setHandle(handle);
     return player;
 }

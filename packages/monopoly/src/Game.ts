@@ -1,18 +1,15 @@
-import Player from './player';
+import Player from './Player';
 import { ClientId, Handle } from '@prisel/server';
-import GameObject, { IGameObject, FlatGameObject, Ref } from './GameObject';
+import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Node from './Node';
+import { flattenState } from './state';
+import { log } from './logGameObject';
 
-interface GameProps extends IGameObject {
+interface Props {
+    id: string;
     players: Map<ClientId, Player>;
     turnOrder: Player[];
     map: Node;
-}
-
-export default interface Game extends GameProps {
-    isCurrentPlayer(player: Player): boolean;
-    giveTurnToNext(): void;
-    processMessage(handle: Handle, playerId: ClientId, data: any): void;
 }
 
 interface FlatGame extends FlatGameObject {
@@ -21,13 +18,13 @@ interface FlatGame extends FlatGameObject {
     map: Ref<Node>;
 }
 
-class GameImpl extends GameObject implements Game {
+export default class Game extends GameObject {
     public id: string;
     public players: Map<string, Player>;
     public turnOrder: Player[];
     public map: Node;
 
-    constructor(props: GameProps) {
+    constructor(props: Props) {
         super();
         this.id = props.id;
         this.players = props.players;
@@ -36,12 +33,19 @@ class GameImpl extends GameObject implements Game {
     }
 
     public processMessage(handle: Handle, playerId: ClientId, data: any) {
+        if (data.type === 'debug') {
+            const flatState = flattenState(this);
+            handle.emit(playerId, flatState);
+            handle.log('current game state is: \n%O', flatState);
+            return;
+        }
         const player = this.players.get(playerId);
         if (player) {
             player.handleAction(data.type, this);
         }
     }
 
+    @log
     public giveTurnToNext(): void {
         this.turnOrder = [...this.turnOrder.slice(1), this.turnOrder[0]];
     }
@@ -64,8 +68,8 @@ class GameImpl extends GameObject implements Game {
     }
 }
 
-export function create(props: GameProps, handle: Handle) {
-    const game = new GameImpl(props);
+export function create(props: Props, handle: Handle) {
+    const game = new Game(props);
     game.setHandle(handle);
     return game;
 }

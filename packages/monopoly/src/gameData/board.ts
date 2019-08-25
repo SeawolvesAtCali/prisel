@@ -1,11 +1,7 @@
 import { create as createNode } from '../Node';
 import { create as createProperty } from '../Property';
-import crypto from 'crypto';
 import { Handle } from '@prisel/server';
-
-export function genId() {
-    return crypto.randomBytes(8).toString('hex');
-}
+import genId from '../genId';
 
 const nodeList = [
     null,

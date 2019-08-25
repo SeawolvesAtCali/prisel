@@ -1,0 +1,443 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`initial state 1`] = `
+Object {
+  "currentPlayer": "player1",
+  "map": Array [
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": null,
+      },
+      "property": null,
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Medierranean Avenue",
+        "owner": null,
+        "price": 60,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Baltic Avenue",
+        "owner": null,
+        "price": 60,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Oriental Avenue",
+        "owner": null,
+        "price": 100,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Vermont Avenue",
+        "owner": null,
+        "price": 100,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Connecticut Avenue",
+        "owner": null,
+        "price": 120,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "St. Charles Place",
+        "owner": null,
+        "price": 140,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "States Avenue",
+        "owner": null,
+        "price": 140,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Virginia Avenue",
+        "owner": null,
+        "price": 160,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "St.James Place",
+        "owner": null,
+        "price": 180,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Tennessee Avenue",
+        "owner": null,
+        "price": 180,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "New York Avenue",
+        "owner": null,
+        "price": 200,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Kentucky Avenue",
+        "owner": null,
+        "price": 220,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Indiana Avenue",
+        "owner": null,
+        "price": 220,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Illinois Avenue",
+        "owner": null,
+        "price": 240,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Atlantic Avenue",
+        "owner": null,
+        "price": 260,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Ventnor Avenue",
+        "owner": null,
+        "price": 260,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Marvin Gardens",
+        "owner": null,
+        "price": 280,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "Parcific Avenue",
+        "owner": null,
+        "price": 300,
+        "rent": 100,
+      },
+    },
+    Object {
+      "node": Object {
+        "id": "gen_id",
+        "next": Object {
+          Symbol(refId): "gen_id",
+        },
+        "prev": Object {
+          Symbol(refId): "gen_id",
+        },
+        "property": Object {
+          Symbol(refId): undefined,
+        },
+      },
+      "property": Object {
+        "id": undefined,
+        "name": "North Carolina Avenue",
+        "owner": null,
+        "price": 300,
+        "rent": 100,
+      },
+    },
+  ],
+  "players": Array [
+    Object {
+      "cash": 1000,
+      "id": "player1",
+      "owning": Array [],
+      "position": Object {
+        Symbol(refId): "gen_id",
+      },
+      "rolled": false,
+    },
+    Object {
+      "cash": 1000,
+      "id": "player2",
+      "owning": Array [],
+      "position": Object {
+        Symbol(refId): "gen_id",
+      },
+      "rolled": false,
+    },
+  ],
+}
+`;
+
+exports[`initial state 2`] = `"{\\"currentPlayer\\":\\"player1\\",\\"players\\":[{\\"id\\":\\"player1\\",\\"position\\":{},\\"owning\\":[],\\"cash\\":1000,\\"rolled\\":false},{\\"id\\":\\"player2\\",\\"position\\":{},\\"owning\\":[],\\"cash\\":1000,\\"rolled\\":false}],\\"map\\":[{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":null},\\"property\\":null},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Medierranean Avenue\\",\\"price\\":60,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Baltic Avenue\\",\\"price\\":60,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Oriental Avenue\\",\\"price\\":100,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Vermont Avenue\\",\\"price\\":100,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Connecticut Avenue\\",\\"price\\":120,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"St. Charles Place\\",\\"price\\":140,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"States Avenue\\",\\"price\\":140,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Virginia Avenue\\",\\"price\\":160,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"St.James Place\\",\\"price\\":180,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Tennessee Avenue\\",\\"price\\":180,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"New York Avenue\\",\\"price\\":200,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Kentucky Avenue\\",\\"price\\":220,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Indiana Avenue\\",\\"price\\":220,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Illinois Avenue\\",\\"price\\":240,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Atlantic Avenue\\",\\"price\\":260,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Ventnor Avenue\\",\\"price\\":260,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Marvin Gardens\\",\\"price\\":280,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"Parcific Avenue\\",\\"price\\":300,\\"rent\\":100,\\"owner\\":null}},{\\"node\\":{\\"id\\":\\"gen_id\\",\\"prev\\":{},\\"next\\":{},\\"property\\":{}},\\"property\\":{\\"name\\":\\"North Carolina Avenue\\",\\"price\\":300,\\"rent\\":100,\\"owner\\":null}}]}"`;

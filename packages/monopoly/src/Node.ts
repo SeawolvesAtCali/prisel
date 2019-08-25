@@ -1,36 +1,32 @@
-import GameObject, { IGameObject, FlatGameObject, Ref } from './GameObject';
+import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Property from './Property';
 import { Handle } from '@prisel/server';
 
-interface NodeProps extends IGameObject {
+interface FlatNode extends FlatGameObject {
+    next: Ref<Node>;
+    prev: Ref<Node>;
+    property: Ref<Property>;
+}
+interface Props {
     id: string;
     next?: Node;
     prev?: Node;
     property?: Property;
 }
 
-export default interface Node extends NodeProps {
-    genPath(steps: number): Node[];
-}
-
-interface FlatNodeProject extends FlatGameObject {
-    next: Ref<Node>;
-    prev: Ref<Node>;
-    property: Ref<Property>;
-}
-
-class NodeImpl extends GameObject implements Node {
+export default class Node extends GameObject {
     public id: string;
     public next?: Node;
     public prev?: Node;
     public property?: Property;
 
-    constructor(node: NodeProps) {
+    constructor(props: Props) {
         super();
-        this.id = node.id;
-        this.next = node.next;
-        this.prev = node.prev;
-        this.property = node.property;
+        const { id, next, prev, property } = props;
+        this.id = id;
+        this.next = next;
+        this.prev = prev;
+        this.property = property;
     }
 
     public genPath(steps: number) {
@@ -48,7 +44,7 @@ class NodeImpl extends GameObject implements Node {
         return path;
     }
 
-    public flat(): FlatNodeProject {
+    public flat(): FlatNode {
         return {
             id: this.id,
             prev: this.ref(this.prev),
@@ -58,8 +54,8 @@ class NodeImpl extends GameObject implements Node {
     }
 }
 
-export function create(props: NodeProps, handle: Handle): Node {
-    const node = new NodeImpl(props);
+export function create(props: Props, handle: Handle): Node {
+    const node = new Node(props);
     node.setHandle(handle);
     return node;
 }

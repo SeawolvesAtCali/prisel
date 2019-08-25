@@ -2,7 +2,9 @@ import { ClientId, Handle } from '@prisel/server';
 import Game from './Game';
 import { create as createPlayer } from './Player';
 import { create as createGame } from './Game';
-import createBoard, { genId } from './gameData/board';
+import createBoard from './gameData/board';
+import Node from './Node';
+import genId from './genId';
 
 const CASH = 1000;
 
@@ -33,21 +35,26 @@ export function createIntialState(players: ClientId[], handle: Handle): Game {
         },
         handle,
     );
-    // tslint:disable-next-line:no-console
-    console.log(game.flat());
     return game;
 }
 
-export function flattenState(gameState: Game): object {
-    const players: any = {};
-    for (const [playerId, player] of gameState.players) {
-        players[playerId] = {
-            id: playerId,
-            cash: player.cash,
-        };
+function flattenMap(node: Node): Node[] {
+    const nodeSet = new Set<Node>();
+    let currentNode = node;
+    while (currentNode && !nodeSet.has(currentNode)) {
+        nodeSet.add(currentNode);
+        currentNode = currentNode.next;
     }
+    return Array.from(nodeSet);
+}
+
+export function flattenState(game: Game): object {
     return {
-        currentPlayer: gameState.turnOrder[0].id,
-        players,
+        currentPlayer: game.turnOrder[0].id,
+        players: Array.from(game.players.values()).map((player) => player.flat()),
+        map: flattenMap(game.map).map((node) => ({
+            node: node.flat(),
+            property: node.property ? node.property.flat() : null,
+        })),
     };
 }

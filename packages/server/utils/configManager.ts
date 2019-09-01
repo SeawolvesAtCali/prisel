@@ -22,8 +22,10 @@ class ConfigManager {
         gameType: string = BaseGameConfig.type,
         roomType: string = BaseRoomConfig.type,
     ): { gameConfig: GameConfig; roomConfig: RoomConfig } {
-        const gameConfig = this.gameConfigs.get(gameType);
-        const roomConfig = this.roomConfigs.get(roomType);
+        const gameConfig =
+            gameType === BaseGameConfig.type ? BaseGameConfig : this.gameConfigs.get(gameType);
+        const roomConfig =
+            roomType === BaseRoomConfig.type ? BaseRoomConfig : this.roomConfigs.get(roomType);
 
         if (roomConfig.supportGame(gameConfig)) {
             return {

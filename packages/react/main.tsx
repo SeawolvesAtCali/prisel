@@ -2,10 +2,8 @@ import * as React from 'react';
 import ClientContainer from './ClientContainer';
 import RoomManager from './RoomManager';
 import GameStartButton from './GameStartButton';
-import CommandInput from './commandInput/CommandInput';
 import CommandEditor from './commandEditor/CommandEditor';
-import providers from './suggestionProviders';
-import CommandManager from './commandEditor/commandManager';
+import CommandManager, { Command } from './commandEditor/commandManager';
 
 const generateUsername = (index: number) => {
     const usernameList = [
@@ -33,6 +31,7 @@ const generateUsername = (index: number) => {
 
 export default function App() {
     const [clients, setClients] = React.useState([0]);
+    const [commands, setCommands] = React.useState<Command[]>(CommandManager.getAll());
     const addClient = React.useCallback(() => {
         setClients((prevClients) => [...clients, clients.length]);
     }, [clients]);
@@ -40,10 +39,11 @@ export default function App() {
     const handleSaveCommand = React.useCallback((title, script, tokens) => {
         CommandManager.add(title, script, tokens);
         CommandManager.refresh();
+        setCommands(CommandManager.getAll());
     }, []);
     return (
         <div style={{ overflow: 'auto', whiteSpace: 'nowrap', height: '100vh' }}>
-            <CommandEditor onSave={handleSaveCommand} savedCommands={CommandManager.getAll()} />
+            <CommandEditor onSave={handleSaveCommand} savedCommands={commands} />
             {clients.map((client, index) => (
                 <ClientContainer key={client} username={generateUsername(index)}>
                     <RoomManager />

@@ -17,8 +17,6 @@ function useGameAndRoomTypes(client: Client) {
                         data.action === MessageType.GET_GAME_AND_ROOM_TYPES,
                 )
                 .then((response) => {
-                    // tslint:disable-next-line:no-console
-                    console.log(response);
                     setGameTypes(response.gameTypes as string[]);
                     setRoomTypes(response.roomTypes as string[]);
                     setLoading(false);

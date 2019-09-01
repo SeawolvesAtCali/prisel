@@ -12,6 +12,7 @@ interface CommandMap {
 
 export class CommandManager {
     private commands: CommandMap = {};
+    private cachedCommand: Command[];
     private storage: Storage;
 
     constructor(storage: Storage) {
@@ -29,20 +30,23 @@ export class CommandManager {
             code,
             tokens,
         };
+        this.cachedCommand = Object.values(this.commands);
         this.preserve();
     }
 
     public refresh() {
         this.commands = (JSON.parse(this.storage.getItem(STORAGE_KEY)) || {}) as CommandMap;
+        this.cachedCommand = Object.values(this.commands);
     }
 
     public delete(title: string) {
         delete this.commands[title];
+        this.cachedCommand = Object.values(this.commands);
         this.preserve();
     }
 
     public getAll(): Command[] {
-        return Object.values(this.commands);
+        return this.cachedCommand;
     }
 }
 

@@ -4,11 +4,13 @@ import { ClientId } from '../objects/client';
 import { getFailure, getJoinSuccess, getLeaveSuccess, getGameStartSuccess } from '../message';
 import { GAME_PHASE } from '../objects/gamePhase';
 import debug from '../debug';
+import { GameConfig } from './gameConfig';
 
 type EventHandler = (handle: Handle, client: ClientId, data: any) => void;
 
 interface FullRoomConfig {
     type: string;
+    supportGame: (game: GameConfig) => boolean;
     onCreate: EventHandler;
     onJoin: EventHandler;
     onLeave: EventHandler;
@@ -20,6 +22,9 @@ export type RoomConfig = Partial<FullRoomConfig>;
 
 export const BaseRoomConfig: RoomConfig = {
     type: 'room',
+    supportGame(game) {
+        return true;
+    },
     onCreate(handle, client, data) {
         handle.addPlayer(client);
         handle.setHost(client);

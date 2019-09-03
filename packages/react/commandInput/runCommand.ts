@@ -1,4 +1,4 @@
-import { Suggestion } from './Chip';
+import Suggestion from '../Suggestion';
 import { Command } from '../commandEditor/commandManager';
 import { execute } from '../commandEditor/CommandEditor';
 

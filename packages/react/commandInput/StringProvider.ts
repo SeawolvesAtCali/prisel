@@ -1,5 +1,5 @@
 import { SuggestionProvider } from './SuggestionProvider';
-import { Suggestion } from './Chip';
+import Suggestion from '../Suggestion';
 import trim from 'lodash/trim';
 
 export default class StringProvider extends SuggestionProvider {
@@ -11,7 +11,13 @@ export default class StringProvider extends SuggestionProvider {
             return [];
         }
         const trimmed = trim(currentInput, `'"`);
-        return [this.createParam(this.getLabel(trimmed), trimmed)];
+        if (trimmed !== '') {
+            return [this.createParam(this.getLabel(trimmed), trimmed, '')];
+        }
+        if (trimmed === '' && currentInput !== '') {
+            return [this.createParam(this.getLabel(''), '', '')];
+        }
+        return [];
     }
     private getLabel(value: string) {
         return `'${value}'`;

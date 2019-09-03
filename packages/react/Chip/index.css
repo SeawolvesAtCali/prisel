@@ -1,0 +1,62 @@
+@keyframes slideup {
+    from {
+        opacity: 0;
+        transform: translateY(50%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slidein {
+    from {
+        opacity: 0;
+        transform: translatex(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+.chip {
+    display: inline-block;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+    font-size: 16px;
+    padding: 3px 4px;
+    box-sizing: border-box;
+    align-self: center;
+    cursor: pointer;
+    white-space: normal;
+    margin: 1px;
+    margin-right: 2px;
+    white-space: nowrap;
+}
+
+.chip.display {
+    animation-duration: 700ms;
+    animation-name: slideup;
+}
+
+.chip.edit {
+    animation-duration: 400ms;
+    animation-name: slidein;
+}
+
+.commandType {
+    background: #ffeeff;
+    border-color: #f8bbd0;
+    color: #c48b9f;
+}
+
+.paramType {
+    background: #fbfffc;
+    border-color: #c8e6c9;
+    color: #97b498;
+}
+
+.placeholderType {
+    background: white;
+}

@@ -1,5 +1,5 @@
 import { SuggestionProvider } from './SuggestionProvider';
-import { Suggestion } from './Chip';
+import Suggestion from '../Suggestion';
 
 export default class NullProvider extends SuggestionProvider {
     constructor() {
@@ -10,7 +10,7 @@ export default class NullProvider extends SuggestionProvider {
             return [];
         }
         if ('null'.startsWith(currentInput.toLocaleLowerCase())) {
-            return [this.createParam('null', null)];
+            return [this.createParam('null', null, '')];
         }
         return [];
     }

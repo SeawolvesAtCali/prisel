@@ -1,5 +1,5 @@
 import { SuggestionProvider } from './SuggestionProvider';
-import { Suggestion } from './Chip';
+import Suggestion from '../Suggestion';
 
 export default class BooleanProvider extends SuggestionProvider {
     constructor() {
@@ -14,10 +14,10 @@ export default class BooleanProvider extends SuggestionProvider {
         }
         const lowercaseInput = currentInput.toLocaleLowerCase();
         if ('true'.startsWith(lowercaseInput)) {
-            return [this.createParam('true', true)];
+            return [this.createParam('true', true, 'true')];
         }
         if ('false'.startsWith(lowercaseInput)) {
-            return [this.createParam('false', false)];
+            return [this.createParam('false', false, 'false')];
         }
         return [];
     }

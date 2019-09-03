@@ -1,5 +1,5 @@
 import { SuggestionProvider } from './SuggestionProvider';
-import { Suggestion } from './Chip';
+import Suggestion from '../Suggestion';
 
 export default class VariableProvider extends SuggestionProvider {
     private variables: string[];
@@ -8,7 +8,7 @@ export default class VariableProvider extends SuggestionProvider {
         this.variables = variables;
     }
     private toSuggestions(variables: string[]): Suggestion[] {
-        return variables.map((variable) => this.createVariable(variable));
+        return variables.map((variable) => this.createVariable(variable, variable));
     }
     public getSuggestion(chips: Suggestion[], currentInput: string): Suggestion[] {
         if (chips.length < 1) {

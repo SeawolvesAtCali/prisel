@@ -1,5 +1,5 @@
 import { SuggestionProvider } from './SuggestionProvider';
-import { Suggestion } from './Chip';
+import Suggestion from '../Suggestion';
 import { Command, CommandManager } from '../commandEditor/commandManager';
 
 export default class CommandSuggestionProvider extends SuggestionProvider {
@@ -35,7 +35,9 @@ export default class CommandSuggestionProvider extends SuggestionProvider {
         const command: Command = suggestion.value;
         return [
             this.createCommand(suggestion.label, command),
-            ...command.tokens.map((token) => this.createPlaceholder(token)),
+            ...command.tokens.map((token, index) =>
+                this.createPlaceholder(token, this.getUniqueKey()),
+            ),
         ];
     }
 }

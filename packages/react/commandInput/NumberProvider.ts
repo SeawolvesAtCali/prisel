@@ -1,5 +1,5 @@
 import { SuggestionProvider } from './SuggestionProvider';
-import { Suggestion } from './Chip';
+import Suggestion from '../Suggestion';
 
 export default class NumberProvider extends SuggestionProvider {
     constructor() {
@@ -11,7 +11,7 @@ export default class NumberProvider extends SuggestionProvider {
         }
         if (currentInput.match(/^-?[0-9]+\.?[0-9]*$/)) {
             const num = parseFloat(currentInput);
-            return [this.createParam(`${num}`, num)];
+            return [this.createParam(`${num}`, num, '')];
         }
         return [];
     }

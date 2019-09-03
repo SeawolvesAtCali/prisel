@@ -2,7 +2,8 @@ import * as React from 'react';
 import { SuggestionProvider } from './SuggestionProvider';
 import './style.css';
 import Dropdown from './Dropdown';
-import { Suggestion, Chip } from './Chip';
+import Suggestion from '../Suggestion';
+import { Chip } from './Chip';
 import SuggestionList from './SuggestionList';
 import cn from '../utils/classname';
 import { Button } from 'antd';
@@ -160,7 +161,7 @@ function CommandInput(props: CommandInputProps) {
             >
                 {chips.map((chip, index) => (
                     <Chip
-                        key={index}
+                        key={index + ''}
                         {...chip}
                         editMode={highlightedChipIndex === index}
                         onClick={() => {

@@ -1,13 +1,7 @@
 import * as React from 'react';
 import cn from '../utils/classname';
 import './style.css';
-
-export interface Suggestion {
-    type: 'command' | 'param' | 'variableParam' | 'placeholderParam';
-    label: string;
-    value: any;
-    providerKey: string;
-}
+import Suggestion from '../Suggestion';
 interface ChipProps extends Suggestion {
     onClick?: (e: MouseEvent) => void;
     editMode?: boolean;

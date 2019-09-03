@@ -45,7 +45,9 @@
         "react-simple-code-editor": "^0.9.14"
     },
     "devDependencies": {
+        "autoprefixer": "^9.6.1",
         "parcel-bundler": "^1.12.3",
+        "postcss-modules": "^1.4.1",
         "react": "^16.8.1",
         "react-dom": "^16.8.1",
         "rollup": "^1.1.2",

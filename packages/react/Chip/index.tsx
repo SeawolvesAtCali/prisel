@@ -24,12 +24,13 @@ function Display(props: DisplayProps) {
 }
 
 interface EditProps extends Suggestion {
+    editing: boolean;
     onClick?: (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void;
     onDelete?: (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void;
 }
 
 function Edit(props: EditProps) {
-    const { type, label, onClick, onDelete } = props;
+    const { type, label, onClick, onDelete, editing } = props;
     const closeRef = React.useRef(null);
     const handleClick = React.useCallback(
         (e) => {
@@ -44,7 +45,12 @@ function Edit(props: EditProps) {
 
     return (
         <span
-            className={cn(styles.chip, styles.edit, classNameForType[type])}
+            className={cn(
+                styles.chip,
+                styles.edit,
+                { [styles.focus]: editing },
+                classNameForType[type],
+            )}
             onClick={handleClick}
         >
             {label} <span ref={closeRef}>✖</span>

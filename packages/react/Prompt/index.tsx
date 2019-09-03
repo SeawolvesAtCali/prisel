@@ -94,13 +94,35 @@ function Prompt({ onSubmit }: PromptProps) {
     }, [chips]);
     const handleSelect = React.useCallback(
         (suggestion: Suggestion) => {
-            setChips((prevSuggestions) =>
-                prevSuggestions.concat(selectSuggestion(suggestion, chips, input)),
-            );
+            if (editingChip) {
+                setChips((prevChips) => {
+                    return prevChips.map((chip) => {
+                        if (chip === editingChip) {
+                            return {
+                                ...selectSuggestion(suggestion, chips, input)[0],
+                                key: editingChip.key,
+                            };
+                        }
+                        return chip;
+                    });
+                });
+                // move editing to next or null
+                const currentEditingIndex = chips.indexOf(editingChip);
+                const nextChip =
+                    chips.find(
+                        (chip, index) =>
+                            chip.type === 'placeholderParam' && index > currentEditingIndex,
+                    ) || null;
+                setEditingChip(nextChip);
+            } else {
+                setChips((prevChips) =>
+                    prevChips.concat(selectSuggestion(suggestion, chips, input)),
+                );
+            }
             setInput('');
             inputRef.current.focus();
         },
-        [chips, input],
+        [chips, input, editingChip],
     );
     const suggestions = generateSuggestions(suggestionProviders, chips, input);
     return (

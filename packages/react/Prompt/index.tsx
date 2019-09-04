@@ -77,6 +77,21 @@ function getKey(suggestion: Suggestion) {
 interface PromptProps {
     onSubmit: (chips: Suggestion[]) => void;
 }
+
+function setNextEditingChip(
+    currentEditingIndex: number,
+    chips: Suggestion[],
+    setEditingChip: React.Dispatch<React.SetStateAction<Suggestion>>,
+) {
+    if (currentEditingIndex !== undefined) {
+        const nextChip =
+            chips.find(
+                (chip, index) => chip.type === 'placeholderParam' && index > currentEditingIndex,
+            ) || null;
+        setEditingChip(nextChip);
+    }
+}
+
 function Prompt({ onSubmit }: PromptProps) {
     const [input, setInput] = React.useState('');
     const [chips, setChips] = React.useState<Suggestion[]>([]);
@@ -94,31 +109,28 @@ function Prompt({ onSubmit }: PromptProps) {
     }, [chips]);
     const handleSelect = React.useCallback(
         (suggestion: Suggestion) => {
+            const newChips = chips.slice();
+
+            let fistInsertedIndex;
             if (editingChip) {
-                setChips((prevChips) => {
-                    return prevChips.map((chip) => {
-                        if (chip === editingChip) {
-                            return {
-                                ...selectSuggestion(suggestion, chips, input)[0],
-                                key: editingChip.key,
-                            };
-                        }
-                        return chip;
-                    });
-                });
-                // move editing to next or null
-                const currentEditingIndex = chips.indexOf(editingChip);
-                const nextChip =
-                    chips.find(
-                        (chip, index) =>
-                            chip.type === 'placeholderParam' && index > currentEditingIndex,
-                    ) || null;
-                setEditingChip(nextChip);
+                const editingIndex = newChips.findIndex((chip) => chip === editingChip);
+                if (editingIndex >= 0) {
+                    newChips[editingIndex] = {
+                        ...selectSuggestion(suggestion, chips, input)[0],
+                        key: editingChip.key,
+                    };
+                    fistInsertedIndex = editingIndex;
+                }
             } else {
-                setChips((prevChips) =>
-                    prevChips.concat(selectSuggestion(suggestion, chips, input)),
-                );
+                const currentLength = newChips.length;
+                newChips.push(...selectSuggestion(suggestion, chips, input));
+                fistInsertedIndex = currentLength;
             }
+
+            if (editingChip || suggestion.type === 'command') {
+                setNextEditingChip(fistInsertedIndex, newChips, setEditingChip);
+            }
+            setChips(newChips);
             setInput('');
             inputRef.current.focus();
         },

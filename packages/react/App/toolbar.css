@@ -1,0 +1,6 @@
+.Toolbar {
+    height: 40px;
+    border: 1px solid red;
+    flex-grow: 0;
+    flex-shrink: 0;
+}

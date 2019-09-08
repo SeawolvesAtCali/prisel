@@ -1,0 +1,86 @@
+.Container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: scroll;
+}
+.outerContainer {
+    flex-grow: 1;
+    position: relative;
+}
+
+.MessageDisplay {
+    padding: 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid lightgray;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.MessageDisplay:last-child {
+    border-bottom: none;
+}
+
+.messageHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.origin {
+    display: inline-block;
+    color: white;
+    padding: 0 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 24px;
+    height: 24px;
+    margin-left: 4px;
+}
+
+.origin.server {
+    background: #2db7f5;
+}
+
+.origin.client {
+    background: #87d068;
+}
+.origin.none {
+    background: lightgrey;
+}
+
+.commandContainer {
+    display: inline-block;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.shortJsonDisplay {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scrollButton {
+    position: absolute;
+    background: #108ee9;
+    z-index: 1;
+    color: white;
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    font-size: 18px;
+    line-height: 40px;
+    text-align: center;
+    left: 0;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    outline: none;
+}
+
+.scrollButton.hidden {
+    display: none;
+}

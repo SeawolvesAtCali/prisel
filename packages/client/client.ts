@@ -15,7 +15,7 @@ const DEFAULT_TIMEOUT = 5000;
 const CONNECTION_TIMEOUT = DEFAULT_TIMEOUT;
 const LOGIN_TIMEOUT = DEFAULT_TIMEOUT;
 
-interface State {
+export interface State {
     [property: string]: unknown;
 }
 /**
@@ -32,7 +32,7 @@ interface State {
  *
  * After a client is connected, we can attach message handler using `client.on`
  */
-class Client {
+class Client<T = State> {
     static get CONNECTION_CLOSED() {
         return new Error('connection closed');
     }
@@ -48,10 +48,11 @@ class Client {
         return !!this.conn;
     }
 
-    public state: State;
+    public state: Partial<T>;
     private conn: WebSocket;
     private serverUri: string;
-    private messageQueue = new PubSub();
+    private onMessageListeners = new PubSub();
+    private onEmitListeners = new PubSub();
 
     constructor(server: string = SERVER) {
         this.state = {};
@@ -137,12 +138,20 @@ class Client {
      * @param messageType
      * @param data
      */
-    public emit(messageType: string, data: PayloadType) {
+    public emit(messageType: MessageType, data: PayloadType) {
         if (this.isConnected) {
             this.connection.send(createPacket(messageType, data));
+            this.onEmitListeners.dispatch(messageType, data);
         } else {
             throw Client.CONNECTION_CLOSED;
         }
+    }
+
+    public onEmit(
+        messageTypeOrFilter: HandlerKey,
+        callback: (data: PayloadType, messageType: MessageType) => void,
+    ) {
+        return this.onEmitListeners.on(messageTypeOrFilter, callback);
     }
 
     /**
@@ -152,20 +161,17 @@ class Client {
      */
     public on(
         messageTypeOrFilter: HandlerKey,
-        callback: (data: PayloadType, messageType?: string) => State | void,
+        callback: (data: PayloadType, messageType: MessageType) => void,
     ): RemoveListenerFunc {
-        return this.messageQueue.on(messageTypeOrFilter, (data, messageType) => {
-            const updatedState = callback(data, messageType) || this.state;
-            this.state = updatedState;
-        });
+        return this.onMessageListeners.on(messageTypeOrFilter, callback);
     }
 
     /**
      * Set the client state
      * @param newState new state object to replace the old state
      */
-    public setState(newState: State) {
-        this.state = newState;
+    public setState(newState: Partial<T>) {
+        this.state = { ...this.state, ...newState };
     }
 
     /**
@@ -174,14 +180,14 @@ class Client {
      */
     public once(messageTypeOrFilter: HandlerKey): Promise<PayloadType> {
         return new Promise((resolve) => {
-            this.messageQueue.once(messageTypeOrFilter, resolve);
+            this.onMessageListeners.once(messageTypeOrFilter, resolve);
         });
     }
 
     private handleMessage(rawMessage: string) {
         if (this.isConnected) {
             const message = JSON.parse(rawMessage);
-            this.messageQueue.dispatch(message.type, message.payload);
+            this.onMessageListeners.dispatch(message.type, message.payload);
         }
     }
 
@@ -191,8 +197,8 @@ class Client {
             this.connection.close();
             this.conn = undefined;
         }
-        this.messageQueue.close();
-        this.messageQueue = undefined;
+        this.onMessageListeners.close();
+        this.onMessageListeners = undefined;
     }
 }
 

@@ -1,3 +1,3 @@
-import { PayloadType } from '@prisel/common';
+import { PayloadType, MessageType } from '@prisel/common';
 
-export type Message = [string, PayloadType];
+export type Message = [MessageType, PayloadType];

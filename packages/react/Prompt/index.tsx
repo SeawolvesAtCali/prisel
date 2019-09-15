@@ -8,35 +8,19 @@ import Suggestion from '../Suggestion';
 interface InputProps {
     value: string;
     onChange: (value: string) => void;
-    onSubmit: () => void;
-    onSelect: () => void;
-    onSelectIndex: (index: number) => void;
+    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 function InputContainer({ children }: { children: React.ReactNode }) {
     return <div className={styles.inputContainer}>{children}</div>;
 }
 const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-    const { value, onChange, onSubmit, onSelect, onSelectIndex } = props;
+    const { value, onChange, onKeyDown } = props;
     const handleChange = React.useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value),
         [onChange],
     );
 
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            if (e.ctrlKey) {
-                onSubmit();
-            } else {
-                onSelect();
-            }
-            return;
-        }
-        if (e.key >= '0' && e.key <= '9' && e.ctrlKey) {
-            // select the suggestion
-            onSelectIndex(parseInt(e.key, 10));
-        }
-    };
     return (
         <>
             <span className={styles.instruction}>CTRL + ENTER TO SUBMIT</span>
@@ -45,7 +29,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
                 className={styles.input}
                 value={value}
                 onChange={handleChange}
-                onKeyDown={handleKeyPress}
+                onKeyDown={onKeyDown}
             />
         </>
     );
@@ -101,6 +85,8 @@ function Prompt({ onSubmit }: PromptProps) {
     const [chips, setChips] = React.useState<Suggestion[]>([]);
     const [editingChip, setEditingChip] = React.useState<Suggestion>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const suggestions = generateSuggestions(suggestionProviders, chips, input);
+
     const handleSubmit = React.useCallback(() => {
         if (onSubmit) {
             onSubmit(chips);
@@ -140,7 +126,44 @@ function Prompt({ onSubmit }: PromptProps) {
         },
         [chips, input, editingChip],
     );
-    const suggestions = generateSuggestions(suggestionProviders, chips, input);
+
+    const handleDelete = (chip: Suggestion) => {
+        let newChips: Suggestion[] = [];
+        // it's a command type, remove all the chips
+        if (chip.type !== 'command') {
+            newChips = chips.filter((filteredChip) => filteredChip !== chip);
+        }
+
+        setChips(newChips);
+        if (editingChip) {
+            setEditingChip(null);
+        }
+        inputRef.current.focus();
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            if (e.ctrlKey) {
+                handleSubmit();
+            } else if (suggestions.length) {
+                handleSelect(suggestions[0]);
+            }
+            return;
+        }
+        if (e.key.match(/[0-9]/) && e.ctrlKey) {
+            const suggestionIndex = parseInt(e.key, 10) - 1;
+            if (suggestionIndex >= 0 && suggestionIndex < suggestions.length) {
+                handleSelect(suggestions[suggestionIndex]);
+            }
+            return;
+        }
+        if (e.key === 'Backspace') {
+            if (input.length === 0 && chips.length > 0) {
+                handleDelete(chips.slice(-1)[0]);
+            }
+            return;
+        }
+    };
     return (
         <div className={styles.container}>
             <InputContainer>
@@ -149,17 +172,8 @@ function Prompt({ onSubmit }: PromptProps) {
                         {...chip}
                         editing={editingChip === chip}
                         key={getKey(chip)}
-                        onDelete={(e) => {
-                            let newChips: Suggestion[] = [];
-                            // it's a command type, remove all the chips
-                            if (chip.type !== 'command') {
-                                newChips = chips.filter((filteredChip) => filteredChip !== chip);
-                            }
-
-                            setChips(newChips);
-                            inputRef.current.focus();
-                        }}
-                        onClick={(e) => {
+                        onDelete={() => handleDelete(chip)}
+                        onClick={() => {
                             if (chip.type === 'placeholderParam') {
                                 setEditingChip(editingChip === chip ? null : chip);
                                 inputRef.current.focus();
@@ -167,18 +181,7 @@ function Prompt({ onSubmit }: PromptProps) {
                         }}
                     />
                 ))}
-                <Input
-                    ref={inputRef}
-                    value={input}
-                    onChange={setInput}
-                    onSubmit={handleSubmit}
-                    onSelect={() => suggestions.length > 0 && handleSelect(suggestions[0])}
-                    onSelectIndex={(userIndex: number) => {
-                        if (suggestions.length >= userIndex && userIndex > 0) {
-                            handleSelect(suggestions[userIndex - 1]);
-                        }
-                    }}
-                />
+                <Input ref={inputRef} value={input} onKeyDown={handleKeyDown} onChange={setInput} />
             </InputContainer>
             <div className={styles.suggestionContainer}>
                 {suggestions.map((suggestion, index) => (

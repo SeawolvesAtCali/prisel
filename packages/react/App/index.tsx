@@ -2,27 +2,31 @@ import React, { useState } from 'react';
 import GameContext, { RoomInfo } from '../GameContext';
 import { HostContainer, GuestContainer } from '../ClientContainer';
 import generateUsername from '../ClientContainer/username';
-import Toolbar from './Toolbar';
+import { Toolbar, ToolbarItem } from '../Toolbar';
 import styles from './index.css';
+import { CommandEditor, useCommandEditor } from '../commandEditor';
 
 function App() {
     const [roomGameType, setRoomGameType] = useState(['', '']);
     const [roomInfo, setRoomInfo] = useState<RoomInfo>(null);
     const [roomId, setRoomId] = useState('');
     const [guests, setGuests] = useState<string[]>([]);
+    const [commands, handleSaveCommand] = useCommandEditor();
+
     return (
         <div className={styles.App}>
             <Toolbar>
                 {roomId && (
-                    <button
+                    <ToolbarItem
                         onClick={() => {
                             const newGuests = guests.concat([generateUsername(guests.length)]);
                             setGuests(newGuests);
                         }}
                     >
                         Add Guest
-                    </button>
+                    </ToolbarItem>
                 )}
+                <CommandEditor onSave={handleSaveCommand} savedCommands={commands} />
             </Toolbar>
             <div className={styles.ClientContainers}>
                 <GameContext.Provider

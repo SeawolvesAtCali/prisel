@@ -7,8 +7,9 @@ import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import './highlight.css';
-import './style.css';
+import styles from './style.css';
 import { Command } from './commandManager';
+import { ToolbarItem } from '../Toolbar';
 
 const regex = /\$([a-zA-Z_]+\w*)/g;
 
@@ -69,8 +70,12 @@ function CommandEditor(props: CommandEditorProp) {
 
     return (
         <React.Fragment>
-            <Button onClick={handleOpen}>Edit Command</Button>
-            <Dialog open={open} onClose={handleClose}>
+            <ToolbarItem onClick={handleOpen}>Edit Command</ToolbarItem>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                containerClass={styles.commandEditorDialogContainer}
+            >
                 <Card title="Command Editor" style={{ width: 500 }}>
                     {savedCommands.map((command) => (
                         <Button

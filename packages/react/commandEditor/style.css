@@ -1,4 +1,4 @@
-.command-editor-dialog-container {
+.commandEditorDialogContainer {
     position: absolute;
     z-index: 2;
     top: 0;
@@ -6,6 +6,7 @@
     right: 0;
     bottom: 0;
     overflow: hidden;
+    background: #e8e8e8aa;
 }
 
 .command-editor-drop-shadow {

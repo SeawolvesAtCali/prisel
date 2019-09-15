@@ -10,29 +10,31 @@ interface InputProps {
     onChange: (value: string) => void;
     onSubmit: () => void;
     onSelect: () => void;
+    onSelectIndex: (index: number) => void;
 }
 
 function InputContainer({ children }: { children: React.ReactNode }) {
     return <div className={styles.inputContainer}>{children}</div>;
 }
 const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-    const { value, onChange, onSubmit, onSelect } = props;
+    const { value, onChange, onSubmit, onSelect, onSelectIndex } = props;
     const handleChange = React.useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value),
         [onChange],
     );
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        switch (e.key) {
-            case 'Enter':
-                if (e.ctrlKey) {
-                    onSubmit();
-                } else {
-                    onSelect();
-                }
-                break;
-            default:
-            // do nothing
+        if (e.key === 'Enter') {
+            if (e.ctrlKey) {
+                onSubmit();
+            } else {
+                onSelect();
+            }
+            return;
+        }
+        if (e.key >= '0' && e.key <= '9' && e.ctrlKey) {
+            // select the suggestion
+            onSelectIndex(parseInt(e.key, 10));
         }
     };
     return (
@@ -171,14 +173,20 @@ function Prompt({ onSubmit }: PromptProps) {
                     onChange={setInput}
                     onSubmit={handleSubmit}
                     onSelect={() => suggestions.length > 0 && handleSelect(suggestions[0])}
+                    onSelectIndex={(userIndex: number) => {
+                        if (suggestions.length >= userIndex && userIndex > 0) {
+                            handleSelect(suggestions[userIndex - 1]);
+                        }
+                    }}
                 />
             </InputContainer>
             <div className={styles.suggestionContainer}>
-                {suggestions.map((suggestion) => (
+                {suggestions.map((suggestion, index) => (
                     <Chip.Display
                         {...suggestion}
                         key={getKey(suggestion)}
                         onClick={(e) => handleSelect(suggestion)}
+                        selectIndex={index + 1}
                     />
                 ))}
             </div>

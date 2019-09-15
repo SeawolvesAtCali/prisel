@@ -12,12 +12,15 @@ const classNameForType: { [key in Suggestion['type']]: string } = {
 
 interface DisplayProps extends Suggestion {
     onClick?: (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void;
+    selectIndex?: number;
 }
 
 function Display(props: DisplayProps) {
-    const { type, label, onClick } = props;
+    const { type, label, onClick, selectIndex } = props;
+    const indexDisplay = selectIndex === undefined ? null : `${selectIndex}: `;
     return (
         <span className={cn(styles.chip, styles.display, classNameForType[type])} onClick={onClick}>
+            {indexDisplay}
             {label}
         </span>
     );

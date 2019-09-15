@@ -63,7 +63,17 @@
     text-overflow: ellipsis;
 }
 
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
 .scrollButton {
+    animation-duration: 500ms;
+    animation-name: fadein;
     position: absolute;
     background: #108ee9;
     z-index: 1;
@@ -79,8 +89,4 @@
     left: 50%;
     transform: translateX(-50%);
     outline: none;
-}
-
-.scrollButton.hidden {
-    display: none;
 }

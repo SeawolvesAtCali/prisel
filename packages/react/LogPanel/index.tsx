@@ -80,13 +80,13 @@ const AUTO_SCROLL_THRESHHOLD = 50;
 
 function LogPanel({ messages }: LogPanelProps) {
     const containerRef = React.useRef(null);
-    const [scrolledToEnd, setScrolledToEnd] = React.useState(true);
+    const [scrolledToBottom, setScrolledToBottom] = React.useState(true);
     const scrollToBottom = React.useCallback(() => {
         const container = containerRef.current;
         container.scrollTop = container.scrollHeight - container.clientHeight;
     }, []);
     React.useEffect(() => {
-        if (scrolledToEnd) {
+        if (scrolledToBottom) {
             scrollToBottom();
         }
     }, [messages]);
@@ -99,9 +99,9 @@ function LogPanel({ messages }: LogPanelProps) {
                         container.scrollHeight - container.clientHeight - container.scrollTop,
                     ) < AUTO_SCROLL_THRESHHOLD
                 ) {
-                    setScrolledToEnd(true);
+                    setScrolledToBottom(true);
                 } else {
-                    setScrolledToEnd(false);
+                    setScrolledToBottom(false);
                 }
             }),
         [],
@@ -109,12 +109,11 @@ function LogPanel({ messages }: LogPanelProps) {
 
     return (
         <section className={styles.outerContainer}>
-            <button
-                className={cn(styles.scrollButton, { [styles.hidden]: scrolledToEnd })}
-                onClick={scrollToBottom}
-            >
-                ↓
-            </button>
+            {!scrolledToBottom && (
+                <button className={styles.scrollButton} onClick={scrollToBottom}>
+                    ↓
+                </button>
+            )}
             <section className={styles.Container} ref={containerRef} onScroll={handleScroll}>
                 {messages.map((message) => (
                     <MessageDisplay {...message} key={message.timestamp} />

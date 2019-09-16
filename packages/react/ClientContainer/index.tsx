@@ -12,12 +12,12 @@ import {
 import GameContext from '../GameContext';
 import LogPanel, { MessageWithMetaData, createMessage } from '../LogPanel';
 import { Client, MessageType } from '@prisel/client';
-import Container from '../Container';
+import Container, { BorderBox } from '../Container';
 import Suggestion from '../Suggestion';
 import Prompt from '../Prompt';
 import run from '../commandInput/runCommand';
 
-interface HostContainerProps {
+interface HostContainerProps extends BorderBox {
     username: string;
 }
 
@@ -55,7 +55,7 @@ function useLog(): [MessageWithMetaData[], AddToLogs] {
     return [logs, addToLogs];
 }
 
-export function HostContainer({ username }: HostContainerProps) {
+export function HostContainer({ username, displayBorder }: HostContainerProps) {
     const { setRoomAndGameType, setRoomInfo, setRoomId } = useContext(GameContext);
     const [logs, addToLogs] = useLog();
     const [client, setClient] = useState<Client<ClientState>>(null);
@@ -81,19 +81,19 @@ export function HostContainer({ username }: HostContainerProps) {
     const onRun = useRun(client, addToLogs);
 
     return (
-        <Container>
+        <Container displayBorder={displayBorder}>
             <LogPanel messages={logs} />
             <Prompt onSubmit={onRun} />
         </Container>
     );
 }
 
-interface GuestContainerProps {
+interface GuestContainerProps extends BorderBox {
     username: string;
     roomId: string;
 }
 
-export function GuestContainer({ username, roomId }: GuestContainerProps) {
+export function GuestContainer({ username, roomId, displayBorder }: GuestContainerProps) {
     const [logs, addToLogs] = useLog();
     const [client, setClient] = useState<Client<ClientState>>(null);
     useEffect(() => {
@@ -109,7 +109,7 @@ export function GuestContainer({ username, roomId }: GuestContainerProps) {
     const onRun = useRun(client, addToLogs);
 
     return (
-        <Container>
+        <Container displayBorder={displayBorder}>
             <LogPanel messages={logs} />
             <Prompt onSubmit={onRun} />
         </Container>

@@ -2,8 +2,11 @@ import React, { useContext } from 'react';
 import styles from './index.css';
 import cn from '../utils/classname';
 
-interface ContainerProps {
+export interface BorderBox {
+    // TODO: change to ResizerBox when implemented resizing
     displayBorder?: boolean;
+}
+interface ContainerProps extends BorderBox {
     children?: React.ReactNode;
 }
 

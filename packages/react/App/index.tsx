@@ -41,11 +41,19 @@ function App() {
                             setRoomGameType([roomType, gameType]),
                     }}
                 >
-                    <HostContainer username={generateUsername(0)} />
+                    <HostContainer
+                        username={generateUsername(0)}
+                        displayBorder={guests.length > 0}
+                    />
 
                     {roomId &&
-                        guests.map((guest) => (
-                            <GuestContainer username={guest} key={guest} roomId={roomId} />
+                        guests.map((guest, index) => (
+                            <GuestContainer
+                                username={guest}
+                                key={guest}
+                                roomId={roomId}
+                                displayBorder={index < guests.length - 1}
+                            />
                         ))}
                 </GameContext.Provider>
             </div>

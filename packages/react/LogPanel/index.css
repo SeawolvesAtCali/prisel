@@ -29,6 +29,11 @@
     flex-direction: row;
     align-items: center;
 }
+
+.time {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 .origin {
     display: inline-block;
     color: white;

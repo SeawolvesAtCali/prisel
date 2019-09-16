@@ -1,4 +1,5 @@
 export * from './constants';
 export * from './createPacket';
-export * from './payloadTypes';
+export * from './Payload';
+export * from './Packet';
 export { default as MessageType } from './messageTypes';

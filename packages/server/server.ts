@@ -89,7 +89,9 @@ export class Server {
                     const handler = clientHandlerRegister.get(packet.type);
                     if (!handler) {
                         debug(
-                            `Cannot find handler for ${packet.type}in ${clientHandlerRegister.messageList}`,
+                            `Cannot find handler for ${packet.type} in ${Array.from(
+                                clientHandlerRegister.messageList,
+                            )}`,
                         );
                         return;
                     }

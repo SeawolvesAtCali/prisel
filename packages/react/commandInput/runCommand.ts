@@ -1,11 +1,12 @@
 import Suggestion from '../Suggestion';
 import { Command } from '../commandEditor/commandManager';
 import { execute } from '../commandEditor/CommandEditor';
+import { Packet, isPacket } from '@prisel/common';
 
 export default function run(
     chips: Suggestion[],
     variableResolver: (key: string) => any,
-    onRun: (chips: Suggestion[], json: object) => void,
+    onRun: (json: Packet) => void,
 ) {
     if (chips.length === 0) {
         return;
@@ -21,6 +22,7 @@ export default function run(
     let error = false;
     if (command.tokens.length > chips.length - 1) {
         error = true;
+        // tslint:disable-next-line:no-console
         console.error('cannot execute because there are some params missing');
     }
     const params: Array<[string, any]> = command.tokens.map((token, index) => {
@@ -42,9 +44,10 @@ export default function run(
     try {
         object = execute(command.code, new Map(params));
     } catch (e) {
+        // tslint:disable-next-line:no-console
         console.error(e);
     }
-    if (object) {
-        onRun(chips, object);
+    if (object && isPacket(object)) {
+        onRun(object);
     }
 }

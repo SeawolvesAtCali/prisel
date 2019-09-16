@@ -5,7 +5,7 @@ import Suggestion from '../Suggestion';
 
 const classNameForType: { [key in Suggestion['type']]: string } = {
     command: styles.commandType,
-    variableParam: styles.variableType,
+    variableParam: styles.paramType,
     param: styles.paramType,
     placeholderParam: styles.placeholderType,
 };
@@ -48,12 +48,7 @@ function Edit(props: EditProps) {
 
     return (
         <span
-            className={cn(
-                styles.chip,
-                styles.edit,
-                { [styles.focus]: editing },
-                classNameForType[type],
-            )}
+            className={cn(styles.chip, { [styles.focus]: editing }, classNameForType[type])}
             onClick={handleClick}
         >
             {label} <span ref={closeRef}>✖</span>

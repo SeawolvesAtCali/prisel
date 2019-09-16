@@ -1,5 +1,5 @@
 import { Message } from '../objects';
-import { MessageType } from '@prisel/common';
+import { MessageType, Payload } from '@prisel/common';
 
 /**
  * functions to create messages.
@@ -67,7 +67,7 @@ export function getCreateRoomSuccess(roomId: string) {
     return getSuccess(MessageType.CREATE_ROOM, { roomId });
 }
 
-export function getRoomUpdate(roomData: object): Message {
+export function getRoomUpdate(roomData: Payload): Message {
     return [MessageType.ROOM_UPDATE, roomData];
 }
 

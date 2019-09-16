@@ -1,5 +1,5 @@
 import once from 'lodash/once';
-import { SERVER, PayloadType } from '@prisel/common';
+import { SERVER, Payload } from '@prisel/common';
 import { createPacket, isFeedback } from '@prisel/common';
 
 import { getLogin, getExit } from './message/room';
@@ -112,7 +112,7 @@ class Client<T = State> {
      * Throw error if not connected, or don't have controller namespace.
      * @param {string} username username to login with
      */
-    public login(username: string = DEFAULT_USERNAME): Promise<PayloadType> {
+    public login(username: string = DEFAULT_USERNAME): Promise<Payload> {
         if (this.isConnected) {
             this.emit(...getLogin(username));
             return withTimer(
@@ -138,7 +138,7 @@ class Client<T = State> {
      * @param messageType
      * @param data
      */
-    public emit(messageType: MessageType, data: PayloadType) {
+    public emit(messageType: MessageType, data: Payload) {
         if (this.isConnected) {
             this.connection.send(createPacket(messageType, data));
             this.onEmitListeners.dispatch(messageType, data);
@@ -149,7 +149,7 @@ class Client<T = State> {
 
     public onEmit(
         messageTypeOrFilter: HandlerKey,
-        callback: (data: PayloadType, messageType: MessageType) => void,
+        callback: (data: Payload, messageType: MessageType) => void,
     ) {
         return this.onEmitListeners.on(messageTypeOrFilter, callback);
     }
@@ -161,7 +161,7 @@ class Client<T = State> {
      */
     public on(
         messageTypeOrFilter: HandlerKey,
-        callback: (data: PayloadType, messageType: MessageType) => void,
+        callback: (data: Payload, messageType: MessageType) => void,
     ): RemoveListenerFunc {
         return this.onMessageListeners.on(messageTypeOrFilter, callback);
     }
@@ -178,7 +178,7 @@ class Client<T = State> {
      * Listen for message until receive the message once.
      * @param messageTypeOrFilter message type to listen to
      */
-    public once(messageTypeOrFilter: HandlerKey): Promise<PayloadType> {
+    public once(messageTypeOrFilter: HandlerKey): Promise<Payload> {
         return new Promise((resolve) => {
             this.onMessageListeners.once(messageTypeOrFilter, resolve);
         });

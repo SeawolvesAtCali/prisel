@@ -10,10 +10,12 @@ import {
     joinRoom,
 } from './utils';
 import GameContext from '../GameContext';
-import { MessageWithMetaData, createMessage } from '../LogPanel';
+import LogPanel, { MessageWithMetaData, createMessage } from '../LogPanel';
 import { Client, MessageType } from '@prisel/client';
 import Container from '../Container';
 import Suggestion from '../Suggestion';
+import Prompt from '../Prompt';
+import run from '../commandInput/runCommand';
 
 interface HostContainerProps {
     username: string;
@@ -21,15 +23,24 @@ interface HostContainerProps {
 
 function useRun(client: Client, addToLogs: AddToLogs) {
     const onRun = useCallback(
-        (
-            suggestions: Suggestion[],
-            { messageType, data }: { messageType: MessageType; data: any },
-        ) => {
+        (suggestions: Suggestion[]) => {
             if (!client) {
                 return;
             }
-            client.emit(messageType, data);
-            addToLogs({ origin: 'client', payload: data, command: suggestions, type: messageType });
+            run(
+                suggestions,
+                (key) => {},
+                (json) => {
+                    const { type, payload } = json;
+                    client.emit(type, payload);
+                    addToLogs({
+                        origin: 'client',
+                        payload,
+                        command: suggestions,
+                        type,
+                    });
+                },
+            );
         },
         [client],
     );
@@ -69,7 +80,12 @@ export function HostContainer({ username }: HostContainerProps) {
     }, []);
     const onRun = useRun(client, addToLogs);
 
-    return <Container onRun={onRun} logs={logs} />;
+    return (
+        <Container>
+            <LogPanel messages={logs} />
+            <Prompt onSubmit={onRun} />
+        </Container>
+    );
 }
 
 interface GuestContainerProps {
@@ -92,5 +108,10 @@ export function GuestContainer({ username, roomId }: GuestContainerProps) {
     }, []);
     const onRun = useRun(client, addToLogs);
 
-    return <Container onRun={onRun} logs={logs} />;
+    return (
+        <Container>
+            <LogPanel messages={logs} />
+            <Prompt onSubmit={onRun} />
+        </Container>
+    );
 }

@@ -4,6 +4,7 @@ import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Node from './Node';
 import { flattenState } from './state';
 import { log } from './logGameObject';
+import { Payload, isPayload } from '@prisel/common';
 
 interface Props {
     id: string;
@@ -33,6 +34,9 @@ export default class Game extends GameObject {
     }
 
     public processMessage(handle: Handle, playerId: ClientId, data: any) {
+        if (!isPayload(data)) {
+            return;
+        }
         if (data.type === 'debug') {
             const flatState = flattenState(this);
             handle.emit(playerId, flatState);
@@ -40,7 +44,7 @@ export default class Game extends GameObject {
             return;
         }
         const player = this.players.get(playerId);
-        if (player) {
+        if (player && typeof data.type === 'string') {
             player.handleAction(data.type, this);
         }
     }

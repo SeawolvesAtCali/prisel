@@ -9,7 +9,7 @@ import {
     emit,
     createServerFromHTTPServer,
 } from './utils/networkUtils';
-import clientHandlerRegister, { Handler } from './clientHandlerRegister';
+import clientHandlerRegister from './clientHandlerRegister';
 import { parsePacket } from '@prisel/common';
 import { handleDisconnect } from './handler/handleDisconnect';
 import { getWelcome } from './message/room';

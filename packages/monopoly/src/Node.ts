@@ -2,7 +2,7 @@ import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Property from './Property';
 import { Handle } from '@prisel/server';
 
-interface FlatNode extends FlatGameObject {
+export interface FlatNode extends FlatGameObject {
     next: Ref<Node>;
     prev: Ref<Node>;
     property: Ref<Property>;

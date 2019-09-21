@@ -1,14 +1,14 @@
 import { Context } from '../objects';
 import { emit } from './networkUtils';
-import { getMessage } from '../message';
 import { ClientId } from '../objects/client';
 import { RoomId } from '../objects/room';
-import { MessageType } from '@prisel/common';
+import { MessageType, isPayload, Payload } from '@prisel/common';
 import { GameConfig } from './gameConfig';
 import { RoomConfig } from './roomConfig';
 import { updateClientWithRoomData } from './updateUtils';
 
 import { Handle, HandleProps } from './abstractHandle';
+import { isMessageType } from '@prisel/common/lib/messageTypes';
 
 /**
  * handle provides utilities to update room and game state
@@ -26,15 +26,16 @@ class HandleImpl extends Handle {
         super({ context, roomId, gameConfig, roomConfig });
     }
 
-    public emit(playerId: ClientId, ...rest: any[]) {
-        if (rest.length === 2) {
+    public emit(playerId: ClientId, ...rest: [MessageType, Payload] | [Payload]) {
+        if (isMessageType(rest[0]) && isPayload(rest[1])) {
             emitWithPlayerId(this.context, playerId, rest[0], rest[1]);
-        } else {
+        }
+        if (isPayload(rest[0])) {
             emitWithPlayerId(this.context, playerId, MessageType.MESSAGE, rest[0]);
         }
     }
 
-    public broadcast(playerIds: ClientId[], ...rest: any[]) {
+    public broadcast(playerIds: ClientId[], ...rest: [MessageType, Payload] | [Payload]) {
         playerIds.forEach((playerId) => {
             this.emit(playerId, ...rest);
         });
@@ -45,13 +46,16 @@ class HandleImpl extends Handle {
     }
 }
 
-function emitWithPlayerId(context: Context, playerId: ClientId, ...rest: any[]): void {
-    const message: [MessageType, any] =
-        rest.length === 1 ? getMessage(rest[0]) : (rest as [MessageType, any]);
+function emitWithPlayerId(
+    context: Context,
+    playerId: ClientId,
+    messageType: MessageType,
+    payload: Payload,
+): void {
     const { SocketManager } = context;
     const clientSocket = SocketManager.getSocket(playerId);
     if (clientSocket) {
-        emit(clientSocket, ...message);
+        emit(clientSocket, messageType, payload);
     }
 }
 

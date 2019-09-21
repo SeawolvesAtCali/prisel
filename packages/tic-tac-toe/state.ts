@@ -1,6 +1,12 @@
 import { GameConfig, AnyObject, debug } from '@prisel/server';
 import { Messages } from '@prisel/server';
 
+interface GameState {
+    player: string[];
+    map: string[];
+    currentPlayer: number;
+    winner: string;
+}
 const TicTacToe: Partial<GameConfig> = {
     type: 'tic-tac-toe',
     canStart(handle) {
@@ -8,13 +14,14 @@ const TicTacToe: Partial<GameConfig> = {
         return handle.players.length === 2;
     },
     onStart(handle) {
-        const gameState = handle.setState({
+        const gameState = handle.setState<GameState>({
             player: handle.players,
             map: ['', '', '', '', '', '', '', '', ''],
             currentPlayer: 0,
             winner: null,
         });
-        handle.broadcast(handle.players, ...Messages.getGameState(gameState));
+        const gameStateMessage = Messages.getGameState(gameState);
+        handle.broadcast(handle.players, ...gameStateMessage);
     },
     onMessage(handle, player, data) {
         const gameState = handle.state;

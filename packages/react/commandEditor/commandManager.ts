@@ -1,3 +1,5 @@
+import preloadedCommands, { TypedCommand } from '../commands';
+
 const STORAGE_KEY = 'command-scripts';
 
 export interface Command {
@@ -10,43 +12,102 @@ interface CommandMap {
     [title: string]: Command;
 }
 
+export function isCommand(arg: any): arg is Command {
+    if (typeof arg !== 'object' || arg === null) {
+        return false;
+    }
+    return (
+        typeof arg.title === 'string' && typeof arg.code === 'string' && Array.isArray(arg.tokens)
+    );
+}
+
+function isCommandMap(arg: any): arg is CommandMap {
+    if (typeof arg !== 'object' || arg === null) {
+        return false;
+    }
+    return Object.entries(arg).every(([key, value]) => {
+        return typeof key === 'string' && isCommand(value);
+    });
+}
+function extractCommandsToObject<T>(map: Map<string, T>): { [key: string]: Command } {
+    const result: { [key: string]: Command } = {};
+    for (const [key, value] of map) {
+        if (isCommand(value)) {
+            result[key] = value;
+        }
+    }
+    return result;
+}
+
+function objectToMap<T>(object: { [key: string]: T }): Map<string, T> {
+    const result = new Map<string, T>();
+    for (const [key, value] of Object.entries(object)) {
+        result.set(key, value);
+    }
+    return result;
+}
+
+function mergeMap<T1, T2>(map1: Map<string, T1>, map2?: Map<string, T2>): Map<string, T1 | T2> {
+    const targetMap = new Map<string, T1 | T2>();
+    // typescript seems to have issue with iterating over map directly
+    // for (const [key, value] of map1) doesnt work
+    for (const [key, value] of Array.from(map1)) {
+        targetMap.set(key, value);
+    }
+    if (map2) {
+        for (const [key, value] of map2) {
+            targetMap.set(key, value);
+        }
+    }
+    return targetMap;
+}
+
 export class CommandManager {
-    private commands: CommandMap = {};
-    private cachedCommand: Command[];
+    private commands: Map<string, Command | TypedCommand>;
+    private cached: Array<Command | TypedCommand> = [];
     private storage: Storage;
 
     constructor(storage: Storage) {
         this.storage = storage;
-        this.refresh();
+        const parsedCommandMap = JSON.parse(this.storage.getItem(STORAGE_KEY)) || {};
+        if (isCommandMap(parsedCommandMap)) {
+            this.commands = mergeMap(preloadedCommands, objectToMap(parsedCommandMap));
+        } else {
+            this.commands = mergeMap(preloadedCommands);
+        }
+        this.cacheAll();
     }
 
     private preserve() {
-        this.storage.setItem(STORAGE_KEY, JSON.stringify(this.commands));
+        this.storage.setItem(STORAGE_KEY, JSON.stringify(extractCommandsToObject(this.commands)));
     }
 
     public add(title: string, code: string, tokens: string[]) {
-        this.commands[title] = {
+        this.commands.set(title, {
             title,
             code,
             tokens,
-        };
-        this.cachedCommand = Object.values(this.commands);
+        });
         this.preserve();
+        this.cacheAll();
     }
 
     public refresh() {
-        this.commands = (JSON.parse(this.storage.getItem(STORAGE_KEY)) || {}) as CommandMap;
-        this.cachedCommand = Object.values(this.commands);
+        // do nothing;
     }
 
     public delete(title: string) {
-        delete this.commands[title];
-        this.cachedCommand = Object.values(this.commands);
+        this.commands.delete(title);
         this.preserve();
+        this.cacheAll();
     }
 
-    public getAll(): Command[] {
-        return this.cachedCommand;
+    private cacheAll() {
+        this.cached = Array.from(this.commands.values());
+    }
+
+    public getAll(): Array<Command | TypedCommand> {
+        return this.cached;
     }
 }
 

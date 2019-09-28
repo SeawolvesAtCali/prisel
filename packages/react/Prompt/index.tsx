@@ -1,8 +1,7 @@
 import * as React from 'react';
 import styles from './index.css';
 import Chip from '../Chip';
-import suggestionProviders from '../suggestionProviders';
-import { SuggestionProvider } from '../commandInput/SuggestionProvider';
+import suggestionProviders, { SuggestionProvider } from '../suggestionProviders';
 import Suggestion from '../Suggestion';
 
 interface InputProps {

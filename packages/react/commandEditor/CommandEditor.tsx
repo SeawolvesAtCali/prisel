@@ -8,8 +8,9 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import './highlight.css';
 import styles from './style.css';
-import { Command } from './commandManager';
+import { Command, isCommand } from './commandManager';
 import { ToolbarItem } from '../Toolbar';
+import { TypedCommand } from '../commands';
 
 const regex = /\$([a-zA-Z_]+\w*)/g;
 
@@ -24,7 +25,7 @@ export function execute(code: string, context: Map<string, any>) {
 }
 
 interface CommandEditorProp {
-    savedCommands?: Command[];
+    savedCommands?: Array<Command | TypedCommand>;
     onSave?: (title: string, script: string, variables: string[]) => void;
 }
 function CommandEditor(props: CommandEditorProp) {
@@ -77,7 +78,7 @@ function CommandEditor(props: CommandEditorProp) {
                 containerClass={styles.commandEditorDialogContainer}
             >
                 <Card title="Command Editor" style={{ width: 500 }}>
-                    {savedCommands.map((command) => (
+                    {savedCommands.filter(isCommand).map((command) => (
                         <Button
                             key={command.title}
                             onClick={() => {

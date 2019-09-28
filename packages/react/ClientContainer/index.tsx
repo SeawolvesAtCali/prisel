@@ -15,7 +15,7 @@ import { Client, MessageType } from '@prisel/client';
 import Container, { BorderBox } from '../Container';
 import Suggestion from '../Suggestion';
 import Prompt from '../Prompt';
-import run from '../commandInput/runCommand';
+import run from '../suggestionProviders/runCommand';
 
 interface HostContainerProps extends BorderBox {
     username: string;
@@ -33,6 +33,7 @@ function useRun(client: Client, addToLogs: AddToLogs) {
                 (json) => {
                     const { type, payload } = json;
                     client.emit(type, payload);
+                    // TODO: if this is not message type, it will be log twice
                     addToLogs({
                         origin: 'client',
                         payload,
@@ -61,7 +62,19 @@ export function HostContainer({ username, displayBorder }: HostContainerProps) {
     const [client, setClient] = useState<Client<ClientState>>(null);
     useEffect(() => {
         (async () => {
-            const myClient = await createClient(username, addToLogs);
+            const myClient = await createClient(username);
+            myClient.on(
+                () => true,
+                (data, messageType) => {
+                    addToLogs({ type: messageType, payload: data, origin: 'server' });
+                },
+            );
+            const cancelEmitListener = myClient.onEmit(
+                () => true,
+                (data, messageType) => {
+                    addToLogs({ type: messageType, payload: data, origin: 'client' });
+                },
+            );
             await connect(myClient);
             setClient(myClient);
             await login(myClient);
@@ -71,6 +84,7 @@ export function HostContainer({ username, displayBorder }: HostContainerProps) {
             const firstGameType = gameTypes[0];
             const firstRoomType = roomTypes[0];
             setRoomId(await createRoom(myClient, firstGameType, firstRoomType));
+            cancelEmitListener();
             setRoomAndGameType(firstRoomType, firstGameType);
             myClient.on(MessageType.ROOM_UPDATE, (data) => {
                 myClient.log(data);
@@ -98,12 +112,25 @@ export function GuestContainer({ username, roomId, displayBorder }: GuestContain
     const [client, setClient] = useState<Client<ClientState>>(null);
     useEffect(() => {
         (async () => {
-            const myClient = await createClient(username, addToLogs);
+            const myClient = await createClient(username);
+            myClient.on(
+                () => true,
+                (data, messageType) => {
+                    addToLogs({ type: messageType, payload: data, origin: 'server' });
+                },
+            );
+            const cancelEmitListener = myClient.onEmit(
+                () => true,
+                (data, messageType) => {
+                    addToLogs({ type: messageType, payload: data, origin: 'client' });
+                },
+            );
             await connect(myClient);
             setClient(myClient);
             await login(myClient);
 
             await joinRoom(myClient, roomId);
+            cancelEmitListener();
         })();
     }, []);
     const onRun = useRun(client, addToLogs);

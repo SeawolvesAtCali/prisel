@@ -1,10 +1,11 @@
-import CommandSuggestionProvider from './commandInput/CommandSuggestionProvider';
-import StringProvider from './commandInput/StringProvider';
-import NumberProvider from './commandInput/NumberProvider';
-import BooleanProvider from './commandInput/BooleanProvider';
-import NullProvider from './commandInput/NullProvider';
-import VariableProvider from './commandInput/VariableProvider';
-import CommandManager from './commandEditor/commandManager';
+import CommandSuggestionProvider from './CommandSuggestionProvider';
+import StringProvider from './StringProvider';
+import NumberProvider from './NumberProvider';
+import BooleanProvider from './BooleanProvider';
+import NullProvider from './NullProvider';
+import VariableProvider from './VariableProvider';
+import CommandManager from '../commandEditor/commandManager';
+export { SuggestionProvider } from './SuggestionProvider';
 
 const commandProvider = new CommandSuggestionProvider(CommandManager);
 const stringProvider = new StringProvider();

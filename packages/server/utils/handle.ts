@@ -2,13 +2,12 @@ import { Context } from '../objects';
 import { emit } from './networkUtils';
 import { ClientId } from '../objects/client';
 import { RoomId } from '../objects/room';
-import { MessageType, isPayload, Payload } from '@prisel/common';
+import { MessageType, isPayload, Payload, isMessageType } from '@prisel/common';
 import { GameConfig } from './gameConfig';
 import { RoomConfig } from './roomConfig';
 import { updateClientWithRoomData } from './updateUtils';
 
 import { Handle, HandleProps } from './abstractHandle';
-import { isMessageType } from '@prisel/common/lib/messageTypes';
 
 /**
  * handle provides utilities to update room and game state

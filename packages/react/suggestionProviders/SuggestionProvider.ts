@@ -1,5 +1,6 @@
 import Suggestion from '../Suggestion';
 import { Command } from '../commandEditor/commandManager';
+import { TypedCommand } from '../commands';
 
 export abstract class SuggestionProvider {
     public key: string;
@@ -41,7 +42,7 @@ export abstract class SuggestionProvider {
         return this.createSuggestion('param', label, value, key);
     }
 
-    protected createCommand(label: string, command: Command): Suggestion {
+    protected createCommand(label: string, command: Command | TypedCommand): Suggestion {
         return this.createSuggestion('command', label, command, command.title);
     }
 

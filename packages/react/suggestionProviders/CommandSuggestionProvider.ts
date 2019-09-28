@@ -1,6 +1,7 @@
 import { SuggestionProvider } from './SuggestionProvider';
 import Suggestion from '../Suggestion';
 import { Command, CommandManager } from '../commandEditor/commandManager';
+import { TypedCommand } from '../commands';
 
 export default class CommandSuggestionProvider extends SuggestionProvider {
     private commandManager: CommandManager;
@@ -9,7 +10,7 @@ export default class CommandSuggestionProvider extends SuggestionProvider {
         super('commandProvider');
         this.commandManager = commandManager;
     }
-    private toSuggestions(commands: Command[]): Suggestion[] {
+    private toSuggestions(commands: Array<Command | TypedCommand>): Suggestion[] {
         return commands.map((command) => this.createCommand(command.title, command));
     }
     public getSuggestion(chips: Suggestion[], currentInput: string): Suggestion[] {

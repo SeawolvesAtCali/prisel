@@ -12,22 +12,9 @@ export interface ClientState {
     userId: string;
 }
 
-export async function createClient(username: string, addToLogs: AddToLogs) {
+export async function createClient(username: string) {
     const client = new Client<ClientState>();
     client.setState({ username, connecting: false, loggingIn: false, loggedIn: false });
-    client.on(
-        () => true,
-        (data, messageType) => {
-            addToLogs({ type: messageType, payload: data, origin: 'server' });
-        },
-    );
-    client.onEmit(
-        // When type is MESSAGE, let Prompt handle adding to log
-        (messageType) => messageType !== MessageType.MESSAGE,
-        (data, messageType) => {
-            addToLogs({ type: messageType, payload: data, origin: 'client' });
-        },
-    );
     return client;
 }
 

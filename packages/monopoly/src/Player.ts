@@ -13,7 +13,7 @@ interface Props {
     rolled: boolean;
 }
 
-interface FlatPlayer extends FlatGameObject {
+export interface FlatPlayer extends FlatGameObject {
     position: Ref<Node>;
     owning: Array<Ref<Property>>;
     cash: number;

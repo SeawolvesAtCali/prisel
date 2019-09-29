@@ -40,7 +40,7 @@ describe('Client', () => {
         it('should login with username', async () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
-                (socket as any).on('message', (data: unknown) => {
+                socket.on('message', (data: string) => {
                     expect(data).toBe(
                         createPacket(MessageType.LOGIN, {
                             username: 'batman',
@@ -55,8 +55,8 @@ describe('Client', () => {
                 });
             });
             await client.connect();
-            const data = await client.login('batman');
-            expect(data.userId).toBe('123');
+            const loginResult = await client.login('batman');
+            expect(loginResult.userId).toBe('123');
         });
         it('should reject if timeout', async () => {
             const client = new Client(fakeURL);
@@ -70,7 +70,7 @@ describe('Client', () => {
         it('should reject if connection closes before login', async () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
-                (socket as any).on('message', (data: unknown) => {
+                socket.on('message', () => {
                     socket.send(
                         createPacket(MessageType.SUCCESS, {
                             action: MessageType.LOGIN,
@@ -86,7 +86,7 @@ describe('Client', () => {
         it('should reject if connection closes during login', async () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
-                (socket as any).on('message', (data: unknown) => {
+                socket.on('message', () => {
                     socket.send(
                         createPacket(MessageType.SUCCESS, {
                             action: MessageType.LOGIN,
@@ -106,31 +106,31 @@ describe('Client', () => {
         it('can start listening before connection', async () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
-                socket.send(createPacket('HI', { value: 3 }));
+                socket.send(createPacket(MessageType.MESSAGE, { value: 3 }));
             });
-            const waitForHi = new Promise((resolve) => {
+            const waitForMessage = new Promise((resolve) => {
                 const mockCallback = (data: unknown) => {
                     expect(data).toMatchObject({
                         value: 3,
                     });
                     resolve();
                 };
-                client.on('HI', mockCallback);
+                client.on(MessageType.MESSAGE, mockCallback);
             });
             await client.connect();
-            await waitForHi;
+            await waitForMessage;
         });
         it('should listen for the right event', async () => {
             const client = new Client(fakeURL);
             let connection: WebSocket;
             mockServer.on('connection', (socket) => (connection = socket));
             await client.connect();
-            const waitForHi = new Promise((resolve, reject) => {
-                client.on('HELLO', reject);
-                client.on('HI', resolve);
+            const waitForGameStart = new Promise((resolve, reject) => {
+                client.on(MessageType.READY, reject);
+                client.on(MessageType.GAME_START, resolve);
             });
-            connection.send(createPacket('HI', {}));
-            await waitForHi;
+            connection.send(createPacket(MessageType.GAME_START, {}));
+            await waitForGameStart;
         });
 
         it('should be able to take a filter', async () => {
@@ -138,13 +138,16 @@ describe('Client', () => {
             let connection: WebSocket;
             mockServer.on('connection', (socket) => (connection = socket));
             await client.connect();
-            const waitForHiFive = new Promise<any>((resolve) =>
-                client.on((messageType, data) => messageType === 'HI' && data.value === 5, resolve),
+            const waitForMessageWithValueFive = new Promise<any>((resolve) =>
+                client.on(
+                    (messageType, data) => messageType === MessageType.MESSAGE && data.value === 5,
+                    resolve,
+                ),
             );
-            connection.send(createPacket('HI', { value: 3 }));
-            connection.send(createPacket('HI', { value: 5 }));
-            connection.send(createPacket('HI', { value: 7 }));
-            const result = await waitForHiFive;
+            connection.send(createPacket(MessageType.MESSAGE, { value: 3 }));
+            connection.send(createPacket(MessageType.MESSAGE, { value: 5 }));
+            connection.send(createPacket(MessageType.MESSAGE, { value: 7 }));
+            const result = await waitForMessageWithValueFive;
             expect(result.value).toBe(5);
         });
     });
@@ -155,9 +158,9 @@ describe('Client', () => {
             let connection: WebSocket;
             mockServer.on('connection', (socket) => (connection = socket));
             await client.connect();
-            const waitForHi = client.once('HI');
-            connection.send(createPacket('HI', { value: 3 }));
-            const result = await waitForHi;
+            const waitForMessage = client.once(MessageType.MESSAGE);
+            connection.send(createPacket(MessageType.MESSAGE, { value: 3 }));
+            const result = await waitForMessage;
             expect(result.value).toBe(3);
         });
     });

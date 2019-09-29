@@ -1,0 +1,44 @@
+.container {
+    display: block;
+    box-sizing: border-box;
+    background: #f8f9fb;
+    padding: 4px 4px 10px 4px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.inputContainer {
+    isolation: isolate;
+    display: block;
+    overflow: hidden;
+    border: 1px solid #1890ff;
+    border-radius: 2px;
+    box-sizing: border-box;
+    height: 30px;
+    background: #ffffff;
+    position: relative;
+    display: flex;
+    margin-bottom: 4px;
+}
+.suggestionContainer {
+    display: block;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.input {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    flex-grow: 1;
+    background: transparent;
+    padding: 0 4px;
+}
+
+.instruction {
+    z-index: -1;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: lightgrey;
+}

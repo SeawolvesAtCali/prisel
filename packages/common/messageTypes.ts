@@ -41,3 +41,7 @@ enum MessageType {
 }
 
 export default MessageType;
+
+export function isMessageType(value: any): value is MessageType {
+    return Object.values(MessageType).includes(value as MessageType);
+}

@@ -4,6 +4,7 @@ import { createPacket, HEARTBEAT_INTERVAL } from '@prisel/common';
 import WebSocket from 'ws';
 import http from 'http';
 import Koa from 'koa';
+import { MessageType, Payload } from '@prisel/common';
 
 export function createServer({ host, port }: { host: string; port: number }): wsServer {
     const app = new Koa();
@@ -62,14 +63,19 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
  * Utility functions to perform network calls.
  */
 
-export function emit(client: WebSocket, messageType: string, data: any) {
+export function emit(client: WebSocket, messageType: MessageType, data: Payload) {
     debug(`SERVER: ${messageType} ${JSON.stringify(data)}`);
     if (client && client.readyState === WebSocket.OPEN) {
         client.send(createPacket(messageType, data));
     }
 }
 
-export function broadcast(context: Context, roomId: string, messageType: string, data: any) {
+export function broadcast(
+    context: Context,
+    roomId: string,
+    messageType: MessageType,
+    data: Payload,
+) {
     const { StateManager, SocketManager } = context;
     const room = StateManager.rooms[roomId];
     if (room) {

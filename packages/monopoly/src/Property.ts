@@ -9,7 +9,7 @@ interface Props {
     name: string;
     owner?: Player;
 }
-interface FlatProperty extends FlatGameObject {
+export interface FlatProperty extends FlatGameObject {
     price: number;
     rent: number;
     name: string;

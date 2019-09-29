@@ -1,7 +1,7 @@
 import { Context, AnyObject } from '../objects';
 import { ClientId } from '../objects/client';
 import { RoomId, Room } from '../objects/room';
-import { MessageType } from '@prisel/common';
+import { MessageType, Payload } from '@prisel/common';
 import { GAME_PHASE } from '../objects/gamePhase';
 import { GameConfig, BaseGameConfig } from './gameConfig';
 import { RoomConfig, BaseRoomConfig } from './roomConfig';
@@ -36,17 +36,17 @@ export abstract class Handle {
      * @param playerId
      * @param data
      */
-    public abstract emit(playerId: ClientId, data: any): void;
+    public abstract emit(playerId: ClientId, data: Payload): void;
     /**
      * Emit an event to client
      * @param playerId
      * @param messageType
      * @param data
      */
-    public abstract emit(playerId: ClientId, messageType: MessageType, data: any): void;
+    public abstract emit(playerId: ClientId, messageType: MessageType, data: Payload): void;
 
-    public abstract broadcast(playerIds: ClientId[], data: any): void;
-    public abstract broadcast(playerIds: ClientId[], messageType: MessageType, data: any): void;
+    public abstract broadcast(playerIds: ClientId[], data: Payload): void;
+    public abstract broadcast(playerIds: ClientId[], messageType: MessageType, data: Payload): void;
 
     public abstract broadcastRoomUpdate(): void;
 

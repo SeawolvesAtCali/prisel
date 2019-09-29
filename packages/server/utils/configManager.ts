@@ -11,11 +11,11 @@ class ConfigManager {
     }
 
     public addGame(gameConfig: GameConfig) {
-        this.gameConfigs.set(gameConfig.type, gameConfig);
+        this.gameConfigs.set(gameConfig.type, { ...BaseGameConfig, ...gameConfig });
     }
 
     public addRoom(roomConfig: RoomConfig) {
-        this.roomConfigs.set(roomConfig.type, roomConfig);
+        this.roomConfigs.set(roomConfig.type, { ...BaseRoomConfig, ...roomConfig });
     }
 
     public get(

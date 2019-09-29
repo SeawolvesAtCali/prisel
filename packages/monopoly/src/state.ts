@@ -48,7 +48,7 @@ function flattenMap(node: Node): Node[] {
     return Array.from(nodeSet);
 }
 
-export function flattenState(game: Game): object {
+export function flattenState(game: Game) {
     return {
         currentPlayer: game.turnOrder[0].id,
         players: Array.from(game.players.values()).map((player) => player.flat()),

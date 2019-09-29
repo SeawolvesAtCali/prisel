@@ -1,8 +1,7 @@
 import { Context, Socket } from './objects';
-import { string } from 'prop-types';
-import { MessageType } from '@prisel/common';
+import { MessageType, Payload } from '@prisel/common';
 
-export type Handler = (context: Context, socket: Socket) => (data: any) => void;
+export type Handler = (context: Context, socket: Socket) => (data: Payload) => void;
 
 class ClientHandlerRegister {
     private map = new Map<MessageType, Handler>();

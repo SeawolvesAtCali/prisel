@@ -9,7 +9,7 @@ import {
     emit,
     createServerFromHTTPServer,
 } from './utils/networkUtils';
-import clientHandlerRegister, { Handler } from './clientHandlerRegister';
+import clientHandlerRegister from './clientHandlerRegister';
 import { parsePacket } from '@prisel/common';
 import { handleDisconnect } from './handler/handleDisconnect';
 import { getWelcome } from './message/room';
@@ -89,7 +89,9 @@ export class Server {
                     const handler = clientHandlerRegister.get(packet.type);
                     if (!handler) {
                         debug(
-                            `Cannot find handler for ${packet.type}in ${clientHandlerRegister.messageList}`,
+                            `Cannot find handler for ${packet.type} in ${Array.from(
+                                clientHandlerRegister.messageList,
+                            )}`,
                         );
                         return;
                     }

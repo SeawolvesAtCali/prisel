@@ -1,5 +1,5 @@
 import once from 'lodash/once';
-import { SERVER, PayloadType } from '@prisel/common';
+import { SERVER, Payload } from '@prisel/common';
 import { createPacket, isFeedback } from '@prisel/common';
 
 import { getLogin, getExit } from './message/room';
@@ -15,7 +15,7 @@ const DEFAULT_TIMEOUT = 5000;
 const CONNECTION_TIMEOUT = DEFAULT_TIMEOUT;
 const LOGIN_TIMEOUT = DEFAULT_TIMEOUT;
 
-interface State {
+export interface State {
     [property: string]: unknown;
 }
 /**
@@ -32,7 +32,7 @@ interface State {
  *
  * After a client is connected, we can attach message handler using `client.on`
  */
-class Client {
+class Client<T = State> {
     static get CONNECTION_CLOSED() {
         return new Error('connection closed');
     }
@@ -48,10 +48,11 @@ class Client {
         return !!this.conn;
     }
 
-    public state: State;
+    public state: Partial<T>;
     private conn: WebSocket;
     private serverUri: string;
-    private messageQueue = new PubSub();
+    private onMessageListeners = new PubSub();
+    private onEmitListeners = new PubSub();
 
     constructor(server: string = SERVER) {
         this.state = {};
@@ -111,7 +112,7 @@ class Client {
      * Throw error if not connected, or don't have controller namespace.
      * @param {string} username username to login with
      */
-    public login(username: string = DEFAULT_USERNAME): Promise<PayloadType> {
+    public login(username: string = DEFAULT_USERNAME): Promise<Payload> {
         if (this.isConnected) {
             this.emit(...getLogin(username));
             return withTimer(
@@ -137,12 +138,20 @@ class Client {
      * @param messageType
      * @param data
      */
-    public emit(messageType: string, data: PayloadType) {
+    public emit(messageType: MessageType, data: Payload) {
         if (this.isConnected) {
             this.connection.send(createPacket(messageType, data));
+            this.onEmitListeners.dispatch(messageType, data);
         } else {
             throw Client.CONNECTION_CLOSED;
         }
+    }
+
+    public onEmit(
+        messageTypeOrFilter: HandlerKey,
+        callback: (data: Payload, messageType: MessageType) => void,
+    ) {
+        return this.onEmitListeners.on(messageTypeOrFilter, callback);
     }
 
     /**
@@ -152,36 +161,33 @@ class Client {
      */
     public on(
         messageTypeOrFilter: HandlerKey,
-        callback: (data: PayloadType, messageType?: string) => State | void,
+        callback: (data: Payload, messageType: MessageType) => void,
     ): RemoveListenerFunc {
-        return this.messageQueue.on(messageTypeOrFilter, (data, messageType) => {
-            const updatedState = callback(data, messageType) || this.state;
-            this.state = updatedState;
-        });
+        return this.onMessageListeners.on(messageTypeOrFilter, callback);
     }
 
     /**
      * Set the client state
      * @param newState new state object to replace the old state
      */
-    public setState(newState: State) {
-        this.state = newState;
+    public setState(newState: Partial<T>) {
+        this.state = { ...this.state, ...newState };
     }
 
     /**
      * Listen for message until receive the message once.
      * @param messageTypeOrFilter message type to listen to
      */
-    public once(messageTypeOrFilter: HandlerKey): Promise<PayloadType> {
+    public once(messageTypeOrFilter: HandlerKey): Promise<Payload> {
         return new Promise((resolve) => {
-            this.messageQueue.once(messageTypeOrFilter, resolve);
+            this.onMessageListeners.once(messageTypeOrFilter, resolve);
         });
     }
 
     private handleMessage(rawMessage: string) {
         if (this.isConnected) {
             const message = JSON.parse(rawMessage);
-            this.messageQueue.dispatch(message.type, message.payload);
+            this.onMessageListeners.dispatch(message.type, message.payload);
         }
     }
 
@@ -191,8 +197,8 @@ class Client {
             this.connection.close();
             this.conn = undefined;
         }
-        this.messageQueue.close();
-        this.messageQueue = undefined;
+        this.onMessageListeners.close();
+        this.onMessageListeners = undefined;
     }
 }
 

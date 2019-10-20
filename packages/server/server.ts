@@ -83,7 +83,7 @@ export class Server {
             debug('client connected');
             emit(socket, ...getWelcome());
             socket.on('message', (data: any) => {
-                debug(data);
+                debug(`received ${data}`);
                 if (data) {
                     const packet = parsePacket(data);
                     const handler = clientHandlerRegister.get(packet.type);

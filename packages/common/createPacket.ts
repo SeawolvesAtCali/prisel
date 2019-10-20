@@ -9,7 +9,7 @@ export function createPacket(messageType: MessageType, payload: any) {
     return JSON.stringify(packet);
 }
 
-export function parsePacket(packet: string): Packet {
-    const parsed = JSON.parse(packet);
+export function parsePacket(packet: string | Buffer): Packet {
+    const parsed = JSON.parse(packet.toString());
     return isPacket(parsed) ? parsed : undefined;
 }

@@ -145,6 +145,14 @@ export abstract class Handle {
         return [];
     }
 
+    public getPlayerInfo(playerId: string) {
+        if (!this.players.includes(playerId)) {
+            return;
+        }
+        const user = this.context.StateManager.connections[playerId];
+        return user;
+    }
+
     public removeRoom() {
         this.context.updateState((draftState) => {
             delete draftState.rooms[this.roomId];

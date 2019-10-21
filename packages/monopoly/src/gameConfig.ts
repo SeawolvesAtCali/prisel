@@ -2,6 +2,7 @@ import { GameConfig } from '@prisel/server';
 import { createIntialState } from './state';
 import Game from './Game';
 import { GAME_PHASE } from '@prisel/server/objects/gamePhase';
+import { isPayload } from '@prisel/common';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
@@ -19,7 +20,27 @@ const MonopolyGameConfig: GameConfig = {
     onMessage(handle, player, data) {
         if (handle.gamePhase === GAME_PHASE.GAME) {
             const game = handle.attached as Game;
-            game.processMessage(handle, player, data);
+            if (isPayload(data)) {
+                game.processMessage(handle, player, data);
+            }
+        }
+        if (isPayload(data) && data.type === 'get_room_state') {
+            handle.emit(player, {
+                request: 'get_room_state',
+                players: handle.players
+                    .map((id) => {
+                        const playerInfo = handle.getPlayerInfo(id);
+                        if (playerInfo) {
+                            return {
+                                username: playerInfo.username,
+                                id: playerInfo.id,
+                                isReady: playerInfo.isReady,
+                                isHost: handle.host === id,
+                            };
+                        }
+                    })
+                    .filter(Boolean),
+            });
         }
     },
     onRemovePlayer(handle, player) {},

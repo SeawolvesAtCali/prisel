@@ -33,10 +33,7 @@ export default class Game extends GameObject {
         this.map = props.map;
     }
 
-    public processMessage(handle: Handle, playerId: ClientId, data: any) {
-        if (!isPayload(data)) {
-            return;
-        }
+    public processMessage(handle: Handle, playerId: ClientId, data: Payload) {
         if (data.type === 'debug') {
             const flatState = flattenState(this);
             handle.emit(playerId, flatState);

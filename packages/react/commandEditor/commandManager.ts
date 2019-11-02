@@ -12,6 +12,12 @@ interface CommandMap {
     [title: string]: Command;
 }
 
+function each<T1, T2>(map: Map<T1, T2>, callback: (key: T1, value: T2) => void) {
+    for (const [key, value] of Array.from(map)) {
+        callback(key, value);
+    }
+}
+
 export function isCommand(arg: any): arg is Command {
     if (typeof arg !== 'object' || arg === null) {
         return false;
@@ -31,11 +37,11 @@ function isCommandMap(arg: any): arg is CommandMap {
 }
 function extractCommandsToObject<T>(map: Map<string, T>): { [key: string]: Command } {
     const result: { [key: string]: Command } = {};
-    for (const [key, value] of map) {
+    each(map, (key, value) => {
         if (isCommand(value)) {
             result[key] = value;
         }
-    }
+    });
     return result;
 }
 
@@ -51,13 +57,14 @@ function mergeMap<T1, T2>(map1: Map<string, T1>, map2?: Map<string, T2>): Map<st
     const targetMap = new Map<string, T1 | T2>();
     // typescript seems to have issue with iterating over map directly
     // for (const [key, value] of map1) doesnt work
-    for (const [key, value] of Array.from(map1)) {
+    each(map1, (key, value) => {
         targetMap.set(key, value);
-    }
+    });
+
     if (map2) {
-        for (const [key, value] of map2) {
+        each(map2, (key, value) => {
             targetMap.set(key, value);
-        }
+        });
     }
     return targetMap;
 }

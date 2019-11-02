@@ -4,6 +4,7 @@ import RoomManager from './RoomManager';
 import GameStartButton from './GameStartButton';
 import CommandEditor from './commandEditor/CommandEditor';
 import CommandManager, { Command } from './commandEditor/commandManager';
+import { TypedCommand } from './commands';
 
 const generateUsername = (index: number) => {
     const usernameList = [
@@ -31,7 +32,9 @@ const generateUsername = (index: number) => {
 
 export default function App() {
     const [clients, setClients] = React.useState([0]);
-    const [commands, setCommands] = React.useState<Command[]>(CommandManager.getAll());
+    const [commands, setCommands] = React.useState<Array<Command | TypedCommand>>(
+        CommandManager.getAll(),
+    );
     const addClient = React.useCallback(() => {
         setClients((prevClients) => [...clients, clients.length]);
     }, [clients]);

@@ -57,6 +57,7 @@ export function addRoom(context: Context, roomName: string): Room {
             name: roomName,
             players: [],
             gamePhase: GAME_PHASE.WAITING,
+            gameState: {},
         };
         draftState.rooms[id] = room;
     }).rooms[id];

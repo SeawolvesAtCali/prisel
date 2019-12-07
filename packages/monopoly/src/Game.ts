@@ -5,6 +5,7 @@ import Node from './Node';
 import { flattenState } from './state';
 import { log } from './logGameObject';
 import { Payload, isPayload } from '@prisel/common';
+import { Messages } from '@prisel/server';
 
 interface Props {
     id: string;
@@ -19,11 +20,20 @@ interface FlatGame extends FlatGameObject {
     map: Ref<Node>;
 }
 
+interface GamePayload {
+    type: string;
+}
+
+export function isGamePayload(arg: any): arg is GamePayload {
+    return arg && typeof arg.type === 'string';
+}
+
 export default class Game extends GameObject {
     public id: string;
     public players: Map<string, Player>;
     public turnOrder: Player[];
     public map: Node;
+    private handleMap: Map<string, (handle: Handle, playerId: ClientId, data: GamePayload) => void>;
 
     constructor(props: Props) {
         super();
@@ -31,18 +41,76 @@ export default class Game extends GameObject {
         this.players = props.players;
         this.turnOrder = props.turnOrder;
         this.map = props.map;
+        this.handleMap = new Map();
+        this.setupHandlers();
     }
 
-    public processMessage(handle: Handle, playerId: ClientId, data: Payload) {
-        if (data.type === 'debug') {
-            const flatState = flattenState(this);
-            handle.emit(playerId, flatState);
-            handle.log('current game state is: \n%O', flatState);
-            return;
+    private setupHandlers() {
+        this.handleMap.set('get_game_state', this.onGetGameState);
+        this.handleMap.set('debug', this.debug);
+        this.handleMap.set('roll', this.roll);
+        this.handleMap.set('purchase', this.purchase);
+        this.handleMap.set('end_turn', this.endTurn);
+        this.handleMap.set('finished_setup', this.onFinishedSetup);
+    }
+
+    public processMessage(handle: Handle, playerId: ClientId, data: GamePayload) {
+        if (this.handleMap.has(data.type)) {
+            this.handleMap.get(data.type).call(this, handle, playerId, data);
         }
+
         const player = this.players.get(playerId);
         if (player && typeof data.type === 'string') {
             player.handleAction(data.type, this);
+        }
+    }
+
+    private onGetGameState(handle: Handle, playerId: ClientId, data: GamePayload) {
+        const flatState = flattenState(this);
+        handle.log('initial game state: \n%O', flatState);
+        handle.emit(
+            playerId,
+            ...Messages.getMessage({
+                request: 'get_game_state',
+                state: flatState,
+            }),
+        );
+    }
+
+    private onFinishedSetup(handle: Handle, playerId: ClientId, data: GamePayload) {
+        const gameState = handle.setState<GameState>((state) => {
+            state.finishedSetup = state.finishedSetup || {};
+            state.finishedSetup[playerId] = true;
+        });
+        if (Object.keys(gameState.finishedSetup).length === handle.players.length) {
+            handle.log('everyone finished setup, lets start the game');
+        }
+    }
+
+    private debug(handle: Handle, playerId: ClientId, data: GamePayload) {
+        const flatState = flattenState(this);
+        handle.emit(playerId, flatState);
+        handle.log('current game state is: \n%O', flatState);
+    }
+
+    private roll(handle: Handle, playerId: ClientId, data: GamePayload) {
+        const player = this.players.get(playerId);
+        if (this.isCurrentPlayer(player)) {
+            player.roll(this);
+        }
+    }
+
+    private purchase(handle: Handle, playerId: ClientId, data: GamePayload) {
+        const player = this.players.get(playerId);
+        if (this.isCurrentPlayer(player)) {
+            player.purchase(this);
+        }
+    }
+
+    private endTurn(handle: Handle, playerId: ClientId, data: GamePayload) {
+        const player = this.players.get(playerId);
+        if (this.isCurrentPlayer(player)) {
+            player.endTurn(this);
         }
     }
 
@@ -73,4 +141,8 @@ export function create(props: Props, handle: Handle) {
     const game = new Game(props);
     game.setHandle(handle);
     return game;
+}
+
+interface GameState {
+    finishedSetup: { [clientId: string]: boolean };
 }

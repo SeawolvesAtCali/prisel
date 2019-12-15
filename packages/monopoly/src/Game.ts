@@ -84,7 +84,19 @@ export default class Game extends GameObject {
         });
         if (Object.keys(gameState.finishedSetup).length === handle.players.length) {
             handle.log('everyone finished setup, lets start the game');
+            handle.setState<GameState>((state) => {
+                state.playerOrders = handle.players.slice();
+            });
+            this.requestStartTurn(handle);
         }
+    }
+
+    private requestStartTurn(handle: Handle) {
+        const currentPlayer = handle.state.playerOrders[0];
+        handle.broadcast(handle.players, {
+            type: 'start_turn',
+            player: currentPlayer,
+        });
     }
 
     private debug(handle: Handle, playerId: ClientId, data: GamePayload) {
@@ -145,4 +157,5 @@ export function create(props: Props, handle: Handle) {
 
 interface GameState {
     finishedSetup: { [clientId: string]: boolean };
+    playerOrders: string[];
 }

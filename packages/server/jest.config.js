@@ -11,7 +11,7 @@ module.exports = {
     transform: {
         '^.+\\.ts(x)?$': 'ts-jest',
     },
-    testRegex: '.test\\.ts$',
+    testRegex: '__test__/.+.test\\.ts$',
     restoreMocks: true,
     clearMocks: true,
 };

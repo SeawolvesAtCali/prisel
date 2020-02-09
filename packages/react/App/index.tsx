@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import GameContext, { RoomInfo } from '../GameContext';
 import { HostContainer, GuestContainer } from '../ClientContainer';
 import generateUsername from '../ClientContainer/username';
 import { Toolbar, ToolbarItem } from '../Toolbar';
 import styles from './index.css';
 import { CommandEditor, useCommandEditor } from '../commandEditor';
+import { RoomChangePayload } from '@prisel/common';
 
 function App() {
-    const [roomGameType, setRoomGameType] = useState(['', '']);
-    const [roomInfo, setRoomInfo] = useState<RoomInfo>(null);
     const [roomId, setRoomId] = useState('');
     const [guests, setGuests] = useState<string[]>([]);
     const [commands, handleSaveCommand] = useCommandEditor();
@@ -34,11 +33,7 @@ function App() {
                         gameType: '',
                         roomType: '',
                         roomId,
-                        roomInfo,
                         setRoomId,
-                        setRoomInfo,
-                        setRoomAndGameType: (roomType, gameType) =>
-                            setRoomGameType([roomType, gameType]),
                     }}
                 >
                     <HostContainer

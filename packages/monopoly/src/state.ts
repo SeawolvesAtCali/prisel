@@ -1,6 +1,6 @@
-import { ClientId, Handle } from '@prisel/server';
+import { Player, Room } from '@prisel/server';
 import Game from './Game';
-import { create as createPlayer } from './Player';
+import { create as createPlayer } from './GamePlayer';
 import { create as createGame } from './Game';
 import createBoard from './gameData/board';
 import Node from './Node';
@@ -8,33 +8,28 @@ import genId from './genId';
 
 const CASH = 1000;
 
-export function createIntialState(players: ClientId[], handle: Handle): Game {
-    const board = createBoard(handle);
+export function createIntialState(players: Player[]): Game {
+    const board = createBoard();
     const playerMap = new Map(
         players.map((player) => [
-            player,
-            createPlayer(
-                {
-                    cash: CASH,
-                    id: player,
-                    owning: [],
-                    rolled: false,
-                    position: board,
-                },
-                handle,
-            ),
+            player.getId(),
+            createPlayer({
+                cash: CASH,
+                id: player.getId(),
+                player,
+                owning: [],
+                rolled: false,
+                position: board,
+            }),
         ]),
     );
 
-    const game = createGame(
-        {
-            id: genId(),
-            players: playerMap,
-            turnOrder: Array.from(playerMap.values()),
-            map: board,
-        },
-        handle,
-    );
+    const game = createGame({
+        id: genId(),
+        players: playerMap,
+        turnOrder: Array.from(playerMap.values()),
+        map: board,
+    });
     return game;
 }
 

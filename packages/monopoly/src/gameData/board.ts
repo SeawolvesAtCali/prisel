@@ -1,6 +1,5 @@
 import { create as createNode } from '../Node';
 import { create as createProperty } from '../Property';
-import { Handle } from '@prisel/server';
 import genId from '../genId';
 
 const nodeList = [
@@ -28,25 +27,19 @@ const nodeList = [
     ['Park Place', 350],
     ['Boardwalk', 400],
 ];
-function createBoard(handle: Handle) {
+function createBoard() {
     const map = Array.from({ length: 20 }).map((ele, index) =>
-        createNode(
-            {
-                id: genId(),
-                property: nodeList[index]
-                    ? createProperty(
-                          {
-                              id: genId(),
-                              price: nodeList[index][1] as number,
-                              rent: 100,
-                              name: nodeList[index][0] as string,
-                          },
-                          handle,
-                      )
-                    : undefined,
-            },
-            handle,
-        ),
+        createNode({
+            id: genId(),
+            property: nodeList[index]
+                ? createProperty({
+                      id: genId(),
+                      price: nodeList[index][1] as number,
+                      rent: 100,
+                      name: nodeList[index][0] as string,
+                  })
+                : undefined,
+        }),
     );
 
     for (let i = 0; i < map.length; i++) {

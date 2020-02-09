@@ -1,4 +1,4 @@
-import { Context, Socket } from './objects';
+import { Context } from './objects';
 import createContext from './createContext';
 import debug from './debug';
 import './handler';
@@ -8,22 +8,23 @@ import {
     getConnectionToken,
     emit,
     createServerFromHTTPServer,
+    deserialize,
 } from './utils/networkUtils';
 import clientHandlerRegister from './clientHandlerRegister';
-import { parsePacket } from '@prisel/common';
 import { handleDisconnect } from './handler/handleDisconnect';
-import { getWelcome } from './message/room';
-import { GameConfig } from './utils/gameConfig';
+import { getWelcome } from './message';
+import { GameConfig, BaseGameConfig } from './utils/gameConfig';
 import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
-import ConfigManager from './utils/configManager';
-import { RoomId } from './objects/room';
-import { string } from 'prop-types';
 import http from 'http';
-import { getClient } from './utils/stateUtils';
+import { getPlayer, getRoom } from './utils/stateUtils';
+import { isResponse } from '@prisel/common';
+import { GAME_PHASE } from './objects/gamePhase';
 
 interface ServerConfig {
     host: string;
     port: number;
+    gameConfig?: Partial<GameConfig>;
+    roomConfig?: Partial<RoomConfig>;
     server: http.Server;
 }
 /**
@@ -57,7 +58,6 @@ interface ServerConfig {
  */
 export class Server {
     private context: Context;
-    private configManager = new ConfigManager();
 
     /**
      * Create and start the server and setup listeners for websocket events.
@@ -65,44 +65,67 @@ export class Server {
      * @param config configuration for the underlying HTTP Server. If not provided, a [koa](https://koajs.com/) server will be created at localhost:3000.
      */
     constructor(
-        config: Pick<ServerConfig, 'host' | 'port'> | Pick<ServerConfig, 'server'> = {
+        config: Omit<ServerConfig, 'host' | 'port'> | Omit<ServerConfig, 'server'> = {
             host: 'localhost',
             port: 3000,
         },
     ) {
         const server =
             'server' in config ? createServerFromHTTPServer(config.server) : createServer(config);
+        const gameConfig = config.gameConfig || BaseGameConfig;
+        const roomConfig = config.roomConfig || BaseRoomConfig;
         const context: Context = createContext({
             server,
-            getConfigs: this.configManager.get.bind(this.configManager),
+            gameConfig,
+            roomConfig,
         });
         this.context = context;
-        context.configManager = this.configManager;
 
         server.on('connection', (socket) => {
             debug('client connected');
-            emit(socket, ...getWelcome());
+            emit(socket, getWelcome());
             socket.on('message', (data: any) => {
                 debug(`received ${data}`);
-                if (data) {
-                    const packet = parsePacket(data);
-                    const handler = clientHandlerRegister.get(packet.type);
+                if (!data) {
+                    return;
+                }
+                const packet = deserialize(data);
+                // handle response
+                if (isResponse(packet)) {
+                    const { id } = packet;
+                    if (context.requests.isWaitingFor(id)) {
+                        context.requests.onResponse(packet);
+                    }
+                    return;
+                }
+                // handle packet or request
+                // systemAction are handled by pre-registered handlers.
+                const { systemAction, action } = packet;
+
+                if (action) {
+                    const player = getPlayer(context, socket);
+                    const room = getRoom(context, socket);
+                    if (player && room && room.getGamePhase() === GAME_PHASE.GAME) {
+                        room.dispatchGamePacket(packet, player);
+                    }
+                } else if (systemAction !== undefined) {
+                    const handler = clientHandlerRegister.get(systemAction);
                     if (!handler) {
                         debug(
-                            `Cannot find handler for ${packet.type} in ${Array.from(
+                            `Cannot find handler for ${systemAction} in ${Array.from(
                                 clientHandlerRegister.messageList,
                             )}`,
                         );
                         return;
                     }
-                    handler(context, socket)(packet.payload);
+                    handler(context, socket)(packet);
                 }
             });
 
             const connectionToken = getConnectionToken();
             socket.on('disconnect', () => {
                 connectionToken.safeDisconnect();
-                handleDisconnect(context, socket)({});
+                handleDisconnect(context, socket);
                 debug('client disconnected');
             });
 
@@ -110,9 +133,9 @@ export class Server {
                 if (!connectionToken.safeDisconnected) {
                     // client is not responding
                     // forcefully terminate connection
-                    const client = getClient(context, socket);
+                    const client = getPlayer(context, socket);
                     if (client) {
-                        debug(`client ${client.id} lost connection`);
+                        debug(`client ${client.getId()} lost connection`);
                     } else {
                         debug('a not logged-in user lost connection');
                     }
@@ -121,16 +144,6 @@ export class Server {
                 }
             });
         });
-    }
-
-    /**
-     * Register a game to the server. If the game requires special room configuration,
-     * a room configuration can also be provided.
-     * @param game game configuration.
-     * @param room room configuration, if not provided, the base room configuration will be used.
-     */
-    public register(game: GameConfig, room: RoomConfig = BaseRoomConfig) {
-        this.configManager.add(game, room);
     }
 
     /**

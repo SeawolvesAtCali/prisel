@@ -1,4 +1,4 @@
-import { Handle } from '@prisel/server';
+import { Room } from '@prisel/server';
 
 export interface FlatGameObject {
     id: string;
@@ -12,7 +12,6 @@ export interface Ref<T extends GameObject> {
 
 export default abstract class GameObject {
     public id: string;
-    protected handle: Handle;
 
     constructor() {
         this.ref = this.ref.bind(this);
@@ -20,10 +19,6 @@ export default abstract class GameObject {
 
     public static from(object: FlatGameObject): GameObject {
         throw new Error('Unimplemented');
-    }
-
-    public setHandle(handle: Handle) {
-        this.handle = handle;
     }
 
     public abstract flat(): FlatGameObject;

@@ -1,17 +1,21 @@
-import debug from './debug';
-import { createClients, untilSuccess, createRoomWithGuests } from './testHelper';
+import {
+    createClients,
+    waitForRoomUpdate,
+    createLoginedClients,
+    connectAndLogin,
+} from './testHelper';
 import { Messages } from '@prisel/client';
-import { MessageType } from '@prisel/common';
+import { RoomInfoPayload, Response, Status, RoomChangePayload } from '@prisel/common';
 
-const receivedRoomUpdate = (messageType: string) => MessageType.ROOM_UPDATE === messageType;
 describe('create room', () => {
     it('create a room', async () => {
         const [client] = createClients();
         await client.connect();
         await client.login('batman');
-        client.emit(...Messages.getCreateRoom('party room'));
-        const data = await untilSuccess(client, MessageType.CREATE_ROOM);
-        expect(typeof data.roomId).toBe('string');
+        const response: Response<RoomInfoPayload> = await client.request(
+            Messages.getCreateRoom(client.newId(), 'party room'),
+        );
+        expect(response.payload.id).toEqual(expect.any(String));
         client.exit();
     });
 
@@ -19,61 +23,64 @@ describe('create room', () => {
         const [client] = createClients();
         await client.connect();
         await client.login('batman');
-        client.emit(...Messages.getCreateRoom('room'));
-        await untilSuccess(client, MessageType.CREATE_ROOM);
-        client.emit(...Messages.getLeave());
-        await untilSuccess(client, MessageType.LEAVE);
+        const createRoomResponse = await client.request(
+            Messages.getCreateRoom(client.newId(), 'room'),
+        );
+        expect(createRoomResponse.status).toBe(Status.SUCCESS);
+        const leaveResponse = await client.request(Messages.getLeave(client.newId()));
+        expect(leaveResponse.status).toBe(Status.SUCCESS);
         client.exit();
     });
 
     it('create a room and a client join', async () => {
         const [host, client] = createClients(2);
+        const hostId = await connectAndLogin(host);
+        const clientId = await connectAndLogin(client);
 
-        await host.connect();
-        const hostData = await host.login('host');
-        const hostId = hostData.userId;
-        await client.connect();
-        const clientData = await client.login('client');
-        const clientId = clientData.userId as string;
-        host.emit(...Messages.getCreateRoom('party room'));
-        const roomData = await untilSuccess(host, MessageType.CREATE_ROOM);
-        const { roomId } = roomData;
-        client.emit(...Messages.getJoin(roomId as string));
-        const [, hostRoomUpdateResult, clientRoomUpdateResult] = await Promise.all([
-            untilSuccess(client, MessageType.JOIN),
-            host.once(
-                (messageType, data) =>
-                    MessageType.ROOM_UPDATE === messageType && (data.players as string[]).includes(clientId),
-            ),
-            client.once(
-                (messageType, data) =>
-                    MessageType.ROOM_UPDATE === messageType && (data.players as string[]).includes(clientId),
-            ),
+        const createRoomResponse: Response<RoomInfoPayload> = await host.request(
+            Messages.getCreateRoom(host.newId(), 'party room'),
+        );
+        const { id: roomId } = createRoomResponse.payload;
+        await waitForRoomUpdate(host);
+        const [hostRoomUpdateResult, clientRoomUpdateResult, _] = await Promise.all([
+            waitForRoomUpdate(host),
+            waitForRoomUpdate(client),
+            client.request(Messages.getJoin(client.newId(), roomId)),
         ]);
 
-        expect(clientRoomUpdateResult.id).toBe(roomId);
-        expect(clientRoomUpdateResult.host).toBe(hostId);
-        expect(clientRoomUpdateResult.players).toEqual([hostId, clientId]);
-        expect(hostRoomUpdateResult.id).toBe(roomId);
-        expect(hostRoomUpdateResult.host).toBe(hostId);
-        expect(hostRoomUpdateResult.players).toEqual([hostId, clientId]);
+        expect(clientRoomUpdateResult).toEqual(
+            expect.objectContaining({
+                newHost: hostId,
+                newJoins: expect.arrayContaining([hostId, clientId]),
+            }),
+        );
+        expect(hostRoomUpdateResult).toEqual(
+            expect.objectContaining({
+                newJoins: [clientId],
+            }),
+        );
         host.exit();
         client.exit();
     });
 
     it('in a room everyone leaves', async () => {
-        const clients = await createRoomWithGuests(2);
-        const [host, guest1, guest2] = clients.map(([userId, client]) => client);
-        guest1.emit(...Messages.getLeave());
-        await Promise.all([
-            untilSuccess(guest1, MessageType.LEAVE),
-            host.once(receivedRoomUpdate),
-            guest2.once(receivedRoomUpdate),
+        const [host, guest] = await createLoginedClients(2);
+        const [createResponse] = await Promise.all([
+            host.request(Messages.getCreateRoom(host.newId(), 'room')),
+            waitForRoomUpdate(host),
         ]);
-        host.emit(...Messages.getLeave());
-        await Promise.all([untilSuccess(host, MessageType.LEAVE), guest2.once(receivedRoomUpdate)]);
-        guest2.emit(...Messages.getLeave());
-        await untilSuccess(guest2, MessageType.LEAVE);
-        clients.map(([userId, client]) => client.exit());
+        const roomId = (createResponse.payload as RoomInfoPayload).id;
+        await Promise.all([
+            waitForRoomUpdate(host),
+            waitForRoomUpdate(guest),
+            guest.request(Messages.getJoin(guest.newId(), roomId)),
+        ]);
+        await Promise.all([
+            waitForRoomUpdate(guest),
+            host.request(Messages.getLeave(host.newId())),
+        ]);
+        await guest.request(Messages.getLeave(guest.newId()));
+        host.exit();
+        guest.exit();
     });
 });

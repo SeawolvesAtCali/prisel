@@ -1,18 +1,10 @@
-import { Socket, Client, Context } from '../objects';
+import { Socket, Context } from '../objects';
 import { RoomConfig } from './roomConfig';
 import { GameConfig } from './gameConfig';
 import createContext from '../createContext';
 
 export function mockSocket() {
     return {} as Socket;
-}
-
-export function mockClient(partial?: Partial<Client>): Client {
-    return {
-        id: 'CLIENT-id',
-        username: 'username',
-        ...partial,
-    };
 }
 
 const noop = () => {};
@@ -23,7 +15,6 @@ export function mockRoomConfig(partial?: Partial<RoomConfig>): RoomConfig {
         onGameStart: noop,
         onJoin: noop,
         onLeave: noop,
-        onMessage: noop,
         ...partial,
     };
 }
@@ -35,7 +26,6 @@ export function mockGameConfig(partial?: Partial<GameConfig>): GameConfig {
         onSetup: noop,
         canStart: () => true,
         onStart: noop,
-        onMessage: noop,
         onAddPlayer: noop,
         onRemovePlayer: noop,
         onEnd: noop,
@@ -51,7 +41,8 @@ export function mockContext(
     const game = gameConfig || mockGameConfig();
     const room = roomConfig || mockRoomConfig();
     return createContext({
-        getConfigs: () => ({ gameConfig: game, roomConfig: room }),
+        gameConfig: game,
+        roomConfig: room,
         ...partial,
     });
 }

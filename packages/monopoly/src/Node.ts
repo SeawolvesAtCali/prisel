@@ -1,6 +1,6 @@
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Property from './Property';
-import { Handle } from '@prisel/server';
+import { Room } from '@prisel/server';
 
 export interface FlatNode extends FlatGameObject {
     next: Ref<Node>;
@@ -14,6 +14,9 @@ interface Props {
     property?: Property;
 }
 
+/**
+ * A point on the path that players follow
+ */
 export default class Node extends GameObject {
     public id: string;
     public next?: Node;
@@ -54,8 +57,6 @@ export default class Node extends GameObject {
     }
 }
 
-export function create(props: Props, handle: Handle): Node {
-    const node = new Node(props);
-    node.setHandle(handle);
-    return node;
+export function create(props: Props): Node {
+    return new Node(props);
 }

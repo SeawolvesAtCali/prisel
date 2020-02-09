@@ -1,31 +1,52 @@
-import { Client } from '@prisel/client';
-import { Messages, MessageType } from '@prisel/client';
+import { Client, RoomChangePayload, Response, RoomInfoPayload } from '@prisel/client';
+import { Messages } from '@prisel/client';
 
 export function createClients(num = 1) {
     return Array.from({ length: num }).map(() => new Client());
 }
 
-export const untilSuccess = (client: Client, actionType: MessageType) =>
-    client.once(
-        (messageType, data) => messageType === MessageType.SUCCESS && data.action === actionType,
-    );
+export function waitForRoomUpdate(client: Client): Promise<RoomChangePayload> {
+    return new Promise((resolve) => {
+        const off = client.onRoomStateChange((roomStateChange) => {
+            off();
+            resolve(roomStateChange);
+        });
+    });
+}
 
-type UserId = string;
-type ClientTuple = [UserId, Client];
-export async function createRoomWithGuests(num = 0): Promise<ClientTuple[]> {
+export async function connectAndLogin(client: Client): Promise<string> {
+    await client.connect();
+    const clientInfo = await client.login('username');
+    return clientInfo.userId;
+}
+
+export async function createLoginedClients(num = 1): Promise<Client[]> {
+    return await Promise.all(
+        createClients(num).map(async (client) => {
+            await client.connect();
+            await client.login('username');
+            return client;
+        }),
+    );
+}
+
+export async function createRoomWithGuests(num = 0): Promise<Client[]> {
     const clients = Array.from({ length: num + 1 }).map(() => new Client());
-    const loginResults = await Promise.all(
-        clients.map((client) =>
-            client
-                .connect()
-                .then(() => client.login('username'))
-                .then((data) => [data.userId, client]),
-        ),
+    await Promise.all(
+        clients.map(async (client) => {
+            await client.connect();
+            await client.login('username');
+        }),
     );
     const [host, ...guests] = clients;
-    host.emit(...Messages.getCreateRoom('roomname'));
-    const createRoomInfo = await untilSuccess(host, MessageType.CREATE_ROOM);
-    guests.map((guest) => guest.emit(...Messages.getJoin(createRoomInfo.roomId as string)));
-    await Promise.all(guests.map((guest) => untilSuccess(guest, MessageType.JOIN)));
-    return loginResults as ClientTuple[];
+    const createRoomResponse: Response<RoomInfoPayload> = await host.request(
+        Messages.getCreateRoom(host.newId(), 'roomname'),
+    );
+    await waitForRoomUpdate(host);
+    await Promise.all(
+        guests.map(async (guest) => {
+            await guest.request(Messages.getJoin(guest.newId(), createRoomResponse.payload.id));
+        }),
+    );
+    return clients;
 }

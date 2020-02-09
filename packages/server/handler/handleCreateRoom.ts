@@ -1,47 +1,33 @@
 import { Context, Socket } from '../objects';
-import { emit } from '../utils/networkUtils';
-import { MessageType } from '@prisel/common';
-import * as messages from '../message/room';
+import { MessageType, Request, CreateRoomPayload } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';
 
-import { getRoom, getClient, addRoom } from '../utils/stateUtils';
-import createHandle, { Handle } from '../utils/handle';
-import { getCreateRoomSuccess } from '../message/room';
+import { getPlayer } from '../utils/stateUtils';
 
-const emitCreateRoomError = (socket: Socket, errorMessage: string) => {
-    emit(socket, ...messages.getFailure(MessageType.CREATE_ROOM, errorMessage));
-};
-
-export const handleCreateRoom = (context: Context, socket: Socket) => (data: {
-    roomName: string;
-    gameType?: string;
-    roomType?: string;
-}) => {
-    const { roomName, gameType, roomType } = data;
-
-    const currentRoom = getRoom(context, socket);
-    if (currentRoom) {
-        // already in a room
-        emitCreateRoomError(socket, `ALREADY IN A ROOM ${currentRoom.id}`);
+export const handleCreateRoom = (context: Context, socket: Socket) => (
+    request: Request<CreateRoomPayload>,
+) => {
+    const player = getPlayer(context, socket);
+    if (!player) {
+        // player hasn't login yet
+        // TODO(minor) give some error message to client
         return;
     }
-    const configs = context.getConfigs(gameType, roomType);
-    if (!configs) {
-        emitCreateRoomError(socket, `CANNOT CREATE A ROOM FOR GAME ${gameType}, ROOM ${roomType}.`);
+    const roomConfig = context.roomConfig;
+    const failureResponse = roomConfig.preCreate(player, request);
+    if (failureResponse) {
+        player.emit(failureResponse);
         return;
     }
-    const { gameConfig, roomConfig } = configs;
-    const room = addRoom(context, roomName);
-    const handle = createHandle({ context, roomId: room.id, gameConfig, roomConfig });
-    context.handles[room.id] = handle;
-    const hostId = getClient(context, socket).id;
-    handle.emit(hostId, ...getCreateRoomSuccess(room.id));
 
-    const initialState = handle.game.onSetup(handle);
-    if (initialState) {
-        handle.setState(initialState);
-    }
-    handle.room.onCreate(handle, hostId, data);
+    roomConfig.onCreate(player, request);
+
+    // TODO setup initial game state
+
+    // const initialState = handle.game.onSetup(handle);
+    // if (initialState) {
+    //     handle.setState(initialState);
+    // }
 };
 
 clientHandlerRegister.push(MessageType.CREATE_ROOM, handleCreateRoom);

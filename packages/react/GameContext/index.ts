@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import { RoomChangePayload } from '@prisel/common';
 
 export interface RoomInfo {
     id: string;
@@ -14,11 +15,6 @@ interface GameContext {
     gameType?: string;
     roomType?: string;
     setRoomId?: (roomId: GameContext['roomId']) => void;
-    setRoomInfo?: (roomInfo: GameContext['roomInfo']) => void;
-    setRoomAndGameType?: (
-        roomType: GameContext['roomType'],
-        gameType: GameContext['gameType'],
-    ) => void;
 }
 
 const context = createContext<GameContext>({});

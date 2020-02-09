@@ -1,8 +1,7 @@
-import { Context, Socket, Room, Client } from '../objects';
-import { Handle } from './handle';
-import { newId } from './idUtils';
-import { RoomId } from '../objects/room';
-import { GAME_PHASE } from '../objects/gamePhase';
+import { Context, Socket } from '../objects';
+
+import { Player } from '../player';
+import { Room } from '../room';
 
 // Some utility functions for working with state
 
@@ -11,14 +10,14 @@ import { GAME_PHASE } from '../objects/gamePhase';
  * @param context
  * @param client
  */
-export function getClient(context: Context, client: Socket): Client {
+export function getPlayer(context: Context, client: Socket): Player | void {
     if (!context || !client) {
         return;
     }
-    const { SocketManager, StateManager } = context;
+    const { SocketManager } = context;
     const userId = SocketManager.getId(client);
-    if (userId) {
-        return StateManager.connections[userId];
+    if (userId && context.players.has(userId)) {
+        return context.players.get(userId);
     }
 }
 
@@ -31,33 +30,8 @@ export function getRoom(context: Context, client: Socket): Room {
     if (!context || !client) {
         return;
     }
-    const { StateManager } = context;
-    const clientData = getClient(context, client);
-    if (clientData) {
-        const { roomId } = clientData;
-        if (roomId) {
-            return StateManager.rooms[roomId];
-        }
+    const player = getPlayer(context, client);
+    if (player) {
+        return player.getRoom();
     }
-}
-
-export function getHandle(context: Context, client: Socket): Handle {
-    const room = getRoom(context, client);
-    if (room) {
-        return context.handles[room.id];
-    }
-}
-
-export function addRoom(context: Context, roomName: string): Room {
-    let id: RoomId;
-    return context.updateState((draftState) => {
-        id = newId<RoomId>('ROOM');
-        const room: Room = {
-            id,
-            name: roomName,
-            players: [],
-            gamePhase: GAME_PHASE.WAITING,
-        };
-        draftState.rooms[id] = room;
-    }).rooms[id];
 }

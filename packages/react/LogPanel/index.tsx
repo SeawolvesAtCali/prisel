@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Suggestion from '../Suggestion';
-import { MessageType } from '@prisel/client';
+import { MessageType, Packet } from '@prisel/client';
 import styles from './index.css';
 import cn from '../utils/classname';
 import Chip from '../Chip';
@@ -8,8 +8,7 @@ import ReactJson from 'react-json-view';
 import debounce from 'lodash/debounce';
 
 export interface Message {
-    type: MessageType;
-    payload: { [prop: string]: unknown };
+    packet: Packet;
     command?: Suggestion[];
     origin: 'server' | 'client' | 'none';
 }
@@ -26,7 +25,7 @@ export interface MessageWithMetaData extends Message {
 }
 
 const MessageDisplay: React.FC<MessageWithMetaData> = (props) => {
-    const { payload, defaultExpanded, origin, timestamp, command } = props;
+    const { packet, defaultExpanded, origin, timestamp, command } = props;
     const [expanded, setExpanded] = React.useState(
         defaultExpanded === undefined ? false : defaultExpanded,
     );
@@ -52,10 +51,7 @@ const MessageDisplay: React.FC<MessageWithMetaData> = (props) => {
                 <span className={styles.time}>{cachedTimestamp}</span>
                 <span className={cn(styles.origin, originClass[origin])}>{origin}</span>
             </div>
-            <ReactJson
-                src={typeof payload !== 'object' ? { _primitive: payload } : payload}
-                name="payload"
-            />
+            <ReactJson src={packet} name="payload" />
         </div>
     );
 };

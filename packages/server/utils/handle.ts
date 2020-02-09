@@ -1,66 +1,68 @@
-import { Context } from '../objects';
-import { emit } from './networkUtils';
-import { ClientId } from '../objects/client';
-import { RoomId } from '../objects/room';
-import { MessageType, isPayload, Payload, isMessageType } from '@prisel/common';
-import { GameConfig } from './gameConfig';
-import { RoomConfig } from './roomConfig';
-import { updateClientWithRoomData } from './updateUtils';
+// import { Context } from '../objects';
+// import { emit } from './networkUtils';
+// import { PlayerId } from '../objects/client';
+// import { RoomId } from '../objects/room';
+// import { Packet } from '@prisel/common';
+// import { GameConfig } from './gameConfig';
+// import { RoomConfig } from './roomConfig';
+// import { updateClientWithRoomData } from './updateUtils';
 
-import { Handle, HandleProps } from './abstractHandle';
+// import { Handle, HandleProps } from './abstractHandle';
 
-/**
- * handle provides utilities to update room and game state
- * as well as performing network calls.
- */
-// tslint:disable-next-line:max-classes-per-file
-class HandleImpl extends Handle {
-    public roomId: RoomId;
-    public game: GameConfig;
-    public room: RoomConfig;
+// const initialRequestId = 0;
 
-    protected context: Context;
+// /**
+//  * handle provides utilities to update room and game state
+//  * as well as performing network calls.
+//  */
+// // tslint:disable-next-line:max-classes-per-file
+// class HandleImpl extends Handle {
+//     public roomId: RoomId;
+//     public game: GameConfig;
+//     public room: RoomConfig;
 
-    constructor({ context, roomId, gameConfig, roomConfig }: HandleProps) {
-        super({ context, roomId, gameConfig, roomConfig });
-    }
+//     protected context: Context;
 
-    public emit(playerId: ClientId, ...rest: [MessageType, Payload] | [Payload]) {
-        if (isMessageType(rest[0]) && isPayload(rest[1])) {
-            emitWithPlayerId(this.context, playerId, rest[0], rest[1]);
-        }
-        if (isPayload(rest[0])) {
-            emitWithPlayerId(this.context, playerId, MessageType.MESSAGE, rest[0]);
-        }
-    }
+//     private requestIds: Map<PlayerId, any> = new Map();
 
-    public broadcast(playerIds: ClientId[], ...rest: [MessageType, Payload] | [Payload]) {
-        playerIds.forEach((playerId) => {
-            this.emit(playerId, ...rest);
-        });
-    }
+//     constructor({ context, roomId, gameConfig, roomConfig }: HandleProps) {
+//         super({ context, roomId, gameConfig, roomConfig });
+//     }
 
-    public broadcastRoomUpdate() {
-        updateClientWithRoomData(this.context, this.roomId);
-    }
-}
+//     public newRequestId(playerId: PlayerId) {
+//         const requestId = this.requestIds.has(playerId)
+//             ? createRequestId(this.requestIds.get(playerId))
+//             : initialRequestId;
+//         this.requestIds.set(playerId, requestId);
+//         return `${requestId}`;
+//     }
 
-function emitWithPlayerId(
-    context: Context,
-    playerId: ClientId,
-    messageType: MessageType,
-    payload: Payload,
-): void {
-    const { SocketManager } = context;
-    const clientSocket = SocketManager.getSocket(playerId);
-    if (clientSocket) {
-        emit(clientSocket, messageType, payload);
-    }
-}
+//     public emit(playerId: PlayerId, packet: Packet<any>) {
+//         const { SocketManager } = this.context;
+//         const clientSocket = SocketManager.getSocket(playerId);
+//         if (clientSocket) {
+//             emit(clientSocket, packet);
+//         }
+//     }
 
-function createHandle(props: HandleProps): Handle {
-    return new HandleImpl(props);
-}
+//     public broadcast(playerIds: PlayerId[], packetBuilder: (player: PlayerId) => Packet<any>) {
+//         for (const playerId of playerIds) {
+//             this.emit(playerId, packetBuilder(playerId));
+//         }
+//     }
 
-export { Handle, HandleProps };
-export default createHandle;
+//     public broadcastRoomUpdate() {
+//         updateClientWithRoomData(this.context, this.roomId);
+//     }
+// }
+
+// function createRequestId(previousRequestId: any) {
+//     return previousRequestId + 1;
+// }
+
+// function createHandle(props: HandleProps): Handle {
+//     return new HandleImpl(props);
+// }
+
+// export { Handle, HandleProps };
+// export default createHandle;

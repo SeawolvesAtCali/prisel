@@ -26,7 +26,7 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "build": "rollup -c",
-        "postbuild": "tsc --emitDeclarationOnly",
+        "postbuild": "tsc --emitDeclarationOnly && node ./generateSystemActionDoc.js",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
     },

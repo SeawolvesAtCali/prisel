@@ -1,10 +1,8 @@
 import './handleChat';
-import './handleLogin';
-import './handleDisconnect';
 import './handleCreateRoom';
+import './handleDisconnect';
 import './handleExit';
+import './handleGameStart';
 import './handleJoin';
 import './handleLeave';
-import './handleGameStart';
-import './handleMessage';
-import './handleGameAndRoomTypes';
+import './handleLogin';

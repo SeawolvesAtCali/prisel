@@ -1,23 +1,31 @@
 import { Context, Socket } from '../objects';
-import { broadcast } from '../utils/networkUtils';
-import * as messages from '../message/chat';
-import { MessageType } from '@prisel/common';
+import { emit } from '../utils/networkUtils';
+import { MessageType, PacketType, ChatPayload, Packet, BroadcastPayload } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';
-import { getClient, getRoom } from '../utils/stateUtils';
+import { getPlayer, getRoom } from '../utils/stateUtils';
+import { broadcast } from '../utils/broadcast';
 
-export const handleChat = (context: Context, client: Socket) => (data: {
-    message: string;
-}): void => {
-    const { message } = data;
-    const player = getClient(context, client);
+// send chat message to everyone in the room including the sender
+export const handleChat = (context: Context, client: Socket) => (
+    chatPacket: Packet<ChatPayload>,
+): void => {
+    const { message } = chatPacket.payload;
+    const player = getPlayer(context, client);
     const room = getRoom(context, client);
 
     if (player && room) {
-        return void broadcast(
-            context,
-            room.id,
-            ...messages.getBroadcastMessage(player.username, message),
-        );
+        const packet: Packet<BroadcastPayload> = {
+            type: PacketType.DEFAULT,
+            systemAction: MessageType.CHAT,
+            payload: {
+                from: {
+                    userId: player.getId(),
+                    username: player.getName(),
+                },
+                message,
+            },
+        };
+        broadcast(room.getPlayers(), packet);
     }
 };
 

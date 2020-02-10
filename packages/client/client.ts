@@ -14,7 +14,7 @@ import {
     MessageType,
     RoomChangePayload,
 } from '@prisel/common';
-import PubSub, { Listener, Filter } from './pubSub';
+import { PubSub } from './pubSub';
 import withTimer from './withTimer';
 
 const DEFAULT_USERNAME = 'user';
@@ -198,7 +198,7 @@ class Client<T = State> {
      * @param messageTypeOrFilter
      * @param callback
      */
-    public on(action: any, listener: Listener): RemoveListenerFunc {
+    public on(action: any, listener: (packet: Packet, action?: any) => void): RemoveListenerFunc {
         return this.listeners.on(action, listener);
     }
 

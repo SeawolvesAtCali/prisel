@@ -145,8 +145,9 @@ class RoomImpl implements Room {
         if (packet.type === PacketType.RESPONSE) {
             return;
         }
-
-        this.actionListeners.emit(action, player, packet, action);
+        setImmediate(() => {
+            this.actionListeners.emit(action, player, packet, action);
+        });
     }
 }
 

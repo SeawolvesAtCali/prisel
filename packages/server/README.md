@@ -18,7 +18,9 @@ By default, prisel creates a server on port 3000.
 
 ```javascript
 import { Server } from '@prisel/server';
-new Server(); // server starts at ws://localhost:3000.
+const server = Server.create(); // server starts at ws://localhost:3000.
+
+server.close(); // close the server;
 ```
 
 To create a game, we need to implement a game configuration and add to the server.

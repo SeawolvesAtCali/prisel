@@ -7,7 +7,6 @@ import { Action } from './messages';
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
     maxPlayers: 4,
-    onSetup(room) {},
     canStart(room) {
         return room.getPlayers().length > 1;
     },

@@ -24,6 +24,12 @@ export abstract class Player {
     ): Promise<Response>;
     public abstract respond<T = never>(request: Request<any>, status: Status, payload?: T): void;
     public abstract getSocket(): WebSocket;
+    public equals(player: Player): boolean {
+        if (!player) {
+            return false;
+        }
+        return this.getId() === player.getId();
+    }
 }
 
 export interface PlayerConfig {

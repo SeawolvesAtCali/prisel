@@ -13,11 +13,6 @@ interface FullGameConfig {
      */
     maxPlayers: number;
     /**
-     * Function invoked at room creation time and after a game ends.
-     * This is a good place to initialize pre game state.
-     */
-    onSetup(room: Room): void;
-    /**
      * Check if all the preparation are done in order to start a new game.
      */
     canStart(room: Room): boolean;
@@ -46,7 +41,6 @@ export type GameConfig = Partial<FullGameConfig>;
 export const BaseGameConfig: FullGameConfig = {
     type: 'game',
     maxPlayers: 10,
-    onSetup(room) {},
     canStart(room) {
         return true;
     },

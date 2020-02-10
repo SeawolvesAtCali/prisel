@@ -21,13 +21,6 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (
     }
 
     roomConfig.onCreate(player, request);
-
-    // TODO setup initial game state
-
-    // const initialState = handle.game.onSetup(handle);
-    // if (initialState) {
-    //     handle.setState(initialState);
-    // }
 };
 
 clientHandlerRegister.push(MessageType.CREATE_ROOM, handleCreateRoom);

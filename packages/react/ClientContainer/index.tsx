@@ -33,7 +33,6 @@ function useRun(client: Client, addToLogs: AddToLogs) {
                     if (packet.type === PacketType.REQUEST) {
                         client.emit({ ...packet, id: client.newId() });
                     }
-                    // TODO: if this is not message type, it will be log twice
                     addToLogs({
                         origin: 'client',
                         packet,

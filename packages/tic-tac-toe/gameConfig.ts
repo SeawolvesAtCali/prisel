@@ -15,7 +15,10 @@ export const TicTacToe: GameConfig = {
         debug('checking canStart, the players are ', room.getPlayers().length);
         return room.getPlayers().length === 2;
     },
-    onSetup(room) {
+    onEnd(room) {
+        room.removeAllGamePacketListener();
+    },
+    onStart(room) {
         const stopListenForMessage = room.listenGamePacket('MESSAGE', (player, packet) => {
             debug('tic-tac-toe receive game message ', packet);
             const gameState = room.getGame<GameState>();
@@ -44,13 +47,13 @@ export const TicTacToe: GameConfig = {
                 newGameState.winner = 'even';
                 gameOver = true;
             }
-            const gameStateMessage: Packet<GameState> = {
+            const newGameStateMessage: Packet<GameState> = {
                 type: PacketType.DEFAULT,
                 action: GAME_STATE,
                 payload: newGameState,
             };
             room.setGame(newGameState);
-            broadcast(room.getPlayers(), gameStateMessage);
+            broadcast(room.getPlayers(), newGameStateMessage);
             if (gameOver) {
                 stopListenForMessage();
                 // end the game 500 ms later to allow clients to paint the last move
@@ -64,11 +67,7 @@ export const TicTacToe: GameConfig = {
                 }, 500);
             }
         });
-    },
-    onEnd(room) {
-        room.removeAllGamePacketListener();
-    },
-    onStart(room) {
+
         room.setGame<GameState>({
             player: room.getPlayers().map((player) => player.getId()),
             map: new Array(9).fill(''),

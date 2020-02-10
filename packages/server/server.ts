@@ -3,7 +3,7 @@ import createContext from './createContext';
 import debug from './debug';
 import './handler';
 import {
-    createServer,
+    createServerWithInternalHTTPServer,
     watchForDisconnection,
     getConnectionToken,
     emit,
@@ -21,11 +21,11 @@ import { isResponse } from '@prisel/common';
 import { GAME_PHASE } from './objects/gamePhase';
 
 interface ServerConfig {
-    host: string;
-    port: number;
+    host?: string;
+    port?: number;
     gameConfig?: Partial<GameConfig>;
     roomConfig?: Partial<RoomConfig>;
-    server: http.Server;
+    server?: http.Server;
 }
 /**
  * Server is a wrapper on top of the websocket server.
@@ -58,6 +58,7 @@ interface ServerConfig {
  */
 export class Server {
     private context: Context;
+    private onClose: () => void;
 
     /**
      * Create and start the server and setup listeners for websocket events.
@@ -65,20 +66,39 @@ export class Server {
      * @param config configuration for the underlying HTTP Server. If not provided, a [koa](https://koajs.com/) server will be created at localhost:3000.
      */
     constructor(
-        config: Omit<ServerConfig, 'host' | 'port'> | Omit<ServerConfig, 'server'> = {
+        config: ServerConfig = {
             host: 'localhost',
             port: 3000,
         },
     ) {
-        const server =
-            'server' in config ? createServerFromHTTPServer(config.server) : createServer(config);
+        const server = (() => {
+            if ('server' in config) {
+                return createServerFromHTTPServer(config.server);
+            }
+            if ('host' in config && 'port' in config) {
+                const [wsServer, httpServer] = createServerWithInternalHTTPServer({
+                    host: config.host,
+                    port: config.port,
+                });
+                // internally created http server will be closed once WebSocket
+                // server is closed. External http server needs to be closed manually.
+                this.onClose = () => {
+                    httpServer.close();
+                };
+                return wsServer;
+            }
+        })();
+        if (!server) {
+            throw new Error('config missing. need to provide either 1. server or 2. host and port');
+        }
+
         const gameConfig = config.gameConfig || BaseGameConfig;
         const roomConfig = config.roomConfig || BaseRoomConfig;
         const context: Context = createContext({
-            server,
             gameConfig,
             roomConfig,
         });
+
         this.context = context;
 
         server.on('connection', (socket) => {
@@ -146,6 +166,10 @@ export class Server {
         });
     }
 
+    public static create(config?: ServerConfig) {
+        return new Server(config);
+    }
+
     /**
      * Close the server. After a server is closed, it cannot be restarted.
      * If we need to start a new server, instantiate a new Server.
@@ -153,6 +177,10 @@ export class Server {
     public close() {
         if (this.context) {
             this.context.server.close();
+            if (this.onClose) {
+                this.onClose();
+                this.onClose = null;
+            }
             this.context = undefined;
         }
     }

@@ -14,7 +14,13 @@ export function deserialize(packet: string): Packet<any> {
     return JSON.parse(packet);
 }
 
-export function createServer({ host, port }: { host: string; port: number }): WebSocket.Server {
+export function createServerWithInternalHTTPServer({
+    host,
+    port,
+}: {
+    host: string;
+    port: number;
+}): [WebSocket.Server, http.Server] {
     const app = new Koa();
     app.use((ctx) => {
         ctx.body = 'Server is running';
@@ -23,7 +29,7 @@ export function createServer({ host, port }: { host: string; port: number }): We
     const ws = new WebSocket.Server({ server: httpServer });
     httpServer.listen(port, host, undefined, undefined);
     debug(`start serving at ws://${host}:${port}`);
-    return ws;
+    return [ws, httpServer];
 }
 
 export function createServerFromHTTPServer(httpServer: http.Server): WebSocket.Server {

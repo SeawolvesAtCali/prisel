@@ -1,6 +1,6 @@
 const { Server, debug } = require('@prisel/server');
 
-const server = new Server({ host: 'localhost', port: 3000 });
+const server = Server.create({ host: 'localhost', port: 3000 });
 process.stdout.write('starting server');
 
 process.title = 'prisel-server';

@@ -1,5 +1,5 @@
 import { RoomChangePayload, Client, PacketType } from '@prisel/client';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 export const phases = {
     LOGIN: 0,
@@ -26,11 +26,12 @@ export function useRoomState() {
     const [players, setPlayers] = useState([]);
     const [host, setHost] = useState(undefined);
 
-    function onJoin(roomInfoPayload) {
+    const onJoin = useCallback((roomInfoPayload) => {
         setRoomId(roomInfoPayload.id);
         setRoomName(roomInfoPayload.name);
-    }
-    function onRoomStateChange(roomChangePayload) {
+    }, []);
+
+    const onRoomStateChange = useCallback((roomChangePayload) => {
         if (roomChangePayload.newHost) {
             setHost(roomChangePayload.newHost);
         }
@@ -39,11 +40,20 @@ export function useRoomState() {
         }
         if (roomChangePayload.newLeaves) {
             setPlayers((oldPlayers) =>
-                oldPlayers.filter((playerInRoom) => !roomChangePayload.includes(playerInRoom)),
+                oldPlayers.filter(
+                    (playerInRoom) => !roomChangePayload.newLeaves.includes(playerInRoom),
+                ),
             );
         }
-    }
-    return { roomId, roomName, players, host, onJoin, onRoomStateChange };
+    }, []);
+
+    const onLeave = useCallback(() => {
+        // clear room state
+        setPlayers([]);
+        setHost(undefined);
+    }, []);
+
+    return { roomId, roomName, players, host, onJoin, onRoomStateChange, onLeave };
 }
 
 const initialGameState = {
@@ -80,7 +90,7 @@ export function useGameState(client, onEnd) {
             setGameState(initialGameState);
             endRef.current(winner);
         });
-    }, []);
+    }, [winner]);
 
     return { gameState, handleMove };
 }

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Client, Messages, PacketType } from '@prisel/client';
+import { Client, Messages, PacketType, Status } from '@prisel/client';
 import Context from './context';
 import Login from './Login';
 import Lobby from './Lobby';
@@ -8,7 +8,6 @@ import Game from './Game';
 import {
     getInitialRoomState,
     onRoomStateChange,
-    onRoomJoin,
     phases,
     useConnected,
     useRoomState,
@@ -20,7 +19,7 @@ import {
 function App() {
     const [phase, setPhase] = useState(phases.LOGIN);
     const connectedRef = useRef(false);
-    const { roomId, roomName, players, host, onJoin, onRoomStateChange } = useRoomState();
+    const { roomId, roomName, players, host, onJoin, onRoomStateChange, onLeave } = useRoomState();
     const { id, name, setUserInfo } = useUserInfo();
 
     const { client, login } = useClient(process.env.SERVER, connectedRef);
@@ -45,14 +44,28 @@ function App() {
         });
     const handleCreate = async (roomName) => {
         const response = await client.request(Messages.getCreateRoom(client.newId(), roomName));
-        onJoin(response.payload);
-        setPhase(phases.ROOM);
+        if (response.status === Status.SUCCESS) {
+            onJoin(response.payload);
+            setPhase(phases.ROOM);
+        } else {
+            client.log(response.payload.detail);
+        }
     };
     const handleJoin = async (roomId) => {
         const response = await client.request(Messages.getJoin(client.newId(), roomId));
-
-        onJoin(response.payload);
-        setPhase(phases.ROOM);
+        if (response.status === Status.SUCCESS) {
+            onJoin(response.payload);
+            setPhase(phases.ROOM);
+        } else {
+            client.log(response.payload.detail);
+        }
+    };
+    const handleLeave = async () => {
+        const response = await client.request(Messages.getLeave(client.newId()));
+        if (response.status === Status.SUCCESS) {
+            onLeave();
+            setPhase(phases.LOBBY);
+        }
     };
     const handleStart = () => {
         return client.request(Messages.getGameStart(client.newId()));
@@ -74,7 +87,7 @@ function App() {
             case phases.LOBBY:
                 return <Lobby onCreate={handleCreate} onJoin={handleJoin} />;
             case phases.ROOM:
-                return <Room onStart={handleStart} />;
+                return <Room onStart={handleStart} onLeave={handleLeave} />;
             case phases.GAME:
                 return <Game onMove={handleMove} />;
         }

@@ -3,22 +3,22 @@ import { enumToMap } from './enumToMap';
 
 export interface Packet<T = any> {
     type: PacketType;
-    systemAction?: MessageType;
+    system_action?: MessageType;
     action?: any;
     status?: Status; // only in response
     payload?: T;
-    id?: string;
+    request_id?: string;
 }
 
 export type Request<T = any> = Omit<Packet<T>, 'status'> & {
     type: PacketType.REQUEST;
-    id: string;
+    request_id: string;
 };
 
 export interface Response<T = any> extends Packet<T> {
     type: PacketType.RESPONSE;
     status: Status;
-    id: string;
+    request_id: string;
 }
 
 export function isResponse(packet: Packet): packet is Response {
@@ -26,7 +26,7 @@ export function isResponse(packet: Packet): packet is Response {
         return false;
     }
     return (
-        packet.id !== undefined &&
+        packet.request_id !== undefined &&
         packet.type === PacketType.RESPONSE &&
         Object.values(Status).some((statusValue) => statusValue === packet.status)
     );
@@ -35,7 +35,7 @@ export function isRequest(packet: Packet): packet is Request {
     if (!packet) {
         return false;
     }
-    return packet.id !== undefined && packet.type === PacketType.REQUEST;
+    return packet.request_id !== undefined && packet.type === PacketType.REQUEST;
 }
 
 export enum PacketType {
@@ -55,10 +55,10 @@ export enum Status {
 export const statusMap = enumToMap<Status>(Status);
 
 export function toDebugString(packet: Packet) {
-    const { systemAction, status, type } = packet;
+    const { system_action: systemAction, status, type } = packet;
     const debugPacket: any = { ...packet };
     if (systemAction !== undefined) {
-        debugPacket.systemAction = messageTypeMap.get(systemAction);
+        debugPacket.system_action = messageTypeMap.get(systemAction);
     }
     if (type !== undefined) {
         debugPacket.type = packetTypeMap.get(type);

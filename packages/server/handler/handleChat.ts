@@ -16,7 +16,7 @@ export const handleChat = (context: Context, client: Socket) => (
     if (player && room) {
         const packet: Packet<BroadcastPayload> = {
             type: PacketType.DEFAULT,
-            systemAction: MessageType.CHAT,
+            system_action: MessageType.CHAT,
             payload: {
                 from: {
                     userId: player.getId(),

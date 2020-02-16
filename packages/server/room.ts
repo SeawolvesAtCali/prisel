@@ -121,7 +121,7 @@ class RoomImpl extends Room {
     }
 
     public close() {
-        // TODO(minor): for safty, clean up other things, like remaining
+        // TODO(minor): for safety, clean up other things, like remaining
         // players, on-going games
         this.actionListeners.removeAllListeners();
         this.gamePhase = GAME_PHASE.WAITING;

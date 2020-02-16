@@ -13,7 +13,7 @@ export function newRequestManager(): RequestManager {
     const requestIdMap = new Map<string, ResolveFunc>();
     let requestId = 1;
     function addRequest(request: Request, timeout: number) {
-        const id = request.id;
+        const id = request.request_id;
         const promise = new Promise<Response>((resolve, reject) => {
             requestIdMap.set(id, resolve);
             if (timeout > 0) {
@@ -29,7 +29,7 @@ export function newRequestManager(): RequestManager {
     }
 
     function onResponse(response: Response) {
-        const id = response.id;
+        const id = response.request_id;
         if (requestIdMap.has(id)) {
             const resolve = requestIdMap.get(id);
             requestIdMap.delete(id);

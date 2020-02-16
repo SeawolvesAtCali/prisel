@@ -112,7 +112,7 @@ export class Server {
                 const packet = deserialize(data);
                 // handle response
                 if (isResponse(packet)) {
-                    const { id } = packet;
+                    const { request_id: id } = packet;
                     if (context.requests.isWaitingFor(id)) {
                         context.requests.onResponse(packet);
                     }
@@ -120,7 +120,7 @@ export class Server {
                 }
                 // handle packet or request
                 // systemAction are handled by pre-registered handlers.
-                const { systemAction, action } = packet;
+                const { system_action: systemAction, action } = packet;
 
                 if (action) {
                     const player = getPlayer(context, socket);

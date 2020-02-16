@@ -18,7 +18,7 @@ export function getBroadcastMessage(
 ): Packet<BroadcastMessagePayload> {
     return {
         type: PacketType.DEFAULT,
-        systemAction: MessageType.BROADCAST,
+        system_action: MessageType.BROADCAST,
         payload: {
             username,
             message,
@@ -29,7 +29,7 @@ export function getBroadcastMessage(
 export function getWelcome(): Packet<never> {
     return {
         type: PacketType.DEFAULT,
-        systemAction: MessageType.WELCOME,
+        system_action: MessageType.WELCOME,
     };
 }
 
@@ -40,7 +40,7 @@ export function getResponseFor<T = never>(
 ): Response<T> {
     const response: Response<T> = {
         type: PacketType.RESPONSE,
-        id: request.id,
+        request_id: request.request_id,
         status,
     };
     if (payload !== undefined) {
@@ -50,7 +50,7 @@ export function getResponseFor<T = never>(
         response.action = request.action;
         return response;
     }
-    response.systemAction = request.systemAction;
+    response.system_action = request.system_action;
     return response;
 }
 export function getSuccessFor<T = never>(request: Request<any>, payload?: T): Response<T> {

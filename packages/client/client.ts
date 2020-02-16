@@ -180,12 +180,12 @@ class Client<T = State> {
     public respond<Payload>(request: Request, status: Status, payload: Payload) {
         const response: Response<Payload> = {
             type: PacketType.RESPONSE,
-            id: request.id,
+            request_id: request.request_id,
             status,
             payload,
         };
-        if (request.systemAction !== undefined) {
-            response.systemAction = request.systemAction;
+        if (request.system_action !== undefined) {
+            response.system_action = request.system_action;
         }
         if (request.action !== undefined) {
             response.action = request.action;
@@ -236,8 +236,8 @@ class Client<T = State> {
 
         if (packet.action !== undefined) {
             this.listeners.dispatch(packet.action, packet);
-        } else if (packet.systemAction !== undefined) {
-            this.systemActionListener.dispatch(packet.systemAction, packet);
+        } else if (packet.system_action !== undefined) {
+            this.systemActionListener.dispatch(packet.system_action, packet);
         } else {
             // tslint:disable-next-line
             console.log('Packet without action is not supported', packet);

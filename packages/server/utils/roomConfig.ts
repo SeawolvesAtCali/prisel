@@ -71,7 +71,7 @@ export const BaseRoomConfig: FullRoomConfig = {
         });
         player.emit<Packet<RoomChangePayload>>({
             type: PacketType.DEFAULT,
-            systemAction: MessageType.ROOM_STATE_CHANGE,
+            system_action: MessageType.ROOM_STATE_CHANGE,
             payload: {
                 newJoins: [player.getId()],
                 newHost: player.getId(),
@@ -109,13 +109,13 @@ export const BaseRoomConfig: FullRoomConfig = {
             if (playerInRoom === player) {
                 return {
                     type: PacketType.DEFAULT,
-                    systemAction: MessageType.ROOM_STATE_CHANGE,
+                    system_action: MessageType.ROOM_STATE_CHANGE,
                     payload: getFullRoomUpdate(room),
                 };
             }
             return {
                 type: PacketType.DEFAULT,
-                systemAction: MessageType.ROOM_STATE_CHANGE,
+                system_action: MessageType.ROOM_STATE_CHANGE,
                 payload: {
                     newJoins: [player.getId()],
                 },
@@ -166,7 +166,7 @@ export const BaseRoomConfig: FullRoomConfig = {
         if (currentRoom) {
             broadcast(currentRoom.getPlayers(), {
                 type: PacketType.DEFAULT,
-                systemAction: MessageType.ANNOUNCE_GAME_START,
+                system_action: MessageType.ANNOUNCE_GAME_START,
             });
             currentRoom.startGame();
         }
@@ -211,7 +211,7 @@ function onLeave(player: Player, leaveRequest?: Request) {
         } else {
             broadcast(remainedPlayers, {
                 type: PacketType.DEFAULT,
-                systemAction: MessageType.ROOM_STATE_CHANGE,
+                system_action: MessageType.ROOM_STATE_CHANGE,
                 payload: roomUpdate,
             });
         }

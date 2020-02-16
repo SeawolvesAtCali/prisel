@@ -19,7 +19,7 @@ export abstract class Player {
     public abstract leaveRoom(): void;
     public abstract emit<T extends Packet<any>>(packet: T): T | void;
     public abstract request<T>(
-        request: Omit<Request<T>, 'id'>,
+        request: Omit<Request<T>, 'request_id'>,
         timeout?: number,
     ): Promise<Response>;
     public abstract respond<T = never>(request: Request<any>, status: Status, payload?: T): void;
@@ -95,7 +95,7 @@ class PlayerImpl extends Player {
     public request<T>(request: Omit<Request<T>, 'id'>, timeout = DEFAULT_REQUEST_TIMEOUT) {
         const fullRequest: Request<T> = {
             ...request,
-            id: this.newRequestId(),
+            request_id: this.newRequestId(),
         };
         this.emit(fullRequest);
         return this.context.requests.addRequest(fullRequest, timeout);

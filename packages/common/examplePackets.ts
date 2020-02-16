@@ -6,7 +6,7 @@ import { Packet, Request, Response, PacketType, Status } from './packet';
  */
 const welcome: Packet<never> = {
     type: PacketType.DEFAULT,
-    systemAction: MessageType.WELCOME,
+    system_action: MessageType.WELCOME,
 };
 
 /**
@@ -14,9 +14,9 @@ const welcome: Packet<never> = {
  */
 const feedback: Response<any> = {
     type: PacketType.RESPONSE,
-    systemAction: MessageType.CREATE_ROOM,
+    system_action: MessageType.CREATE_ROOM,
     status: Status.SUCCESS,
-    id: '123',
+    request_id: '123',
 };
 
 /**
@@ -25,7 +25,7 @@ const feedback: Response<any> = {
  * ```
  * <Response> {
  *  type: PacketType.RESPONSE,
- *  systemAction: MessageTypes.LOGIN,
+ *  system_action: MessageTypes.LOGIN,
  *  id: '123',
  *  status: Status.SUCCESS
  * }
@@ -33,8 +33,8 @@ const feedback: Response<any> = {
  */
 const login: Request<LoginPayload> = {
     type: PacketType.REQUEST,
-    systemAction: MessageType.LOGIN,
-    id: '123',
+    system_action: MessageType.LOGIN,
+    request_id: '123',
     payload: {
         username: 'superman',
     },
@@ -46,8 +46,8 @@ const login: Request<LoginPayload> = {
  */
 const join: Request<JoinPayload> = {
     type: PacketType.REQUEST,
-    systemAction: MessageType.JOIN,
-    id: '123',
+    system_action: MessageType.JOIN,
+    request_id: '123',
     payload: {
         roomId: 'room-1',
     },
@@ -55,8 +55,8 @@ const join: Request<JoinPayload> = {
 
 const createRoom: Request<CreateRoomPayload> = {
     type: PacketType.REQUEST,
-    systemAction: MessageType.CREATE_ROOM,
-    id: '123',
+    system_action: MessageType.CREATE_ROOM,
+    request_id: '123',
     payload: {
         roomName: 'room-1',
     },
@@ -64,17 +64,17 @@ const createRoom: Request<CreateRoomPayload> = {
 
 const leave: Request<never> = {
     type: PacketType.REQUEST,
-    id: '123',
-    systemAction: MessageType.LEAVE,
+    request_id: '123',
+    system_action: MessageType.LEAVE,
 };
 
 const exit: Packet<never> = {
     type: PacketType.DEFAULT,
-    systemAction: MessageType.EXIT,
+    system_action: MessageType.EXIT,
 };
 
 const gameStart: Request<never> = {
     type: PacketType.REQUEST,
-    id: '123',
-    systemAction: MessageType.GAME_START,
+    request_id: '123',
+    system_action: MessageType.GAME_START,
 };

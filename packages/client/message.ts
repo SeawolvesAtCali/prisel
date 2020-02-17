@@ -16,8 +16,8 @@ import {
 export function getLogin(requestId: string, username: string): Request<LoginPayload> {
     return {
         type: PacketType.REQUEST,
-        systemAction: MessageType.LOGIN,
-        id: requestId,
+        system_action: MessageType.LOGIN,
+        request_id: requestId,
         payload: {
             username,
         },
@@ -30,7 +30,7 @@ export function getLogin(requestId: string, username: string): Request<LoginPayl
 export function getExit(): Packet {
     return {
         type: PacketType.DEFAULT,
-        systemAction: MessageType.EXIT,
+        system_action: MessageType.EXIT,
     };
 }
 
@@ -41,8 +41,8 @@ export function getExit(): Packet {
 export function getJoin(requestId: string, roomId: string): Request<JoinPayload> {
     return {
         type: PacketType.REQUEST,
-        systemAction: MessageType.JOIN,
-        id: requestId,
+        system_action: MessageType.JOIN,
+        request_id: requestId,
         payload: {
             roomId,
         },
@@ -55,8 +55,8 @@ export function getJoin(requestId: string, roomId: string): Request<JoinPayload>
 export function getLeave(requestId: string): Request<never> {
     return {
         type: PacketType.REQUEST,
-        systemAction: MessageType.LEAVE,
-        id: requestId,
+        system_action: MessageType.LEAVE,
+        request_id: requestId,
     };
 }
 
@@ -67,8 +67,8 @@ export function getLeave(requestId: string): Request<never> {
 export function getCreateRoom(requestId: string, roomName: string): Request<CreateRoomPayload> {
     return {
         type: PacketType.REQUEST,
-        systemAction: MessageType.CREATE_ROOM,
-        id: requestId,
+        system_action: MessageType.CREATE_ROOM,
+        request_id: requestId,
         payload: {
             roomName,
         },
@@ -78,8 +78,8 @@ export function getCreateRoom(requestId: string, roomName: string): Request<Crea
 export function getGameStart(requestId: string): Request<never> {
     return {
         type: PacketType.REQUEST,
-        systemAction: MessageType.GAME_START,
-        id: requestId,
+        system_action: MessageType.GAME_START,
+        request_id: requestId,
     };
 }
 
@@ -91,7 +91,7 @@ export function getGameStart(requestId: string): Request<never> {
 export function getChat(message: string): Packet<ChatPayload> {
     return {
         type: PacketType.DEFAULT,
-        systemAction: MessageType.CHAT,
+        system_action: MessageType.CHAT,
         payload: {
             message,
         },

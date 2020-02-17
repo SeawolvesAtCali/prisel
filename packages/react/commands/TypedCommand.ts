@@ -1,4 +1,4 @@
-import { Packet } from '@prisel/common';
+import { Packet } from '@prisel/client';
 
 export type PacketBuilder = (...args: any[]) => Packet;
 export interface TypedCommand {

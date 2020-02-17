@@ -2,7 +2,8 @@ import { emit } from '../utils/networkUtils';
 import { mockContext } from '../utils/testUtils';
 import { newPlayer } from '../player';
 import { getWelcome } from '../message';
-import { PacketType, Request, MessageType, Status, StatusPayload } from '@prisel/common';
+import { PacketType, Request, MessageType } from '@prisel/common';
+import { Code } from '@prisel/common/code';
 jest.mock('../utils/networkUtils');
 
 describe('player', () => {
@@ -59,7 +60,7 @@ describe('player', () => {
         jest.useFakeTimers();
         const context = mockContext();
         const player = newPlayer(context, { name: 'player', id: '1' });
-        const request: Omit<Request, 'id'> = {
+        const request: Omit<Request, 'request_id'> = {
             type: PacketType.REQUEST,
             payload: {},
         };
@@ -67,7 +68,7 @@ describe('player', () => {
         jest.runAllImmediates();
         expect(emit).toHaveBeenCalledWith(
             player.getSocket(),
-            expect.objectContaining({ id: expect.any(String) }),
+            expect.objectContaining({ request_id: expect.any(String) }),
         );
     });
     test('response', () => {
@@ -79,18 +80,21 @@ describe('player', () => {
         });
         const request: Request = {
             type: PacketType.REQUEST,
-            id: '123',
-            systemAction: MessageType.CREATE_ROOM,
+            request_id: '123',
+            system_action: MessageType.CREATE_ROOM,
         };
-        player.respond<StatusPayload>(request, Status.FAILURE, { detail: '123' });
+        player.respondFailure(request, '123');
         jest.runAllImmediates();
         expect(emit).toHaveBeenCalledWith(
             player.getSocket(),
             expect.objectContaining({
                 type: PacketType.RESPONSE,
-                id: '123',
-                systemAction: MessageType.CREATE_ROOM,
-                payload: { detail: '123' },
+                request_id: '123',
+                system_action: MessageType.CREATE_ROOM,
+                status: {
+                    code: Code.FAILED,
+                    message: '123',
+                },
             }),
         );
     });

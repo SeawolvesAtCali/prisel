@@ -1,5 +1,5 @@
 import debug from '../debug';
-import { HEARTBEAT_INTERVAL, StatusPayload, toDebugString } from '@prisel/common';
+import { HEARTBEAT_INTERVAL, toDebugString } from '@prisel/common';
 import WebSocket from 'ws';
 import http from 'http';
 import Koa from 'koa';
@@ -78,7 +78,7 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
  */
 
 export function emit<T extends Packet<any>>(client: WebSocket, packet: T): T | void {
-    const { systemAction, action, payload } = packet;
+    const { system_action: systemAction, action, payload } = packet;
     if (action !== undefined) {
         debug(`SERVER: [custom action] ${toDebugString(packet)}`);
     } else if (systemAction !== undefined) {

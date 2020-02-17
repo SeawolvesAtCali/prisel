@@ -6,8 +6,8 @@ import {
     Response,
     LoginResponsePayload,
     Request,
-    Status,
     Packet,
+    Code,
 } from '@prisel/common';
 
 describe('Client', () => {
@@ -51,17 +51,19 @@ describe('Client', () => {
                     const packet = deserialize(data);
                     expect(packet).toMatchObject({
                         type: PacketType.REQUEST,
-                        systemAction: MessageType.LOGIN,
-                        id: expect.any(String),
+                        system_action: MessageType.LOGIN,
+                        request_id: expect.any(String),
                         payload: {
                             username: 'batman',
                         },
                     });
                     const loginResponse: Response<LoginResponsePayload> = {
                         type: PacketType.RESPONSE,
-                        id: (packet as Request).id,
-                        systemAction: MessageType.LOGIN,
-                        status: Status.SUCCESS,
+                        request_id: (packet as Request).request_id,
+                        system_action: MessageType.LOGIN,
+                        status: {
+                            code: Code.OK,
+                        },
                         payload: {
                             userId: '123',
                         },
@@ -89,9 +91,11 @@ describe('Client', () => {
                     const packet = deserialize(data);
                     const loginResponse: Response<LoginResponsePayload> = {
                         type: PacketType.RESPONSE,
-                        id: (packet as Request).id,
-                        systemAction: MessageType.LOGIN,
-                        status: Status.SUCCESS,
+                        request_id: (packet as Request).request_id,
+                        system_action: MessageType.LOGIN,
+                        status: {
+                            code: Code.OK,
+                        },
                         payload: {
                             userId: '123',
                         },
@@ -110,9 +114,9 @@ describe('Client', () => {
                     const packet = deserialize(data);
                     const loginResponse: Response<LoginResponsePayload> = {
                         type: PacketType.RESPONSE,
-                        id: (packet as Request).id,
-                        systemAction: MessageType.LOGIN,
-                        status: Status.SUCCESS,
+                        request_id: (packet as Request).request_id,
+                        system_action: MessageType.LOGIN,
+                        status: { code: Code.OK },
                         payload: {
                             userId: '123',
                         },

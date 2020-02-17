@@ -12,30 +12,39 @@ type RemoveListenerFunc = () => void;
 type PacketListener<T extends Packet<any>> = (player: Player, packet: T, action: any) => void;
 
 // replace handle to control room related info
-export interface Room {
-    removePlayer(player: Player): void;
-    startGame(): void;
-    endGame(): void;
-    getGamePhase(): GAME_PHASE;
-    getGameCapacity(): number;
-    getPlayers(): Player[];
-    getHost(): Player;
-    setHost(player: Player): void;
-    addPlayer(player: Player): void;
-    getId(): string;
-    getName(): string;
+export abstract class Room {
+    public abstract removePlayer(player: Player): void;
+    public abstract startGame(): void;
+    public abstract endGame(): void;
+    public abstract getGamePhase(): GAME_PHASE;
+    public abstract getGameCapacity(): number;
+    public abstract getPlayers(): Player[];
+    public hasPlayer(player: Player): boolean {
+        return this.getPlayers().some((playerInRoom) => playerInRoom.equals(player));
+    }
+    public abstract getHost(): Player;
+    public abstract setHost(player: Player): void;
+    public abstract addPlayer(player: Player): void;
+    public abstract getId(): string;
+    public abstract getName(): string;
     /**
      * Called when everybody left room and the room is ready to be clean up.
      */
-    close(): void;
-    setGame<Game = any>(game: Game): void;
-    getGame<Game = any>(): Game;
-    listenGamePacket<T extends Packet<any> = Packet<any>>(
+    public abstract close(): void;
+    public abstract setGame<Game = any>(game: Game): void;
+    public abstract getGame<Game = any>(): Game;
+    public abstract listenGamePacket<T extends Packet<any> = Packet<any>>(
         action: any,
         onPacket: PacketListener<T>,
     ): RemoveListenerFunc;
-    removeAllGamePacketListener(): void;
-    dispatchGamePacket(packet: Packet, player: Player): void;
+    public abstract removeAllGamePacketListener(): void;
+    public abstract dispatchGamePacket(packet: Packet, player: Player): void;
+    public equals(room: Room): boolean {
+        if (!room) {
+            return false;
+        }
+        return this.getId() === room.getId();
+    }
 }
 
 export interface RoomConfig {
@@ -44,7 +53,7 @@ export interface RoomConfig {
 }
 
 /* tslint:disable: max-classes-per-file*/
-class RoomImpl implements Room {
+class RoomImpl extends Room {
     private context: Context;
     private players: Player[] = [];
     private host: Player;
@@ -55,11 +64,10 @@ class RoomImpl implements Room {
     private actionListeners: EventEmitter = new EventEmitter();
 
     constructor(context: Context, config: RoomConfig) {
+        super();
         this.context = context;
         this.name = config.name;
         this.id = config.id;
-
-        this.context.gameConfig.onSetup(this);
     }
     public getGamePhase() {
         return this.gamePhase;
@@ -71,7 +79,6 @@ class RoomImpl implements Room {
     public endGame() {
         this.gamePhase = GAME_PHASE.WAITING;
         this.context.gameConfig.onEnd(this);
-        this.context.gameConfig.onSetup(this);
     }
     public getGameCapacity() {
         return this.context.gameConfig.maxPlayers;
@@ -81,7 +88,6 @@ class RoomImpl implements Room {
         return this.players;
     }
     public addPlayer(player: Player) {
-        // TODO(minor): find player based on player Id instead of instance
         if (!this.players.includes(player)) {
             this.players = [...this.players, player];
         }
@@ -115,7 +121,7 @@ class RoomImpl implements Room {
     }
 
     public close() {
-        // TODO(minor): for safty, clean up other things, like remaining
+        // TODO(minor): for safety, clean up other things, like remaining
         // players, on-going games
         this.actionListeners.removeAllListeners();
         this.gamePhase = GAME_PHASE.WAITING;

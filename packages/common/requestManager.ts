@@ -1,10 +1,11 @@
 import { Request, Response } from './packet';
+import { ResponseWrapper, wrapResponse } from './responseWrapper';
 
 type ResolveFunc = (value?: Response<any> | PromiseLike<Response<any>>) => void;
 
 export interface RequestManager {
     newId(): string;
-    addRequest(request: Request, timeout: number): Promise<Response>;
+    addRequest(request: Request, timeout: number): Promise<ResponseWrapper>;
     onResponse(response: Response): void;
     isWaitingFor(requestId: string): boolean;
 }
@@ -13,8 +14,8 @@ export function newRequestManager(): RequestManager {
     const requestIdMap = new Map<string, ResolveFunc>();
     let requestId = 1;
     function addRequest(request: Request, timeout: number) {
-        const id = request.id;
-        const promise = new Promise<Response>((resolve, reject) => {
+        const id = request.request_id;
+        const promise = new Promise<ResponseWrapper>((resolve, reject) => {
             requestIdMap.set(id, resolve);
             if (timeout > 0) {
                 setTimeout(() => {
@@ -29,12 +30,12 @@ export function newRequestManager(): RequestManager {
     }
 
     function onResponse(response: Response) {
-        const id = response.id;
+        const id = response.request_id;
         if (requestIdMap.has(id)) {
             const resolve = requestIdMap.get(id);
             requestIdMap.delete(id);
             Promise.resolve().then(() => {
-                resolve(response);
+                resolve(wrapResponse(response));
             });
         }
     }

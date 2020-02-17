@@ -1,16 +1,13 @@
 import { Context, Socket } from '../objects';
 import { MessageType, Request, CreateRoomPayload } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';
-
-import { getPlayer } from '../utils/stateUtils';
+import { getPlayerOrRespondError } from './utils';
 
 export const handleCreateRoom = (context: Context, socket: Socket) => (
     request: Request<CreateRoomPayload>,
 ) => {
-    const player = getPlayer(context, socket);
+    const player = getPlayerOrRespondError(context, socket, request);
     if (!player) {
-        // player hasn't login yet
-        // TODO(minor) give some error message to client
         return;
     }
     const roomConfig = context.roomConfig;
@@ -21,13 +18,6 @@ export const handleCreateRoom = (context: Context, socket: Socket) => (
     }
 
     roomConfig.onCreate(player, request);
-
-    // TODO setup initial game state
-
-    // const initialState = handle.game.onSetup(handle);
-    // if (initialState) {
-    //     handle.setState(initialState);
-    // }
 };
 
 clientHandlerRegister.push(MessageType.CREATE_ROOM, handleCreateRoom);

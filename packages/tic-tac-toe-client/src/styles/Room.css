@@ -16,4 +16,5 @@
     grid-template-columns: 1fr 1fr;
     row-gap: 5px;
     column-gap: 5px;
+    padding-bottom: 10px;
 }

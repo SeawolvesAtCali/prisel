@@ -1,6 +1,4 @@
-// TODO(minor) don't export ACTION_CONFIG in index
-// instead, use another bundle.
-const { ACTION_CONFIG } = require('./lib/index.umd');
+const { ACTION_CONFIG } = require('./lib/actionConfigs.cjs');
 const fs = require('fs');
 
 // print table header

@@ -1,5 +1,4 @@
 import { createContext } from 'react';
-import { RoomChangePayload } from '@prisel/common';
 
 export interface RoomInfo {
     id: string;

@@ -1,11 +1,9 @@
 # `e2e`
 
-> TODO: description
+End to end test for server and client
 
 ## Usage
 
 ```
-const e2e = require('e2e');
-
-// TODO: DEMONSTRATE API
+npm run automation
 ```

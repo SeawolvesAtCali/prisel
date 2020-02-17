@@ -7,7 +7,7 @@ export const start: TypedCommand = {
     code: () => {
         const startPacket: Packet = {
             type: PacketType.REQUEST,
-            systemAction: MessageType.GAME_START,
+            system_action: MessageType.GAME_START,
         };
         return startPacket;
     },

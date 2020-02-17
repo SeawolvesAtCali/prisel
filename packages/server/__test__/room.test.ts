@@ -35,10 +35,8 @@ describe('room', () => {
 
     test('endGame', () => {
         room.startGame();
-        jest.spyOn(context.gameConfig, 'onSetup');
         jest.spyOn(context.gameConfig, 'onEnd');
         room.endGame();
         expect(context.gameConfig.onEnd).toHaveBeenCalledWith(room);
-        expect(context.gameConfig.onSetup).toHaveBeenCalledWith(room);
     });
 });

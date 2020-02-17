@@ -1,13 +1,10 @@
-import { GameConfig, debug } from '@prisel/server';
+import { GameConfig, debug, Request } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
-import Game from './Game';
-import { Status, PacketType, Request } from '@prisel/common';
 import { Action } from './messages';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
     maxPlayers: 4,
-    onSetup(room) {},
     canStart(room) {
         return room.getPlayers().length > 1;
     },
@@ -18,7 +15,7 @@ const MonopolyGameConfig: GameConfig = {
 
         room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
             const flatState = flattenState(game);
-            player.respond(packet, Status.SUCCESS, flatState);
+            player.respond(packet, flatState);
             debug('current game state is: \n%O', flatState);
         });
 

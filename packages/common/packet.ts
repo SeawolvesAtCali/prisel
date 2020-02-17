@@ -1,41 +1,44 @@
 import { MessageType, messageTypeMap } from './messageTypes';
 import { enumToMap } from './enumToMap';
+import { Status, isStatus } from './status';
+import { printCodeToString as codeToDebugString, Code } from './code';
 
-export interface Packet<T = any> {
+export interface Packet<Payload = any> {
     type: PacketType;
-    systemAction?: MessageType;
+    system_action?: MessageType;
     action?: any;
-    status?: Status; // only in response
-    payload?: T;
-    id?: string;
+    payload?: Payload;
 }
 
-export type Request<T = any> = Omit<Packet<T>, 'status'> & {
+export interface Request<Payload = any> extends Packet<Payload> {
     type: PacketType.REQUEST;
-    id: string;
-};
+    request_id: string;
+}
 
-export interface Response<T = any> extends Packet<T> {
+export interface Response<Payload = any> extends Packet<Payload> {
     type: PacketType.RESPONSE;
     status: Status;
-    id: string;
+    request_id: string;
 }
 
 export function isResponse(packet: Packet): packet is Response {
     if (!packet) {
         return false;
     }
+    const response = packet as Response;
     return (
-        packet.id !== undefined &&
-        packet.type === PacketType.RESPONSE &&
-        Object.values(Status).some((statusValue) => statusValue === packet.status)
+        response.request_id !== undefined &&
+        response.type === PacketType.RESPONSE &&
+        isStatus(response.status)
     );
 }
+
 export function isRequest(packet: Packet): packet is Request {
     if (!packet) {
         return false;
     }
-    return packet.id !== undefined && packet.type === PacketType.REQUEST;
+    const request = packet as Request;
+    return request.request_id !== undefined && request.type === PacketType.REQUEST;
 }
 
 export enum PacketType {
@@ -46,25 +49,21 @@ export enum PacketType {
 
 export const packetTypeMap = enumToMap<PacketType>(PacketType);
 
-export enum Status {
-    UNSET = 0,
-    SUCCESS = 1,
-    FAILURE = 2,
-}
-
-export const statusMap = enumToMap<Status>(Status);
-
 export function toDebugString(packet: Packet) {
-    const { systemAction, status, type } = packet;
+    const { system_action: systemAction, type } = packet;
+
     const debugPacket: any = { ...packet };
     if (systemAction !== undefined) {
-        debugPacket.systemAction = messageTypeMap.get(systemAction);
+        debugPacket.system_action = messageTypeMap.get(systemAction);
     }
     if (type !== undefined) {
         debugPacket.type = packetTypeMap.get(type);
     }
-    if (status !== undefined) {
-        debugPacket.status = statusMap.get(status);
+    if (isResponse(packet)) {
+        const status = packet.status;
+        const statusMessage =
+            codeToDebugString(packet.status.code) + status.message ? ` ${status.message}` : '';
+        debugPacket.status = statusMessage;
     }
     return JSON.stringify(debugPacket);
 }

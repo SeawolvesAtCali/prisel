@@ -14,7 +14,7 @@ const Player = ({ username, id, isHost, isSelf, onStart }) => {
     );
 };
 
-const Room = ({ onStart }) => (
+const Room = ({ onStart, onLeave }) => (
     <Context.Consumer>
         {({ id, players, host, roomId, roomName }) => {
             return (
@@ -33,9 +33,9 @@ const Room = ({ onStart }) => (
                                 />
                             );
                         })}
-
                         <div />
                     </div>
+                    <button onClick={onLeave}>LEAVE</button>
                 </Container>
             );
         }}

@@ -9,3 +9,5 @@ export * from './room';
 export { broadcast } from './utils/broadcast';
 
 export { Messages };
+
+export * from '@prisel/common';

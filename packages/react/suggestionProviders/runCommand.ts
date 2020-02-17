@@ -1,7 +1,7 @@
 import Suggestion from '../Suggestion';
-import { Command, isCommand } from '../commandEditor/commandManager';
+import { isCommand } from '../commandEditor/commandManager';
 import { execute } from '../commandEditor/CommandEditor';
-import { Packet } from '@prisel/common';
+import { Packet } from '@prisel/client';
 import { isTypedCommand } from '../commands';
 
 export default function run(

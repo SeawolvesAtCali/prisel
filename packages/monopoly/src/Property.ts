@@ -1,26 +1,26 @@
-import Player from './Player';
+import { GamePlayer } from './GamePlayer';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
-import { Handle } from '@prisel/server';
 import { log } from './logGameObject';
+import { Room } from '@prisel/server';
 interface Props {
     id: string;
     price: number;
     rent: number;
     name: string;
-    owner?: Player;
+    owner?: GamePlayer;
 }
-interface FlatProperty extends FlatGameObject {
+export interface FlatProperty extends FlatGameObject {
     price: number;
     rent: number;
     name: string;
-    owner: Ref<Player>;
+    owner: Ref<GamePlayer>;
 }
 
 export default class Property extends GameObject {
     public price: number;
     public rent: number;
     public name: string;
-    public owner: Player;
+    public owner: GamePlayer;
     constructor(props: Props) {
         super();
         this.id = props.id;
@@ -41,13 +41,11 @@ export default class Property extends GameObject {
     }
 
     @log
-    public setOwner(owner: Player) {
+    public setOwner(owner: GamePlayer) {
         this.owner = owner;
     }
 }
 
-export function create(props: Props, handle: Handle) {
-    const property = new Property(props);
-    property.setHandle(handle);
-    return property;
+export function create(props: Props) {
+    return new Property(props);
 }

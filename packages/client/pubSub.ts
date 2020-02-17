@@ -1,67 +1,70 @@
-import { State } from './objects';
-import { PayloadType } from '@prisel/common';
+import { Packet } from '@prisel/common';
 
-type Handler = (data: PayloadType, messageType?: string) => State;
+export class PubSub {
+    private subscription = new Map<any, Set<(packet: Packet, action?: any) => void>>();
 
-export type MessageFilter = (messageType: string, data: PayloadType) => boolean;
-
-export type HandlerKey = string | MessageFilter;
-
-function isMessageFilter(handlerKey: HandlerKey): handlerKey is MessageFilter {
-    return typeof handlerKey === 'function';
-}
-
-export default class PubSub {
-    private subscription = new Map<HandlerKey, Set<Handler>>();
-    private filters = new Set<MessageFilter>();
-
-    public on(messageTypeOrFilter: HandlerKey, handler: Handler) {
+    public on<T>(action: T, handler: (packet: Packet, action?: T) => void) {
         if (!this.subscription) {
             return;
         }
-        const handlerSet = this.subscription.get(messageTypeOrFilter) || new Set();
-        handlerSet.add(handler);
-        this.subscription.set(messageTypeOrFilter, handlerSet);
-        if (isMessageFilter(messageTypeOrFilter)) {
-            this.filters.add(messageTypeOrFilter);
-        }
+        const listenerSet = this.subscription.get(action) || new Set();
+        listenerSet.add(handler);
+        this.subscription.set(action, listenerSet);
         return () => {
-            handlerSet.delete(handler);
+            listenerSet.delete(handler);
         };
     }
 
-    public once(messageTypeOrFilter: HandlerKey, handler: Handler) {
-        if (!this.subscription) {
-            return;
-        }
-        const onceHandler = (data: PayloadType, messageType: string) => {
-            handler(data, messageType);
-            off();
-        };
-
-        const off = this.on(messageTypeOrFilter, onceHandler);
-        return off;
+    public getListeners(action: any) {
+        return Array.from(this.subscription.get(action) || []);
     }
 
-    public dispatch(messageType: string, data: PayloadType) {
+    public getAllListeners() {
+        let allListeners: Array<(packet: Packet, action?: any) => void> = [];
+        for (const subscriptions of this.subscription.values()) {
+            allListeners = allListeners.concat(Array.from(subscriptions));
+        }
+        return allListeners;
+    }
+
+    public off<T>(action: T, handler?: (packet: Packet, action?: T) => void) {
+        const subscriptions = this.subscription.get(action);
+        if (!subscriptions) {
+            return;
+        }
+        if (!handler) {
+            this.subscription.delete(action);
+            return;
+        }
+        if (subscriptions.has(handler)) {
+            subscriptions.delete(handler);
+        }
+    }
+
+    public dispatch(action: any, packet: Packet) {
         if (!this.subscription) {
             return;
         }
-        const keys = (Array.from(this.filters).filter((filter) =>
-            filter(messageType, data),
-        ) as HandlerKey[]).concat(messageType);
-        keys.forEach((key) => {
-            const handlerSet = this.subscription.get(key);
-            if (handlerSet) {
-                handlerSet.forEach((handler) => {
-                    handler(data, messageType);
-                });
-            }
+        return new Promise((resolve) => {
+            // setImmediate is not standard in browser
+            setTimeout(() => {
+                if (this.subscription.has(action)) {
+                    const listeners = this.subscription.get(action);
+                    for (const listener of listeners) {
+                        // in case one of the listener close the pubSub
+                        if (this.subscription && this.subscription.has(action)) {
+                            listener(packet, action);
+                        }
+                    }
+                }
+                resolve();
+            }, 0);
         });
     }
 
     public close() {
         this.subscription = undefined;
-        this.filters = new Set<MessageFilter>();
     }
 }
+
+export default PubSub;

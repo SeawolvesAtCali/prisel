@@ -18,7 +18,9 @@ By default, prisel creates a server on port 3000.
 
 ```javascript
 import { Server } from '@prisel/server';
-new Server(); // server starts at ws://localhost:3000.
+const server = Server.create(); // server starts at ws://localhost:3000.
+
+server.close(); // close the server;
 ```
 
 To create a game, we need to implement a game configuration and add to the server.
@@ -27,10 +29,6 @@ To create a game, we need to implement a game configuration and add to the serve
 const game = {
     type: 'my-awesome-game',
     maxPlayers: 4, // Limits the room capacity
-    onSetup: (handle) => {
-        // Preparing for the upcoming game.
-        // Call when room is created and when previous game ends.
-    }
     canStart: (handle) => {
         // Check if we can start the game.
         // Called before game starts.
@@ -55,7 +53,7 @@ const game = {
     onEnd: (handle) => {
         // Announce game result.
         // Called when a game ends.
-    }
+    },
 };
 
 server.register(game);

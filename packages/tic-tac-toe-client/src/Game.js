@@ -19,8 +19,8 @@ class Game extends React.Component {
                         if (!context.gameState) {
                             return null;
                         }
-                        const { gameState, userId } = context;
-                        const isMyTurn = gameState.player[gameState.currentPlayer] === userId;
+                        const { gameState, id } = context;
+                        const isMyTurn = gameState.player[gameState.currentPlayer] === id;
                         const gameBoard = gameState.map;
                         return (
                             <React.Fragment>

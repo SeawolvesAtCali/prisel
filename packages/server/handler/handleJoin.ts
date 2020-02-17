@@ -1,31 +1,21 @@
-import { MessageType } from '@prisel/common';
+import { MessageType, JoinPayload, Request } from '@prisel/common';
 import { Socket, Context } from '../objects';
-import { emit } from '../utils/networkUtils';
-import * as messages from '../message/room';
-import { getRoom, getClient } from '../utils/stateUtils';
 import clientHandlerRegister from '../clientHandlerRegister';
+import { getPlayerOrRespondError } from './utils';
 
-const emitJoinError = (socket: Socket, errorMessage: string) => {
-    emit(socket, ...messages.getFailure(MessageType.JOIN, errorMessage));
-};
-
-export const handleJoin = (context: Context, socket: Socket) => (data: { roomId: string }) => {
-    const currentRoom = getRoom(context, socket);
-    const { roomId } = data;
-    if (currentRoom && currentRoom.id !== roomId) {
-        emitJoinError(socket, `ALREADY IN A ROOM ${currentRoom.id}`);
+export const handleJoin = (context: Context, socket: Socket) => (request: Request<JoinPayload>) => {
+    const player = getPlayerOrRespondError(context, socket, request);
+    if (!player) {
         return;
     }
-    if (!context.StateManager.rooms[roomId]) {
-        emitJoinError(socket, 'ROOM DOES NOT EXIST');
+    const { roomConfig } = context;
+    const failureResponse = roomConfig.preJoin(player, request);
+    if (failureResponse) {
+        player.emit(failureResponse);
         return;
     }
-    const client = getClient(context, socket);
 
-    if (client) {
-        const handle = context.handles[roomId];
-        handle.room.onJoin(handle, client.id, data);
-    }
+    roomConfig.onJoin(player, request);
 };
 
 clientHandlerRegister.push(MessageType.JOIN, handleJoin);

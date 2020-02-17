@@ -1,25 +1,30 @@
 import { Context, Socket } from '../objects';
 import { newId } from '../utils/idUtils';
 import { emit } from '../utils/networkUtils';
-import * as roomMessages from '../message/room';
-import { MessageType } from '@prisel/common';
+import { MessageType, Request, LoginPayload, Response, LoginResponsePayload } from '@prisel/common';
 import clientHandlerRegister from '../clientHandlerRegister';
-import debug from '../debug';
-import { ClientId } from '../objects/client';
+import { getSuccessFor } from '../message';
+import { newPlayer, PlayerId } from '../player';
 
 const SOCKET = 'CLIENT';
-export const handleLogin = (context: Context, client: Socket) => (data: { username: string }) => {
-    const id = newId<ClientId>(SOCKET);
-    const { updateState, SocketManager } = context;
-    const { username } = data;
+export const handleLogin = (context: Context, client: Socket) => (
+    request: Request<LoginPayload>,
+) => {
+    const id = newId<PlayerId>(SOCKET);
+    const { SocketManager } = context;
+    const { username } = request.payload;
     SocketManager.add(id, client);
-    updateState((draftState) => {
-        draftState.connections[id] = {
+    context.players.set(
+        id,
+        newPlayer(context, {
+            name: username,
             id,
-            username,
-        };
+        }),
+    );
+    const response = getSuccessFor<LoginResponsePayload>(request, {
+        userId: id,
     });
-    emit(client, ...roomMessages.getLoginSuccess(id));
+    emit<Response<LoginResponsePayload>>(client, response);
 };
 
 clientHandlerRegister.push(MessageType.LOGIN, handleLogin);

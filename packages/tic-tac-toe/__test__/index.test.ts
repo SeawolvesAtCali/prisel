@@ -1,4 +1,4 @@
-import { checkWin, isEven } from '../state';
+import { checkWin, isEven } from '../gameConfig';
 
 describe('@prisel/template', () => {
     describe('checkWin', () => {

@@ -19,23 +19,6 @@ creating a room and the corresponding game configuration will be associated with
 
 `maxPlayer` specifies the maximum number of players. It is also used as the room capacity.
 
-### onSetup: `(handle) => object`
-
-| Param  | Type   | description                                    |
-| ------ | ------ | ---------------------------------------------- |
-| handle | Handle | Utility for accessing and modifying game state |
-
-**Default** noop
-
-`onSetup` is called before a game starts. It is called when a room is created, and when the previous
-game ends. `onSetup` is a good place to to prepare for each game, such as loading player's
-information from database, prompting players for character and map selections and etc.
-
-If `onSetup` returns an object, it will be used as the initial state. This has the same effect of
-calling `handle.setState(<myInitialState>)` in `onSetup`.
-
-`handle.setup()` triggers `onSetup`.
-
 ### canStart: `(handle) => boolean`
 
 | Param  | Type   | description                                    |

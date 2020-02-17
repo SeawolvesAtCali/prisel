@@ -1,0 +1,19 @@
+.Container {
+    box-sizing: border-box;
+    min-width: 300px;
+    min-height: 300px;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    position: relative;
+}
+
+.displayBorder::after {
+    content: '';
+    height: 100%;
+    position: absolute;
+    width: 1px;
+    right: 0;
+    top: 0;
+    background: grey;
+}

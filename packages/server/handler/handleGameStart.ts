@@ -1,15 +1,21 @@
 import { Context, Socket } from '../objects';
-import { getHandle, getClient } from '../utils/stateUtils';
-import { GAME_PHASE } from '../objects/gamePhase';
 import clientHandlerRegister from '../clientHandlerRegister';
-import { MessageType } from '@prisel/common';
+import { MessageType, Request } from '@prisel/common';
+import { getPlayerOrRespondError } from './utils';
 
-const handleGameStart = (context: Context, socket: Socket) => (data: {}) => {
-    const handle = getHandle(context, socket);
-    const client = getClient(context, socket);
-    if (handle && handle.gamePhase === GAME_PHASE.WAITING) {
-        handle.room.onGameStart(handle, client.id, data);
+const handleGameStart = (context: Context, socket: Socket) => (request: Request) => {
+    const player = getPlayerOrRespondError(context, socket, request);
+    if (!player) {
+        return;
     }
+
+    const { roomConfig, gameConfig } = context;
+    const failureResponse = roomConfig.preGameStart(player, request, gameConfig.canStart);
+    if (failureResponse) {
+        player.emit(failureResponse);
+        return;
+    }
+    roomConfig.onGameStart(player, request);
 };
 
 clientHandlerRegister.push(MessageType.GAME_START, handleGameStart);

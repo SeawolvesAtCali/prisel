@@ -14,33 +14,28 @@ const Player = ({ username, id, isHost, isSelf, onStart }) => {
     );
 };
 
-const Room = ({ onStart }) => (
+const Room = ({ onStart, onLeave }) => (
     <Context.Consumer>
-        {({ userId, roomState, result }) => {
-            if (!roomState) {
-                return null;
-            }
+        {({ id, players, host, roomId, roomName }) => {
             return (
-                <Container title={roomState.name}>
-                    <span>ROOM ID: {roomState.id}</span>
+                <Container title={roomName}>
+                    <span>ROOM ID: {roomId}</span>
                     <div className="players-container">
-                        {Object.values(roomState.players).map((player) => {
-                            const playerInfo = roomState.clientMap[player];
+                        {Object.values(players).map((player) => {
                             return (
                                 <Player
                                     key={player}
-                                    username={playerInfo.username}
+                                    username={player}
                                     id={player}
-                                    isHost={player === roomState.host}
-                                    isSelf={userId === player}
+                                    isHost={player === host}
+                                    isSelf={id === player}
                                     onStart={onStart}
                                 />
                             );
                         })}
-
                         <div />
                     </div>
-                    {result}
+                    <button onClick={onLeave}>LEAVE</button>
                 </Container>
             );
         }}

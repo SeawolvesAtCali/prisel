@@ -1,30 +1,31 @@
-import { Context, Socket } from './objects';
+import { Context } from './objects';
 import createContext from './createContext';
 import debug from './debug';
 import './handler';
 import {
-    createServer,
+    createServerWithInternalHTTPServer,
     watchForDisconnection,
     getConnectionToken,
     emit,
     createServerFromHTTPServer,
+    deserialize,
 } from './utils/networkUtils';
-import clientHandlerRegister, { Handler } from './clientHandlerRegister';
-import { parsePacket } from '@prisel/common';
+import clientHandlerRegister from './clientHandlerRegister';
 import { handleDisconnect } from './handler/handleDisconnect';
-import { getWelcome } from './message/room';
-import { GameConfig } from './utils/gameConfig';
+import { getWelcome } from './message';
+import { GameConfig, BaseGameConfig } from './utils/gameConfig';
 import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
-import ConfigManager from './utils/configManager';
-import { RoomId } from './objects/room';
-import { string } from 'prop-types';
 import http from 'http';
-import { getClient } from './utils/stateUtils';
+import { getPlayer, getRoom } from './utils/stateUtils';
+import { isResponse } from '@prisel/common';
+import { GAME_PHASE } from './objects/gamePhase';
 
 interface ServerConfig {
-    host: string;
-    port: number;
-    server: http.Server;
+    host?: string;
+    port?: number;
+    gameConfig?: Partial<GameConfig>;
+    roomConfig?: Partial<RoomConfig>;
+    server?: http.Server;
 }
 /**
  * Server is a wrapper on top of the websocket server.
@@ -57,7 +58,7 @@ interface ServerConfig {
  */
 export class Server {
     private context: Context;
-    private configManager = new ConfigManager();
+    private onClose: () => void;
 
     /**
      * Create and start the server and setup listeners for websocket events.
@@ -65,42 +66,86 @@ export class Server {
      * @param config configuration for the underlying HTTP Server. If not provided, a [koa](https://koajs.com/) server will be created at localhost:3000.
      */
     constructor(
-        config: Pick<ServerConfig, 'host' | 'port'> | Pick<ServerConfig, 'server'> = {
+        config: ServerConfig = {
             host: 'localhost',
             port: 3000,
         },
     ) {
-        const server =
-            'server' in config ? createServerFromHTTPServer(config.server) : createServer(config);
+        const server = (() => {
+            if ('server' in config) {
+                return createServerFromHTTPServer(config.server);
+            }
+            if ('host' in config && 'port' in config) {
+                const [wsServer, httpServer] = createServerWithInternalHTTPServer({
+                    host: config.host,
+                    port: config.port,
+                });
+                // internally created http server will be closed once WebSocket
+                // server is closed. External http server needs to be closed manually.
+                this.onClose = () => {
+                    httpServer.close();
+                };
+                return wsServer;
+            }
+        })();
+        if (!server) {
+            throw new Error('config missing. need to provide either 1. server or 2. host and port');
+        }
+
+        const gameConfig = config.gameConfig || BaseGameConfig;
+        const roomConfig = config.roomConfig || BaseRoomConfig;
         const context: Context = createContext({
-            server,
-            getConfigs: this.configManager.get.bind(this.configManager),
+            gameConfig,
+            roomConfig,
         });
+
         this.context = context;
-        context.configManager = this.configManager;
 
         server.on('connection', (socket) => {
             debug('client connected');
-            emit(socket, ...getWelcome());
+            emit(socket, getWelcome());
             socket.on('message', (data: any) => {
-                debug(data);
-                if (data) {
-                    const packet = parsePacket(data);
-                    const handler = clientHandlerRegister.get(packet.type);
+                debug(`received ${data}`);
+                if (!data) {
+                    return;
+                }
+                const packet = deserialize(data);
+                // handle response
+                if (isResponse(packet)) {
+                    const { request_id: id } = packet;
+                    if (context.requests.isWaitingFor(id)) {
+                        context.requests.onResponse(packet);
+                    }
+                    return;
+                }
+                // handle packet or request
+                // systemAction are handled by pre-registered handlers.
+                const { system_action: systemAction, action } = packet;
+
+                if (action) {
+                    const player = getPlayer(context, socket);
+                    const room = getRoom(context, socket);
+                    if (player && room && room.getGamePhase() === GAME_PHASE.GAME) {
+                        room.dispatchGamePacket(packet, player);
+                    }
+                } else if (systemAction !== undefined) {
+                    const handler = clientHandlerRegister.get(systemAction);
                     if (!handler) {
                         debug(
-                            `Cannot find handler for ${packet.type}in ${clientHandlerRegister.messageList}`,
+                            `Cannot find handler for ${systemAction} in ${Array.from(
+                                clientHandlerRegister.messageList,
+                            )}`,
                         );
                         return;
                     }
-                    handler(context, socket)(packet.payload);
+                    handler(context, socket)(packet);
                 }
             });
 
             const connectionToken = getConnectionToken();
             socket.on('disconnect', () => {
                 connectionToken.safeDisconnect();
-                handleDisconnect(context, socket)({});
+                handleDisconnect(context, socket);
                 debug('client disconnected');
             });
 
@@ -108,9 +153,9 @@ export class Server {
                 if (!connectionToken.safeDisconnected) {
                     // client is not responding
                     // forcefully terminate connection
-                    const client = getClient(context, socket);
+                    const client = getPlayer(context, socket);
                     if (client) {
-                        debug(`client ${client.id} lost connection`);
+                        debug(`client ${client.getId()} lost connection`);
                     } else {
                         debug('a not logged-in user lost connection');
                     }
@@ -121,14 +166,8 @@ export class Server {
         });
     }
 
-    /**
-     * Register a game to the server. If the game requires special room configuration,
-     * a room configuration can also be provided.
-     * @param game game configuration.
-     * @param room room configuration, if not provided, the base room configuration will be used.
-     */
-    public register(game: GameConfig, room: RoomConfig = BaseRoomConfig) {
-        this.configManager.add(game, room);
+    public static create(config?: ServerConfig) {
+        return new Server(config);
     }
 
     /**
@@ -138,6 +177,10 @@ export class Server {
     public close() {
         if (this.context) {
             this.context.server.close();
+            if (this.onClose) {
+                this.onClose();
+                this.onClose = null;
+            }
             this.context = undefined;
         }
     }

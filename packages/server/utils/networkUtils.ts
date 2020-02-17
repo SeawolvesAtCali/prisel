@@ -1,11 +1,26 @@
-import { wsServer, Context } from '../objects';
 import debug from '../debug';
-import { createPacket, HEARTBEAT_INTERVAL } from '@prisel/common';
+import { HEARTBEAT_INTERVAL, toDebugString } from '@prisel/common';
 import WebSocket from 'ws';
 import http from 'http';
 import Koa from 'koa';
+import { Packet, Request, Response } from '@prisel/common';
+import { getFailureFor } from '../message';
 
-export function createServer({ host, port }: { host: string; port: number }): wsServer {
+export function serialize(packet: Packet<any>): string {
+    return JSON.stringify(packet);
+}
+
+export function deserialize(packet: string): Packet<any> {
+    return JSON.parse(packet);
+}
+
+export function createServerWithInternalHTTPServer({
+    host,
+    port,
+}: {
+    host: string;
+    port: number;
+}): [WebSocket.Server, http.Server] {
     const app = new Koa();
     app.use((ctx) => {
         ctx.body = 'Server is running';
@@ -14,10 +29,10 @@ export function createServer({ host, port }: { host: string; port: number }): ws
     const ws = new WebSocket.Server({ server: httpServer });
     httpServer.listen(port, host, undefined, undefined);
     debug(`start serving at ws://${host}:${port}`);
-    return ws;
+    return [ws, httpServer];
 }
 
-export function createServerFromHTTPServer(httpServer: http.Server): wsServer {
+export function createServerFromHTTPServer(httpServer: http.Server): WebSocket.Server {
     const ws = new WebSocket.Server({ server: httpServer });
     return ws;
 }
@@ -62,23 +77,18 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
  * Utility functions to perform network calls.
  */
 
-export function emit(client: WebSocket, messageType: string, data: any) {
-    debug(`SERVER: ${messageType} ${JSON.stringify(data)}`);
-    if (client && client.readyState === WebSocket.OPEN) {
-        client.send(createPacket(messageType, data));
+export function emit<T extends Packet<any>>(client: WebSocket, packet: T): T | void {
+    const { system_action: systemAction, action, payload } = packet;
+    if (action !== undefined) {
+        debug(`SERVER: [custom action] ${toDebugString(packet)}`);
+    } else if (systemAction !== undefined) {
+        debug(`SERVER: [standard action] ${toDebugString(packet)}`);
+    } else {
+        debug(`SERVER: emitting packet without action ${JSON.stringify(packet)}`);
     }
-}
-
-export function broadcast(context: Context, roomId: string, messageType: string, data: any) {
-    const { StateManager, SocketManager } = context;
-    const room = StateManager.rooms[roomId];
-    if (room) {
-        room.players.forEach((player) => {
-            const socket = SocketManager.getSocket(player);
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                emit(socket, messageType, data);
-            }
-        });
+    if (client && client.readyState === WebSocket.OPEN) {
+        client.send(serialize(packet));
+        return packet;
     }
 }
 

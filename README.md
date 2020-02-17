@@ -86,7 +86,6 @@ game has the following lifecycle methods that we can override to describe our ga
 
 #### Preparing
 
--   [**`onSetup`**](docs/API.md#onsetup-handle--object)
 -   [**`canStart`**](docs/API.md#canstart-handle--boolean)
 
 #### Running

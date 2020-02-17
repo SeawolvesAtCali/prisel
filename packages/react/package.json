@@ -1,7 +1,7 @@
 {
     "name": "@prisel/react",
     "version": "0.1.5",
-    "description": "> TODO: description",
+    "description": "Server debugger made with React",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/template#readme",
     "license": "MIT",
@@ -25,6 +25,7 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "build": "parcel build index.html",
+        "check": "tsc --noEmit",
         "postbuild": "tsc --emitDeclarationOnly",
         "start": "parcel serve index.html",
         "test": "jest",
@@ -45,7 +46,9 @@
         "react-simple-code-editor": "^0.9.14"
     },
     "devDependencies": {
+        "autoprefixer": "^9.6.1",
         "parcel-bundler": "^1.12.3",
+        "postcss-modules": "^1.4.1",
         "react": "^16.8.1",
         "react-dom": "^16.8.1",
         "rollup": "^1.1.2",

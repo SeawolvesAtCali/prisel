@@ -4,7 +4,7 @@
     "publishConfig": {
         "access": "public"
     },
-    "description": "> TODO: description",
+    "description": "Common utils shared by @prisel/server and @prisel/client",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/common#readme",
     "license": "MIT",
@@ -26,9 +26,10 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "build": "rollup -c",
-        "postbuild": "tsc --emitDeclarationOnly",
+        "postbuild": "tsc --emitDeclarationOnly && node ./generateSystemActionDoc.js",
         "lint": "tslint --project tsconfig.json",
-        "fix": "tslint --project tsconfig.json --fix"
+        "fix": "tslint --project tsconfig.json --fix",
+        "test": "jest"
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"

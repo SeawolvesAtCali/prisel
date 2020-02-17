@@ -2,7 +2,7 @@
     "name": "@prisel/e2e",
     "version": "0.1.3",
     "private": true,
-    "description": "> TODO: description",
+    "description": "End to end test for client and server",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/e2e#readme",
     "license": "MIT",
@@ -28,7 +28,6 @@
     },
     "dependencies": {
         "@prisel/client": "file:../client",
-        "@prisel/common": "file:../common",
         "@prisel/server": "file:../server",
         "debug": "^4.1.0",
         "immer": "^1.8.2",

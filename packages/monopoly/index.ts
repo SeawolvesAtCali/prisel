@@ -2,5 +2,9 @@ import { Server } from '@prisel/server';
 import Monopoly from './src/gameConfig';
 import RoomConfig from './src/roomConfig';
 
-const server = new Server();
-server.register(Monopoly, RoomConfig);
+Server.create({
+    gameConfig: Monopoly,
+    roomConfig: RoomConfig,
+    host: 'localhost',
+    port: 3000,
+});

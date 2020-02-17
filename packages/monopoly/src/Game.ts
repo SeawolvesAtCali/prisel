@@ -1,27 +1,27 @@
-import Player from './Player';
-import { ClientId, Handle } from '@prisel/server';
+import { GamePlayer } from './GamePlayer';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Node from './Node';
 import { flattenState } from './state';
 import { log } from './logGameObject';
+import { PlayerId } from '@prisel/server';
 
 interface Props {
     id: string;
-    players: Map<ClientId, Player>;
-    turnOrder: Player[];
+    players: Map<PlayerId, GamePlayer>;
+    turnOrder: GamePlayer[];
     map: Node;
 }
 
 interface FlatGame extends FlatGameObject {
-    players: { [playerId: string]: Ref<Player> };
-    turnOrder: Array<Ref<Player>>;
+    players: { [playerId: string]: Ref<GamePlayer> };
+    turnOrder: Array<Ref<GamePlayer>>;
     map: Ref<Node>;
 }
 
 export default class Game extends GameObject {
     public id: string;
-    public players: Map<string, Player>;
-    public turnOrder: Player[];
+    public players: Map<string, GamePlayer>;
+    public turnOrder: GamePlayer[];
     public map: Node;
 
     constructor(props: Props) {
@@ -32,30 +32,17 @@ export default class Game extends GameObject {
         this.map = props.map;
     }
 
-    public processMessage(handle: Handle, playerId: ClientId, data: any) {
-        if (data.type === 'debug') {
-            const flatState = flattenState(this);
-            handle.emit(playerId, flatState);
-            handle.log('current game state is: \n%O', flatState);
-            return;
-        }
-        const player = this.players.get(playerId);
-        if (player) {
-            player.handleAction(data.type, this);
-        }
-    }
-
     @log
     public giveTurnToNext(): void {
         this.turnOrder = [...this.turnOrder.slice(1), this.turnOrder[0]];
     }
 
-    public isCurrentPlayer(player: Player) {
+    public isCurrentPlayer(player: GamePlayer) {
         return this.turnOrder[0] === player;
     }
 
     public flat(): FlatGame {
-        const players: { [playerId: string]: Ref<Player> } = {};
+        const players: { [playerId: string]: Ref<GamePlayer> } = {};
         this.players.forEach((player, key) => {
             players[key] = this.ref(player);
         });
@@ -68,8 +55,6 @@ export default class Game extends GameObject {
     }
 }
 
-export function create(props: Props, handle: Handle) {
-    const game = new Game(props);
-    game.setHandle(handle);
-    return game;
+export function create(props: Props) {
+    return new Game(props);
 }

@@ -1,28 +1,47 @@
-import { GameConfig } from '@prisel/server';
-import { createIntialState } from './state';
-import Game from './Game';
-import { GAME_PHASE } from '@prisel/server/objects/gamePhase';
+import { GameConfig, debug, Request } from '@prisel/server';
+import { createIntialState, flattenState } from './state';
+import { Action } from './messages';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
     maxPlayers: 4,
-    onSetup(handle) {},
-    canStart(handle) {
-        return handle.players.length > 1;
+    canStart(room) {
+        return room.getPlayers().length > 1;
     },
-    onStart(handle) {
-        const game = createIntialState(handle.players, handle);
-        handle.attached = game;
-        handle.log('The first player is %O', game.turnOrder[0].flat());
+    onStart(room) {
+        const game = createIntialState(room.getPlayers());
+        room.setGame(game);
+        debug('The first player is %O', game.turnOrder[0].flat());
+
+        room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
+            const flatState = flattenState(game);
+            player.respond(packet, flatState);
+            debug('current game state is: \n%O', flatState);
+        });
+
+        room.listenGamePacket<Request>('roll', (player, packet) => {
+            const gamePlayer = game.players.get(player.getId());
+            if (game.isCurrentPlayer(gamePlayer)) {
+                gamePlayer.roll(game, packet);
+            }
+        });
+        room.listenGamePacket<Request>('purchase', (player, packet) => {
+            const gamePlayer = game.players.get(player.getId());
+            if (game.isCurrentPlayer(gamePlayer)) {
+                gamePlayer.purchase(game, packet);
+            }
+        });
+        room.listenGamePacket<Request>('endturn', (player, packet) => {
+            const gamePlayer = game.players.get(player.getId());
+            if (game.isCurrentPlayer(gamePlayer)) {
+                gamePlayer.endTurn(game, packet);
+            }
+        });
     },
-    onEnd(handle) {},
-    onMessage(handle, player, data) {
-        if (handle.gamePhase === GAME_PHASE.GAME) {
-            const game = handle.attached as Game;
-            game.processMessage(handle, player, data);
-        }
+    onEnd(room) {
+        room.removeAllGamePacketListener();
     },
-    onRemovePlayer(handle, player) {},
+    onRemovePlayer(room, player) {},
 };
 
 export default MonopolyGameConfig;

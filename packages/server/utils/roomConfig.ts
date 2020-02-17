@@ -1,70 +1,200 @@
-import { MessageType } from '@prisel/common';
-import { Handle } from './handle';
-import { ClientId } from '../objects/client';
-import { getFailure, getJoinSuccess, getLeaveSuccess, getGameStartSuccess } from '../message';
+import {
+    MessageType,
+    CreateRoomPayload,
+    Request,
+    JoinPayload,
+    Packet,
+    Response,
+    RoomChangePayload,
+    PacketType,
+    RoomInfoPayload,
+} from '@prisel/common';
 import { GAME_PHASE } from '../objects/gamePhase';
-import debug from '../debug';
+import { getFailureFor } from '../message';
+import { Player } from '../player';
 import { GameConfig } from './gameConfig';
+import { broadcast } from './broadcast';
+import { Room } from '../room';
 
-type EventHandler = (handle: Handle, client: ClientId, data: any) => void;
+type PreCallback<T extends Request = Request> = (
+    player: Player,
+    packet: T,
+) => Response<never> | void;
+type Callback<T extends Request = Request> = (player: Player, packet: T) => void;
+
+type ExitCallback = (player: Player) => void;
 
 interface FullRoomConfig {
     type: string;
-    supportGame: (game: GameConfig) => boolean;
-    onCreate: EventHandler;
-    onJoin: EventHandler;
-    onLeave: EventHandler;
-    onGameStart: EventHandler;
-    onMessage: EventHandler;
+    preCreate: PreCallback<Request<CreateRoomPayload>>;
+    onCreate: Callback<Request<CreateRoomPayload>>;
+    preJoin: PreCallback<Request<JoinPayload>>;
+    onJoin: Callback<Request<JoinPayload>>;
+    preLeave: PreCallback;
+    onLeave: Callback;
+    onExit: ExitCallback;
+    preGameStart: (
+        player: Player,
+        packet: Request,
+        canStart: GameConfig['canStart'],
+    ) => Response<never> | void;
+    onGameStart: Callback;
 }
 
 export type RoomConfig = Partial<FullRoomConfig>;
 
-export const BaseRoomConfig: RoomConfig = {
+// pre-** is used to do precheck to fail the following action
+// if pre passes, the action will proceed without checking
+
+export const BaseRoomConfig: FullRoomConfig = {
     type: 'room',
-    supportGame(game) {
-        return true;
-    },
-    onCreate(handle, client, data) {
-        handle.addPlayer(client);
-        handle.setHost(client);
-        handle.emit(client, ...getJoinSuccess());
-        handle.broadcastRoomUpdate();
-    },
-    onJoin(handle, client, data) {
-        if (handle.gamePhase === GAME_PHASE.WAITING) {
-            handle.addPlayer(client);
-            handle.emit(client, ...getJoinSuccess());
-            handle.broadcastRoomUpdate();
-        } else {
-            handle.emit(
-                client,
-                ...getFailure(MessageType.JOIN, 'Cannot join when game is already started'),
-            );
+    preCreate(player, packet) {
+        const currentRoom = player.getRoom();
+        if (currentRoom) {
+            return getFailureFor(packet, `ALREADY IN A ROOM ${currentRoom.getName()}`);
         }
     },
-    onLeave(handle, client, data) {
-        handle.removePlayer(client);
-        handle.emit(client, ...getLeaveSuccess());
-        const remainingClients = handle.players;
-        if (remainingClients.length > 0 && !handle.host) {
-            handle.setHost(remainingClients[0]);
-        }
-        handle.broadcastRoomUpdate();
+    onCreate(player, packet) {
+        const { payload } = packet;
+        const { roomName } = payload;
+        const room = player.createRoom({ name: roomName });
+        const roomId = room.getId();
+        player.joinRoom(roomId);
+        room.setHost(player);
+        player.respond<RoomInfoPayload>(packet, {
+            id: roomId,
+            name: room.getName(),
+        });
+        player.emit<Packet<RoomChangePayload>>({
+            type: PacketType.DEFAULT,
+            system_action: MessageType.ROOM_STATE_CHANGE,
+            payload: {
+                newJoins: [player.getId()],
+                newHost: player.getId(),
+            },
+        });
     },
-    onGameStart(handle, client, data) {
-        if (client !== handle.host) {
-            handle.emit(
-                client,
-                ...getFailure(MessageType.GAME_START, 'Not enough privilege to start game'),
-            );
-            return;
+    preJoin(player, packet) {
+        const { roomId } = packet.payload;
+        const currentRoom = player.getRoom();
+        if (currentRoom) {
+            return getFailureFor(packet, `ALREADY IN A ROOM ${currentRoom.getId()}`);
         }
-        if (handle.canStart()) {
-            debug('Starting game!', handle.game.type, handle.room.type);
-            handle.broadcast(handle.players, ...getGameStartSuccess());
-            handle.startGame();
+        const targetRoom = player.findRoomById(roomId);
+        if (!targetRoom) {
+            return getFailureFor(packet, `ROOM ${roomId} DOES NOT EXIST`);
+        }
+        if (targetRoom.getGamePhase() === GAME_PHASE.GAME) {
+            return getFailureFor(packet, 'Cannot join when game is already started');
         }
     },
-    onMessage(handle, client, data) {},
+    onJoin(player, packet) {
+        const { roomId } = packet.payload;
+        const room = player.joinRoom(roomId);
+        player.respond<RoomInfoPayload>(packet, {
+            id: roomId,
+            name: room.getName(),
+        });
+        broadcast(room.getPlayers(), (playerInRoom) => {
+            if (playerInRoom === player) {
+                return {
+                    type: PacketType.DEFAULT,
+                    system_action: MessageType.ROOM_STATE_CHANGE,
+                    payload: getFullRoomUpdate(room),
+                };
+            }
+            return {
+                type: PacketType.DEFAULT,
+                system_action: MessageType.ROOM_STATE_CHANGE,
+                payload: {
+                    newJoins: [player.getId()],
+                },
+            };
+        });
+        // TODO(minor): currently, room members can grow infinitely. This would
+        // required a locking mechanism to prevent race condition between
+        // preJoin and onJoin
+    },
+    preLeave(player, packet) {
+        if (!player.getRoom()) {
+            return getFailureFor(packet, `NOT IN A ROOM`);
+        }
+    },
+    onLeave(player, packet) {
+        onLeave(player, packet);
+    },
+    onExit(player) {
+        onLeave(player);
+    },
+    preGameStart(player, packet, canStart) {
+        const currentRoom = player.getRoom();
+
+        if (!currentRoom) {
+            return getFailureFor(packet, 'NOT IN A ROOM');
+        }
+        if (currentRoom.getGamePhase() === GAME_PHASE.GAME) {
+            return getFailureFor(packet, 'GAME ALREADY STARTED');
+        }
+        if (player !== currentRoom.getHost()) {
+            return getFailureFor(packet, 'NOT ENOUGH PRIVILEGE TO START GAME');
+        }
+        if (!canStart(currentRoom)) {
+            return getFailureFor(packet, 'GAME_CONFIG DISALLOW STARTING GAME');
+        }
+    },
+    onGameStart(player, packet) {
+        player.respond(packet);
+        const currentRoom = player.getRoom();
+        if (currentRoom) {
+            broadcast(currentRoom.getPlayers(), {
+                type: PacketType.DEFAULT,
+                system_action: MessageType.ANNOUNCE_GAME_START,
+            });
+            currentRoom.startGame();
+        }
+    },
 };
+
+function getFullRoomUpdate(room: Room): RoomChangePayload {
+    const host = room.getHost();
+    const players = room.getPlayers();
+    const roomUpdate: RoomChangePayload = {
+        newJoins: players.map((player) => player.getId()),
+    };
+    if (host) {
+        roomUpdate.newHost = host.getId();
+    }
+    return roomUpdate;
+}
+
+function onLeave(player: Player, leaveRequest?: Request) {
+    const currentRoom = player.getRoom();
+    if (currentRoom) {
+        const roomUpdate: RoomChangePayload = {};
+        if (player.equals(currentRoom.getHost())) {
+            const nextHost = currentRoom
+                .getPlayers()
+                .find((playerInRoom) => playerInRoom !== player);
+            if (nextHost) {
+                currentRoom.setHost(nextHost);
+                roomUpdate.newHost = nextHost.getId();
+            }
+        }
+        player.leaveRoom();
+        if (leaveRequest) {
+            player.respond(leaveRequest);
+        }
+        roomUpdate.newLeaves = [player.getId()];
+        const remainedPlayers = currentRoom.getPlayers();
+        if (remainedPlayers.length === 0) {
+            // no player left, remove the room
+            currentRoom.close();
+        } else {
+            broadcast(remainedPlayers, {
+                type: PacketType.DEFAULT,
+                system_action: MessageType.ROOM_STATE_CHANGE,
+                payload: roomUpdate,
+            });
+        }
+    }
+}

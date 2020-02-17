@@ -1,7 +1,14 @@
-import Client from '../client';
-import { createPacket } from '@prisel/common';
+import Client, { serialize, deserialize } from '../client';
 import { Server } from 'mock-socket';
-import { MessageType } from '@prisel/common';
+import {
+    MessageType,
+    PacketType,
+    Response,
+    LoginResponsePayload,
+    Request,
+    Packet,
+    Code,
+} from '@prisel/common';
 
 describe('Client', () => {
     const fakeURL = 'ws://localhost:3000';
@@ -40,23 +47,33 @@ describe('Client', () => {
         it('should login with username', async () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
-                (socket as any).on('message', (data: unknown) => {
-                    expect(data).toBe(
-                        createPacket(MessageType.LOGIN, {
+                socket.on('message', (data: string) => {
+                    const packet = deserialize(data);
+                    expect(packet).toMatchObject({
+                        type: PacketType.REQUEST,
+                        system_action: MessageType.LOGIN,
+                        request_id: expect.any(String),
+                        payload: {
                             username: 'batman',
-                        }),
-                    );
-                    socket.send(
-                        createPacket(MessageType.SUCCESS, {
-                            action: MessageType.LOGIN,
+                        },
+                    });
+                    const loginResponse: Response<LoginResponsePayload> = {
+                        type: PacketType.RESPONSE,
+                        request_id: (packet as Request).request_id,
+                        system_action: MessageType.LOGIN,
+                        status: {
+                            code: Code.OK,
+                        },
+                        payload: {
                             userId: '123',
-                        }),
-                    );
+                        },
+                    };
+                    socket.send(serialize(loginResponse));
                 });
             });
             await client.connect();
-            const data = await client.login('batman');
-            expect(data.userId).toBe('123');
+            const loginResult = await client.login('batman');
+            expect(loginResult.userId).toBe('123');
         });
         it('should reject if timeout', async () => {
             const client = new Client(fakeURL);
@@ -70,13 +87,20 @@ describe('Client', () => {
         it('should reject if connection closes before login', async () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
-                (socket as any).on('message', (data: unknown) => {
-                    socket.send(
-                        createPacket(MessageType.SUCCESS, {
-                            action: MessageType.LOGIN,
+                socket.on('message', (data: string) => {
+                    const packet = deserialize(data);
+                    const loginResponse: Response<LoginResponsePayload> = {
+                        type: PacketType.RESPONSE,
+                        request_id: (packet as Request).request_id,
+                        system_action: MessageType.LOGIN,
+                        status: {
+                            code: Code.OK,
+                        },
+                        payload: {
                             userId: '123',
-                        }),
-                    );
+                        },
+                    };
+                    socket.send(serialize(loginResponse));
                 });
             });
             await client.connect();
@@ -86,13 +110,18 @@ describe('Client', () => {
         it('should reject if connection closes during login', async () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
-                (socket as any).on('message', (data: unknown) => {
-                    socket.send(
-                        createPacket(MessageType.SUCCESS, {
-                            action: MessageType.LOGIN,
+                socket.on('message', (data: string) => {
+                    const packet = deserialize(data);
+                    const loginResponse: Response<LoginResponsePayload> = {
+                        type: PacketType.RESPONSE,
+                        request_id: (packet as Request).request_id,
+                        system_action: MessageType.LOGIN,
+                        status: { code: Code.OK },
+                        payload: {
                             userId: '123',
-                        }),
-                    );
+                        },
+                    };
+                    socket.send(serialize(loginResponse));
                 });
             });
             await client.connect();
@@ -106,59 +135,42 @@ describe('Client', () => {
         it('can start listening before connection', async () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
-                socket.send(createPacket('HI', { value: 3 }));
+                const packet: Packet = {
+                    type: PacketType.DEFAULT,
+                    action: 'MESSAGE',
+                    payload: {
+                        value: 3,
+                    },
+                };
+                socket.send(serialize(packet));
             });
-            const waitForHi = new Promise((resolve) => {
-                const mockCallback = (data: unknown) => {
-                    expect(data).toMatchObject({
+            const waitForMessage = new Promise((resolve) => {
+                const mockCallback = (packet: Packet, action: string) => {
+                    expect(packet.payload).toMatchObject({
                         value: 3,
                     });
                     resolve();
                 };
-                client.on('HI', mockCallback);
+                client.on('MESSAGE', mockCallback);
             });
             await client.connect();
-            await waitForHi;
+            await waitForMessage;
         });
         it('should listen for the right event', async () => {
             const client = new Client(fakeURL);
             let connection: WebSocket;
             mockServer.on('connection', (socket) => (connection = socket));
             await client.connect();
-            const waitForHi = new Promise((resolve, reject) => {
-                client.on('HELLO', reject);
-                client.on('HI', resolve);
+            const waitForGameStart = new Promise((resolve, reject) => {
+                client.on('NO', reject);
+                client.on('YES', resolve);
             });
-            connection.send(createPacket('HI', {}));
-            await waitForHi;
-        });
-
-        it('should be able to take a filter', async () => {
-            const client = new Client(fakeURL);
-            let connection: WebSocket;
-            mockServer.on('connection', (socket) => (connection = socket));
-            await client.connect();
-            const waitForHiFive = new Promise<any>((resolve) =>
-                client.on((messageType, data) => messageType === 'HI' && data.value === 5, resolve),
-            );
-            connection.send(createPacket('HI', { value: 3 }));
-            connection.send(createPacket('HI', { value: 5 }));
-            connection.send(createPacket('HI', { value: 7 }));
-            const result = await waitForHiFive;
-            expect(result.value).toBe(5);
-        });
-    });
-
-    describe('once', () => {
-        it('should resolve when receive message type', async () => {
-            const client = new Client(fakeURL);
-            let connection: WebSocket;
-            mockServer.on('connection', (socket) => (connection = socket));
-            await client.connect();
-            const waitForHi = client.once('HI');
-            connection.send(createPacket('HI', { value: 3 }));
-            const result = await waitForHi;
-            expect(result.value).toBe(3);
+            const packet: Packet = {
+                type: PacketType.DEFAULT,
+                action: 'YES',
+            };
+            connection.send(serialize(packet));
+            await waitForGameStart;
         });
     });
 });

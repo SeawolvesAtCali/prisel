@@ -171,8 +171,7 @@ function onLeave(player: Player, leaveRequest?: Request) {
     const currentRoom = player.getRoom();
     if (currentRoom) {
         const roomUpdate: RoomChangePayload = {};
-        // TODO(minor): other way of checking player instead of using identity
-        if (currentRoom.getHost() === player) {
+        if (player.equals(currentRoom.getHost())) {
             const nextHost = currentRoom
                 .getPlayers()
                 .find((playerInRoom) => playerInRoom !== player);

@@ -12,3 +12,4 @@
 | CHAT | Client | Client send chat message to room | **packet**:ChatPayload |  | BROADCAST |
 | BROADCAST | Server | Broadcast client's message to the room | **packet**:BroadcastPayload |  | CHAT |
 | ANNOUNCE_GAME_START | Server | Broadcast game start to players in the room |  |  | GAME_START |
+| ERROR | Server | Report error to client, usually responding to a packet. If an error is related to a request, a response should be used instead. | **packet**:ErrorPayload |  |  |

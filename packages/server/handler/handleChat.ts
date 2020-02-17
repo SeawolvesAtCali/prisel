@@ -4,14 +4,18 @@ import { MessageType, PacketType, ChatPayload, Packet, BroadcastPayload } from '
 import clientHandlerRegister from '../clientHandlerRegister';
 import { getPlayer, getRoom } from '../utils/stateUtils';
 import { broadcast } from '../utils/broadcast';
+import { getPlayerOrRespondError } from './utils';
 
 // send chat message to everyone in the room including the sender
-export const handleChat = (context: Context, client: Socket) => (
+export const handleChat = (context: Context, socket: Socket) => (
     chatPacket: Packet<ChatPayload>,
 ): void => {
+    const player = getPlayerOrRespondError(context, socket, chatPacket);
+    if (!player) {
+        return;
+    }
     const { message } = chatPacket.payload;
-    const player = getPlayer(context, client);
-    const room = getRoom(context, client);
+    const room = getRoom(context, socket);
 
     if (player && room) {
         const packet: Packet<BroadcastPayload> = {

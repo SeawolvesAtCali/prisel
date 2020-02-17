@@ -1,15 +1,14 @@
 import { Context, Socket } from '../objects';
-import { getPlayer } from '../utils/stateUtils';
 import clientHandlerRegister from '../clientHandlerRegister';
 import { MessageType, Request } from '@prisel/common';
+import { getPlayerOrRespondError } from './utils';
 
 const handleGameStart = (context: Context, socket: Socket) => (request: Request) => {
-    const player = getPlayer(context, socket);
+    const player = getPlayerOrRespondError(context, socket, request);
     if (!player) {
-        // player hasn't login yet
-        // TODO(minor) give some error message to client
         return;
     }
+
     const { roomConfig, gameConfig } = context;
     const failureResponse = roomConfig.preGameStart(player, request, gameConfig.canStart);
     if (failureResponse) {

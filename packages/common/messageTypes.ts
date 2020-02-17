@@ -12,6 +12,7 @@ export enum MessageType {
     BROADCAST = 9,
     ROOM_STATE_CHANGE = 10,
     ANNOUNCE_GAME_START = 11,
+    ERROR = 12,
 }
 
 export interface LoginPayload {
@@ -47,6 +48,11 @@ export interface ChatPayload {
 export interface BroadcastPayload {
     from: { userId: string; username: string };
     message: string;
+}
+
+export interface ErrorPayload {
+    message?: string;
+    detail?: any;
 }
 
 export default MessageType;

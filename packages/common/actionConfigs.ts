@@ -1,4 +1,5 @@
 import * as messageTypes from './messageTypes';
+import { MessageType } from './lib';
 
 enum FROM {
     UNSPECIFIED = '',
@@ -99,5 +100,12 @@ export const ACTION_CONFIG: Record<messageTypes.ActionName, ActionConfig> = {
         from: FROM.SERVER,
         isRest: false,
         related: ['GAME_START'],
+    },
+    ERROR: {
+        desc:
+            'Report error to client, usually responding to a packet. If an error is related to a request, a response should be used instead.',
+        from: FROM.SERVER,
+        isRest: false,
+        payload: [packet<messageTypes.ErrorPayload>('ErrorPayload')],
     },
 };

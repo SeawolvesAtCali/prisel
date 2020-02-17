@@ -4,7 +4,7 @@
     "publishConfig": {
         "access": "public"
     },
-    "description": "> TODO: description",
+    "description": "Common utils shared by @prisel/server and @prisel/client",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/common#readme",
     "license": "MIT",

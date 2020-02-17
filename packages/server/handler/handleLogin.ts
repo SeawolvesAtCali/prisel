@@ -14,12 +14,6 @@ export const handleLogin = (context: Context, client: Socket) => (
     const { SocketManager } = context;
     const { username } = request.payload;
     SocketManager.add(id, client);
-    // updateState((draftState) => {
-    //     draftState.connections[id] = {
-    //         id,
-    //         username,
-    //     };
-    // });
     context.players.set(
         id,
         newPlayer(context, {

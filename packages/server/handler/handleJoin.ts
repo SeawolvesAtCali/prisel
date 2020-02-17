@@ -1,13 +1,11 @@
 import { MessageType, JoinPayload, Request } from '@prisel/common';
 import { Socket, Context } from '../objects';
-import { getPlayer } from '../utils/stateUtils';
 import clientHandlerRegister from '../clientHandlerRegister';
+import { getPlayerOrRespondError } from './utils';
 
 export const handleJoin = (context: Context, socket: Socket) => (request: Request<JoinPayload>) => {
-    const player = getPlayer(context, socket);
+    const player = getPlayerOrRespondError(context, socket, request);
     if (!player) {
-        // player hasn't login yet
-        // TODO(minor) give some error message to client
         return;
     }
     const { roomConfig } = context;

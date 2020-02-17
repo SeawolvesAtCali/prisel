@@ -1,10 +1,9 @@
-import { debug, Room, Player, PlayerId } from '@prisel/server';
+import { debug, Player, PlayerId, Request } from '@prisel/server';
 import Property from './Property';
 import Node from './Node';
 import { log } from './logGameObject';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Game from './Game';
-import { Request, Status } from '@prisel/common';
 import { RollReponsePayload } from './messages';
 
 interface Props {

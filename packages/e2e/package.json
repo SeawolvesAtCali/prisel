@@ -28,7 +28,6 @@
     },
     "dependencies": {
         "@prisel/client": "file:../client",
-        "@prisel/common": "file:../common",
         "@prisel/server": "file:../server",
         "debug": "^4.1.0",
         "immer": "^1.8.2",

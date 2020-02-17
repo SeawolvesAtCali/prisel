@@ -1,5 +1,4 @@
-import { GameConfig, debug, broadcast } from '@prisel/server';
-import { Packet, PacketType } from '@prisel/common';
+import { GameConfig, debug, broadcast, Packet, PacketType } from '@prisel/server';
 
 interface GameState {
     player: string[];

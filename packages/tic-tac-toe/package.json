@@ -31,7 +31,6 @@
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
-        "@prisel/client": "file:../client",
         "@prisel/server": "file:../server"
     }
 }

@@ -1,6 +1,5 @@
-import { GameConfig, debug } from '@prisel/server';
+import { GameConfig, debug, Request } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
-import { Request } from '@prisel/common';
 import { Action } from './messages';
 
 const MonopolyGameConfig: GameConfig = {

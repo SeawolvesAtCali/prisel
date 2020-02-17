@@ -1,7 +1,8 @@
 import typescript from 'rollup-plugin-typescript2';
 import pkg from './package.json';
 
-const externalDependencyList = [...Object.keys(pkg.dependencies), 'http'];
+const nodeDependencies = ['http', 'events'];
+const externalDependencyList = [...Object.keys(pkg.dependencies), ...nodeDependencies];
 
 export default [
     // CommonJS (for Node) and ES module (for bundlers) build.

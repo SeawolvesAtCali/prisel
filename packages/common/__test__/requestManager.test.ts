@@ -12,8 +12,12 @@ describe('requestManager', () => {
     });
 
     test('addRequest', async () => {
-        const promise = manager.addRequest({ type: PacketType.REQUEST, id: '123' }, 10);
-        const response: Response = { type: PacketType.RESPONSE, status: Status.SUCCESS, id: '123' };
+        const promise = manager.addRequest({ type: PacketType.REQUEST, request_id: '123' }, 10);
+        const response: Response = {
+            type: PacketType.RESPONSE,
+            status: Status.SUCCESS,
+            request_id: '123',
+        };
         manager.onResponse(response);
         const receivedResponse = await promise;
         expect(response).toBe(receivedResponse);

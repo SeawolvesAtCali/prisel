@@ -28,7 +28,8 @@
         "build": "rollup -c",
         "postbuild": "tsc --emitDeclarationOnly && node ./generateSystemActionDoc.js",
         "lint": "tslint --project tsconfig.json",
-        "fix": "tslint --project tsconfig.json --fix"
+        "fix": "tslint --project tsconfig.json --fix",
+        "test": "jest"
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"

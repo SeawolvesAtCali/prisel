@@ -7,12 +7,13 @@ import {
     RequestManager,
     Request,
     Response,
-    Status,
     PacketType,
     LoginResponsePayload,
     isResponse,
     MessageType,
     RoomChangePayload,
+    Code,
+    ResponseWrapper,
 } from '@prisel/common';
 import { PubSub } from './pubSub';
 import withTimer from './withTimer';
@@ -146,7 +147,7 @@ class Client<T = State> {
      */
     public async login(username: string = DEFAULT_USERNAME): Promise<LoginResponsePayload> {
         if (this.isConnected) {
-            const response: Response<LoginResponsePayload> = await this.request(
+            const response: ResponseWrapper<LoginResponsePayload> = await this.request(
                 getLogin(this.requestManager.newId(), username),
             );
             return response.payload;
@@ -170,18 +171,20 @@ class Client<T = State> {
         }
     }
 
-    public request<Payload = any>(request: Request<Payload>): Promise<Response> {
+    public request<Payload = any>(request: Request<Payload>) {
         this.emit(request);
         return this.requestManager.addRequest(request, DEFAULT_TIMEOUT).catch(() => {
             throw Client.CONNECTION_CLOSED;
         });
     }
 
-    public respond<Payload>(request: Request, status: Status, payload: Payload) {
+    public respond<Payload>(request: Request, payload: Payload) {
         const response: Response<Payload> = {
             type: PacketType.RESPONSE,
             request_id: request.request_id,
-            status,
+            status: {
+                code: Code.OK,
+            },
             payload,
         };
         if (request.system_action !== undefined) {
@@ -189,6 +192,23 @@ class Client<T = State> {
         }
         if (request.action !== undefined) {
             response.action = request.action;
+        }
+        this.emit(response);
+    }
+
+    public respondFailure(request: Request, message?: string, detail?: any) {
+        const response: Response<never> = {
+            type: PacketType.RESPONSE,
+            request_id: request.request_id,
+            status: {
+                code: Code.FAILED,
+            },
+        };
+        if (message) {
+            response.status.message = message;
+        }
+        if (detail !== undefined) {
+            response.status.detail = detail;
         }
         this.emit(response);
     }
@@ -239,8 +259,7 @@ class Client<T = State> {
         } else if (packet.system_action !== undefined) {
             this.systemActionListener.dispatch(packet.system_action, packet);
         } else {
-            // tslint:disable-next-line
-            console.log('Packet without action is not supported', packet);
+            this.log('Packet without action is not supported', packet);
         }
     }
 

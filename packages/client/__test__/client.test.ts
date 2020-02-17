@@ -6,8 +6,8 @@ import {
     Response,
     LoginResponsePayload,
     Request,
-    Status,
     Packet,
+    Code,
 } from '@prisel/common';
 
 describe('Client', () => {
@@ -61,7 +61,9 @@ describe('Client', () => {
                         type: PacketType.RESPONSE,
                         request_id: (packet as Request).request_id,
                         system_action: MessageType.LOGIN,
-                        status: Status.SUCCESS,
+                        status: {
+                            code: Code.OK,
+                        },
                         payload: {
                             userId: '123',
                         },
@@ -91,7 +93,9 @@ describe('Client', () => {
                         type: PacketType.RESPONSE,
                         request_id: (packet as Request).request_id,
                         system_action: MessageType.LOGIN,
-                        status: Status.SUCCESS,
+                        status: {
+                            code: Code.OK,
+                        },
                         payload: {
                             userId: '123',
                         },
@@ -112,7 +116,7 @@ describe('Client', () => {
                         type: PacketType.RESPONSE,
                         request_id: (packet as Request).request_id,
                         system_action: MessageType.LOGIN,
-                        status: Status.SUCCESS,
+                        status: { code: Code.OK },
                         payload: {
                             userId: '123',
                         },

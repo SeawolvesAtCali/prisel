@@ -1,9 +1,9 @@
 import { Room, newRoom, RoomConfig, RoomId } from './room';
 import { Context } from './objects';
-import { Packet, Request, Status, Response } from '@prisel/common';
+import { Packet, Request, ResponseWrapper } from '@prisel/common';
 import WebSocket from 'ws';
 import { emit } from './utils/networkUtils';
-import { getResponseFor } from './message';
+import { getSuccessFor, getFailureFor } from './message';
 
 export type PlayerId = string;
 
@@ -18,11 +18,12 @@ export abstract class Player {
     public abstract joinRoom(roomId: RoomId): Room | null;
     public abstract leaveRoom(): void;
     public abstract emit<T extends Packet<any>>(packet: T): T | void;
-    public abstract request<T>(
-        request: Omit<Request<T>, 'request_id'>,
+    public abstract request<Payload = any>(
+        request: Omit<Request<Payload>, 'request_id'>,
         timeout?: number,
-    ): Promise<Response>;
-    public abstract respond<T = never>(request: Request<any>, status: Status, payload?: T): void;
+    ): Promise<ResponseWrapper>;
+    public abstract respond<Payload = never>(request: Request<any>, payload?: Payload): void;
+    public abstract respondFailure(request: Request<any>, message?: string, detail?: any): void;
     public abstract getSocket(): WebSocket;
     public equals(player: Player): boolean {
         if (!player) {
@@ -81,6 +82,7 @@ class PlayerImpl extends Player {
         }
         return this.room;
     }
+
     public leaveRoom() {
         if (this.room) {
             this.room.removePlayer(this);
@@ -92,8 +94,11 @@ class PlayerImpl extends Player {
         setImmediate(emit, this.getSocket(), packet);
     }
 
-    public request<T>(request: Omit<Request<T>, 'id'>, timeout = DEFAULT_REQUEST_TIMEOUT) {
-        const fullRequest: Request<T> = {
+    public request<Payload = any>(
+        request: Omit<Request<Payload>, 'request_id'>,
+        timeout = DEFAULT_REQUEST_TIMEOUT,
+    ) {
+        const fullRequest: Request<Payload> = {
             ...request,
             request_id: this.newRequestId(),
         };
@@ -101,8 +106,12 @@ class PlayerImpl extends Player {
         return this.context.requests.addRequest(fullRequest, timeout);
     }
 
-    public respond<T = never>(request: Request<any>, status: Status, payload?: T) {
-        this.emit(getResponseFor(request, status, payload));
+    public respond<Payload = never>(request: Request<any>, payload?: Payload) {
+        this.emit(getSuccessFor(request, payload));
+    }
+
+    public respondFailure(request: Request<any>, message?: string, detail?: any) {
+        this.emit(getFailureFor(request, message, detail));
     }
 }
 

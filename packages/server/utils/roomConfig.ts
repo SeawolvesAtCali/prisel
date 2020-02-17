@@ -4,16 +4,14 @@ import {
     Request,
     JoinPayload,
     Packet,
-    StatusPayload,
     Response,
     RoomChangePayload,
     PacketType,
     RoomInfoPayload,
 } from '@prisel/common';
 import { GAME_PHASE } from '../objects/gamePhase';
-import { getFailureFor, getResponseFor } from '../message';
+import { getFailureFor } from '../message';
 import { Player } from '../player';
-import { Status } from '@prisel/common';
 import { GameConfig } from './gameConfig';
 import { broadcast } from './broadcast';
 import { Room } from '../room';
@@ -21,7 +19,7 @@ import { Room } from '../room';
 type PreCallback<T extends Request = Request> = (
     player: Player,
     packet: T,
-) => Response<StatusPayload> | void;
+) => Response<never> | void;
 type Callback<T extends Request = Request> = (player: Player, packet: T) => void;
 
 type ExitCallback = (player: Player) => void;
@@ -39,7 +37,7 @@ interface FullRoomConfig {
         player: Player,
         packet: Request,
         canStart: GameConfig['canStart'],
-    ) => Response<StatusPayload> | void;
+    ) => Response<never> | void;
     onGameStart: Callback;
 }
 
@@ -53,9 +51,7 @@ export const BaseRoomConfig: FullRoomConfig = {
     preCreate(player, packet) {
         const currentRoom = player.getRoom();
         if (currentRoom) {
-            return getFailureFor<StatusPayload>(packet, {
-                detail: `ALREADY IN A ROOM ${currentRoom.getName()}`,
-            });
+            return getFailureFor(packet, `ALREADY IN A ROOM ${currentRoom.getName()}`);
         }
     },
     onCreate(player, packet) {
@@ -65,7 +61,7 @@ export const BaseRoomConfig: FullRoomConfig = {
         const roomId = room.getId();
         player.joinRoom(roomId);
         room.setHost(player);
-        player.respond<RoomInfoPayload>(packet, Status.SUCCESS, {
+        player.respond<RoomInfoPayload>(packet, {
             id: roomId,
             name: room.getName(),
         });
@@ -82,26 +78,20 @@ export const BaseRoomConfig: FullRoomConfig = {
         const { roomId } = packet.payload;
         const currentRoom = player.getRoom();
         if (currentRoom) {
-            return getFailureFor<StatusPayload>(packet, {
-                detail: `ALREADY IN A ROOM ${currentRoom.getId()}`,
-            });
+            return getFailureFor(packet, `ALREADY IN A ROOM ${currentRoom.getId()}`);
         }
         const targetRoom = player.findRoomById(roomId);
         if (!targetRoom) {
-            return getFailureFor<StatusPayload>(packet, {
-                detail: `ROOM ${roomId} DOES NOT EXIST`,
-            });
+            return getFailureFor(packet, `ROOM ${roomId} DOES NOT EXIST`);
         }
         if (targetRoom.getGamePhase() === GAME_PHASE.GAME) {
-            return getFailureFor(packet, {
-                detail: 'Cannot join when game is already started',
-            });
+            return getFailureFor(packet, 'Cannot join when game is already started');
         }
     },
     onJoin(player, packet) {
         const { roomId } = packet.payload;
         const room = player.joinRoom(roomId);
-        player.respond<RoomInfoPayload>(packet, Status.SUCCESS, {
+        player.respond<RoomInfoPayload>(packet, {
             id: roomId,
             name: room.getName(),
         });
@@ -127,9 +117,7 @@ export const BaseRoomConfig: FullRoomConfig = {
     },
     preLeave(player, packet) {
         if (!player.getRoom()) {
-            return getFailureFor<StatusPayload>(packet, {
-                detail: `NOT IN A ROOM`,
-            });
+            return getFailureFor(packet, `NOT IN A ROOM`);
         }
     },
     onLeave(player, packet) {
@@ -142,28 +130,20 @@ export const BaseRoomConfig: FullRoomConfig = {
         const currentRoom = player.getRoom();
 
         if (!currentRoom) {
-            return getFailureFor<StatusPayload>(packet, {
-                detail: 'NOT IN A ROOM',
-            });
+            return getFailureFor(packet, 'NOT IN A ROOM');
         }
         if (currentRoom.getGamePhase() === GAME_PHASE.GAME) {
-            return getFailureFor<StatusPayload>(packet, {
-                detail: 'GAME ALREADY STARTED',
-            });
+            return getFailureFor(packet, 'GAME ALREADY STARTED');
         }
         if (player !== currentRoom.getHost()) {
-            return getFailureFor<StatusPayload>(packet, {
-                detail: 'NOT ENOUGH PRIVILEGE TO START GAME',
-            });
+            return getFailureFor(packet, 'NOT ENOUGH PRIVILEGE TO START GAME');
         }
         if (!canStart(currentRoom)) {
-            return getFailureFor<StatusPayload>(packet, {
-                detail: 'GAME_CONFIG DISALLOW STARTING GAME',
-            });
+            return getFailureFor(packet, 'GAME_CONFIG DISALLOW STARTING GAME');
         }
     },
     onGameStart(player, packet) {
-        player.respond(packet, Status.SUCCESS);
+        player.respond(packet);
         const currentRoom = player.getRoom();
         if (currentRoom) {
             broadcast(currentRoom.getPlayers(), {
@@ -203,7 +183,7 @@ function onLeave(player: Player, leaveRequest?: Request) {
         }
         player.leaveRoom();
         if (leaveRequest) {
-            player.respond(leaveRequest, Status.SUCCESS);
+            player.respond(leaveRequest);
         }
         roomUpdate.newLeaves = [player.getId()];
         const remainedPlayers = currentRoom.getPlayers();

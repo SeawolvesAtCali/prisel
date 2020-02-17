@@ -4,18 +4,15 @@ import {
     createLoginedClients,
     connectAndLogin,
 } from './testHelper';
-import { Messages } from '@prisel/client';
-import { RoomInfoPayload, Response, Status, RoomChangePayload } from '@prisel/common';
+import { Messages, RoomInfoPayload, Response } from '@prisel/client';
 
 describe('create room', () => {
     it('create a room', async () => {
         const [client] = createClients();
         await client.connect();
         await client.login('batman');
-        const response: Response<RoomInfoPayload> = await client.request(
-            Messages.getCreateRoom(client.newId(), 'party room'),
-        );
-        expect(response.payload.id).toEqual(expect.any(String));
+        const response = await client.request(Messages.getCreateRoom(client.newId(), 'party room'));
+        expect((response.payload as RoomInfoPayload).id).toEqual(expect.any(String));
         client.exit();
     });
 
@@ -26,9 +23,9 @@ describe('create room', () => {
         const createRoomResponse = await client.request(
             Messages.getCreateRoom(client.newId(), 'room'),
         );
-        expect(createRoomResponse.status).toBe(Status.SUCCESS);
+        expect(createRoomResponse.ok()).toBe(true);
         const leaveResponse = await client.request(Messages.getLeave(client.newId()));
-        expect(leaveResponse.status).toBe(Status.SUCCESS);
+        expect(leaveResponse.ok()).toBe(true);
         client.exit();
     });
 
@@ -37,10 +34,10 @@ describe('create room', () => {
         const hostId = await connectAndLogin(host);
         const clientId = await connectAndLogin(client);
 
-        const createRoomResponse: Response<RoomInfoPayload> = await host.request(
+        const createRoomResponse = await host.request(
             Messages.getCreateRoom(host.newId(), 'party room'),
         );
-        const { id: roomId } = createRoomResponse.payload;
+        const { id: roomId } = createRoomResponse.payload as RoomInfoPayload;
         await waitForRoomUpdate(host);
         const [hostRoomUpdateResult, clientRoomUpdateResult, _] = await Promise.all([
             waitForRoomUpdate(host),

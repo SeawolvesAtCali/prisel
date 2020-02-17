@@ -1,5 +1,6 @@
 import { MessageType, LoginPayload, JoinPayload, CreateRoomPayload } from './messageTypes';
-import { Packet, Request, Response, PacketType, Status } from './packet';
+import { Packet, Request, Response, PacketType } from './packet';
+import { Code } from './code';
 
 /**
  * message from server to client once a client connects
@@ -15,7 +16,9 @@ const welcome: Packet<never> = {
 const feedback: Response<any> = {
     type: PacketType.RESPONSE,
     system_action: MessageType.CREATE_ROOM,
-    status: Status.SUCCESS,
+    status: {
+        code: Code.OK,
+    },
     request_id: '123',
 };
 

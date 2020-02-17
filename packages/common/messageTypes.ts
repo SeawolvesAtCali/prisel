@@ -49,10 +49,6 @@ export interface BroadcastPayload {
     message: string;
 }
 
-export interface StatusPayload {
-    detail: string;
-}
-
 export default MessageType;
 
 export function isMessageType(value: any): value is MessageType {
@@ -106,7 +102,6 @@ export const ACTION_CONFIG: Record<ActionName, ActionConfig> = {
         isRest: true,
         payload: [
             request<JoinPayload>('JoinPayload'),
-            response<StatusPayload>('StatusPayload'),
             response<RoomInfoPayload>('RoomInfoPayload'),
         ],
         related: ['ROOM_STATE_CHANGE'],
@@ -124,14 +119,12 @@ export const ACTION_CONFIG: Record<ActionName, ActionConfig> = {
         payload: [
             request<CreateRoomPayload>('CreateRoomPayload'),
             response<RoomInfoPayload>('RoomInfoPayload'),
-            response<StatusPayload>('StatusPayload'),
         ],
     },
     LEAVE: {
         desc: 'Client leave a room',
         from: FROM.CLIENT,
         isRest: true,
-        payload: [response<StatusPayload>('StatusPayload')],
         related: ['ROOM_STATE_CHANGE'],
     },
     EXIT: {
@@ -144,7 +137,6 @@ export const ACTION_CONFIG: Record<ActionName, ActionConfig> = {
         desc: 'Host declare game start',
         from: FROM.CLIENT,
         isRest: true,
-        payload: [response<StatusPayload>('StatusPayload')],
         related: ['ANNOUNCE_GAME_START'],
     },
     CHAT: {

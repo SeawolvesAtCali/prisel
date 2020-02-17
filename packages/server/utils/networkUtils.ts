@@ -1,5 +1,5 @@
 import debug from '../debug';
-import { HEARTBEAT_INTERVAL, StatusPayload, toDebugString } from '@prisel/common';
+import { HEARTBEAT_INTERVAL, toDebugString } from '@prisel/common';
 import WebSocket from 'ws';
 import http from 'http';
 import Koa from 'koa';

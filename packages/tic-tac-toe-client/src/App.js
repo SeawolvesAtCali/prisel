@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Client, Messages, PacketType, Status } from '@prisel/client';
+import { Client, Messages, PacketType, Code } from '@prisel/client';
 import Context from './context';
 import Login from './Login';
 import Lobby from './Lobby';
@@ -44,25 +44,25 @@ function App() {
         });
     const handleCreate = async (roomName) => {
         const response = await client.request(Messages.getCreateRoom(client.newId(), roomName));
-        if (response.status === Status.SUCCESS) {
+        if (response.ok()) {
             onJoin(response.payload);
             setPhase(phases.ROOM);
         } else {
-            client.log(response.payload.detail);
+            client.log(response.getMessage());
         }
     };
     const handleJoin = async (roomId) => {
         const response = await client.request(Messages.getJoin(client.newId(), roomId));
-        if (response.status === Status.SUCCESS) {
+        if (response.ok()) {
             onJoin(response.payload);
             setPhase(phases.ROOM);
         } else {
-            client.log(response.payload.detail);
+            client.log(response.status.message);
         }
     };
     const handleLeave = async () => {
         const response = await client.request(Messages.getLeave(client.newId()));
-        if (response.status === Status.SUCCESS) {
+        if (response.ok()) {
             onLeave();
             setPhase(phases.LOBBY);
         }

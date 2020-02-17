@@ -29,24 +29,3 @@ export async function createLoginedClients(num = 1): Promise<Client[]> {
         }),
     );
 }
-
-export async function createRoomWithGuests(num = 0): Promise<Client[]> {
-    const clients = Array.from({ length: num + 1 }).map(() => new Client());
-    await Promise.all(
-        clients.map(async (client) => {
-            await client.connect();
-            await client.login('username');
-        }),
-    );
-    const [host, ...guests] = clients;
-    const createRoomResponse: Response<RoomInfoPayload> = await host.request(
-        Messages.getCreateRoom(host.newId(), 'roomname'),
-    );
-    await waitForRoomUpdate(host);
-    await Promise.all(
-        guests.map(async (guest) => {
-            await guest.request(Messages.getJoin(guest.newId(), createRoomResponse.payload.id));
-        }),
-    );
-    return clients;
-}

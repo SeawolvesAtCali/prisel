@@ -1,7 +1,6 @@
 import { GameConfig, debug } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
-import Game from './Game';
-import { Status, PacketType, Request } from '@prisel/common';
+import { Request } from '@prisel/common';
 import { Action } from './messages';
 
 const MonopolyGameConfig: GameConfig = {
@@ -17,7 +16,7 @@ const MonopolyGameConfig: GameConfig = {
 
         room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
             const flatState = flattenState(game);
-            player.respond(packet, Status.SUCCESS, flatState);
+            player.respond(packet, flatState);
             debug('current game state is: \n%O', flatState);
         });
 

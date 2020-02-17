@@ -75,7 +75,7 @@ export class GamePlayer extends GameObject {
                 }
             }
 
-            this.player.respond<RollReponsePayload>(packet, Status.SUCCESS, {
+            this.player.respond<RollReponsePayload>(packet, {
                 steps,
             });
             // TODO notify other players

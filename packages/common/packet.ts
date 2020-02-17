@@ -1,5 +1,7 @@
 import { MessageType, messageTypeMap } from './messageTypes';
 import { enumToMap } from './enumToMap';
+import { Status, isStatus } from './status';
+import { printCodeToString as codeToDebugString, Code } from './code';
 
 export interface Packet<Payload = any> {
     type: PacketType;
@@ -19,10 +21,6 @@ export interface Response<Payload = any> extends Packet<Payload> {
     request_id: string;
 }
 
-export function isStatus(status: any): status is Status {
-    return Object.values(Status).some((statusValue) => statusValue === status);
-}
-
 export function isResponse(packet: Packet): packet is Response {
     if (!packet) {
         return false;
@@ -34,6 +32,7 @@ export function isResponse(packet: Packet): packet is Response {
         isStatus(response.status)
     );
 }
+
 export function isRequest(packet: Packet): packet is Request {
     if (!packet) {
         return false;
@@ -50,14 +49,6 @@ export enum PacketType {
 
 export const packetTypeMap = enumToMap<PacketType>(PacketType);
 
-export enum Status {
-    UNSET = 0,
-    SUCCESS = 1,
-    FAILURE = 2,
-}
-
-export const statusMap = enumToMap<Status>(Status);
-
 export function toDebugString(packet: Packet) {
     const { system_action: systemAction, type } = packet;
 
@@ -69,7 +60,10 @@ export function toDebugString(packet: Packet) {
         debugPacket.type = packetTypeMap.get(type);
     }
     if (isResponse(packet)) {
-        debugPacket.status = statusMap.get(packet.status);
+        const status = packet.status;
+        const statusMessage =
+            codeToDebugString(packet.status.code) + status.message ? ` ${status.message}` : '';
+        debugPacket.status = statusMessage;
     }
     return JSON.stringify(debugPacket);
 }

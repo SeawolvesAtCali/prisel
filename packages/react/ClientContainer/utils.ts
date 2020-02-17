@@ -1,12 +1,4 @@
-import {
-    Client,
-    Messages,
-    CreateRoomPayload,
-    RoomInfoPayload,
-    StatusPayload,
-    Status,
-    Packet,
-} from '@prisel/client';
+import { Client, Messages, CreateRoomPayload, RoomInfoPayload, Packet } from '@prisel/client';
 import { Message } from '../LogPanel';
 
 export type AddToLogs = (message: Message) => void;
@@ -90,15 +82,16 @@ export async function createRoom(client: Client<ClientState>) {
         Messages.getCreateRoom(client.newId(), 'default-room'),
     );
 
-    if (response.status === Status.SUCCESS) {
+    if (response.ok()) {
         return (response.payload as RoomInfoPayload).id;
     }
-    throw new Error('createRoom error: ' + (response.payload as StatusPayload).detail);
+
+    throw new Error('createRoom error: ' + response.status.message);
 }
 
 export async function joinRoom(client: Client<ClientState>, roomId: string) {
     const response = await client.request(Messages.getJoin(client.newId(), roomId));
-    if (response.status === Status.FAILURE) {
-        throw new Error('joinRoom error: ' + (response.payload as StatusPayload).detail);
+    if (response.failed()) {
+        throw new Error('joinRoom error: ' + response.getMessage());
     }
 }

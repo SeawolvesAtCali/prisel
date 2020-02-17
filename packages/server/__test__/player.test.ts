@@ -2,7 +2,8 @@ import { emit } from '../utils/networkUtils';
 import { mockContext } from '../utils/testUtils';
 import { newPlayer } from '../player';
 import { getWelcome } from '../message';
-import { PacketType, Request, MessageType, Status, StatusPayload } from '@prisel/common';
+import { PacketType, Request, MessageType } from '@prisel/common';
+import { Code } from '@prisel/common/code';
 jest.mock('../utils/networkUtils');
 
 describe('player', () => {
@@ -82,7 +83,7 @@ describe('player', () => {
             request_id: '123',
             system_action: MessageType.CREATE_ROOM,
         };
-        player.respond<StatusPayload>(request, Status.FAILURE, { detail: '123' });
+        player.respondFailure(request, '123');
         jest.runAllImmediates();
         expect(emit).toHaveBeenCalledWith(
             player.getSocket(),
@@ -90,7 +91,10 @@ describe('player', () => {
                 type: PacketType.RESPONSE,
                 request_id: '123',
                 system_action: MessageType.CREATE_ROOM,
-                payload: { detail: '123' },
+                status: {
+                    code: Code.FAILED,
+                    message: '123',
+                },
             }),
         );
     });

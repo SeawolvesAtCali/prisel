@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import GameContext, { RoomInfo } from '../GameContext';
+import React, { useState } from 'react';
+import GameContext from '../GameContext';
 import { HostContainer, GuestContainer } from '../ClientContainer';
 import generateUsername from '../ClientContainer/username';
 import { Toolbar, ToolbarItem } from '../Toolbar';
 import styles from './index.css';
 import { CommandEditor, useCommandEditor } from '../commandEditor';
-import { RoomChangePayload } from '@prisel/common';
 
 function App() {
     const [roomId, setRoomId] = useState('');

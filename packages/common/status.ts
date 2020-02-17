@@ -1,4 +1,4 @@
-import { Code } from './code';
+import { Code, isCode } from './code';
 
 export interface Status {
     /**
@@ -12,4 +12,11 @@ export interface Status {
      */
     message?: string;
     detail?: any;
+}
+
+export function isStatus(status: any): status is Status {
+    if (!status) {
+        return false;
+    }
+    return isCode(status.code);
 }

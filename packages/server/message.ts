@@ -6,6 +6,7 @@ import {
     Status,
     Response,
     LoginPayload,
+    Code,
 } from '@prisel/common';
 
 interface BroadcastMessagePayload {
@@ -53,12 +54,28 @@ export function getResponseFor<T = never>(
     response.system_action = request.system_action;
     return response;
 }
-export function getSuccessFor<T = never>(request: Request<any>, payload?: T): Response<T> {
-    return getResponseFor(request, Status.SUCCESS, payload);
+export function getSuccessFor<Payload = never>(
+    request: Request<any>,
+    payload?: Payload,
+): Response<Payload> {
+    return getResponseFor(request, { code: Code.OK }, payload);
 }
 
-export function getFailureFor<T = never>(request: Request<any>, payload?: T): Response<T> {
-    return getResponseFor(request, Status.FAILURE, payload);
+export function getFailureFor(
+    request: Request<any>,
+    message?: string,
+    detail?: any,
+): Response<never> {
+    const status: Status = {
+        code: Code.FAILED,
+    };
+    if (message) {
+        status.message = message;
+    }
+    if (detail !== undefined) {
+        status.detail = detail;
+    }
+    return getResponseFor(request, status);
 }
 
 /**

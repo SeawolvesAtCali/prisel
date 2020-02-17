@@ -121,7 +121,9 @@ export const BaseRoomConfig: FullRoomConfig = {
                 },
             };
         });
-        // TODO(minor): currently, room members can grow infinitely
+        // TODO(minor): currently, room members can grow infinitely. This would
+        // required a locking mechanism to prevent race condition between
+        // preJoin and onJoin
     },
     preLeave(player, packet) {
         if (!player.getRoom()) {

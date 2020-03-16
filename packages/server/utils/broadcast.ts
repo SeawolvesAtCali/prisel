@@ -2,7 +2,10 @@ import { emit } from './networkUtils';
 import { Player } from '../player';
 import { Packet } from '@prisel/common';
 
-export function broadcast(players: Player[], packetBuilder: ((player: Player) => Packet) | Packet) {
+export function broadcast<Payload = any>(
+    players: Player[],
+    packetBuilder: ((player: Player) => Packet<Payload>) | Packet<Payload>,
+) {
     if (typeof packetBuilder === 'function') {
         const packets = players.map(packetBuilder);
         setImmediate(() => {

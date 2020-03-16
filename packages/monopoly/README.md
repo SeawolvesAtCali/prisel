@@ -8,15 +8,10 @@ Server message might contains secret in the payload. The secret is JWT token wit
 what request a player can issue.
 
 ```
-// Request a roll
-type = 'requestRoll',
-secret: string // roll
-
-// Move according to the number on the dice
-type = 'move',
-secret: string, // purchase, endTurn
-payload = {
-    steps: number,
+// request player to start turn, also notify other players
+action: player_start_turn
+payload: {
+    id: "PLAYER-1"
 }
 ```
 
@@ -24,14 +19,11 @@ payload = {
 
 ```
 // Roll
-type = 'roll',
-secret: string // the secret from requestRoll
+action: roll
 
 // Purchase
-type = 'purchase',
-secret: string // the secret from move
+action: purchase
 
 // Conclude current turn
-type = 'endTurn',
-secret: string // the secret from move
+action: end_turn
 ```

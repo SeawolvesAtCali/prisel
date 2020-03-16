@@ -1,10 +1,10 @@
-import { debug, Player, PlayerId, Request } from '@prisel/server';
+import { debug, Player, PlayerId, Request, Messages, Response } from '@prisel/server';
 import Property from './Property';
 import Node from './Node';
 import { log } from './logGameObject';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Game from './Game';
-import { RollReponsePayload } from './messages';
+import { RollResponsePayload, PurchaseResponsePayload } from './messages';
 
 interface Props {
     id: PlayerId;
@@ -57,48 +57,69 @@ export class GamePlayer extends GameObject {
     }
 
     @log
-    public roll(game: Game, packet: Request): void {
-        if (!this.rolled) {
-            const steps = roll();
-            this.rolled = true;
-            const path = this.position.genPath(steps);
-            this.position = path[path.length - 1];
-            const { property } = this.position;
-            if (property) {
-                debug('there is a property %O', property.flat());
-                if (property.owner && property.owner.id !== this.id) {
-                    this.payRent(property.owner, property.rent);
-                }
-                if (!property.owner) {
-                    debug('can purchase this property for ' + property.price);
-                }
-            }
-
-            this.player.respond<RollReponsePayload>(packet, {
-                steps,
-            });
-            // TODO notify other players
-        }
-    }
-
-    @log
-    public purchase(game: Game, packet: Request): void {
-        const { property } = this.position;
-        if (property && !property.owner && property.price <= this.cash) {
-            this.cash = this.cash - property.price;
-            property.setOwner(this);
-            this.owning.push(property);
-        }
-    }
-
-    @log
-    public endTurn(game: Game, packet: Request): void {
+    public roll(game: Game, packet: Request): Response<RollResponsePayload> {
         if (this.rolled) {
-            // if not rolled, cannot end turn
-            this.rolled = true;
-            game.giveTurnToNext();
-            // TODO: notify next player
+            return Messages.getFailureFor(packet, `Player ${this.id} already rolled`);
         }
+
+        const steps = roll();
+        this.rolled = true;
+        const path = this.position.genPath(steps);
+        this.position = path[path.length - 1];
+        const { property } = this.position;
+        if (property) {
+            debug('there is a property %O', property.flat());
+            if (property.owner && property.owner.id !== this.id) {
+                this.payRent(property.owner, property.rent);
+            }
+            if (!property.owner) {
+                debug('can purchase this property for ' + property.price);
+            }
+        }
+
+        return Messages.getSuccessFor<RollResponsePayload>(packet, {
+            steps,
+        });
+    }
+
+    @log
+    public purchase(game: Game, packet: Request): Response<PurchaseResponsePayload> {
+        const { property } = this.position;
+        if (!property) {
+            return Messages.getFailureFor(packet, `no property at location ${this.position.id}`);
+        }
+        if (property.owner) {
+            return Messages.getFailureFor(packet, 'property is already owned');
+        }
+        if (property.price > this.cash) {
+            return Messages.getFailureFor(
+                packet,
+                `not enough cash to purchase, current cash ${this.cash}, property price ${property.price}`,
+            );
+        }
+
+        this.cash = this.cash - property.price;
+        property.setOwner(this);
+        this.owning.push(property);
+        return Messages.getSuccessFor<PurchaseResponsePayload>(packet, {
+            property: {
+                id: property.id,
+                cost: property.price,
+                rent: property.rent,
+                name: property.name,
+            },
+            remaining_cash: this.cash,
+        });
+    }
+
+    @log
+    public endTurn(game: Game, packet: Request): Response {
+        if (this.rolled) {
+            this.rolled = false;
+            return Messages.getSuccessFor(packet);
+        }
+        // if not rolled, cannot end turn
+        return Messages.getFailureFor(packet, 'Not rolled yet');
     }
 
     public flat(): FlatPlayer {

@@ -8,7 +8,7 @@ import { Packet, PacketType } from '@prisel/common';
 
 export type RoomId = string;
 
-type RemoveListenerFunc = () => void;
+export type RemoveListenerFunc = () => void;
 type PacketListener<T extends Packet<any>> = (player: Player, packet: T, action: any) => void;
 
 // replace handle to control room related info

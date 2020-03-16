@@ -8,7 +8,8 @@ import genId from './genId';
 
 const CASH = 1000;
 
-export function createIntialState(players: Player[]): Game {
+export function createIntialState(room: Room): Game {
+    const players = room.getPlayers();
     const board = createBoard();
     const playerMap = new Map(
         players.map((player) => [
@@ -29,6 +30,7 @@ export function createIntialState(players: Player[]): Game {
         players: playerMap,
         turnOrder: Array.from(playerMap.values()),
         map: board,
+        room,
     });
     return game;
 }

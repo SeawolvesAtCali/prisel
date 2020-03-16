@@ -30,9 +30,18 @@ function useRun(client: Client, addToLogs: AddToLogs) {
                 suggestions,
                 (key) => {},
                 (packet) => {
-                    if (packet.type === PacketType.REQUEST) {
-                        client.emit({ ...packet, id: client.newId() });
+                    switch (packet.type) {
+                        case PacketType.DEFAULT:
+                        case PacketType.RESPONSE:
+                            // TODO(minor): currently, let's hardcode the
+                            // response id
+                            client.emit(packet);
+                            break;
+                        case PacketType.REQUEST:
+                            client.emit({ ...packet, id: client.newId() });
+                            break;
                     }
+
                     addToLogs({
                         origin: 'client',
                         packet,

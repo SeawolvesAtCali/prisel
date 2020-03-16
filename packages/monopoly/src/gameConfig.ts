@@ -1,6 +1,8 @@
-import { GameConfig, debug, Request } from '@prisel/server';
+import { GameConfig, debug, Request, Packet, broadcast, Room, PacketType } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
-import { Action } from './messages';
+import { Action, PlayerStartTurnPayload } from './messages';
+import Game from './Game';
+import { waitForEveryoneSetup, runPlayerTurn } from './gameFlow';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
@@ -9,34 +11,26 @@ const MonopolyGameConfig: GameConfig = {
         return room.getPlayers().length > 1;
     },
     onStart(room) {
-        const game = createIntialState(room.getPlayers());
+        const game = createIntialState(room);
         room.setGame(game);
-        debug('The first player is %O', game.turnOrder[0].flat());
-
         room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
             const flatState = flattenState(game);
             player.respond(packet, flatState);
             debug('current game state is: \n%O', flatState);
         });
+        (async () => {
+            await waitForEveryoneSetup(game, room);
+            while (true) {
+                game.startTurn();
+                await runPlayerTurn(game, room);
+                game.endTurn();
 
-        room.listenGamePacket<Request>('roll', (player, packet) => {
-            const gamePlayer = game.players.get(player.getId());
-            if (game.isCurrentPlayer(gamePlayer)) {
-                gamePlayer.roll(game, packet);
+                // TODO wait for everyone acknowledge turn end
+
+                // check game over
+                game.giveTurnToNext();
             }
-        });
-        room.listenGamePacket<Request>('purchase', (player, packet) => {
-            const gamePlayer = game.players.get(player.getId());
-            if (game.isCurrentPlayer(gamePlayer)) {
-                gamePlayer.purchase(game, packet);
-            }
-        });
-        room.listenGamePacket<Request>('endturn', (player, packet) => {
-            const gamePlayer = game.players.get(player.getId());
-            if (game.isCurrentPlayer(gamePlayer)) {
-                gamePlayer.endTurn(game, packet);
-            }
-        });
+        })();
     },
     onEnd(room) {
         room.removeAllGamePacketListener();

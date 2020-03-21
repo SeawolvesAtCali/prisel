@@ -4,7 +4,9 @@ import { Player } from './player';
 import { Context } from './objects';
 import { GAME_PHASE } from './objects/gamePhase';
 import { newId } from './utils/idUtils';
-import { Packet, PacketType } from '@prisel/common';
+import { Packet, PacketType, isRequest, ErrorPayload } from '@prisel/common';
+import debug from './debug';
+import { DEBUG_MODE } from './flags';
 
 export type RoomId = string;
 
@@ -148,11 +150,41 @@ class RoomImpl extends Room {
 
         // RESPONSE should be handled directly using promise.
         // only handle PACKET and REQUEST
+        // TODO(minor) there is no detection for where a response is proccessed.
+        // But this might not be an issue if we don't require all response to be
+        // processed.
         if (packet.type === PacketType.RESPONSE) {
             return;
         }
         setImmediate(() => {
-            this.actionListeners.emit(action, player, packet, action);
+            if (this.actionListeners.listenerCount(action) === 0) {
+                // no listener currently subscribe to this action
+                debug(`no game action listener is listening for ${action}`);
+                if (isRequest(packet)) {
+                    if (DEBUG_MODE) {
+                        player.respondFailure(
+                            packet,
+                            'no game action listener is listening for this package',
+                            packet,
+                        );
+                    } else {
+                        player.respondFailure(packet);
+                    }
+                } else {
+                    // type === Packet
+                    if (DEBUG_MODE) {
+                        player.emit<Packet<ErrorPayload>>({
+                            type: PacketType.DEFAULT,
+                            payload: {
+                                message: 'no game action listener is listening for this package',
+                                detail: packet,
+                            },
+                        });
+                    }
+                }
+            } else {
+                this.actionListeners.emit(action, player, packet, action);
+            }
         });
     }
 }

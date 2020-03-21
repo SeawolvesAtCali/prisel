@@ -42,7 +42,6 @@
         "immer": "^1.8.2",
         "lodash": "^4.17.11",
         "prismjs": "^1.17.1",
-        "react-json-view": "^1.19.1",
         "react-simple-code-editor": "^0.9.14"
     },
     "devDependencies": {

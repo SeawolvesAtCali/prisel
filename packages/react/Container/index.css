@@ -4,6 +4,7 @@
     min-height: 300px;
     display: flex;
     flex-grow: 1;
+    flex-basis: 0; /* use the flex-basis instead of initial width and distribute the free spaces. This way, each containers are equal width */
     flex-direction: column;
     position: relative;
 }

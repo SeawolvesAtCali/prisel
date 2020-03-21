@@ -1,11 +1,11 @@
 import * as React from 'react';
 import Suggestion from '../Suggestion';
-import { MessageType, Packet } from '@prisel/client';
+import { Packet } from '@prisel/client';
 import styles from './index.css';
 import cn from '../utils/classname';
 import Chip from '../Chip';
-import ReactJson from 'react-json-view';
 import debounce from 'lodash/debounce';
+import { PacketView } from '../PacketView';
 
 export interface Message {
     packet: Packet;
@@ -51,7 +51,7 @@ const MessageDisplay: React.FC<MessageWithMetaData> = (props) => {
                 <span className={styles.time}>{cachedTimestamp}</span>
                 <span className={cn(styles.origin, originClass[origin])}>{origin}</span>
             </div>
-            <ReactJson src={packet} name="payload" />
+            <PacketView packet={packet} fromServer={origin === 'server'} />
         </div>
     );
 };

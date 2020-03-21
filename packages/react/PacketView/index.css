@@ -1,0 +1,47 @@
+.json {
+    font-family: monospace;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    padding: 4px;
+}
+
+.indent {
+    padding-left: 20px;
+}
+
+.attribute {
+    color: rgb(0, 43, 54);
+    opacity: 0.85;
+    margin-right: 5px;
+}
+
+.string {
+    color: rgb(203, 75, 22);
+}
+
+.number {
+    color: rgb(38, 139, 210);
+}
+
+.collapsed {
+    background-color: rgb(220, 220, 220);
+    height: 1px;
+}
+
+.hidden {
+    display: none;
+}
+
+.download {
+    font-family: monospace;
+    color: rgb(187, 72, 9);
+}
+
+.upload {
+    font-family: monospace;
+    color: rgb(5, 150, 34);
+}
+
+.status {
+    background: rgb(240, 240, 240);
+}

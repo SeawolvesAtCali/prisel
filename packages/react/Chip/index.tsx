@@ -2,12 +2,13 @@ import * as React from 'react';
 import styles from './index.css';
 import cn from '../utils/classname';
 import Suggestion from '../Suggestion';
+import { Pill, Preset } from '../Pill';
 
-const classNameForType: { [key in Suggestion['type']]: string } = {
-    command: styles.commandType,
-    variableParam: styles.paramType,
-    param: styles.paramType,
-    placeholderParam: styles.placeholderType,
+const classNameForType: { [key in Suggestion['type']]: Preset } = {
+    command: Preset.PINK,
+    variableParam: Preset.GREEN,
+    param: Preset.GREEN,
+    placeholderParam: Preset.WHITE,
 };
 
 interface DisplayProps extends Suggestion {
@@ -18,11 +19,16 @@ interface DisplayProps extends Suggestion {
 function Display(props: DisplayProps) {
     const { type, label, onClick, selectIndex } = props;
     const indexDisplay = selectIndex === undefined ? null : `${selectIndex}: `;
+
     return (
-        <span className={cn(styles.chip, styles.display, classNameForType[type])} onClick={onClick}>
+        <Pill
+            preset={classNameForType[type]}
+            className={cn(styles.chip, styles.display)}
+            onClick={onClick}
+        >
             {indexDisplay}
             {label}
-        </span>
+        </Pill>
     );
 }
 
@@ -47,12 +53,13 @@ function Edit(props: EditProps) {
     );
 
     return (
-        <span
-            className={cn(styles.chip, { [styles.focus]: editing }, classNameForType[type])}
+        <Pill
+            preset={classNameForType[type]}
+            className={cn(styles.chip, { [styles.focus]: editing })}
             onClick={handleClick}
         >
             {label} <span ref={closeRef}>✖</span>
-        </span>
+        </Pill>
     );
 }
 

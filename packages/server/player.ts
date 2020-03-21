@@ -17,7 +17,7 @@ export abstract class Player {
     public abstract createRoom(config: Omit<RoomConfig, 'id'>): Room;
     public abstract joinRoom(roomId: RoomId): Room | null;
     public abstract leaveRoom(): void;
-    public abstract emit<T extends Packet<any>>(packet: T): T | void;
+    public abstract emit<T extends Packet<any>>(packet: T): void;
     public abstract request<Payload = any>(
         request: Omit<Request<Payload>, 'request_id'>,
         timeout?: number,

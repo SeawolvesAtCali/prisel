@@ -47,6 +47,36 @@ export enum PacketType {
     RESPONSE = 2,
 }
 
+export function isPacketType(type: any): type is PacketType {
+    return (
+        type === PacketType.DEFAULT || type === PacketType.REQUEST || type === PacketType.RESPONSE
+    );
+}
+export function isPacket(packet: any): packet is Packet {
+    if (!packet) {
+        return false;
+    }
+    return typeof packet === 'object' && isPacketType(packet.type);
+}
+
+/**
+ * Return true if the packet is one of the three types and follows structure of
+ * the type
+ * @param packet
+ */
+export function isSupportedPacket(packet: any): packet is Packet {
+    if (!isPacket(packet)) {
+        return false;
+    }
+    if (isRequest(packet)) {
+        return true;
+    }
+    if (isResponse(packet)) {
+        return true;
+    }
+    return packet.type === PacketType.DEFAULT;
+}
+
 export const packetTypeMap = enumToMap<PacketType>(PacketType);
 
 export function toDebugString(packet: Packet) {

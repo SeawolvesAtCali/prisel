@@ -1,4 +1,13 @@
-import { GameConfig, debug, Request, Packet, broadcast, Room, PacketType } from '@prisel/server';
+import {
+    GameConfig,
+    debug,
+    Request,
+    Packet,
+    broadcast,
+    Room,
+    PacketType,
+    isSupportedPacket,
+} from '@prisel/server';
 import { createIntialState, flattenState } from './state';
 import { Action, PlayerStartTurnPayload } from './messages';
 import Game from './Game';

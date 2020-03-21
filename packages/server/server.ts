@@ -17,8 +17,10 @@ import { GameConfig, BaseGameConfig } from './utils/gameConfig';
 import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
 import http from 'http';
 import { getPlayer, getRoom } from './utils/stateUtils';
-import { isResponse } from '@prisel/common';
+import { isResponse, isSupportedPacket, ErrorPayload, Packet, PacketType } from '@prisel/common';
 import { GAME_PHASE } from './objects/gamePhase';
+
+const STRICT_MODE = true;
 
 interface ServerConfig {
     host?: string;
@@ -110,6 +112,23 @@ export class Server {
                     return;
                 }
                 const packet = deserialize(data);
+                if (STRICT_MODE && !isSupportedPacket(packet)) {
+                    debug(`packet structure is invalid`);
+                    const player = getPlayer(context, socket);
+                    if (player) {
+                        player.emit<Packet<ErrorPayload>>({
+                            type: PacketType.DEFAULT,
+                            payload: {
+                                message: 'packet structure is invalid',
+                                detail: packet,
+                            },
+                        });
+                    } else {
+                        debug(`player is not logged in, cannot send error report`);
+                    }
+                    // TODO send info back to client
+                    return;
+                }
                 // handle response
                 if (isResponse(packet)) {
                     const { request_id: id } = packet;

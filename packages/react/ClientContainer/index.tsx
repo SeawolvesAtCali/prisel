@@ -10,7 +10,7 @@ import {
 } from './utils';
 import GameContext from '../GameContext';
 import LogPanel, { MessageWithMetaData, createMessage } from '../LogPanel';
-import { Client, PacketType } from '@prisel/client';
+import { Client, PacketType, Request } from '@prisel/client';
 import Container, { BorderBox } from '../Container';
 import Suggestion from '../Suggestion';
 import Prompt from '../Prompt';
@@ -38,7 +38,12 @@ function useRun(client: Client, addToLogs: AddToLogs) {
                             client.emit(packet);
                             break;
                         case PacketType.REQUEST:
-                            client.emit({ ...packet, id: client.newId() });
+                            const request: Request = {
+                                ...packet,
+                                type: PacketType.REQUEST,
+                                request_id: client.newId(),
+                            };
+                            client.emit(request);
                             break;
                     }
 

@@ -19,8 +19,7 @@ import http from 'http';
 import { getPlayer, getRoom } from './utils/stateUtils';
 import { isResponse, isSupportedPacket, ErrorPayload, Packet, PacketType } from '@prisel/common';
 import { GAME_PHASE } from './objects/gamePhase';
-
-const STRICT_MODE = true;
+import { DEBUG_MODE } from './flags';
 
 interface ServerConfig {
     host?: string;
@@ -112,7 +111,7 @@ export class Server {
                     return;
                 }
                 const packet = deserialize(data);
-                if (STRICT_MODE && !isSupportedPacket(packet)) {
+                if (DEBUG_MODE && !isSupportedPacket(packet)) {
                     debug(`packet structure is invalid`);
                     const player = getPlayer(context, socket);
                     if (player) {

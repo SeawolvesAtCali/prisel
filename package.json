@@ -132,7 +132,6 @@
         "prismjs": "^1.17.1",
         "react": "^16.8.1",
         "react-dom": "^16.8.1",
-        "react-json-view": "^1.19.1",
         "react-simple-code-editor": "^0.9.14",
         "rollup": "^1.16.2",
         "rollup-plugin-commonjs": "^9.3.4",

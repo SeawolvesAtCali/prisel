@@ -1,7 +1,15 @@
-import { Client } from '@prisel/client';
+import { Client } from './packages/client/lib/index.d';
 
-export async function createClient() {
-    const client = new Client('ws://localhost:3000');
-    await client.connect();
-    return client;
+export const client = new Client<ClientState>('ws://localhost:3000');
+
+client.setState({
+    isInRoom: false,
+});
+
+export interface ClientState {
+    roomId?: string;
+    roomName?: string;
+    isInRoom?: boolean;
 }
+
+export * from './packages/client/lib/index.d';

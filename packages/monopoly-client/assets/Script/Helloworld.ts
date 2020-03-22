@@ -1,5 +1,4 @@
-import { Client } from '@prisel/client';
-import { createClient } from './Client';
+import { Client, client } from './Client';
 
 const { ccclass, property } = cc._decorator;
 
@@ -16,17 +15,22 @@ export default class Helloworld extends cc.Component {
 
     private client: Client;
 
+    private some: string;
+
     public start() {
         // init logic
-        createClient().then((client) => {
+        client.connect().then(() => {
             this.client = client;
+            this.loginButton.node.active = true;
+            this.usernameInput.node.active = true;
             this.loginButton.node.on('click', this.handleLogin, this);
         });
     }
 
-    private handleLogin(button): void {
+    private handleLogin(): void {
         this.client.login(this.usernameInput.string).then((loginResponse) => {
             this.label.string = loginResponse.userId;
+            cc.director.loadScene('createOrJoinRoom');
         });
     }
 }

@@ -1,7 +1,7 @@
 import { MessageType, messageTypeMap } from './messageTypes';
 import { enumToMap } from './enumToMap';
 import { Status, isStatus } from './status';
-import { printCodeToString as codeToDebugString, Code } from './code';
+import { printCodeToString, Code } from './code';
 
 export interface Packet<Payload = any> {
     type: PacketType;
@@ -92,7 +92,7 @@ export function toDebugString(packet: Packet) {
     if (isResponse(packet)) {
         const status = packet.status;
         const statusMessage =
-            codeToDebugString(packet.status.code) + status.message ? ` ${status.message}` : '';
+            printCodeToString(status.code) + status.message ? ` ${status.message}` : '';
         debugPacket.status = statusMessage;
     }
     return JSON.stringify(debugPacket);

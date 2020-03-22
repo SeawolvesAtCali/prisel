@@ -33,6 +33,7 @@ class SocketManager {
             // socket is already added, abort
             return;
         }
+        // TODO if client login twice, this will break
         if (existingId) {
             throw new Error(
                 `SocketMap inconsistency found. adding Id ${id} but found ${existingId}`,

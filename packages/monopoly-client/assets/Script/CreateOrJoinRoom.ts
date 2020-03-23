@@ -1,4 +1,11 @@
-import { Client, CreateRoomPayload, Messages, JoinPayload, RoomInfoPayload } from '@prisel/client';
+import {
+    Client,
+    CreateRoomPayload,
+    Messages,
+    JoinPayload,
+    RoomInfoPayload,
+} from './packages/client/prisel.umd.js';
+
 import { client, ClientState } from './Client';
 const { ccclass, property } = cc._decorator;
 
@@ -37,8 +44,8 @@ export default class CreateOrJoinRoom extends cc.Component {
                     const payload = response.payload as RoomInfoPayload;
                     this.client.setState({
                         roomId: payload.id,
-                        roomName: payload.name,
                         isInRoom: true,
+                        roomName: payload.name,
                     });
                     cc.director.loadScene('room');
                 } else {

@@ -66,4 +66,5 @@ quick_gen_project_*_autogen.sh.meta
 
 .vscode/
 
-assets/Script/packages
+assets/Script/packages/*.js
+assets/Script/packages/*.ts

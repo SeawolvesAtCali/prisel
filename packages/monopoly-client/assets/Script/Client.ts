@@ -1,4 +1,4 @@
-import { Client } from './packages/client/lib/index.d';
+import { Client } from '@prisel/client';
 
 export const client = new Client<ClientState>('ws://localhost:3000');
 
@@ -11,5 +11,3 @@ export interface ClientState {
     roomName?: string;
     isInRoom?: boolean;
 }
-
-export * from './packages/client/lib/index.d';

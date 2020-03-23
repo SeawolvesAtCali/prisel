@@ -1,4 +1,5 @@
-import { Client, client } from './Client';
+import { client } from './Client';
+import { Client } from '@prisel/client';
 
 const { ccclass, property } = cc._decorator;
 

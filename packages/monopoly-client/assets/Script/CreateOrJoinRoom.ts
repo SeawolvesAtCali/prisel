@@ -1,12 +1,5 @@
-import {
-    Client,
-    CreateRoomPayload,
-    Messages,
-    JoinPayload,
-    RoomInfoPayload,
-    client,
-    ClientState,
-} from './Client';
+import { Client, CreateRoomPayload, Messages, JoinPayload, RoomInfoPayload } from '@prisel/client';
+import { client, ClientState } from './Client';
 const { ccclass, property } = cc._decorator;
 
 @ccclass

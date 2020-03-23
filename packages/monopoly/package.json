@@ -31,7 +31,6 @@
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
-        "@prisel/server": "file:../server",
-        "jsonwebtoken": "^8.5.1"
+        "@prisel/server": "file:../server"
     }
 }

@@ -14,7 +14,7 @@
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "echo \"Error: no test specified\"",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix",
         "build": "rollup -c"

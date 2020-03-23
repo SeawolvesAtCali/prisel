@@ -1,5 +1,5 @@
 import { client } from './Client';
-import { Client } from './packages/client/prisel.umd.js';
+import { Client } from './packages/priselClient';
 const { ccclass, property } = cc._decorator;
 
 @ccclass

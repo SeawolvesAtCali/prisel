@@ -4,7 +4,7 @@ import {
     Messages,
     JoinPayload,
     RoomInfoPayload,
-} from './packages/client/prisel.umd.js';
+} from './packages/priselClient';
 
 import { client, ClientState } from './Client';
 const { ccclass, property } = cc._decorator;

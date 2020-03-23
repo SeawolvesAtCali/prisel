@@ -1,4 +1,4 @@
-import { Client } from './packages/client/prisel.umd.js';
+import { Client } from './packages/priselClient';
 export const client = new Client<ClientState>('ws://localhost:3000');
 client.setState({
     isInRoom: false,

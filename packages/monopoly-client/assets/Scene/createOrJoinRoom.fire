@@ -94,6 +94,9 @@
       },
       {
         "__id__": 45
+      },
+      {
+        "__id__": 46
       }
     ],
     "_prefab": null,
@@ -183,7 +186,7 @@
       "array": [
         0,
         0,
-        448.60115916033925,
+        360.2665679743265,
         0,
         0,
         0,
@@ -2095,5 +2098,27 @@
     "_originalWidth": 0,
     "_originalHeight": 0,
     "_id": "29zXboiXFBKoIV4PQ2liTe"
+  },
+  {
+    "__type__": "00193t6Z+lOEJ22I0YLsfNr",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 2
+    },
+    "_enabled": true,
+    "joinButton": {
+      "__id__": 14
+    },
+    "joinRoomIdInput": {
+      "__id__": 25
+    },
+    "createButton": {
+      "__id__": 32
+    },
+    "createRoomNameInput": {
+      "__id__": 43
+    },
+    "_id": "23gTTMEK5O1a4RFjjiqMGn"
   }
 ]

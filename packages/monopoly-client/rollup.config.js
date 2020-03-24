@@ -5,9 +5,7 @@ import commonjs from 'rollup-plugin-commonjs';
 const config = [
     {
         input: 'priselClient.js',
-        output: [
-            { file: 'assets/Script/packages/priselClient.js', format: 'umd', name: 'priselClient' },
-        ],
+        output: [{ file: 'assets/Script/packages/priselClient.js', format: 'cjs' }],
         plugins: [
             resolve({
                 // need to specify preferBuiltins

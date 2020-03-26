@@ -26,10 +26,44 @@ export interface JoinPayload {
     roomId: string;
 }
 
+export interface PlayerInfo {
+    name: string;
+    id: string;
+}
+
+// Token is used to prevent lost packets. When client receives a new
+// UpdateToken, they should compare if the previousToken matches the current
+// token saved in the client, if so, no packet was dropped, and they should
+// update the saved token to be the new token.
+export interface UpdateToken {
+    previousToken?: string;
+    token?: string;
+}
 export interface RoomChangePayload {
+    // deprecated
     newJoins?: string[];
+    // deprecated
     newLeaves?: string[];
+    // deprecated
     newHost?: string;
+
+    playerJoin?: PlayerInfo;
+    hostJoin?: PlayerInfo;
+    playerLeave?: {
+        id: string;
+    };
+    hostLeave?: {
+        hostId: string;
+        newHostId?: string;
+    };
+
+    token?: UpdateToken;
+}
+
+export interface RoomStatePayload {
+    players: PlayerInfo[];
+    hostId: string;
+    token: string;
 }
 
 export interface CreateRoomPayload {

@@ -13,6 +13,7 @@ export enum MessageType {
     ROOM_STATE_CHANGE = 10,
     ANNOUNCE_GAME_START = 11,
     ERROR = 12,
+    GET_ROOM_STATE = 13,
 }
 
 export interface LoginPayload {
@@ -24,6 +25,14 @@ export interface LoginResponsePayload {
 }
 export interface JoinPayload {
     roomId: string;
+}
+
+export interface RoomInfo {
+    name: string;
+    id: string;
+}
+export interface JoinResponsePayload {
+    room: RoomInfo;
 }
 
 export interface PlayerInfo {
@@ -60,16 +69,25 @@ export interface RoomChangePayload {
     token?: UpdateToken;
 }
 
-export interface RoomStatePayload {
+export interface RoomStateSnapshot {
     players: PlayerInfo[];
     hostId: string;
     token: string;
 }
 
+// tslint:disable-next-line:no-empty-interface
+export interface RoomStateResponsePayload extends RoomStateSnapshot {}
+
 export interface CreateRoomPayload {
     roomName: string;
 }
 
+export interface CreateRoomResponsePayload {
+    room: RoomInfo;
+    host: PlayerInfo;
+}
+
+// deprecated use CreateRoomResponsePayload or JoinResponsePayload
 export interface RoomInfoPayload {
     id: string;
     name: string;

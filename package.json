@@ -88,6 +88,7 @@
         "@prisel/client": "file:packages/client",
         "@prisel/common": "file:packages/common",
         "@prisel/e2e": "file:packages/e2e",
+        "@prisel/map-creator": "file:packages/map-creator",
         "@prisel/monopoly": "file:packages/monopoly",
         "@prisel/monopoly-client": "file:packages/monopoly-client",
         "@prisel/react": "file:packages/react",

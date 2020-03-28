@@ -47,6 +47,7 @@ export default class Room extends cc.Component {
         const { token, playerJoin, playerLeave, hostLeave } = roomStateChange;
         this.stateToken = token.token;
         if (playerJoin) {
+            cc.log(`player joined ${playerJoin.name}`);
             this.playerDataList.push({
                 name: playerJoin.name,
                 id: playerJoin.id,
@@ -55,11 +56,13 @@ export default class Room extends cc.Component {
             });
         }
         if (playerLeave) {
+            cc.log(`player left ${playerLeave.id}`);
             this.playerDataList = this.playerDataList.filter(
                 (player) => player.id !== playerLeave.id,
             );
         }
         if (hostLeave) {
+            cc.log(`host left ${hostLeave.hostId}, new host ${hostLeave.newHostId}`);
             this.playerDataList = this.playerDataList.filter(
                 (player) => player.id !== hostLeave.hostId,
             );
@@ -68,6 +71,7 @@ export default class Room extends cc.Component {
                 newHost.isHost = true;
             }
         }
+        this.updatePlayerListUi();
     }
 
     private loadRoomData() {

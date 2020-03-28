@@ -1,5 +1,11 @@
 import { client } from './Client';
-import { Client } from './packages/priselClient';
+import {
+    Client,
+    Messages,
+    RoomStateResponsePayload,
+    ResponseWrapper,
+    RoomChangePayload,
+} from './packages/priselClient';
 import PlayerInfo from './PlayerInfo';
 
 const { ccclass, property } = cc._decorator;
@@ -24,48 +30,70 @@ export default class Room extends cc.Component {
 
     private client: Client;
 
+    private stateToken: string = null;
+
     public onLoad() {
         this.client = client;
-        // this is not fast enough, self data is already sent
-        this.client.onRoomStateChange((roomStateChange) => {
-            // consolidate playerDataList
-            if (roomStateChange.newJoins) {
-                for (const newJoin of roomStateChange.newJoins) {
-                    const foundPlayer = this.playerDataList.find(
-                        (playerInList) => playerInList.id === newJoin,
-                    );
-                    if (foundPlayer) {
-                        // maybe update player if needed
-                    } else {
-                        this.playerDataList.push({
-                            name: newJoin,
-                            id: newJoin,
-                            isHost: roomStateChange.newHost === newJoin,
-                            key: newJoin,
-                        });
-                    }
-                }
-            }
-            if (roomStateChange.newLeaves) {
-                this.playerDataList = this.playerDataList.filter((playerInList) =>
-                    roomStateChange.newLeaves.includes(playerInList.id),
-                );
-            }
-            if (roomStateChange.newHost) {
-                for (const playerInRoom of this.playerDataList) {
-                    playerInRoom.isHost = playerInRoom.id === roomStateChange.newHost;
-                }
-            }
+    }
 
-            if (this.node.active && this.enabled) {
-                this.updatePlayerListUi();
+    private handleRoomStateChange(roomStateChange: RoomChangePayload) {
+        if (roomStateChange.token.previousToken !== this.stateToken) {
+            // we lost some packages. For now, lets just log and quit
+            cc.log(
+                `room state package lost, our token is ${this.stateToken}, token from server is ${roomStateChange.token.previousToken}`,
+            );
+            return;
+        }
+        const { token, playerJoin, playerLeave, hostLeave } = roomStateChange;
+        this.stateToken = token.token;
+        if (playerJoin) {
+            this.playerDataList.push({
+                name: playerJoin.name,
+                id: playerJoin.id,
+                isHost: false,
+                key: playerJoin.id,
+            });
+        }
+        if (playerLeave) {
+            this.playerDataList = this.playerDataList.filter(
+                (player) => player.id !== playerLeave.id,
+            );
+        }
+        if (hostLeave) {
+            this.playerDataList = this.playerDataList.filter(
+                (player) => player.id !== hostLeave.hostId,
+            );
+            const newHost = this.playerDataList.find((player) => player.id === hostLeave.newHostId);
+            if (newHost) {
+                newHost.isHost = true;
             }
-        });
+        }
+    }
+
+    private loadRoomData() {
+        cc.log('start loading room data');
+        this.client
+            .request(Messages.getGetRoomState(this.client.newId()))
+            .then((response: ResponseWrapper<RoomStateResponsePayload>) => {
+                if (response.failed()) {
+                    cc.log('Loading room data failed');
+                    return;
+                }
+                this.playerDataList = response.payload.players.map((player) => ({
+                    name: player.name,
+                    id: player.id,
+                    isHost: player.id === response.payload.hostId,
+                    key: player.id,
+                }));
+                this.updatePlayerListUi();
+                this.client.onRoomStateChange(this.handleRoomStateChange.bind(this));
+                this.stateToken = response.payload.token;
+            });
     }
 
     public start() {
         cc.log('start');
-        this.updatePlayerListUi();
+        this.loadRoomData();
     }
 
     private addPlayer(player: PlayerInfoData) {

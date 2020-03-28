@@ -3,7 +3,9 @@ import {
     CreateRoomPayload,
     Messages,
     JoinPayload,
-    RoomInfoPayload,
+    ResponseWrapper,
+    CreateRoomResponsePayload,
+    JoinResponsePayload,
 } from './packages/priselClient';
 
 import { client, ClientState } from './Client';
@@ -39,13 +41,13 @@ export default class CreateOrJoinRoom extends cc.Component {
             .request<CreateRoomPayload>(
                 Messages.getCreateRoom(this.client.newId(), this.createRoomNameInput.string),
             )
-            .then((response) => {
+            .then((response: ResponseWrapper<CreateRoomResponsePayload>) => {
                 if (response.ok()) {
-                    const payload = response.payload as RoomInfoPayload;
+                    const payload = response.payload;
                     this.client.setState({
-                        roomId: payload.id,
+                        roomId: payload.room.id,
                         isInRoom: true,
-                        roomName: payload.name,
+                        roomName: payload.room.name,
                     });
                     cc.director.loadScene('room');
                 } else {
@@ -59,12 +61,12 @@ export default class CreateOrJoinRoom extends cc.Component {
             .request<JoinPayload>(
                 Messages.getJoin(this.client.newId(), this.joinRoomIdInput.string),
             )
-            .then((response) => {
+            .then((response: ResponseWrapper<JoinResponsePayload>) => {
                 if (response.ok()) {
-                    const payload = response.payload as RoomInfoPayload;
+                    const payload = response.payload;
                     this.client.setState({
-                        roomId: payload.id,
-                        roomName: payload.name,
+                        roomId: payload.room.id,
+                        roomName: payload.room.name,
                         isInRoom: true,
                     });
                     cc.director.loadScene('room');

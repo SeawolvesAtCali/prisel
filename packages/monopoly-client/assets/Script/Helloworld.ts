@@ -1,5 +1,5 @@
 import { client } from './Client';
-import { Client } from './packages/priselClient';
+import { Client, Messages, ResponseWrapper, LoginResponsePayload } from './packages/priselClient';
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -28,9 +28,13 @@ export default class Helloworld extends cc.Component {
     }
 
     private handleLogin(): void {
-        this.client.login(this.usernameInput.string).then((loginResponse) => {
-            this.label.string = loginResponse.userId;
-            cc.director.loadScene('createOrJoinRoom');
-        });
+        this.client
+            .request(Messages.getLogin(this.client.newId(), this.usernameInput.string))
+            .then((loginResponse: ResponseWrapper<LoginResponsePayload>) => {
+                if (loginResponse.ok()) {
+                    this.label.string = loginResponse.payload.userId;
+                    cc.director.loadScene('createOrJoinRoom');
+                }
+            });
     }
 }

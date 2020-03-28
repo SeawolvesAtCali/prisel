@@ -21,8 +21,8 @@
     },
     "scripts": {
         "prebuild": "rm -rf ./lib",
-        "build": "tsc",
-        "start": "echo HI",
+        "build": "parcel build index.html",
+        "start": "parcel serve index.html",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"
@@ -32,5 +32,20 @@
     },
     "dependencies": {
         "@prisel/monopoly": "file:../monopoly"
+    },
+    "devDependencies": {
+        "autoprefixer": "^9.6.1",
+        "parcel-bundler": "^1.12.3",
+        "postcss-modules": "^1.4.1",
+        "react": "^16.8.1",
+        "react-dom": "^16.8.1",
+        "rollup": "^1.1.2",
+        "rollup-plugin-commonjs": "^9.2.0",
+        "rollup-plugin-node-resolve": "^4.0.0",
+        "rollup-plugin-typescript2": "^0.19.2"
+    },
+    "peerDependencies": {
+        "react": "^16.8.1",
+        "react-dom": "^16.8.1"
     }
 }

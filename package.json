@@ -11,6 +11,7 @@
         "start:tic-tac-toe-client": "lerna run start --scope @prisel/tic-tac-toe-client --stream",
         "start:monopoly-server": "lerna run start --scope @prisel/monopoly --stream",
         "start:debugger": "lerna run start --scope @prisel/react --stream",
+        "start:map-creator": "lerna run start --scope @prisel/map-creator --stream",
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "postinstall": "npm run build",
         "publish": "lerna publish",

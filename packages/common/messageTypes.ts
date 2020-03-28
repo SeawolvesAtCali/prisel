@@ -33,6 +33,7 @@ export interface RoomInfo {
 }
 export interface JoinResponsePayload {
     room: RoomInfo;
+    roomState: RoomStateSnapshot;
 }
 
 export interface PlayerInfo {
@@ -49,15 +50,7 @@ export interface UpdateToken {
     token?: string;
 }
 export interface RoomChangePayload {
-    // deprecated
-    newJoins?: string[];
-    // deprecated
-    newLeaves?: string[];
-    // deprecated
-    newHost?: string;
-
     playerJoin?: PlayerInfo;
-    hostJoin?: PlayerInfo;
     playerLeave?: {
         id: string;
     };
@@ -84,13 +77,7 @@ export interface CreateRoomPayload {
 
 export interface CreateRoomResponsePayload {
     room: RoomInfo;
-    host: PlayerInfo;
-}
-
-// deprecated use CreateRoomResponsePayload or JoinResponsePayload
-export interface RoomInfoPayload {
-    id: string;
-    name: string;
+    roomState: RoomStateSnapshot;
 }
 
 export interface ChatPayload {

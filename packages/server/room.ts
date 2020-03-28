@@ -4,7 +4,7 @@ import { Player } from './player';
 import { Context } from './objects';
 import { GAME_PHASE } from './objects/gamePhase';
 import { newId } from './utils/idUtils';
-import { Packet, PacketType, isRequest, ErrorPayload } from '@prisel/common';
+import { Packet, PacketType, isRequest, ErrorPayload, UpdateToken } from '@prisel/common';
 import debug from './debug';
 import { DEBUG_MODE } from './flags';
 
@@ -47,6 +47,9 @@ export abstract class Room {
         }
         return this.getId() === room.getId();
     }
+
+    public abstract updateStateToken(): UpdateToken;
+    public abstract getStateToken(): string;
 }
 
 export interface RoomConfig {
@@ -64,6 +67,7 @@ class RoomImpl extends Room {
     private gamePhase: GAME_PHASE = GAME_PHASE.WAITING;
     private game: any;
     private actionListeners: EventEmitter = new EventEmitter();
+    private currentToken = 0;
 
     constructor(context: Context, config: RoomConfig) {
         super();
@@ -96,6 +100,9 @@ class RoomImpl extends Room {
     }
     public removePlayer(player: Player) {
         this.players = this.players.filter((playerInRoom) => playerInRoom !== player);
+        if (player.equals(this.host)) {
+            this.host = null;
+        }
     }
     public getHost() {
         return this.host;
@@ -140,6 +147,19 @@ class RoomImpl extends Room {
 
     public removeAllGamePacketListener() {
         this.actionListeners.removeAllListeners();
+    }
+
+    public updateStateToken(): UpdateToken {
+        const previousToken = this.getStateToken();
+        this.currentToken = this.currentToken + 1;
+        return {
+            previousToken,
+            token: this.getStateToken(),
+        };
+    }
+
+    public getStateToken(): string {
+        return `${this.currentToken}`;
     }
 
     public dispatchGamePacket(packet: Packet, player: Player) {

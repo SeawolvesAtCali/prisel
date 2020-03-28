@@ -1,5 +1,10 @@
-import { Client, RoomChangePayload, Response, RoomInfoPayload } from '@prisel/client';
-import { Messages } from '@prisel/client';
+import {
+    Client,
+    RoomChangePayload,
+    Messages,
+    ResponseWrapper,
+    LoginResponsePayload,
+} from '@prisel/client';
 
 export function createClients(num = 1) {
     return Array.from({ length: num }).map(() => new Client());
@@ -16,15 +21,17 @@ export function waitForRoomUpdate(client: Client): Promise<RoomChangePayload> {
 
 export async function connectAndLogin(client: Client): Promise<string> {
     await client.connect();
-    const clientInfo = await client.login('username');
-    return clientInfo.userId;
+    const loginResponse: ResponseWrapper<LoginResponsePayload> = await client.request(
+        Messages.getLogin(client.newId(), 'username'),
+    );
+    return loginResponse.payload.userId;
 }
 
 export async function createLoginedClients(num = 1): Promise<Client[]> {
     return await Promise.all(
         createClients(num).map(async (client) => {
             await client.connect();
-            await client.login('username');
+            await client.request(Messages.getLogin(client.newId(), 'username'));
             return client;
         }),
     );

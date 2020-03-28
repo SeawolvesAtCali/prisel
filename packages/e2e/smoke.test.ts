@@ -1,4 +1,5 @@
 import { createClients } from './testHelper';
+import { Messages } from '@prisel/client';
 
 describe('connect', () => {
     it('single client connect', async () => {
@@ -21,7 +22,7 @@ describe('connect', () => {
     it('login', async () => {
         const [client] = createClients();
         await client.connect();
-        await client.login('super');
+        await client.request(Messages.getLogin(client.newId(), 'super'));
         client.exit();
     });
 });

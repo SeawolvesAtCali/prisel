@@ -8,7 +8,9 @@ import {
     Request,
     Packet,
     Code,
+    ResponseWrapper,
 } from '@prisel/common';
+import { getLogin } from '../message';
 
 describe('Client', () => {
     const fakeURL = 'ws://localhost:3000';
@@ -72,14 +74,16 @@ describe('Client', () => {
                 });
             });
             await client.connect();
-            const loginResult = await client.login('batman');
-            expect(loginResult.userId).toBe('123');
+            const loginResult: ResponseWrapper<LoginResponsePayload> = await client.request(
+                getLogin(client.newId(), 'batman'),
+            );
+            expect(loginResult.payload.userId).toBe('123');
         });
         it('should reject if timeout', async () => {
             const client = new Client(fakeURL);
             await client.connect();
             jest.useFakeTimers();
-            const loginPromise = client.login('batman');
+            const loginPromise = client.request(getLogin(client.newId(), 'batman'));
             jest.advanceTimersByTime(6000);
             expect(loginPromise).rejects.toThrowError();
             jest.useRealTimers();
@@ -105,7 +109,9 @@ describe('Client', () => {
             });
             await client.connect();
             client.exit();
-            expect(client.login('batman')).rejects.toThrowError('connection closed');
+            expect(client.request(getLogin(client.newId(), 'batman'))).rejects.toThrowError(
+                'not connected',
+            );
         });
         it('should reject if connection closes during login', async () => {
             const client = new Client(fakeURL);
@@ -125,7 +131,7 @@ describe('Client', () => {
                 });
             });
             await client.connect();
-            const loginPromise = client.login('batman');
+            const loginPromise = client.request(getLogin(client.newId(), 'batman'));
             client.exit();
             expect(loginPromise).rejects.toThrowError('connection closed');
         });

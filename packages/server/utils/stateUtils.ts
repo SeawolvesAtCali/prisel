@@ -2,6 +2,9 @@ import { Context, Socket } from '../objects';
 
 import { Player } from '../player';
 import { Room } from '../room';
+import { RoomStateSnapshot } from '@prisel/common';
+import { PlayerInfo } from '@prisel/common';
+import { RoomInfo } from '@prisel/common';
 
 // Some utility functions for working with state
 
@@ -34,4 +37,28 @@ export function getRoom(context: Context, client: Socket): Room {
     if (player) {
         return player.getRoom();
     }
+}
+
+export function getRoomStateSnapshot(room: Room): RoomStateSnapshot {
+    const host = room.getHost();
+
+    return {
+        players: room.getPlayers().map((player) => getPlayerInfo(player)),
+        hostId: host ? host.getId() : null,
+        token: room.getStateToken(),
+    };
+}
+
+export function getPlayerInfo(player: Player): PlayerInfo {
+    return {
+        name: player.getName(),
+        id: player.getId(),
+    };
+}
+
+export function getRoomInfo(room: Room): RoomInfo {
+    return {
+        name: room.getName(),
+        id: room.getId(),
+    };
 }

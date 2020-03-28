@@ -97,3 +97,11 @@ export function getChat(message: string): Packet<ChatPayload> {
         },
     };
 }
+
+export function getGetRoomState(requestId: string): Request {
+    return {
+        type: PacketType.REQUEST,
+        system_action: MessageType.GET_ROOM_STATE,
+        request_id: requestId,
+    };
+}

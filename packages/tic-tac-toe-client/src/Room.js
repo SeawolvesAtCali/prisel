@@ -21,14 +21,14 @@ const Room = ({ onStart, onLeave }) => (
                 <Container title={roomName}>
                     <span>ROOM ID: {roomId}</span>
                     <div className="players-container">
-                        {Object.values(players).map((player) => {
+                        {players.map((player) => {
                             return (
                                 <Player
-                                    key={player}
-                                    username={player}
-                                    id={player}
-                                    isHost={player === host}
-                                    isSelf={id === player}
+                                    key={player.id}
+                                    username={player.name}
+                                    id={player.id}
+                                    isHost={player.id === host}
+                                    isSelf={id === player.id}
                                     onStart={onStart}
                                 />
                             );

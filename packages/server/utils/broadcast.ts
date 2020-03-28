@@ -10,10 +10,15 @@ export function broadcast<Payload = any>(
         const packets = players.map(packetBuilder);
         setImmediate(() => {
             for (let i = 0; i < players.length; i++) {
-                emit(players[i].getSocket(), packets[i]);
+                if (packets[i]) {
+                    emit(players[i].getSocket(), packets[i]);
+                }
             }
         });
-    } else {
+        return;
+    }
+    const packet = packetBuilder;
+    if (packet) {
         setImmediate(() => {
             for (const player of players) {
                 emit(player.getSocket(), packetBuilder);

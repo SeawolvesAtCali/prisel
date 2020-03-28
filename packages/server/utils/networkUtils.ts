@@ -78,7 +78,7 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
  */
 
 export function emit<T extends Packet<any>>(client: WebSocket, packet: T): T | void {
-    const { system_action: systemAction, action, payload } = packet;
+    const { system_action: systemAction, action } = packet;
     if (action !== undefined) {
         debug(`SERVER: [custom action] ${toDebugString(packet)}`);
     } else if (systemAction !== undefined) {

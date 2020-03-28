@@ -13,6 +13,7 @@ export enum MessageType {
     ROOM_STATE_CHANGE = 10,
     ANNOUNCE_GAME_START = 11,
     ERROR = 12,
+    GET_ROOM_STATE = 13,
 }
 
 export interface LoginPayload {
@@ -26,19 +27,57 @@ export interface JoinPayload {
     roomId: string;
 }
 
-export interface RoomChangePayload {
-    newJoins?: string[];
-    newLeaves?: string[];
-    newHost?: string;
+export interface RoomInfo {
+    name: string;
+    id: string;
 }
+export interface JoinResponsePayload {
+    room: RoomInfo;
+    roomState: RoomStateSnapshot;
+}
+
+export interface PlayerInfo {
+    name: string;
+    id: string;
+}
+
+// Token is used to prevent lost packets. When client receives a new
+// UpdateToken, they should compare if the previousToken matches the current
+// token saved in the client, if so, no packet was dropped, and they should
+// update the saved token to be the new token.
+export interface UpdateToken {
+    previousToken?: string;
+    token?: string;
+}
+export interface RoomChangePayload {
+    playerJoin?: PlayerInfo;
+    playerLeave?: {
+        id: string;
+    };
+    hostLeave?: {
+        hostId: string;
+        newHostId?: string;
+    };
+
+    token?: UpdateToken;
+}
+
+export interface RoomStateSnapshot {
+    players: PlayerInfo[];
+    hostId: string;
+    token: string;
+}
+
+// tslint:disable-next-line:no-empty-interface
+export interface RoomStateResponsePayload extends RoomStateSnapshot {}
 
 export interface CreateRoomPayload {
     roomName: string;
 }
 
-export interface RoomInfoPayload {
-    id: string;
-    name: string;
+export interface CreateRoomResponsePayload {
+    room: RoomInfo;
+    roomState: RoomStateSnapshot;
 }
 
 export interface ChatPayload {

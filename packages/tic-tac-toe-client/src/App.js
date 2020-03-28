@@ -19,7 +19,16 @@ import {
 function App() {
     const [phase, setPhase] = useState(phases.LOGIN);
     const connectedRef = useRef(false);
-    const { roomId, roomName, players, host, onJoin, onRoomStateChange, onLeave } = useRoomState();
+    const {
+        roomId,
+        roomName,
+        players,
+        host,
+        onJoin,
+        onRoomStateChange,
+        onLeave,
+        onCreateRoom,
+    } = useRoomState();
     const { id, name, setUserInfo } = useUserInfo();
 
     const { client, login } = useClient(process.env.SERVER, connectedRef);

@@ -1,5 +1,5 @@
 import once from 'lodash/once';
-import { getLogin, getExit } from './message';
+import { getExit } from './message';
 import {
     SERVER,
     newRequestManager,
@@ -8,17 +8,14 @@ import {
     Request,
     Response,
     PacketType,
-    LoginResponsePayload,
     isResponse,
     MessageType,
     RoomChangePayload,
     Code,
-    ResponseWrapper,
 } from '@prisel/common';
 import { PubSub } from './pubSub';
 import withTimer from './withTimer';
-
-const DEFAULT_USERNAME = 'user';
+import { assert } from './assert';
 
 type RemoveListenerFunc = () => void;
 
@@ -41,6 +38,9 @@ export function deserialize(buffer: string): Packet | void {
         console.log('Error parsing packet: ' + buffer);
     }
 }
+
+const NOT_CONNECTED = 'not connected';
+
 /**
  * Client class
  *
@@ -56,15 +56,8 @@ export function deserialize(buffer: string): Packet | void {
  * After a client is connected, we can attach message handler using `client.on`
  */
 class Client<T = State> {
-    static get CONNECTION_CLOSED() {
-        return new Error('connection closed');
-    }
-
     public get connection(): WebSocket {
-        if (this.conn) {
-            return this.conn;
-        }
-        throw Client.CONNECTION_CLOSED;
+        return this.conn;
     }
 
     public get isConnected(): boolean {
@@ -141,41 +134,21 @@ class Client<T = State> {
     }
 
     /**
-     * Login to server using the username specified.
-     * Throw error if not connected, or don't have controller namespace.
-     * @param {string} username username to login with
-     */
-    public async login(username: string = DEFAULT_USERNAME): Promise<LoginResponsePayload> {
-        if (this.isConnected) {
-            const response: ResponseWrapper<LoginResponsePayload> = await this.request(
-                getLogin(this.requestManager.newId(), username),
-            );
-            return response.payload;
-        }
-        throw Client.CONNECTION_CLOSED;
-    }
-
-    /**
      * Emit to server
      * @param messageType
      * @param data
      */
     public emit<P extends Packet = any>(packet: P) {
-        if (this.isConnected) {
-            this.connection.send(serialize(packet));
-            if (this.onEmitCallback) {
-                this.onEmitCallback(packet);
-            }
-        } else {
-            throw Client.CONNECTION_CLOSED;
+        assert(this.isConnected, NOT_CONNECTED);
+        this.connection.send(serialize(packet));
+        if (this.onEmitCallback) {
+            this.onEmitCallback(packet);
         }
     }
 
-    public request<Payload = any>(request: Request<Payload>) {
+    public async request<Payload = any>(request: Request<Payload>) {
         this.emit(request);
-        return this.requestManager.addRequest(request, DEFAULT_TIMEOUT).catch(() => {
-            throw Client.CONNECTION_CLOSED;
-        });
+        return this.requestManager.addRequest(request, DEFAULT_TIMEOUT);
     }
 
     public respond<Payload>(request: Request, payload: Payload) {

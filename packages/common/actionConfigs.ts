@@ -44,7 +44,7 @@ export const ACTION_CONFIG: Record<messageTypes.ActionName, ActionConfig> = {
         isRest: true,
         payload: [
             request<messageTypes.JoinPayload>('JoinPayload'),
-            response<messageTypes.RoomInfoPayload>('RoomInfoPayload'),
+            response<messageTypes.JoinResponsePayload>('JoinResponsePayload'),
         ],
         related: ['ROOM_STATE_CHANGE'],
     },
@@ -60,7 +60,7 @@ export const ACTION_CONFIG: Record<messageTypes.ActionName, ActionConfig> = {
         isRest: true,
         payload: [
             request<messageTypes.CreateRoomPayload>('CreateRoomPayload'),
-            response<messageTypes.RoomInfoPayload>('RoomInfoPayload'),
+            response<messageTypes.CreateRoomResponsePayload>('CreateRoomResponsePayload'),
         ],
     },
     LEAVE: {
@@ -107,5 +107,11 @@ export const ACTION_CONFIG: Record<messageTypes.ActionName, ActionConfig> = {
         from: FROM.SERVER,
         isRest: false,
         payload: [packet<messageTypes.ErrorPayload>('ErrorPayload')],
+    },
+    GET_ROOM_STATE: {
+        desc: 'Client request a snapshot of current room state.',
+        from: FROM.CLIENT,
+        isRest: true,
+        payload: [response<messageTypes.RoomStateResponsePayload>('RoomStateResponsePayload')],
     },
 };

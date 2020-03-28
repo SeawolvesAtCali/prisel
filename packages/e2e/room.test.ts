@@ -4,22 +4,28 @@ import {
     createLoginedClients,
     connectAndLogin,
 } from './testHelper';
-import { Messages, RoomInfoPayload, Response } from '@prisel/client';
+import {
+    Messages,
+    CreateRoomResponsePayload,
+    RoomChangePayload,
+    ResponseWrapper,
+    JoinResponsePayload,
+} from '@prisel/client';
 
 describe('create room', () => {
     it('create a room', async () => {
         const [client] = createClients();
         await client.connect();
-        await client.login('batman');
+        await client.request(Messages.getLogin(client.newId(), 'batman'));
         const response = await client.request(Messages.getCreateRoom(client.newId(), 'party room'));
-        expect((response.payload as RoomInfoPayload).id).toEqual(expect.any(String));
+        expect((response.payload as CreateRoomResponsePayload).room.id).toEqual(expect.any(String));
         client.exit();
     });
 
     it('create a room, join and then leave', async () => {
         const [client] = createClients();
         await client.connect();
-        await client.login('batman');
+        await client.request(Messages.getLogin(client.newId(), 'batman'));
         const createRoomResponse = await client.request(
             Messages.getCreateRoom(client.newId(), 'room'),
         );
@@ -37,39 +43,35 @@ describe('create room', () => {
         const createRoomResponse = await host.request(
             Messages.getCreateRoom(host.newId(), 'party room'),
         );
-        const { id: roomId } = createRoomResponse.payload as RoomInfoPayload;
-        await waitForRoomUpdate(host);
-        const [hostRoomUpdateResult, clientRoomUpdateResult, _] = await Promise.all([
+        const { id: roomId } = (createRoomResponse.payload as CreateRoomResponsePayload).room;
+        const [hostRoomUpdateResult, clientJoinResponse]: [
+            RoomChangePayload,
+            ResponseWrapper<JoinResponsePayload>,
+        ] = await Promise.all([
             waitForRoomUpdate(host),
-            waitForRoomUpdate(client),
             client.request(Messages.getJoin(client.newId(), roomId)),
         ]);
 
-        expect(clientRoomUpdateResult).toEqual(
+        expect(clientJoinResponse.payload.roomState.players.length).toBe(2);
+        expect(clientJoinResponse.payload.roomState.hostId).toBe(hostId);
+        expect(clientJoinResponse.payload.roomState.token).toEqual(expect.any(String));
+        expect(hostRoomUpdateResult.token).toEqual(
             expect.objectContaining({
-                newHost: hostId,
-                newJoins: expect.arrayContaining([hostId, clientId]),
+                previousToken: expect.any(String),
+                token: expect.any(String),
             }),
         );
-        expect(hostRoomUpdateResult).toEqual(
-            expect.objectContaining({
-                newJoins: [clientId],
-            }),
-        );
+
         host.exit();
         client.exit();
     });
 
     it('in a room everyone leaves', async () => {
         const [host, guest] = await createLoginedClients(2);
-        const [createResponse] = await Promise.all([
-            host.request(Messages.getCreateRoom(host.newId(), 'room')),
-            waitForRoomUpdate(host),
-        ]);
-        const roomId = (createResponse.payload as RoomInfoPayload).id;
+        const createResponse = await host.request(Messages.getCreateRoom(host.newId(), 'room'));
+        const roomId = (createResponse.payload as CreateRoomResponsePayload).room.id;
         await Promise.all([
             waitForRoomUpdate(host),
-            waitForRoomUpdate(guest),
             guest.request(Messages.getJoin(guest.newId(), roomId)),
         ]);
         await Promise.all([

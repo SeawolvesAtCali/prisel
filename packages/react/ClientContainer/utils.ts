@@ -1,4 +1,12 @@
-import { Client, Messages, CreateRoomPayload, RoomInfoPayload, Packet } from '@prisel/client';
+import {
+    Client,
+    Messages,
+    CreateRoomPayload,
+    CreateRoomResponsePayload,
+    Packet,
+    ResponseWrapper,
+    LoginResponsePayload,
+} from '@prisel/client';
 import { Message } from '../LogPanel';
 
 export type AddToLogs = (message: Message) => void;
@@ -65,12 +73,14 @@ export async function login(client: Client<ClientState>): Promise<Client<ClientS
     }
     const username = client.state.username || 'unnamed';
 
-    const data = await client.login(username);
+    const loginResponse: ResponseWrapper<LoginResponsePayload> = await client.request(
+        Messages.getLogin(client.newId(), username),
+    );
 
-    if (data) {
+    if (loginResponse.ok()) {
         client.setState({
             loggingIn: false,
-            userId: data.userId,
+            userId: loginResponse.payload.userId,
         });
         return client;
     }
@@ -78,12 +88,12 @@ export async function login(client: Client<ClientState>): Promise<Client<ClientS
 }
 
 export async function createRoom(client: Client<ClientState>) {
-    const response = await client.request<CreateRoomPayload>(
-        Messages.getCreateRoom(client.newId(), 'default-room'),
-    );
+    const response: ResponseWrapper<CreateRoomResponsePayload> = await client.request<
+        CreateRoomPayload
+    >(Messages.getCreateRoom(client.newId(), 'default-room'));
 
     if (response.ok()) {
-        return (response.payload as RoomInfoPayload).id;
+        return response.payload.room.id;
     }
 
     throw new Error('createRoom error: ' + response.status.message);

@@ -6,3 +6,4 @@ import './handleGameStart';
 import './handleJoin';
 import './handleLeave';
 import './handleLogin';
+import './handleGetRoomState';

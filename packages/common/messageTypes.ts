@@ -16,6 +16,14 @@ export enum MessageType {
     GET_ROOM_STATE = 13,
 }
 
+export const serverInitiatedMessages = [
+    MessageType.WELCOME,
+    MessageType.BROADCAST,
+    MessageType.ROOM_STATE_CHANGE,
+    MessageType.ANNOUNCE_GAME_START,
+    MessageType.ERROR,
+];
+
 export interface LoginPayload {
     username: string;
 }

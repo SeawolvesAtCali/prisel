@@ -1,5 +1,4 @@
 import * as messageTypes from './messageTypes';
-import { MessageType } from './lib';
 
 enum FROM {
     UNSPECIFIED = '',

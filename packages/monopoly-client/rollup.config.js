@@ -2,10 +2,10 @@ import dts from 'rollup-plugin-dts';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 
-const config = [
-    {
-        input: 'priselClient.js',
-        output: [{ file: 'assets/Script/packages/priselClient.js', format: 'cjs' }],
+function buildJs(input, file) {
+    return {
+        input,
+        output: [{ file, format: 'cjs' }],
         plugins: [
             resolve({
                 // need to specify preferBuiltins
@@ -14,17 +14,27 @@ const config = [
             }), // so Rollup can find dependencies
             commonjs(), // so Rollup can convert dependencies to an ES module
         ],
-    },
-    {
-        input: '../client/lib/index.d.ts',
+    };
+}
+
+function buildDef(input, file) {
+    return {
+        input,
         output: [
             {
-                file: 'assets/Script/packages/priselClient.d.ts',
+                file,
                 format: 'es',
             },
         ],
         plugins: [dts()],
-    },
+    };
+}
+
+const config = [
+    buildJs('priselClient.js', 'assets/Script/packages/priselClient.js'),
+    buildDef('../client/lib/index.d.ts', 'assets/Script/packages/priselClient.d.ts'),
+    buildJs('monopolyCommon.js', 'assets/Script/packages/monopolyCommon.js'),
+    buildDef('../monopoly/lib/index.d.ts', 'assets/Script/packages/monopolyCommon.d.ts'),
 ];
 
 export default config;

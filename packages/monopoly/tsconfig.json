@@ -5,6 +5,7 @@
         "module": "commonjs",
         "rootDir": "./",
         "outDir": "./lib",
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "resolveJsonModule": true
     }
 }

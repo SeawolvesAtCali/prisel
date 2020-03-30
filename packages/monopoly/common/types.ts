@@ -17,14 +17,22 @@ export interface Tile {
 
 export interface RoadTile extends Tile {
     type: TileType.ROAD;
-    next: Coordinate;
-    prev: Coordinate;
+    next: Coordinate[];
+    prev: Coordinate[];
+}
+
+export function isRoadTile(tile: Tile): tile is RoadTile {
+    return tile && tile.type === TileType.ROAD;
 }
 
 export interface StartTile extends Tile {
     type: TileType.START;
-    next: Coordinate;
-    prev: Coordinate;
+    next: Coordinate[];
+    prev: Coordinate[];
+}
+
+export function isStartTile(tile: Tile): tile is StartTile {
+    return tile && tile.type === TileType.START;
 }
 
 export interface PropertyTile extends Tile {

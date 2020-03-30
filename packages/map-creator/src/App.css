@@ -1,0 +1,51 @@
+.board {
+    display: inline-grid;
+    column-gap: 4px;
+    row-gap: 4px;
+    padding: 2px; /* padding is half of the gap, so that center of the tile is the same as if there is no gap. Easier for calculation */
+    user-select: none;
+    position: relative;
+    background-color: #edeedf;
+}
+
+.arrowContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+}
+
+.arrow {
+    box-sizing: border-box;
+    border-top-style: solid;
+    border-top-color: transparent;
+    border-bottom-style: solid;
+    border-bottom-color: transparent;
+    border-left-style: solid;
+    border-left-color: black;
+    position: absolute;
+    /* top: -5px; */
+    /* left: -5px; */
+}
+
+.tile {
+    background: skyblue;
+    height: 50px;
+    width: 50px;
+    overflow: hidden;
+    user-select: none;
+}
+
+.tile.roadTile {
+    background: orange;
+}
+
+.tile.propertyTile {
+    background: yellow;
+}
+
+.tile.startTile {
+    background: red;
+}

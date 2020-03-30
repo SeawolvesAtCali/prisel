@@ -1,6 +1,7 @@
 import dts from 'rollup-plugin-dts';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
+import copy from 'rollup-plugin-copy';
 
 function buildJs(input, file) {
     return {
@@ -35,6 +36,18 @@ const config = [
     buildDef('../client/lib/index.d.ts', 'assets/Script/packages/priselClient.d.ts'),
     buildJs('monopolyCommon.js', 'assets/Script/packages/monopolyCommon.js'),
     buildDef('../monopoly/lib/index.d.ts', 'assets/Script/packages/monopolyCommon.d.ts'),
+    {
+        input: 'resource.js',
+        output: {
+            file: 'assets/Script/packages/resource.js',
+            format: 'cjs',
+        },
+        plugins: [
+            copy({
+                targets: [{ src: '../monopoly/common/data/*', dest: 'assets/resources' }],
+            }),
+        ],
+    },
 ];
 
 export default config;

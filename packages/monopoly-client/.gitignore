@@ -68,3 +68,6 @@ quick_gen_project_*_autogen.sh.meta
 
 assets/Script/packages/*.js
 assets/Script/packages/*.ts
+
+assets/resources/*
+!assets/resources/README*

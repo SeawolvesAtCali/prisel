@@ -63,14 +63,16 @@ export const BoardView = React.forwardRef<ExportInterface, BoardViewProps>((prop
                 if (!canConnect(newCoor, previousCoor)) {
                     return oldPathDirs;
                 }
-                if (
-                    oldPathDirs.find(
-                        (oldPair) => equal(oldPair[0], previousCoor) && equal(oldPair[1], newCoor),
+                return oldPathDirs
+                    .filter(
+                        (oldPair) =>
+                            !(
+                                (equal(oldPair[0], previousCoor) && equal(oldPair[1], newCoor)) ||
+                                // not allowing two way path
+                                (equal(oldPair[1], previousCoor) && equal(oldPair[0], newCoor))
+                            ),
                     )
-                ) {
-                    return oldPathDirs;
-                }
-                return oldPathDirs.concat([[previousCoor, newCoor]]);
+                    .concat([[previousCoor, newCoor]]);
             });
         }
     }, []);

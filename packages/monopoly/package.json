@@ -6,7 +6,7 @@
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/monopoly#readme",
     "license": "MIT",
-    "main": "./lib/index.js",
+    "module": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
@@ -22,7 +22,7 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "build": "tsc",
-        "start": "env DEBUG=debug ts-node demo.ts",
+        "start": "env DEBUG=debug ts-node --project demo_tsconfig.json demo.ts ",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"

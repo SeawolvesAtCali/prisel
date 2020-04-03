@@ -85,6 +85,9 @@
       },
       {
         "__id__": 11
+      },
+      {
+        "__id__": 12
       }
     ],
     "_prefab": null,
@@ -427,7 +430,6 @@
       "__id__": 8
     },
     "_enabled": true,
-    "mapJsonPath": "map/demoMap",
     "emptyTile": {
       "__uuid__": "c1d70393-4b8a-496b-a34c-78e4802a94e9"
     },
@@ -485,5 +487,19 @@
     "_originalWidth": 0,
     "_originalHeight": 0,
     "_id": "29zXboiXFBKoIV4PQ2liTe"
+  },
+  {
+    "__type__": "62dfaXpM1lIMqirw/XxbMIY",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 2
+    },
+    "_enabled": true,
+    "mapJsonPath": "map/demoMap",
+    "playerPrefab": {
+      "__uuid__": "21f12e00-bb8f-4447-8208-9123c0e20e4c"
+    },
+    "_id": "62BMBid9RE0ozqym5Qi6td"
   }
 ]

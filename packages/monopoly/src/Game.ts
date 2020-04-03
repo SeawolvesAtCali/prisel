@@ -16,7 +16,7 @@ import {
     RemoveListenerFunc,
     debug,
 } from '@prisel/server';
-import { Action, PlayerStartTurnPayload } from './messages';
+import { Action, PlayerStartTurnPayload } from '../common/messages';
 import { startTurn, Turn } from './Turn';
 
 interface Props {

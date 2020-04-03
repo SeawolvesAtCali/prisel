@@ -1,6 +1,6 @@
 import Game from './Game';
 import { Room, PacketType, broadcast, Request, wrapResponse, Packet } from '@prisel/server';
-import { Action, AnnouncePlayerPurchasePayload } from './messages';
+import { Action, AnnouncePlayerPurchasePayload } from '../common/messages';
 
 export function waitForEveryoneSetup(game: Game, room: Room): Promise<void> {
     return new Promise((resolve) => {

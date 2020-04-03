@@ -1,6 +1,6 @@
 import Game from './Game';
 import { GamePlayer } from './GamePlayer';
-import { Action } from './messages';
+import { Action } from '../common/messages';
 import { ResponseWrapper, RemoveListenerFunc, Request, debug } from '@prisel/server';
 
 /**

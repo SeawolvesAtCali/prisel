@@ -1,6 +1,6 @@
 {
     "extends": "../../tsconfig",
-    "files": ["index.ts"],
+    "files": ["index.ts", "demo.ts"],
     "compilerOptions": {
         "rootDir": "./",
         "outDir": "./lib",

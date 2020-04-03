@@ -4,7 +4,7 @@ import Node from './Node';
 import { log } from './logGameObject';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Game from './Game';
-import { RollResponsePayload, PurchaseResponsePayload } from './messages';
+import { RollResponsePayload, PurchaseResponsePayload } from '../common/messages';
 
 interface Props {
     id: PlayerId;

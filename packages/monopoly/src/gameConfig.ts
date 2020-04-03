@@ -9,7 +9,7 @@ import {
     isSupportedPacket,
 } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
-import { Action, PlayerStartTurnPayload } from './messages';
+import { Action, PlayerStartTurnPayload } from '../common/messages';
 import Game from './Game';
 import { waitForEveryoneSetup, runPlayerTurn } from './gameFlow';
 

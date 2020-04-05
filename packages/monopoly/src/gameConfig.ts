@@ -20,18 +20,19 @@ const MonopolyGameConfig: GameConfig = {
         return room.getPlayers().length > 1;
     },
     onStart(room) {
-        const game = createIntialState(room);
-        room.setGame(game);
-        room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
-            const flatState = flattenState(game);
-            player.respond(packet, flatState);
-            debug('current game state is: \n%O', flatState);
-        });
         (async () => {
+            const game = await createIntialState(room);
+            room.setGame(game);
+            room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
+                const flatState = flattenState(game);
+                player.respond(packet, flatState);
+                debug('current game state is: \n%O', flatState);
+            });
             await waitForEveryoneSetup(game, room);
             while (true) {
                 game.startTurn();
                 await runPlayerTurn(game, room);
+                debug('game config, player finished turn');
                 game.endTurn();
 
                 // TODO wait for everyone acknowledge turn end

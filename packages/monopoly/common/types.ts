@@ -1,3 +1,5 @@
+import { PlayerInfo } from '@prisel/server';
+
 export enum TileType {
     UNSPECIFIED = 0,
     ROAD = 1,
@@ -63,4 +65,33 @@ export interface BoardSetup {
     width: number;
     tiles: Tile[];
     roadPropertyMapping: CoordinatePair[];
+}
+
+export interface PropertyInfo {
+    cost: number;
+    rent: number;
+    name: string;
+    pos: Coordinate;
+}
+
+/**
+ * Information about a game character that player controls
+ */
+export interface GamePlayer {
+    money: number;
+    player: PlayerInfo;
+    pos: Coordinate;
+}
+
+export interface PayRentEncounter {
+    properties: PropertyInfo[];
+    remainingMoney: number;
+}
+
+export interface PropertyForPurchaseEncounter {
+    properties: PropertyInfo[];
+}
+export interface Encounter {
+    newPropertyForPurchase?: PropertyForPurchaseEncounter;
+    payRent?: PayRentEncounter;
 }

@@ -142,7 +142,7 @@ class RoomImpl extends Room {
         onPacket: PacketListener<T>,
     ) {
         this.actionListeners.on(action, onPacket);
-        return this.actionListeners.off.bind(this, action, onPacket);
+        return this.actionListeners.off.bind(this.actionListeners, action, onPacket);
     }
 
     public removeAllGamePacketListener() {
@@ -184,7 +184,7 @@ class RoomImpl extends Room {
                     if (DEBUG_MODE) {
                         player.respondFailure(
                             packet,
-                            'no game action listener is listening for this package',
+                            'no game action listener is listening for this request',
                             packet,
                         );
                     } else {
@@ -196,7 +196,7 @@ class RoomImpl extends Room {
                         player.emit<Packet<ErrorPayload>>({
                             type: PacketType.DEFAULT,
                             payload: {
-                                message: 'no game action listener is listening for this package',
+                                message: 'no game action listener is listening for this packet',
                                 detail: packet,
                             },
                         });

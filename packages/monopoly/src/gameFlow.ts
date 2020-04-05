@@ -1,6 +1,19 @@
 import Game from './Game';
-import { Room, PacketType, broadcast, Request, wrapResponse, Packet } from '@prisel/server';
-import { Action, AnnouncePlayerPurchasePayload } from '../common/messages';
+import {
+    Room,
+    PacketType,
+    broadcast,
+    Request,
+    wrapResponse,
+    Packet,
+    ResponseWrapper,
+} from '@prisel/server';
+import {
+    Action,
+    PlayerPurchasePayload,
+    PlayerRollPayload,
+    RollResponsePayload,
+} from '../common/messages';
 
 export function waitForEveryoneSetup(game: Game, room: Room): Promise<void> {
     return new Promise((resolve) => {
@@ -26,9 +39,18 @@ export function runPlayerTurn(game: Game, room: Room): Promise<void> {
         handle(currentGame, packet, player) {
             return wrapResponse(player.roll(currentGame, packet));
         },
-        postHandle(currentGame, response, player) {
+        postHandle(currentGame, response: ResponseWrapper<RollResponsePayload>, player) {
             if (response.ok()) {
                 // notify other players about current player's move
+                broadcast<PlayerRollPayload>(currentGame.room.getPlayers(), {
+                    type: PacketType.DEFAULT,
+                    action: Action.ANNOUNCE_ROLL,
+                    payload: {
+                        id: player.id,
+                        path: response.payload.path,
+                        encounters: response.payload.encounters,
+                    },
+                });
             }
         },
         isDone(_, response) {
@@ -47,9 +69,9 @@ export function runPlayerTurn(game: Game, room: Room): Promise<void> {
         postHandle(currentGame, response, player) {
             if (response.ok()) {
                 // notify other player about the purchase
-                broadcast<AnnouncePlayerPurchasePayload>(currentGame.room.getPlayers(), {
+                broadcast<PlayerPurchasePayload>(currentGame.room.getPlayers(), {
                     type: PacketType.DEFAULT,
-                    action: Action.ANNOUNCE_PLAYER_PURCHASE,
+                    action: Action.ANNOUNCE_PURCHASE,
                     payload: {
                         id: player.id,
                         property: response.payload.property,

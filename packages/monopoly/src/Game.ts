@@ -1,6 +1,5 @@
 import { GamePlayer } from './GamePlayer';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
-import Node from './Node';
 import { flattenState } from './state';
 import { log } from './logGameObject';
 import {
@@ -23,21 +22,18 @@ interface Props {
     id: string;
     players: Map<PlayerId, GamePlayer>;
     turnOrder: GamePlayer[];
-    map: Node;
     room: Room;
 }
 
 interface FlatGame extends FlatGameObject {
     players: { [playerId: string]: Ref<GamePlayer> };
     turnOrder: Array<Ref<GamePlayer>>;
-    map: Ref<Node>;
 }
 
 export default class Game extends GameObject {
     public id: string;
     public players: Map<string, GamePlayer>;
     public turnOrder: GamePlayer[];
-    public map: Node;
     public room: Room;
     public turn: Turn;
 
@@ -46,7 +42,6 @@ export default class Game extends GameObject {
         this.id = props.id;
         this.players = props.players;
         this.turnOrder = props.turnOrder;
-        this.map = props.map;
         this.room = props.room;
     }
 
@@ -59,7 +54,7 @@ export default class Game extends GameObject {
         this.turn = startTurn(this, this.getCurrentPlayer());
         const startTurnPacket: Packet<PlayerStartTurnPayload> = {
             type: PacketType.DEFAULT,
-            action: Action.PLAYER_START_TURN,
+            action: Action.ANNOUNCE_START_TURN,
             payload: {
                 id: this.turn.player.id,
             },
@@ -89,7 +84,6 @@ export default class Game extends GameObject {
         return {
             id: this.id,
             players,
-            map: this.ref(this.map),
             turnOrder: this.turnOrder.map(this.ref),
         };
     }

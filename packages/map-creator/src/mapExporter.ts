@@ -2,12 +2,7 @@ import {
     BoardSetup,
     Tile,
     CoordinatePair,
-    TileType,
     Coordinate,
-    StartTile,
-    RoadTile,
-    isRoadTile,
-    isStartTile,
     Walkable,
     isWalkable,
     PropertyTile,
@@ -60,19 +55,21 @@ export function toBoardSetup(
     // Run through all properties, see if there are road next to it, if there
     // is, create a mapping
     const roadPropertyMapping: CoordinatePair[] = [];
-    for (const proprety of Array.from(propertySet)) {
-        const { pos } = proprety;
-        for (let dRow = -1; dRow <= 1; dRow++) {
-            for (let dCol = -1; dCol <= 1; dCol++) {
-                if (dRow === 0 && dCol === 0) {
-                    continue;
-                }
-                const walkable = tileMap.get(toKey({ row: pos.row + dRow, col: pos.col + dCol }));
-                if (walkable) {
-                    roadPropertyMapping.push([walkable.pos, pos]);
-                }
-            }
+    function addNeighborWalkable(pos: Coordinate, dRow: number, dCol: number): void {
+        const walkable = tileMap.get(toKey({ row: pos.row + dRow, col: pos.col + dCol }));
+        if (walkable) {
+            roadPropertyMapping.push([walkable.pos, pos]);
         }
+    }
+    for (const property of Array.from(propertySet)) {
+        // up
+        addNeighborWalkable(property.pos, -1, 0);
+        // down
+        addNeighborWalkable(property.pos, 1, 0);
+        // left
+        addNeighborWalkable(property.pos, 0, -1);
+        // right
+        addNeighborWalkable(property.pos, 0, 1);
     }
 
     return {

@@ -1,4 +1,4 @@
-import { Coordinate, PropertyInfo, GamePlayer, Encounter } from './types';
+import { Coordinate, PropertyInfo, GamePlayerInfo, Encounter } from './types';
 
 export enum Action {
     UNSPECIFIED = '',
@@ -69,7 +69,7 @@ export interface PlayerPayRentPayload {
 }
 
 export interface InitialStatePayload {
-    gamePlayers: GamePlayer[];
+    gamePlayers: GamePlayerInfo[];
 }
 
 // Server Client

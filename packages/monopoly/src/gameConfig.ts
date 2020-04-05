@@ -40,6 +40,7 @@ const MonopolyGameConfig: GameConfig = {
                             id: player.player.getId(),
                         },
                         pos: player.pathNode.tile.pos,
+                        character: player.character,
                     })),
                 },
             });

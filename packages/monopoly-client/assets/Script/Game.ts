@@ -3,19 +3,17 @@ import {
     BoardSetup,
     Action,
     InitialStatePayload,
-    GamePlayer,
-    StartTile,
-    RollResponsePayload,
+    GamePlayerInfo,
     PurchasePayload,
-    Coordinate,
     PlayerStartTurnPayload,
     PlayerRollPayload,
+    PlayerPurchasePayload,
 } from './packages/monopolyCommon';
 import { client, ClientState } from './Client';
 import { Client, Packet, PacketType, ResponseWrapper } from './packages/priselClient';
-import { getRand } from './utils';
 import Player from './Player';
 import Tile from './Tile';
+import { CHARACTER_COLORS } from './consts';
 
 const { ccclass, property } = cc._decorator;
 
@@ -111,7 +109,14 @@ export default class Game extends cc.Component {
         this.map.moveAlongPath(playerNode, path);
     }
 
-    private handleAnnouncPurchase() {}
+    private handleAnnouncPurchase(packet: Packet<PlayerPurchasePayload>) {
+        const { property: purchasdProperty, id } = packet.payload;
+        const player = this.playerNodes.find(
+            (playerNode) => playerNode.getComponent(Player).getId() === id,
+        );
+
+        this.map.getPropertyTileAt(purchasdProperty.pos).setOwner(player.getComponent(Player));
+    }
 
     private handleAnnouncePayRent() {}
 
@@ -156,10 +161,10 @@ export default class Game extends cc.Component {
         }
     }
 
-    private instantiatePlayer(gamePlayer: GamePlayer): cc.Node {
+    private instantiatePlayer(gamePlayer: GamePlayerInfo): cc.Node {
         const playerNode = this.map.addToMap(cc.instantiate(this.playerPrefab), gamePlayer.pos);
         const playerComponent = playerNode.getComponent(Player);
-        playerComponent.init(gamePlayer.player);
+        playerComponent.init(gamePlayer.player, CHARACTER_COLORS[gamePlayer.character]);
         return playerNode;
     }
 
@@ -173,6 +178,10 @@ export default class Game extends cc.Component {
 
     protected start() {
         this.started = true;
+        const debugNode = this.node.getChildByName('debug');
+        if (debugNode) {
+            this.node.removeChild(debugNode);
+        }
         if (this.funcWaitingForStart.length > 0) {
             for (const func of this.funcWaitingForStart) {
                 func();

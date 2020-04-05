@@ -14,6 +14,7 @@ interface Props {
     pathNode: PathNode;
     owning: Property[];
     cash: number;
+    character: number;
     rolled: boolean;
 }
 
@@ -36,6 +37,7 @@ export class GamePlayer extends GameObject {
     public cash: number;
     public rolled: boolean;
     public player: Player;
+    public character: number;
 
     constructor(props: Props) {
         super();
@@ -45,6 +47,7 @@ export class GamePlayer extends GameObject {
         this.cash = props.cash;
         this.rolled = props.rolled;
         this.player = props.player;
+        this.character = props.character;
     }
 
     @log

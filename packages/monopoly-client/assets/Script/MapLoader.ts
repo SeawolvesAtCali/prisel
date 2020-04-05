@@ -48,7 +48,11 @@ export default class MapLoader extends cc.Component {
         this.startTiles = [];
         this.tileMap = new Map();
         const onSelect = (node: cc.Node) => {
+            if (this.selectedPropertyTile) {
+                this.selectedPropertyTile.getComponent(PropertyTile).restoreColor();
+            }
             this.selectedPropertyTile = node;
+            this.selectedPropertyTile.color = cc.Color.RED;
         };
 
         for (const tile of tiles) {
@@ -85,6 +89,13 @@ export default class MapLoader extends cc.Component {
 
     public getStartTiles(): StartTile[] {
         return this.startTiles;
+    }
+
+    public getPropertyTileAt(pos: Coordinate): PropertyTile {
+        const node = this.tileMap.get(getTileKeyFromCoordinate(pos));
+        if (node) {
+            return node.getComponent(PropertyTile);
+        }
     }
 
     // position node at the tile. Node needs to be a child of map

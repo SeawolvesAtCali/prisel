@@ -82,7 +82,7 @@ export async function createIntialState(room: Room): Promise<Game> {
     const startPathNodes = processBoardSetup(boardSetup);
     const players = room.getPlayers();
     const playerMap = new Map(
-        players.map((player) => [
+        players.map((player, index) => [
             player.getId(),
             createGamePlayer({
                 cash: CASH,
@@ -91,6 +91,7 @@ export async function createIntialState(room: Room): Promise<Game> {
                 owning: [],
                 rolled: false,
                 pathNode: getRand(startPathNodes),
+                character: index,
             }),
         ]),
     );

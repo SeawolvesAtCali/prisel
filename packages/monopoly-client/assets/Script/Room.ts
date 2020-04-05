@@ -1,4 +1,4 @@
-import { client } from './Client';
+import { client, ClientState } from './Client';
 import {
     Client,
     Messages,
@@ -26,14 +26,24 @@ export default class Room extends cc.Component {
     @property(cc.Node)
     public playersContainer: cc.Node = null;
 
+    @property(cc.Label)
+    private roomLabel: cc.Label = null;
+
+    @property(cc.Button)
+    private startButton: cc.Button = null;
+
     private playerDataList: PlayerInfoData[] = [];
 
-    private client: Client;
+    private client: Client<ClientState>;
 
     private stateToken: string = null;
 
     public onLoad() {
         this.client = client;
+        const offGameStartListener = this.client.onGameStart(() => {
+            offGameStartListener();
+            cc.director.loadScene('game');
+        });
     }
 
     private handleRoomStateChange(roomStateChange: RoomChangePayload) {
@@ -70,6 +80,7 @@ export default class Room extends cc.Component {
             if (newHost) {
                 newHost.isHost = true;
             }
+            this.setupForHost(hostLeave.newHostId === this.client.state.id);
         }
         this.updatePlayerListUi();
     }
@@ -89,15 +100,26 @@ export default class Room extends cc.Component {
                     isHost: player.id === response.payload.hostId,
                     key: player.id,
                 }));
+                this.setupForHost(response.payload.hostId === this.client.state.id);
                 this.updatePlayerListUi();
                 this.client.onRoomStateChange(this.handleRoomStateChange.bind(this));
                 this.stateToken = response.payload.token;
             });
     }
 
+    private setupForHost(isHost: boolean) {
+        if (isHost) {
+            this.startButton.node.active = true;
+        } else {
+            this.startButton.node.active = false;
+        }
+    }
+
     public start() {
         cc.log('start');
+        this.roomLabel.string = `${this.client.state.roomName} - ${this.client.state.roomId}`;
         this.loadRoomData();
+        this.startButton.node.on('click', this.startGame, this);
     }
 
     private addPlayer(player: PlayerInfoData) {
@@ -120,5 +142,15 @@ export default class Room extends cc.Component {
             height = height - PLAYER_CARD_HEIGHT - 10;
             cc.log('added player at ' + playerInfo.x + ' ' + playerInfo.y);
         }
+    }
+
+    private startGame() {
+        this.client
+            .request(Messages.getGameStart(this.client.newId()))
+            .then((response: ResponseWrapper) => {
+                if (response.ok()) {
+                    cc.director.loadScene('game');
+                }
+            });
     }
 }

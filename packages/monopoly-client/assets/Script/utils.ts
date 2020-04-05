@@ -13,3 +13,10 @@ export function setZIndexAction(zIndex: number): cc.ActionInstant {
         node.zIndex = zIndex;
     });
 }
+
+export function getRand<T>(list: T[]): T {
+    if (list.length > 0) {
+        return list[Math.trunc(Math.random() * list.length)];
+    }
+    return null;
+}

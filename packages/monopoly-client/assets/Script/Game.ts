@@ -1,20 +1,50 @@
 import MapLoader from './MapLoader';
-import { BoardSetup } from './packages/monopolyCommon';
+import {
+    BoardSetup,
+    Action,
+    InitialStatePayload,
+    GamePlayer,
+    StartTile,
+    RollResponsePayload,
+    PurchasePayload,
+    Coordinate,
+    PlayerStartTurnPayload,
+    PlayerRollPayload,
+} from './packages/monopolyCommon';
+import { client, ClientState } from './Client';
+import { Client, Packet, PacketType, ResponseWrapper } from './packages/priselClient';
+import { getRand } from './utils';
+import Player from './Player';
+import Tile from './Tile';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class NewClass extends cc.Component {
+export default class Game extends cc.Component {
     @property
     private mapJsonPath = '';
 
     @property(cc.Prefab)
     private playerPrefab: cc.Prefab = null;
 
+    @property(cc.Button)
+    private rollButton: cc.Button = null;
+
+    @property(cc.Button)
+    private purchaseButton: cc.Button = null;
+
+    @property(cc.Button)
+    private endTurnButton: cc.Button = null;
+
     private funcWaitingForStart: Array<() => void> = [];
     private started = false;
+    private client: Client<ClientState> = null;
+    private offPacketListeners: Array<() => void> = [];
+    private map: MapLoader = null;
+    private playerNodes: cc.Node[] = [];
 
     protected onLoad() {
+        this.client = client;
         // load map data
         if (this.mapJsonPath) {
             cc.loader.loadRes(this.mapJsonPath, cc.JsonAsset, (err, json) => {
@@ -30,7 +60,107 @@ export default class NewClass extends cc.Component {
     }
 
     private setupGame(boardSetup: BoardSetup) {
-        this.node.getComponentInChildren(MapLoader).renderMap(boardSetup);
+        this.map = this.node.getComponentInChildren(MapLoader);
+        this.map.renderMap(boardSetup);
+        this.offPacketListeners.push(
+            this.client.on(Action.ANNOUNCE_START_TURN, this.handleAnnounceStartTurn.bind(this)),
+        );
+        this.offPacketListeners.push(
+            this.client.on(Action.ANNOUNCE_ROLL, this.handleAnnouncRoll.bind(this)),
+        );
+        this.offPacketListeners.push(
+            this.client.on(Action.ANNOUNCE_PURCHASE, this.handleAnnouncPurchase.bind(this)),
+        );
+        this.offPacketListeners.push(
+            this.client.on(Action.ANNOUNCE_PAY_RENT, this.handleAnnouncePayRent.bind(this)),
+        );
+
+        const startTiles = this.map.getStartTiles();
+        cc.log('start tiles are ', startTiles);
+        const offInitialStateListener = this.client.on(
+            Action.INITIAL_STATE,
+            (packet: Packet<InitialStatePayload>) => {
+                const { gamePlayers } = packet.payload;
+                for (const gamePlayer of gamePlayers) {
+                    this.playerNodes.push(this.instantiatePlayer(gamePlayer));
+                }
+                offInitialStateListener();
+            },
+        );
+        this.client.emit<Packet>({
+            type: PacketType.DEFAULT,
+            action: Action.SETUP_FINISHED,
+        });
+    }
+
+    private handleAnnounceStartTurn(packet: Packet<PlayerStartTurnPayload>) {
+        cc.log('start turn ' + packet.payload.id);
+        const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
+
+        this.rollButton.node.active = isCurrentPlayerTurn;
+        this.purchaseButton.node.active = isCurrentPlayerTurn;
+        this.endTurnButton.node.active = isCurrentPlayerTurn;
+    }
+
+    private handleAnnouncRoll(packet: Packet<PlayerRollPayload>) {
+        cc.log('start moving');
+        const { id, path } = packet.payload;
+        const playerNode = this.playerNodes.find(
+            (node) => node.getComponent(Player).getId() === id,
+        );
+        this.map.moveAlongPath(playerNode, path);
+    }
+
+    private handleAnnouncPurchase() {}
+
+    private handleAnnouncePayRent() {}
+
+    private requestRoll() {
+        cc.log('request Roll');
+        this.client.request({
+            type: PacketType.REQUEST,
+            request_id: this.client.newId(),
+            action: Action.ROLL,
+            payload: {},
+        });
+    }
+
+    private requestEndTurn() {
+        this.client
+            .request({
+                type: PacketType.REQUEST,
+                request_id: this.client.newId(),
+                action: Action.END_TURN,
+                payload: {},
+            })
+            .then((response: ResponseWrapper) => {
+                if (response.ok()) {
+                    this.rollButton.node.active = false;
+                    this.purchaseButton.node.active = false;
+                    this.endTurnButton.node.active = false;
+                }
+            });
+    }
+
+    private requestPurchase() {
+        const selectedPropertyTile = this.map.selectedPropertyTile;
+        if (selectedPropertyTile) {
+            this.client.request<PurchasePayload>({
+                type: PacketType.REQUEST,
+                request_id: this.client.newId(),
+                action: Action.PURCHASE,
+                payload: {
+                    propertyPos: selectedPropertyTile.getComponent(Tile).getTile().pos,
+                },
+            });
+        }
+    }
+
+    private instantiatePlayer(gamePlayer: GamePlayer): cc.Node {
+        const playerNode = this.map.addToMap(cc.instantiate(this.playerPrefab), gamePlayer.pos);
+        const playerComponent = playerNode.getComponent(Player);
+        playerComponent.init(gamePlayer.player);
+        return playerNode;
     }
 
     private waitForStart(callback: () => void) {
@@ -49,6 +179,17 @@ export default class NewClass extends cc.Component {
             }
         }
         this.funcWaitingForStart = [];
+
+        this.rollButton.node.on('click', this.requestRoll, this);
+        this.purchaseButton.node.on('click', this.requestPurchase, this);
+        this.endTurnButton.node.on('click', this.requestEndTurn, this);
+    }
+
+    protected onDestroy() {
+        for (const offListener of this.offPacketListeners) {
+            offListener();
+        }
+        this.offPacketListeners = [];
     }
 
     // update (dt) {}

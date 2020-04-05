@@ -8,4 +8,6 @@ export interface ClientState {
     roomId?: string;
     roomName?: string;
     isInRoom?: boolean;
+    id?: string;
+    name?: string;
 }

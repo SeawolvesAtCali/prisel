@@ -21,6 +21,10 @@ export default class Player extends cc.Component {
         this.playerId = playerData.id;
     }
 
+    public getId() {
+        return this.playerId;
+    }
+
     public start() {}
 
     // update (dt) {}

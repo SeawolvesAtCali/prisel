@@ -15,8 +15,6 @@ export default class Helloworld extends cc.Component {
 
     private client: Client;
 
-    private some: string;
-
     public start() {
         // init logic
         client.connect().then(() => {
@@ -28,10 +26,15 @@ export default class Helloworld extends cc.Component {
     }
 
     private handleLogin(): void {
+        const name = this.usernameInput.string;
         this.client
-            .request(Messages.getLogin(this.client.newId(), this.usernameInput.string))
+            .request(Messages.getLogin(this.client.newId(), name))
             .then((loginResponse: ResponseWrapper<LoginResponsePayload>) => {
                 if (loginResponse.ok()) {
+                    this.client.setState({
+                        id: loginResponse.payload.userId,
+                        name,
+                    });
                     this.label.string = loginResponse.payload.userId;
                     cc.director.loadScene('createOrJoinRoom');
                 }

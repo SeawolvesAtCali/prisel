@@ -11,6 +11,7 @@ import {
 import { default as TileComponent } from './Tile';
 import { getTileKey, getTileKeyFromCoordinate, setZIndexAction } from './utils';
 import { MOVING_DURATION_PER_TILE } from './consts';
+import PropertyTile from './PropertyTile';
 const { ccclass, property } = cc._decorator;
 
 // TODO: reposition this to be Map component, that handles only rendering map
@@ -33,6 +34,8 @@ export default class MapLoader extends cc.Component {
 
     private tileMap: Map<string, TileComponent> = null;
 
+    public selectedPropertyTile: cc.Node = null;
+
     // LIFE-CYCLE CALLBACKS:
 
     public renderMap(boardSetup: BoardSetup) {
@@ -44,6 +47,9 @@ export default class MapLoader extends cc.Component {
 
         this.startTiles = [];
         this.tileMap = new Map();
+        const onSelect = (node: cc.Node) => {
+            this.selectedPropertyTile = node;
+        };
 
         for (const tile of tiles) {
             if (isRoadTile(tile)) {
@@ -52,7 +58,8 @@ export default class MapLoader extends cc.Component {
                 this.startTiles.push(tile);
                 this.renderTile(this.startTile, tile);
             } else if (isPropertyTile(tile)) {
-                this.renderTile(this.propertyTile, tile);
+                const propertyTile = this.renderTile(this.propertyTile, tile);
+                propertyTile.getComponent(PropertyTile).onSelect = onSelect;
             } else {
                 // assume it is unspecified tile
                 this.renderTile(this.emptyTile, tile);
@@ -81,14 +88,20 @@ export default class MapLoader extends cc.Component {
     }
 
     // position node at the tile. Node needs to be a child of map
-    public posToTile(tile: Tile, node: cc.Node) {
-        const tileComp = this.tileMap.get(getTileKey(tile));
+    public moveToPos(node: cc.Node, pos: Coordinate) {
+        const tileComp = this.tileMap.get(getTileKeyFromCoordinate(pos));
         if (tileComp) {
             node.setPosition(tileComp.getLandingPos());
             node.zIndex = tileComp.getLandingZIndex();
         } else {
-            cc.log('unable to find tile ' + getTileKey(tile));
+            cc.log('unable to find tile ' + getTileKeyFromCoordinate(pos));
         }
+    }
+
+    public addToMap(node: cc.Node, pos: Coordinate) {
+        this.node.addChild(node, 0);
+        this.moveToPos(node, pos);
+        return node;
     }
 
     public moveAlongPath(node: cc.Node, coors: Coordinate[], callback?: (node: cc.Node) => void) {

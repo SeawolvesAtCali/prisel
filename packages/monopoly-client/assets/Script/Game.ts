@@ -106,7 +106,9 @@ export default class Game extends cc.Component {
         const playerNode = this.playerNodes.find(
             (node) => node.getComponent(Player).getId() === id,
         );
-        this.map.moveAlongPath(playerNode, path);
+        const playerComponent = playerNode.getComponent(Player);
+        playerComponent.walk();
+        this.map.moveAlongPath(playerNode, path, () => playerComponent.stop());
     }
 
     private handleAnnouncPurchase(packet: Packet<PlayerPurchasePayload>) {

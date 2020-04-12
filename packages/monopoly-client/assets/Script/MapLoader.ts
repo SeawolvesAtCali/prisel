@@ -12,6 +12,7 @@ import { default as TileComponent } from './Tile';
 import { getTileKey, getTileKeyFromCoordinate, setZIndexAction } from './utils';
 import { MOVING_DURATION_PER_TILE } from './consts';
 import PropertyTile from './PropertyTile';
+import Player from './Player';
 const { ccclass, property } = cc._decorator;
 
 // TODO: reposition this to be Map component, that handles only rendering map

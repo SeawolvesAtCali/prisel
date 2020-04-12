@@ -28,10 +28,13 @@
       },
       {
         "__id__": 6
+      },
+      {
+        "__id__": 12
       }
     ],
     "_prefab": {
-      "__id__": 7
+      "__id__": 13
     },
     "_opacity": 255,
     "_color": {
@@ -49,7 +52,7 @@
     "_anchorPoint": {
       "__type__": "cc.Vec2",
       "x": 0.5,
-      "y": -0.4
+      "y": 0
     },
     "_trs": {
       "__type__": "TypedArray",
@@ -202,9 +205,7 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_spriteFrame": {
-      "__uuid__": "8cdb44ac-a3f6-449f-b354-7cd48cf84061"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_sizeMode": 1,
     "_fillType": 0,
@@ -230,6 +231,89 @@
     "label": {
       "__id__": 3
     },
+    "sprites": [
+      {
+        "__id__": 7
+      },
+      {
+        "__id__": 8
+      },
+      {
+        "__id__": 9
+      },
+      {
+        "__id__": 10
+      },
+      {
+        "__id__": 11
+      }
+    ],
+    "_id": ""
+  },
+  {
+    "__type__": "SpriteFrameEntry",
+    "name": "green",
+    "sprite": {
+      "__uuid__": "6c05dd6a-bad5-40c4-9fc6-87a4f87e9d6b"
+    }
+  },
+  {
+    "__type__": "SpriteFrameEntry",
+    "name": "blue",
+    "sprite": {
+      "__uuid__": "cefea6b1-379c-4a2f-9071-00177410f334"
+    }
+  },
+  {
+    "__type__": "SpriteFrameEntry",
+    "name": "beige",
+    "sprite": {
+      "__uuid__": "7fd082cb-8578-4312-971f-90a012bb45e2"
+    }
+  },
+  {
+    "__type__": "SpriteFrameEntry",
+    "name": "yellow",
+    "sprite": {
+      "__uuid__": "74e99f29-f53e-44c7-b2cf-31fb2b3edde2"
+    }
+  },
+  {
+    "__type__": "SpriteFrameEntry",
+    "name": "pink",
+    "sprite": {
+      "__uuid__": "0cd44aa6-3f91-4cdc-9067-83ecd4be8f1f"
+    }
+  },
+  {
+    "__type__": "cc.Animation",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "_defaultClip": {
+      "__uuid__": "2150b196-1414-4855-8582-57dbec47771b"
+    },
+    "_clips": [
+      {
+        "__uuid__": "4fd1d031-8e3a-4c6f-b894-160ff11de939"
+      },
+      {
+        "__uuid__": "167dfaae-b1af-461b-a8bb-e49e690eeb2f"
+      },
+      {
+        "__uuid__": "e3d2931b-b01e-4d29-aef0-d5f92ee3d0c4"
+      },
+      {
+        "__uuid__": "0b8c8537-d10e-4389-ad35-98d5da9d50a5"
+      },
+      {
+        "__uuid__": "2150b196-1414-4855-8582-57dbec47771b"
+      }
+    ],
+    "playOnLoad": false,
     "_id": ""
   },
   {

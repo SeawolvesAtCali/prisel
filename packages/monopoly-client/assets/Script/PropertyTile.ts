@@ -24,15 +24,15 @@ export default class PropertyTile extends cc.Component {
 
     public setOwner(player: Player) {
         this.owner = player;
-        if (player) {
-            this.node.color = player.color;
-        }
+        // if (player) {
+        //     this.node.color = player.color;
+        // }
     }
 
     public restoreColor() {
-        if (this.owner) {
-            this.node.color = this.owner.color;
-        }
+        // if (this.owner) {
+        //     this.node.color = this.owner.color;
+        // }
         this.node.color = cc.Color.WHITE;
     }
 

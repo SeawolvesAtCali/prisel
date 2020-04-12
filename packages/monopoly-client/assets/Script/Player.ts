@@ -18,6 +18,7 @@ export default class Player extends cc.Component {
     private playerId: string = '';
     public color: string = null;
     private anim: cc.Animation = null;
+    private staleSprite: cc.SpriteFrame = null;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -38,9 +39,15 @@ export default class Player extends cc.Component {
         const spriteFrameEntry = this.sprites.find(
             (spriteEntry) => spriteEntry.name === this.color,
         );
-        this.getComponent(cc.Sprite).spriteFrame = spriteFrameEntry.sprite;
+
+        this.staleSprite = spriteFrameEntry.sprite;
+        this.stale();
         this.walk = this.walk.bind(this);
         this.stop = this.stop.bind(this);
+    }
+
+    private stale() {
+        this.getComponent(cc.Sprite).spriteFrame = this.staleSprite;
     }
 
     public walk() {
@@ -49,6 +56,7 @@ export default class Player extends cc.Component {
 
     public stop() {
         this.anim.stop();
+        this.stale();
     }
 
     // update (dt) {}

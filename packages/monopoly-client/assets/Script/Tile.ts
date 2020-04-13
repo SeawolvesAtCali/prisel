@@ -25,10 +25,7 @@ export default class Tile extends cc.Component {
     }
 
     public getLandingPos() {
-        return new cc.Vec2(
-            this.tile.pos.col * TILE_SIZE + TILE_SIZE / 2,
-            -this.tile.pos.row * TILE_SIZE - TILE_SIZE / 2,
-        );
+        return this.getAnchorPos();
     }
 
     public getAnchorPos() {
@@ -41,5 +38,13 @@ export default class Tile extends cc.Component {
 
     public getZIndex() {
         return this.tile.pos.row * 10;
+    }
+
+    protected start() {
+        if (this.tile.sprite) {
+            this.getComponent(cc.Sprite).spriteFrame = this.tileAtlas.getSpriteFrame(
+                this.tile.sprite,
+            );
+        }
     }
 }

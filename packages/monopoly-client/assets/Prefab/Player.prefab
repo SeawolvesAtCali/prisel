@@ -51,15 +51,15 @@
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 0.5,
-      "y": 0
+      "x": -0.2,
+      "y": 0.7
     },
     "_trs": {
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        247.733,
-        -51.284,
+        -360,
+        0,
         0,
         0,
         0,

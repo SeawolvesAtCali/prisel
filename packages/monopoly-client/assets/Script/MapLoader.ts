@@ -122,9 +122,13 @@ export default class MapLoader extends cc.Component {
         const actionSequence: cc.FiniteTimeAction[] = [];
         for (const coor of coors) {
             const tileComp = this.tileMap.get(getTileKeyFromCoordinate(coor));
-            actionSequence.push(setZIndexAction(tileComp.getLandingZIndex()));
-            actionSequence.push(cc.moveTo(MOVING_DURATION_PER_TILE, tileComp.getLandingPos()));
+            const targetPos = tileComp.getLandingPos();
+            const targetZIndex = tileComp.getLandingZIndex();
+            actionSequence.push(setZIndexAction(Math.max(node.zIndex, targetZIndex)));
+            actionSequence.push(cc.moveTo(MOVING_DURATION_PER_TILE, targetPos));
+            actionSequence.push(setZIndexAction(targetZIndex));
         }
+
         if (callback) {
             actionSequence.push(cc.callFunc(callback));
         }

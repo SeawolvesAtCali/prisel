@@ -17,7 +17,9 @@ const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
     maxPlayers: 4,
     canStart(room) {
-        return room.getPlayers().length > 1;
+        // TODO temporarily allow 1 person playing
+        return true;
+        // return room.getPlayers().length > 1;
     },
     onStart(room) {
         (async () => {

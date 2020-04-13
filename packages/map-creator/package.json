@@ -20,7 +20,8 @@
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
-        "prebuild": "rm -rf ./lib",
+        "generate-declaration": "node ./generateDeclaration.js",
+        "prebuild": "rm -rf ./lib & npm run generate-declaration",
         "build": "parcel build index.html",
         "start": "parcel serve index.html",
         "test": "jest",

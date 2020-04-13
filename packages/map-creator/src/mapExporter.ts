@@ -8,6 +8,7 @@ import {
     PropertyTile,
     isPropertyTile,
 } from '@prisel/monopoly';
+import { AllFileName } from '../images';
 
 const toKey = (tile: Coordinate) => `${tile.row}-${tile.col}`;
 
@@ -40,6 +41,21 @@ export function toBoardSetup(
         } else {
             throw new Error(`cannot get tile for ${toKey(path[0])} or ${toKey(path[1])}`);
         }
+    }
+
+    // set sprites
+    for (const tile of tiles) {
+        if (isWalkable(tile)) {
+            tile.sprite = getRoadSprite(tile);
+            continue;
+        }
+        if (isPropertyTile(tile)) {
+            const propertyImage: AllFileName = 'property';
+            tile.sprite = propertyImage;
+            continue;
+        }
+        const defaultSprite: AllFileName = 'slice1';
+        tile.sprite = defaultSprite;
     }
 
     // sort tiles from smaller row to larger row, smaller col to larger col.
@@ -78,4 +94,68 @@ export function toBoardSetup(
         height,
         roadPropertyMapping,
     };
+}
+function getRoadSprite(tile: Walkable & Tile): AllFileName {
+    let up = false;
+    let down = false;
+    let left = false;
+    let right = false;
+    const pos = tile.pos;
+    for (const prev of tile.prev) {
+        if (prev.col === pos.col && prev.row === pos.row + 1) {
+            down = true;
+        }
+        if (prev.col === pos.col && prev.row === pos.row - 1) {
+            up = true;
+        }
+        if (prev.row === pos.row && prev.col === pos.col + 1) {
+            right = true;
+        }
+        if (prev.row === pos.row && prev.col === pos.col - 1) {
+            left = true;
+        }
+    }
+
+    for (const next of tile.next) {
+        if (next.col === pos.col && next.row === pos.row + 1) {
+            down = true;
+        }
+        if (next.col === pos.col && next.row === pos.row - 1) {
+            up = true;
+        }
+        if (next.row === pos.row && next.col === pos.col + 1) {
+            right = true;
+        }
+        if (next.row === pos.row && next.col === pos.col - 1) {
+            left = true;
+        }
+    }
+    if (up && down && left && right) {
+        return 'all-direction';
+    }
+    if (up && down && left) {
+        return 't-left';
+    }
+    if (up && down && right) {
+        return 't-right';
+    }
+    if (up && down) {
+        return 'vertical';
+    }
+    if (left && right) {
+        return 'horizontal';
+    }
+    if (left && up) {
+        return 'left-up';
+    }
+    if (left && down) {
+        return 'left-down';
+    }
+    if (right && up) {
+        return 'right-up';
+    }
+    if (right && down) {
+        return 'right-down';
+    }
+    throw new Error('cannot find sprite for file ' + JSON.stringify(tile));
 }

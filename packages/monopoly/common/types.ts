@@ -20,6 +20,7 @@ export interface Walkable {
 export interface Tile {
     type: TileType;
     pos: Coordinate;
+    sprite?: string;
 }
 
 export interface RoadTile extends Tile, Walkable {

@@ -14,6 +14,15 @@ export function setZIndexAction(zIndex: number): cc.ActionInstant {
     });
 }
 
+export function callOnMoveAction(
+    target: cc.Vec2,
+    onMove: (node: cc.Node, target: cc.Vec2) => void,
+): cc.ActionInstant {
+    return cc.callFunc((node: cc.Node) => {
+        onMove(node, target);
+    });
+}
+
 export function getRand<T>(list: T[]): T {
     if (list.length > 0) {
         return list[Math.trunc(Math.random() * list.length)];

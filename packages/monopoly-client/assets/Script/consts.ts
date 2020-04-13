@@ -8,3 +8,7 @@ export const CHARACTER_COLORS = {
     3: 'pink',
     4: 'yellow',
 };
+
+// if the horizontal distance is more than FLIP_THRESHOLD when moving, consider
+// flipping the node.
+export const FLIP_THRESHHOLD = 10;

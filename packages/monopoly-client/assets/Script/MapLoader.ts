@@ -9,7 +9,7 @@ import {
 } from './packages/monopolyCommon';
 
 import { default as TileComponent } from './Tile';
-import { getTileKey, getTileKeyFromCoordinate, setZIndexAction } from './utils';
+import { getTileKey, getTileKeyFromCoordinate, setZIndexAction, callOnMoveAction } from './utils';
 import { MOVING_DURATION_PER_TILE } from './consts';
 import PropertyTile from './PropertyTile';
 import Player from './Player';
@@ -116,7 +116,12 @@ export default class MapLoader extends cc.Component {
         return node;
     }
 
-    public moveAlongPath(node: cc.Node, coors: Coordinate[], callback?: (node: cc.Node) => void) {
+    public moveAlongPath(
+        node: cc.Node,
+        coors: Coordinate[],
+        onMove?: (node: cc.Node, next: cc.Vec2) => void,
+        callback?: (node: cc.Node) => void,
+    ) {
         // assuming server doesn't send the initial tile, just the other tiles
         // on the path
         const actionSequence: cc.FiniteTimeAction[] = [];
@@ -125,6 +130,9 @@ export default class MapLoader extends cc.Component {
             const targetPos = tileComp.getLandingPos();
             const targetZIndex = tileComp.getLandingZIndex();
             actionSequence.push(setZIndexAction(Math.max(node.zIndex, targetZIndex)));
+            if (onMove) {
+                actionSequence.push(callOnMoveAction(targetPos, onMove));
+            }
             actionSequence.push(cc.moveTo(MOVING_DURATION_PER_TILE, targetPos));
             actionSequence.push(setZIndexAction(targetZIndex));
         }

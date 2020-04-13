@@ -13,7 +13,7 @@ import { client, ClientState } from './Client';
 import { Client, Packet, PacketType, ResponseWrapper } from './packages/priselClient';
 import Player from './Player';
 import Tile from './Tile';
-import { CHARACTER_COLORS } from './consts';
+import { CHARACTER_COLORS, FLIP_THRESHHOLD } from './consts';
 
 const { ccclass, property } = cc._decorator;
 
@@ -92,7 +92,6 @@ export default class Game extends cc.Component {
     }
 
     private handleAnnounceStartTurn(packet: Packet<PlayerStartTurnPayload>) {
-        cc.log('start turn ' + packet.payload.id);
         const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
 
         this.rollButton.node.active = isCurrentPlayerTurn;
@@ -101,14 +100,26 @@ export default class Game extends cc.Component {
     }
 
     private handleAnnouncRoll(packet: Packet<PlayerRollPayload>) {
-        cc.log('start moving');
         const { id, path } = packet.payload;
         const playerNode = this.playerNodes.find(
             (node) => node.getComponent(Player).getId() === id,
         );
         const playerComponent = playerNode.getComponent(Player);
         playerComponent.walk();
-        this.map.moveAlongPath(playerNode, path, () => playerComponent.stop());
+        this.map.moveAlongPath(
+            playerNode,
+            path,
+            (node, target: cc.Vec2) => {
+                if (target.x - node.position.x > FLIP_THRESHHOLD) {
+                    node.setScale(1, 1);
+                }
+                if (node.position.x - target.x > FLIP_THRESHHOLD) {
+                    // moving left, flip sprite
+                    node.setScale(-1, 1);
+                }
+            },
+            () => playerComponent.stop(),
+        );
     }
 
     private handleAnnouncPurchase(packet: Packet<PlayerPurchasePayload>) {

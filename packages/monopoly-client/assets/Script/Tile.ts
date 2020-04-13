@@ -6,6 +6,8 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class Tile extends cc.Component {
     private tile: TileData = null;
+    @property(cc.SpriteAtlas)
+    private tileAtlas: cc.SpriteAtlas = null;
 
     public init(tile: TileData) {
         this.tile = tile;

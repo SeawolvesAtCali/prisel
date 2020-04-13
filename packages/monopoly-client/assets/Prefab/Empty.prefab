@@ -51,7 +51,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        0,
+        -187.949,
         0,
         0,
         0,
@@ -116,6 +116,9 @@
       "__id__": 1
     },
     "_enabled": true,
+    "tileAtlas": {
+      "__uuid__": "2a76583b-3f5f-48c4-b955-f8ed4c594efe"
+    },
     "_id": ""
   },
   {

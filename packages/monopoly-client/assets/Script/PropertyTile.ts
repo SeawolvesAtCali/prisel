@@ -11,7 +11,6 @@ export default class PropertyTile extends cc.Component {
     }
 
     private handleSelect() {
-        cc.log('handle select', this.onSelect);
         if (this.onSelect) {
             this.onSelect(this.node);
         }

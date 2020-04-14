@@ -34,6 +34,9 @@ export default class MapLoader extends cc.Component {
     @property(cc.Node)
     private propertySelector: cc.Node = null;
 
+    @property(cc.Node)
+    private overlayUiLayer: cc.Node = null;
+
     private startTiles: StartTile[] = null;
 
     private tileMap: Map<string, TileComponent> = null;
@@ -52,13 +55,18 @@ export default class MapLoader extends cc.Component {
         this.startTiles = [];
         this.tileMap = new Map();
         const onSelect = (node: cc.Node) => {
-            // if (this.selectedPropertyTile) {
-            //     this.selectedPropertyTile.getComponent(PropertyTile).restoreColor();
-            // }
             this.selectedPropertyTile = node;
             this.moveToPos(this.propertySelector, node.getComponent(TileComponent).getTile().pos);
             this.propertySelector.active = true;
             this.propertySelector.zIndex = SELECTOR_ZINDEX;
+            this.propertySelector
+                .getChildByName('selector head')
+                .getComponent(cc.Animation)
+                .play();
+            this.propertySelector
+                .getChildByName('selector shadow')
+                .getComponent(cc.Animation)
+                .play();
         };
 
         for (const tile of tiles) {
@@ -91,7 +99,14 @@ export default class MapLoader extends cc.Component {
         return tileNode;
     }
 
-    protected start() {}
+    protected start() {
+        this.synchronizeUiLayerSize();
+    }
+
+    private synchronizeUiLayerSize() {
+        this.overlayUiLayer.setPosition(this.node.position);
+        this.overlayUiLayer.setScale(this.node.scale);
+    }
 
     public getStartTiles(): StartTile[] {
         return this.startTiles;

@@ -27,12 +27,12 @@ export default class Tile extends cc.Component {
     public getLandingPos() {
         return new cc.Vec2(
             this.tile.pos.col * TILE_SIZE + TILE_SIZE / 2,
-            -this.tile.pos.row * TILE_SIZE,
+            -(this.tile.pos.row + 1) * TILE_SIZE,
         );
     }
 
     public getAnchorPos() {
-        return new cc.Vec2(this.tile.pos.col * TILE_SIZE, -this.tile.pos.row * TILE_SIZE);
+        return new cc.Vec2(this.tile.pos.col * TILE_SIZE, -(this.tile.pos.row + 1) * TILE_SIZE);
     }
 
     public getLandingZIndex() {

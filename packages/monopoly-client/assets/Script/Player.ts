@@ -11,14 +11,19 @@ export default class Player extends cc.Component {
     @property(SpriteFrameEntry)
     private sprites: SpriteFrameEntry[] = [];
 
+    private character: cc.Node = null;
+
+    private characterSprite: cc.Sprite = null;
+
+    private characterAnim: cc.Animation = null;
+
     // @property
     // public text: string = 'hello';
 
     private playerName: string = '';
     private playerId: string = '';
     public color: string = null;
-    private anim: cc.Animation = null;
-    private staleSprite: cc.SpriteFrame = null;
+    private idleSprite: cc.SpriteFrame = null;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -27,6 +32,8 @@ export default class Player extends cc.Component {
         this.playerName = playerData.name;
         this.playerId = playerData.id;
         this.color = color;
+        this.turnToLeft = this.turnToLeft.bind(this);
+        this.turnToRight = this.turnToRight.bind(this);
     }
 
     public getId() {
@@ -35,28 +42,38 @@ export default class Player extends cc.Component {
 
     public start() {
         this.label.string = this.playerName;
-        this.anim = this.getComponent(cc.Animation);
+        this.character = this.node.getChildByName('character');
+        this.characterSprite = this.character.getComponent(cc.Sprite);
+        this.characterAnim = this.character.getComponent(cc.Animation);
         const spriteFrameEntry = this.sprites.find(
             (spriteEntry) => spriteEntry.name === this.color,
         );
 
-        this.staleSprite = spriteFrameEntry.sprite;
+        this.idleSprite = spriteFrameEntry.sprite;
         this.stale();
         this.walk = this.walk.bind(this);
         this.stop = this.stop.bind(this);
     }
 
     private stale() {
-        this.getComponent(cc.Sprite).spriteFrame = this.staleSprite;
+        this.characterSprite.spriteFrame = this.idleSprite;
     }
 
     public walk() {
-        this.anim.play(this.color);
+        this.characterAnim.play(this.color);
     }
 
     public stop() {
-        this.anim.stop();
+        this.characterAnim.stop();
         this.stale();
+    }
+
+    public turnToLeft() {
+        this.character.setScale(-1, 1);
+    }
+
+    public turnToRight() {
+        this.character.setScale(1, 1);
     }
 
     // update (dt) {}

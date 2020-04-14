@@ -110,12 +110,12 @@ export default class Game extends cc.Component {
             playerNode,
             path,
             (node, target: cc.Vec2) => {
+                const playerComp = node.getComponent(Player);
                 if (target.x - node.position.x > FLIP_THRESHHOLD) {
-                    node.setScale(1, 1);
+                    playerComp.turnToRight();
                 }
                 if (node.position.x - target.x > FLIP_THRESHHOLD) {
-                    // moving left, flip sprite
-                    node.setScale(-1, 1);
+                    playerComp.turnToLeft();
                 }
             },
             () => playerComponent.stop(),

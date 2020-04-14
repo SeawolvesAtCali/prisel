@@ -10,7 +10,7 @@ import {
 
 import { default as TileComponent } from './Tile';
 import { getTileKey, getTileKeyFromCoordinate, setZIndexAction, callOnMoveAction } from './utils';
-import { MOVING_DURATION_PER_TILE } from './consts';
+import { MOVING_DURATION_PER_TILE, SELECTOR_ZINDEX } from './consts';
 import PropertyTile from './PropertyTile';
 import Player from './Player';
 const { ccclass, property } = cc._decorator;
@@ -31,6 +31,9 @@ export default class MapLoader extends cc.Component {
     @property(cc.Prefab)
     private startTile = null;
 
+    @property(cc.Node)
+    private propertySelector: cc.Node = null;
+
     private startTiles: StartTile[] = null;
 
     private tileMap: Map<string, TileComponent> = null;
@@ -49,11 +52,13 @@ export default class MapLoader extends cc.Component {
         this.startTiles = [];
         this.tileMap = new Map();
         const onSelect = (node: cc.Node) => {
-            if (this.selectedPropertyTile) {
-                this.selectedPropertyTile.getComponent(PropertyTile).restoreColor();
-            }
+            // if (this.selectedPropertyTile) {
+            //     this.selectedPropertyTile.getComponent(PropertyTile).restoreColor();
+            // }
             this.selectedPropertyTile = node;
-            this.selectedPropertyTile.color = cc.Color.RED;
+            this.moveToPos(this.propertySelector, node.getComponent(TileComponent).getTile().pos);
+            this.propertySelector.active = true;
+            this.propertySelector.zIndex = SELECTOR_ZINDEX;
         };
 
         for (const tile of tiles) {

@@ -6,7 +6,6 @@ const { ccclass, property } = cc._decorator;
 export default class PropertyTile extends cc.Component {
     public onSelect: (node: cc.Node) => void;
     private owner: Player = null;
-
     protected start() {
         this.node.on('click', this.handleSelect, this);
     }

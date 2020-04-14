@@ -12,3 +12,5 @@ export const CHARACTER_COLORS = {
 // if the horizontal distance is more than FLIP_THRESHOLD when moving, consider
 // flipping the node.
 export const FLIP_THRESHHOLD = 10;
+
+export const SELECTOR_ZINDEX = 1000;

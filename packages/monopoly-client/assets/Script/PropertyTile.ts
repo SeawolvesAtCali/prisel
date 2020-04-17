@@ -4,6 +4,9 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class PropertyTile extends cc.Component {
+    @property(cc.SpriteFrame)
+    private level1Sprite: cc.SpriteFrame = null;
+
     public onSelect: (node: cc.Node) => void;
     private owner: Player = null;
     protected start() {
@@ -22,16 +25,7 @@ export default class PropertyTile extends cc.Component {
 
     public setOwner(player: Player) {
         this.owner = player;
-        // if (player) {
-        //     this.node.color = player.color;
-        // }
-    }
-
-    public restoreColor() {
-        // if (this.owner) {
-        //     this.node.color = this.owner.color;
-        // }
-        this.node.color = cc.Color.WHITE;
+        this.getComponent(cc.Sprite).spriteFrame = this.level1Sprite;
     }
 
     // update (dt) {}

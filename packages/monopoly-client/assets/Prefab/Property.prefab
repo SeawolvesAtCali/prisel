@@ -101,7 +101,7 @@
       "__uuid__": "e6bbd96f-ba85-4631-ac3a-6e94192a6a0d"
     },
     "_type": 0,
-    "_sizeMode": 0,
+    "_sizeMode": 2,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -137,6 +137,9 @@
       "__id__": 1
     },
     "_enabled": true,
+    "level1Sprite": {
+      "__uuid__": "17a6d520-b5a8-40fc-9544-0c1e552aacec"
+    },
     "_id": ""
   },
   {

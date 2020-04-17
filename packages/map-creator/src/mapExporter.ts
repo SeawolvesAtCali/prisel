@@ -157,5 +157,6 @@ function getRoadSprite(tile: Walkable & Tile): AllFileName {
     if (right && down) {
         return 'right-down';
     }
+    window.alert('cannot find sprite for file ' + JSON.stringify(tile));
     throw new Error('cannot find sprite for file ' + JSON.stringify(tile));
 }

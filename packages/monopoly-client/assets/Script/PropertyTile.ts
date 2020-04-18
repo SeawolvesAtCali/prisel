@@ -9,11 +9,27 @@ export default class PropertyTile extends cc.Component {
 
     public onSelect: (node: cc.Node) => void;
     private owner: Player = null;
+    private touchStarted = false;
     protected start() {
-        this.node.on('click', this.handleSelect, this);
+        this.node.on(cc.Node.EventType.TOUCH_START, this.handleTouchStart, this);
+        this.node.on(cc.Node.EventType.TOUCH_MOVE, this.cancelTouch, this);
+        this.node.on(cc.Node.EventType.TOUCH_END, this.handleSelect, this);
+        this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.cancelTouch, this);
+    }
+
+    private handleTouchStart() {
+        this.touchStarted = true;
+    }
+
+    private cancelTouch() {
+        this.touchStarted = false;
     }
 
     private handleSelect() {
+        if (!this.touchStarted) {
+            return;
+        }
+        this.touchStarted = false;
         if (this.onSelect) {
             this.onSelect(this.node);
         }

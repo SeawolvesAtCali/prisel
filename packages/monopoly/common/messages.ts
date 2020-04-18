@@ -19,18 +19,29 @@ export enum Action {
     // initiate from client
     END_TURN = 'endturn',
 
-    // initiate from client, to report finishing loading/rendering map
+    // initiate from client, to report ready to receive game packet
     SETUP_FINISHED = 'setup_finished',
 
     // from server
     // broadcast initial game state
     INITIAL_STATE = 'initial_state',
 
+    // from client. After receiving ANNOUNCE_END_TURN, client should flush any
+    // animation about current player, and pan view to the next player. Then
+    // send READY_TO_START_TURN to server. Server will synchronize and broadcase
+    // ANNOUNCE_START_TURN to all clients.
+    READY_TO_START_TURN = 'ready_to_start_turn',
+
     // packet to annouce a player to start a turn.
     ANNOUNCE_START_TURN = 'announce_start_turn',
     ANNOUNCE_ROLL = 'announce_roll',
     ANNOUNCE_PURCHASE = 'announce_purchase',
     ANNOUNCE_PAY_RENT = 'announce_payrent',
+    // packet to announce a player finished turn.
+    // this immediately follows END_TURN response from current player. After
+    // receiving this packet, Other players should send back READY_TO_START_TURN
+    // when they finish animations of current player and pan to the next player.
+    ANNOUNCE_END_TURN = 'announce_end_turn',
 }
 
 export interface RollResponsePayload {
@@ -45,6 +56,11 @@ export interface PurchasePayload {
 export interface PurchaseResponsePayload {
     property: PropertyInfo;
     remainingMoney: number;
+}
+
+export interface PlayerEndTurnPayload {
+    currentPlayerId: string;
+    nextPlayerId: string;
 }
 
 export interface PlayerStartTurnPayload {
@@ -70,11 +86,14 @@ export interface PlayerPayRentPayload {
 
 export interface InitialStatePayload {
     gamePlayers: GamePlayerInfo[];
+    firstPlayerId?: string;
 }
 
 // Server Client
 // <= SETUP_FINISHED
 // => INITIAL_STATE
+
+// <= READY_TO_START_TURN
 
 // => PLAYER_START_TURN (first player)
 // <- ROLL
@@ -84,6 +103,9 @@ export interface InitialStatePayload {
 // -> PURCHASE response
 // => ANNOUNC_PURCHASE
 // <- END_TURN
+// -> END_TURN response
+// => PLAYER_END_TURN
+// <= READY_TO_START_TURN
 
 // => PLAYER_START_TURN (second player)
 // <- ROLL

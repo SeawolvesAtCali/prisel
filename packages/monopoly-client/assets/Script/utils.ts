@@ -29,3 +29,25 @@ export function getRand<T>(list: T[]): T {
     }
     return null;
 }
+
+export function playAnimation(node: cc.Node, animationName: string): Promise<never> {
+    return new Promise((resolve, reject) => {
+        const animationComp = node.getComponent(cc.Animation);
+        if (!animationComp) {
+            reject(new Error('cannot find animation component'));
+        }
+        animationComp.play(animationName);
+        const offListeners = () => {
+            animationComp.off('stop', offListeners);
+            animationComp.off('finished', offListeners);
+        };
+        animationComp.on('stop', () => {
+            offListeners();
+            resolve();
+        });
+        animationComp.on('finished', () => {
+            offListeners();
+            resolve();
+        });
+    });
+}

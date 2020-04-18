@@ -10,7 +10,7 @@ import {
 
 import { default as TileComponent } from './Tile';
 import { getTileKey, getTileKeyFromCoordinate, setZIndexAction, callOnMoveAction } from './utils';
-import { MOVING_DURATION_PER_TILE, SELECTOR_ZINDEX } from './consts';
+import { MOVING_DURATION_PER_TILE, SELECTOR_ZINDEX, TILE_SIZE } from './consts';
 import PropertyTile from './PropertyTile';
 import Player from './Player';
 const { ccclass, property } = cc._decorator;
@@ -34,14 +34,14 @@ export default class MapLoader extends cc.Component {
     @property(cc.Node)
     private propertySelector: cc.Node = null;
 
-    @property(cc.Node)
-    private overlayUiLayer: cc.Node = null;
-
     private startTiles: StartTile[] = null;
 
     private tileMap: Map<string, TileComponent> = null;
 
     public selectedPropertyTile: cc.Node = null;
+
+    public mapHeightInPx = 0;
+    public mapWidthInPx = 0;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -51,6 +51,8 @@ export default class MapLoader extends cc.Component {
             return;
         }
         const { tiles, height, width, roadPropertyMapping } = boardSetup;
+        this.mapHeightInPx = height * TILE_SIZE;
+        this.mapWidthInPx = width * TILE_SIZE;
 
         this.startTiles = [];
         this.tileMap = new Map();
@@ -97,15 +99,6 @@ export default class MapLoader extends cc.Component {
         this.tileMap.set(getTileKey(tile), tileComp);
 
         return tileNode;
-    }
-
-    protected start() {
-        this.synchronizeUiLayerSize();
-    }
-
-    private synchronizeUiLayerSize() {
-        this.overlayUiLayer.setPosition(this.node.position);
-        this.overlayUiLayer.setScale(this.node.scale);
     }
 
     public getStartTiles(): StartTile[] {

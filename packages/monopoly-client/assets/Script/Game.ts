@@ -14,6 +14,7 @@ import { Client, Packet, PacketType, ResponseWrapper } from './packages/priselCl
 import Player from './Player';
 import Tile from './Tile';
 import { CHARACTER_COLORS, FLIP_THRESHHOLD } from './consts';
+import Pannable from './Pannable';
 
 const { ccclass, property } = cc._decorator;
 
@@ -33,6 +34,12 @@ export default class Game extends cc.Component {
 
     @property(cc.Button)
     private endTurnButton: cc.Button = null;
+
+    @property(cc.Node)
+    private mapNode: cc.Node = null;
+
+    @property(cc.Node)
+    private mapUiPannable: cc.Node = null;
 
     private funcWaitingForStart: Array<() => void> = [];
     private started = false;
@@ -58,8 +65,12 @@ export default class Game extends cc.Component {
     }
 
     private setupGame(boardSetup: BoardSetup) {
-        this.map = this.node.getComponentInChildren(MapLoader);
+        this.map = this.mapNode.getComponent(MapLoader);
         this.map.renderMap(boardSetup);
+        this.mapUiPannable
+            .getComponent(Pannable)
+            .setSize(this.map.mapWidthInPx, this.map.mapHeightInPx);
+
         this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_START_TURN, this.handleAnnounceStartTurn.bind(this)),
         );

@@ -1,4 +1,8 @@
 export const TILE_SIZE = 100;
+// the landing position on a tile relative to the anchor of a tile.
+// the anchor is at the bottom left corner of the tile.
+// the landing is at the bottom center of the tile.
+export const LANDING_POS_OFFSET = cc.v2(TILE_SIZE / 2, 0);
 export const MOVING_DURATION_PER_TILE = 0.5;
 
 export const CHARACTER_COLORS = {
@@ -19,6 +23,7 @@ export const AUTO_PANNING_PX_PER_SECOND = 1000;
 
 // name of the node used for event emitting
 export const EVENT_BUS = 'Canvas/eventBus';
+export const GAME_CAMERA = 'Canvas/game camera';
 
 export enum EVENT {
     DICE_ROLLED = 'dice_rolled',

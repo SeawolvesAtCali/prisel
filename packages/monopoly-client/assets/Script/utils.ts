@@ -51,3 +51,7 @@ export function playAnimation(node: cc.Node, animationName: string): Promise<nev
         });
     });
 }
+
+export function toVec2(vec: cc.Vec3): cc.Vec2 {
+    return cc.v2(vec.x, vec.y);
+}

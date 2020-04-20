@@ -10,7 +10,7 @@ import {
 
 import { default as TileComponent } from './Tile';
 import { getTileKey, getTileKeyFromCoordinate, setZIndexAction, callOnMoveAction } from './utils';
-import { MOVING_DURATION_PER_TILE, SELECTOR_ZINDEX, TILE_SIZE } from './consts';
+import { MOVING_DURATION_PER_TILE, SELECTOR_ZINDEX, TILE_SIZE, GAME_CAMERA } from './consts';
 import PropertyTile from './PropertyTile';
 import Player from './Player';
 const { ccclass, property } = cc._decorator;
@@ -42,8 +42,15 @@ export default class MapLoader extends cc.Component {
 
     public mapHeightInPx = 0;
     public mapWidthInPx = 0;
+    private tilePositionOffset: cc.Vec2 = null;
+
+    private gameCamera: cc.Node = null;
 
     // LIFE-CYCLE CALLBACKS:
+
+    protected start() {
+        this.gameCamera = cc.find(GAME_CAMERA);
+    }
 
     public renderMap(boardSetup: BoardSetup) {
         if (!this.emptyTile || !this.roadTile || !this.propertyTile || !this.startTile) {
@@ -53,6 +60,8 @@ export default class MapLoader extends cc.Component {
         const { tiles, height, width, roadPropertyMapping } = boardSetup;
         this.mapHeightInPx = height * TILE_SIZE;
         this.mapWidthInPx = width * TILE_SIZE;
+        this.tilePositionOffset = cc.v2(-this.mapWidthInPx / 2, this.mapHeightInPx / 2);
+        this.node.setContentSize(this.mapWidthInPx, this.mapHeightInPx);
 
         this.startTiles = [];
         this.tileMap = new Map();
@@ -95,7 +104,7 @@ export default class MapLoader extends cc.Component {
         }
         tileComp.init(tile);
         this.node.addChild(tileNode, tileComp.getZIndex());
-        tileNode.setPosition(tileComp.getAnchorPos());
+        tileNode.setPosition(this.tilePositionOffset.add(tileComp.getInitialAnchorPos()));
         this.tileMap.set(getTileKey(tile), tileComp);
 
         return tileNode;
@@ -116,6 +125,7 @@ export default class MapLoader extends cc.Component {
     public moveToPos(node: cc.Node, pos: Coordinate) {
         const tileComp = this.tileMap.get(getTileKeyFromCoordinate(pos));
         if (tileComp) {
+            cc.log(`setting landingPost of selector ${tileComp.getLandingPos()}`);
             node.setPosition(tileComp.getLandingPos());
             node.zIndex = tileComp.getLandingZIndex();
         } else {

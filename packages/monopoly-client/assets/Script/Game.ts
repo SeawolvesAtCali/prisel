@@ -21,8 +21,10 @@ import {
     AUTO_PANNING_PX_PER_SECOND,
     EVENT_BUS,
     EVENT,
+    GAME_CAMERA,
 } from './consts';
 import Pannable from './Pannable';
+import GameCameraControl from './GameCameraControl';
 
 const { ccclass, property } = cc._decorator;
 
@@ -58,6 +60,7 @@ export default class Game extends cc.Component {
 
     private eventBus: cc.Node = null;
     private rollPromise: Promise<void> = null;
+    private gameCamera: cc.Node = null;
 
     protected onLoad() {
         this.client = client;
@@ -78,9 +81,7 @@ export default class Game extends cc.Component {
     private setupGame(boardSetup: BoardSetup) {
         this.map = this.mapNode.getComponent(MapLoader);
         this.map.renderMap(boardSetup);
-        this.mapUiPannable
-            .getComponent(Pannable)
-            .setSize(this.map.mapWidthInPx, this.map.mapHeightInPx);
+        this.mapUiPannable.setContentSize(this.map.mapWidthInPx, this.map.mapHeightInPx);
 
         this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_START_TURN, this.handleAnnounceStartTurn.bind(this)),
@@ -128,36 +129,7 @@ export default class Game extends cc.Component {
 
     private panToPlayer(id: string): Promise<void> {
         const playerNode = this.getPlayerNode(id);
-        const pannableControllerNode = this.mapUiPannable.parent;
-        const playerInPannableControllerPositionV3 = pannableControllerNode.convertToNodeSpaceAR(
-            playerNode.convertToWorldSpaceAR(cc.v2(), cc.v2()),
-        );
-        const playerInPannableControllerPosition = cc.v2(
-            playerInPannableControllerPositionV3.x,
-            playerInPannableControllerPositionV3.y,
-        );
-
-        const containerCenter = cc
-            .v2(0.5, 0.5)
-            .sub(pannableControllerNode.getAnchorPoint())
-            .scale(cc.v2(pannableControllerNode.width, pannableControllerNode.height));
-        const moveBy = containerCenter.sub(playerInPannableControllerPosition);
-
-        const moveDistance = moveBy.mag();
-        const moveToPosition = moveBy.add(this.mapUiPannable.position);
-
-        return new Promise((resolve) => {
-            cc.tween(this.mapUiPannable)
-                .to(
-                    moveDistance / AUTO_PANNING_PX_PER_SECOND,
-                    {
-                        position: moveToPosition,
-                    },
-                    { easing: 'sineInOut' },
-                )
-                .call(resolve)
-                .start();
-        });
+        return this.gameCamera.getComponent(GameCameraControl).moveToNode(playerNode);
     }
 
     private handleAnnounceStartTurn(packet: Packet<PlayerStartTurnPayload>) {
@@ -184,6 +156,8 @@ export default class Game extends cc.Component {
         const playerNode = this.getPlayerNode(id);
         const playerComponent = playerNode.getComponent(Player);
         playerComponent.walk();
+        const gameCameraControl = this.gameCamera.getComponent(GameCameraControl);
+        gameCameraControl.startFollowing(playerNode);
         this.map.moveAlongPath(
             playerNode,
             path,
@@ -196,7 +170,10 @@ export default class Game extends cc.Component {
                     playerComp.turnToLeft();
                 }
             },
-            () => playerComponent.stop(),
+            () => {
+                playerComponent.stop();
+                gameCameraControl.stopFollowing();
+            },
         );
     }
 
@@ -290,6 +267,7 @@ export default class Game extends cc.Component {
     protected start() {
         this.started = true;
         this.eventBus = cc.find(EVENT_BUS);
+        this.gameCamera = cc.find(GAME_CAMERA);
         cc.log('event bus', this.eventBus);
         const debugNode = this.node.getChildByName('debug');
         if (debugNode) {

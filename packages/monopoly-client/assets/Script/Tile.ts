@@ -1,5 +1,5 @@
 import { Tile as TileData } from './packages/monopolyCommon';
-import { TILE_SIZE } from './consts';
+import { TILE_SIZE, LANDING_POS_OFFSET } from './consts';
 
 const { ccclass, property } = cc._decorator;
 
@@ -25,13 +25,12 @@ export default class Tile extends cc.Component {
     }
 
     public getLandingPos() {
-        return new cc.Vec2(
-            this.tile.pos.col * TILE_SIZE + TILE_SIZE / 2,
-            -(this.tile.pos.row + 1) * TILE_SIZE,
-        );
+        return this.node.position.add(LANDING_POS_OFFSET);
     }
 
-    public getAnchorPos() {
+    // return the initial position of the bottom as if map's anchor is at the
+    // top left corner.
+    public getInitialAnchorPos() {
         return new cc.Vec2(this.tile.pos.col * TILE_SIZE, -(this.tile.pos.row + 1) * TILE_SIZE);
     }
 

@@ -6,6 +6,11 @@
     [
       false,
       false
+    ],
+    [
+      false,
+      false,
+      false
     ]
   ],
   "excluded-modules": [
@@ -15,7 +20,8 @@
   ],
   "group-list": [
     "ui",
-    "game"
+    "game",
+    "unrendered"
   ],
   "start-scene": "2d2f792f-a40c-49bb-a189-ed176a246e49",
   "design-resolution-width": 960,

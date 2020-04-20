@@ -104,6 +104,7 @@ export class GamePlayer extends GameObject {
         }
 
         return Messages.getSuccessFor<RollResponsePayload>(packet, {
+            steps: path.length,
             path: path.map((pathNode) => pathNode.tile.pos),
             encounters,
         });

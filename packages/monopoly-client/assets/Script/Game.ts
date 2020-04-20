@@ -8,12 +8,20 @@ import {
     PlayerStartTurnPayload,
     PlayerRollPayload,
     PlayerPurchasePayload,
+    PlayerEndTurnPayload,
+    RollResponsePayload,
 } from './packages/monopolyCommon';
 import { client, ClientState } from './Client';
 import { Client, Packet, PacketType, ResponseWrapper } from './packages/priselClient';
 import Player from './Player';
 import Tile from './Tile';
-import { CHARACTER_COLORS, FLIP_THRESHHOLD } from './consts';
+import {
+    CHARACTER_COLORS,
+    FLIP_THRESHHOLD,
+    AUTO_PANNING_PX_PER_SECOND,
+    EVENT_BUS,
+    EVENT,
+} from './consts';
 import Pannable from './Pannable';
 
 const { ccclass, property } = cc._decorator;
@@ -48,6 +56,9 @@ export default class Game extends cc.Component {
     private map: MapLoader = null;
     private playerNodes: cc.Node[] = [];
 
+    private eventBus: cc.Node = null;
+    private rollPromise: Promise<void> = null;
+
     protected onLoad() {
         this.client = client;
         // load map data
@@ -75,46 +86,102 @@ export default class Game extends cc.Component {
             this.client.on(Action.ANNOUNCE_START_TURN, this.handleAnnounceStartTurn.bind(this)),
         );
         this.offPacketListeners.push(
-            this.client.on(Action.ANNOUNCE_ROLL, this.handleAnnouncRoll.bind(this)),
+            this.client.on(Action.ANNOUNCE_ROLL, this.handleAnnounceRoll.bind(this)),
         );
         this.offPacketListeners.push(
-            this.client.on(Action.ANNOUNCE_PURCHASE, this.handleAnnouncPurchase.bind(this)),
+            this.client.on(Action.ANNOUNCE_PURCHASE, this.handleAnnouncePurchase.bind(this)),
         );
         this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_PAY_RENT, this.handleAnnouncePayRent.bind(this)),
         );
+        this.offPacketListeners.push(
+            this.client.on(Action.ANNOUNCE_END_TURN, this.handleAnnounceEndTurn.bind(this)),
+        );
 
         const startTiles = this.map.getStartTiles();
         cc.log('start tiles are ', startTiles);
-        const offInitialStateListener = this.client.on(
-            Action.INITIAL_STATE,
-            (packet: Packet<InitialStatePayload>) => {
-                const { gamePlayers } = packet.payload;
-                for (const gamePlayer of gamePlayers) {
+        this.client
+            .request({
+                type: PacketType.REQUEST,
+                request_id: this.client.newId(),
+                action: Action.GET_INITIAL_STATE,
+                payload: {},
+            })
+            .then((response: ResponseWrapper<InitialStatePayload>) => {
+                for (const gamePlayer of response.payload.gamePlayers) {
                     this.playerNodes.push(this.instantiatePlayer(gamePlayer));
                 }
-                offInitialStateListener();
-            },
-        );
-        this.client.emit<Packet>({
+                // TODO pan to current player
+                this.panToPlayer(response.payload.firstPlayerId);
+                this.prepareForNextTurn();
+            });
+    }
+
+    private prepareForNextTurn() {
+        this.rollPromise = null;
+        this.client.emit({
             type: PacketType.DEFAULT,
-            action: Action.SETUP_FINISHED,
+            action: Action.READY_TO_START_TURN,
+            payload: {},
+        });
+    }
+
+    private panToPlayer(id: string): Promise<void> {
+        const playerNode = this.getPlayerNode(id);
+        const pannableControllerNode = this.mapUiPannable.parent;
+        const playerInPannableControllerPositionV3 = pannableControllerNode.convertToNodeSpaceAR(
+            playerNode.convertToWorldSpaceAR(cc.v2(), cc.v2()),
+        );
+        const playerInPannableControllerPosition = cc.v2(
+            playerInPannableControllerPositionV3.x,
+            playerInPannableControllerPositionV3.y,
+        );
+
+        const containerCenter = cc
+            .v2(0.5, 0.5)
+            .sub(pannableControllerNode.getAnchorPoint())
+            .scale(cc.v2(pannableControllerNode.width, pannableControllerNode.height));
+        const moveBy = containerCenter.sub(playerInPannableControllerPosition);
+
+        const moveDistance = moveBy.mag();
+        const moveToPosition = moveBy.add(this.mapUiPannable.position);
+
+        return new Promise((resolve) => {
+            cc.tween(this.mapUiPannable)
+                .to(
+                    moveDistance / AUTO_PANNING_PX_PER_SECOND,
+                    {
+                        position: moveToPosition,
+                    },
+                    { easing: 'sineInOut' },
+                )
+                .call(resolve)
+                .start();
         });
     }
 
     private handleAnnounceStartTurn(packet: Packet<PlayerStartTurnPayload>) {
         const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
-
-        this.rollButton.node.active = isCurrentPlayerTurn;
-        this.purchaseButton.node.active = isCurrentPlayerTurn;
-        this.endTurnButton.node.active = isCurrentPlayerTurn;
+        if (isCurrentPlayerTurn) {
+            this.eventBus.emit(EVENT.START_CURRENT_PLAYER_TURN);
+            this.rollButton.node.active = isCurrentPlayerTurn;
+            this.purchaseButton.node.active = isCurrentPlayerTurn;
+            this.endTurnButton.node.active = isCurrentPlayerTurn;
+        }
     }
 
-    private handleAnnouncRoll(packet: Packet<PlayerRollPayload>) {
+    private getPlayerNode(id: string): cc.Node {
+        return this.playerNodes.find((node) => node.getComponent(Player).getId() === id);
+    }
+
+    private async handleAnnounceRoll(packet: Packet<PlayerRollPayload>) {
+        if (this.rollPromise) {
+            await this.rollPromise;
+        }
+        this.rollPromise = null;
+
         const { id, path } = packet.payload;
-        const playerNode = this.playerNodes.find(
-            (node) => node.getComponent(Player).getId() === id,
-        );
+        const playerNode = this.getPlayerNode(id);
         const playerComponent = playerNode.getComponent(Player);
         playerComponent.walk();
         this.map.moveAlongPath(
@@ -133,7 +200,7 @@ export default class Game extends cc.Component {
         );
     }
 
-    private handleAnnouncPurchase(packet: Packet<PlayerPurchasePayload>) {
+    private handleAnnouncePurchase(packet: Packet<PlayerPurchasePayload>) {
         const { property: purchasdProperty, id } = packet.payload;
         const player = this.playerNodes.find(
             (playerNode) => playerNode.getComponent(Player).getId() === id,
@@ -144,13 +211,33 @@ export default class Game extends cc.Component {
 
     private handleAnnouncePayRent() {}
 
+    private handleAnnounceEndTurn(packet: Packet<PlayerEndTurnPayload>) {
+        const isCurrentPlayerTurn = packet.payload.currentPlayerId === this.client.state.id;
+        if (isCurrentPlayerTurn) {
+            this.eventBus.emit(EVENT.END_CURRENT_PLAYER_TURN);
+        }
+        // pan to the next player
+        this.panToPlayer(packet.payload.nextPlayerId);
+
+        this.prepareForNextTurn();
+    }
+
     private requestRoll() {
         cc.log('request Roll');
-        this.client.request({
-            type: PacketType.REQUEST,
-            request_id: this.client.newId(),
-            action: Action.ROLL,
-            payload: {},
+        this.client
+            .request({
+                type: PacketType.REQUEST,
+                request_id: this.client.newId(),
+                action: Action.ROLL,
+                payload: {},
+            })
+            .then((response: ResponseWrapper<RollResponsePayload>) => {
+                if (response.ok()) {
+                    this.eventBus.emit(EVENT.DICE_ROLLED_RESPONSE, response.payload.steps);
+                }
+            });
+        this.rollPromise = new Promise((resolve) => {
+            this.eventBus.on(EVENT.DICE_ROLLED_END, resolve);
         });
     }
 
@@ -202,6 +289,8 @@ export default class Game extends cc.Component {
 
     protected start() {
         this.started = true;
+        this.eventBus = cc.find(EVENT_BUS);
+        cc.log('event bus', this.eventBus);
         const debugNode = this.node.getChildByName('debug');
         if (debugNode) {
             this.node.removeChild(debugNode);
@@ -212,6 +301,8 @@ export default class Game extends cc.Component {
             }
         }
         this.funcWaitingForStart = [];
+
+        this.eventBus.on(EVENT.DICE_ROLLED, this.requestRoll, this);
 
         this.rollButton.node.on('click', this.requestRoll, this);
         this.purchaseButton.node.on('click', this.requestPurchase, this);

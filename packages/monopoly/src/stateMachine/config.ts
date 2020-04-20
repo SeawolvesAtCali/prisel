@@ -14,7 +14,9 @@ const states: StateConfig[] = [
         transitions: [
             {
                 to: 'setupFinished',
-                condition: syncAction(Action.SETUP_FINISHED),
+                condition: {
+                    type: 'no condition',
+                },
             },
         ],
     },

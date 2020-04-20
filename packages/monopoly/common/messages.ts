@@ -19,12 +19,8 @@ export enum Action {
     // initiate from client
     END_TURN = 'endturn',
 
-    // initiate from client, to report ready to receive game packet
-    SETUP_FINISHED = 'setup_finished',
-
-    // from server
-    // broadcast initial game state
-    INITIAL_STATE = 'initial_state',
+    // from client
+    GET_INITIAL_STATE = 'get_initial_state',
 
     // from client. After receiving ANNOUNCE_END_TURN, client should flush any
     // animation about current player, and pan view to the next player. Then
@@ -45,6 +41,7 @@ export enum Action {
 }
 
 export interface RollResponsePayload {
+    steps: number;
     path: Coordinate[]; // not including the current position
     encounters: Encounter[];
 }
@@ -74,6 +71,7 @@ export interface PlayerPurchasePayload {
 
 export interface PlayerRollPayload {
     id: string;
+    steps: number;
     path: Coordinate[];
     encounters: Encounter[];
 }
@@ -86,15 +84,14 @@ export interface PlayerPayRentPayload {
 
 export interface InitialStatePayload {
     gamePlayers: GamePlayerInfo[];
-    firstPlayerId?: string;
+    firstPlayerId: string;
 }
 
 // Server Client
-// <= SETUP_FINISHED
-// => INITIAL_STATE
+// <- GET_INITIAL_STATE
+// -> GET_INITIAL_STATE response
 
 // <= READY_TO_START_TURN
-
 // => PLAYER_START_TURN (first player)
 // <- ROLL
 // -> ROLL response, including charge, new property info
@@ -105,8 +102,8 @@ export interface InitialStatePayload {
 // <- END_TURN
 // -> END_TURN response
 // => PLAYER_END_TURN
-// <= READY_TO_START_TURN
 
+// <= READY_TO_START_TURN
 // => PLAYER_START_TURN (second player)
 // <- ROLL
 // (assuming this player need to pay rent)

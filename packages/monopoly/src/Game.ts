@@ -15,7 +15,7 @@ import {
     RemoveListenerFunc,
     debug,
 } from '@prisel/server';
-import { Action, PlayerStartTurnPayload } from '../common/messages';
+import { Action, PlayerStartTurnPayload, PlayerEndTurnPayload } from '../common/messages';
 import { startTurn, Turn } from './Turn';
 
 interface Props {
@@ -50,6 +50,10 @@ export default class Game extends GameObject {
         this.turnOrder = [...this.turnOrder.slice(1), this.turnOrder[0]];
     }
 
+    public getNextPlayer(): GamePlayer {
+        return [...this.turnOrder.slice(1), this.turnOrder[0]][0];
+    }
+
     public startTurn(): void {
         this.turn = startTurn(this, this.getCurrentPlayer());
         const startTurnPacket: Packet<PlayerStartTurnPayload> = {
@@ -66,6 +70,14 @@ export default class Game extends GameObject {
     public endTurn(): void {
         this.turn.end();
         this.turn = null;
+        broadcast<PlayerEndTurnPayload>(this.room.getPlayers(), {
+            type: PacketType.DEFAULT,
+            action: Action.ANNOUNCE_END_TURN,
+            payload: {
+                currentPlayerId: this.getCurrentPlayer().id,
+                nextPlayerId: this.getNextPlayer().id,
+            },
+        });
     }
 
     public isCurrentPlayer(player: GamePlayer) {

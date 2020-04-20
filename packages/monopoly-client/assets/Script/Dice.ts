@@ -1,4 +1,5 @@
 import { playAnimation } from './utils';
+import { EVENT_BUS, EVENT } from './consts';
 
 const { ccclass, property } = cc._decorator;
 
@@ -8,12 +9,15 @@ export default class Dice extends cc.Component {
     private pointSprites: cc.SpriteFrame[] = [];
     private value: 1 | 2 | 3 | 4 | 5 | 6;
     private sprite: cc.Sprite = null;
+    private eventBus: cc.Node = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
 
     protected start() {
         this.sprite = this.getComponent(cc.Sprite);
+        this.eventBus = cc.find(EVENT_BUS);
+        this.eventBus.on(EVENT.DICE_ROLLED_RESPONSE, this.setValue, this);
     }
 
     // called by animation event, set through timeline editor

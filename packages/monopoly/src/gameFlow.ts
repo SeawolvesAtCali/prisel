@@ -15,10 +15,11 @@ import {
     RollResponsePayload,
 } from '../common/messages';
 
-export function waitForEveryoneSetup(game: Game, room: Room): Promise<void> {
+export function syncAllPlayer(game: Game, action: Action): Promise<void> {
     return new Promise((resolve) => {
         const syncedSet = new Set<string>();
-        const off = room.listenGamePacket<Packet>(Action.SETUP_FINISHED, (player) => {
+        const room = game.room;
+        const off = room.listenGamePacket<Packet>(action, (player) => {
             syncedSet.add(game.getPlayerId(player));
             for (const playerInGame of game.players.keys()) {
                 if (!syncedSet.has(playerInGame)) {
@@ -47,6 +48,7 @@ export function runPlayerTurn(game: Game, room: Room): Promise<void> {
                     action: Action.ANNOUNCE_ROLL,
                     payload: {
                         id: player.id,
+                        steps: response.payload.path.length,
                         path: response.payload.path,
                         encounters: response.payload.encounters,
                     },

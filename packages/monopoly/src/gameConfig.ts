@@ -11,7 +11,7 @@ import {
 import { createIntialState, flattenState } from './state';
 import { Action, PlayerStartTurnPayload, InitialStatePayload } from '../common/messages';
 import Game from './Game';
-import { waitForEveryoneSetup, runPlayerTurn } from './gameFlow';
+import { syncAllPlayer, runPlayerTurn } from './gameFlow';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
@@ -30,23 +30,25 @@ const MonopolyGameConfig: GameConfig = {
                 player.respond(packet, flatState);
                 debug('current game state is: \n%O', flatState);
             });
-            await waitForEveryoneSetup(game, room);
-            broadcast<InitialStatePayload>(room.getPlayers(), {
-                type: PacketType.DEFAULT,
-                action: Action.INITIAL_STATE,
-                payload: {
-                    gamePlayers: Array.from(game.players.values()).map((player) => ({
-                        money: player.cash,
-                        player: {
-                            name: player.player.getName(),
-                            id: player.player.getId(),
-                        },
-                        pos: player.pathNode.tile.pos,
-                        character: player.character,
-                    })),
-                },
+            const initialState: InitialStatePayload = {
+                gamePlayers: Array.from(game.players.values()).map((player) => ({
+                    money: player.cash,
+                    player: {
+                        name: player.player.getName(),
+                        id: player.player.getId(),
+                    },
+                    pos: player.pathNode.tile.pos,
+                    character: player.character,
+                })),
+                firstPlayerId: game.getCurrentPlayer().id,
+            };
+
+            room.listenGamePacket<Request>(Action.GET_INITIAL_STATE, (player, packet) => {
+                player.respond(packet, initialState);
             });
+
             while (true) {
+                await syncAllPlayer(game, Action.READY_TO_START_TURN);
                 game.startTurn();
                 await runPlayerTurn(game, room);
                 debug('game config, player finished turn');

@@ -1,4 +1,5 @@
 import Player from './Player';
+import Tile from './Tile';
 
 const { ccclass, property } = cc._decorator;
 
@@ -31,6 +32,7 @@ export default class PropertyTile extends cc.Component {
         }
         this.touchStarted = false;
         if (this.onSelect) {
+            const tilePos = this.getComponent(Tile).getTile().pos;
             this.onSelect(this.node);
         }
     }

@@ -15,15 +15,7 @@ import { client, ClientState } from './Client';
 import { Client, Packet, PacketType, ResponseWrapper } from './packages/priselClient';
 import Player from './Player';
 import Tile from './Tile';
-import {
-    CHARACTER_COLORS,
-    FLIP_THRESHHOLD,
-    AUTO_PANNING_PX_PER_SECOND,
-    EVENT_BUS,
-    EVENT,
-    GAME_CAMERA,
-} from './consts';
-import Pannable from './Pannable';
+import { CHARACTER_COLORS, FLIP_THRESHHOLD, EVENT_BUS, EVENT, GAME_CAMERA } from './consts';
 import GameCameraControl from './GameCameraControl';
 
 const { ccclass, property } = cc._decorator;
@@ -37,9 +29,6 @@ export default class Game extends cc.Component {
     private playerPrefab: cc.Prefab = null;
 
     @property(cc.Button)
-    private rollButton: cc.Button = null;
-
-    @property(cc.Button)
     private purchaseButton: cc.Button = null;
 
     @property(cc.Button)
@@ -47,9 +36,6 @@ export default class Game extends cc.Component {
 
     @property(cc.Node)
     private mapNode: cc.Node = null;
-
-    @property(cc.Node)
-    private mapUiPannable: cc.Node = null;
 
     private funcWaitingForStart: Array<() => void> = [];
     private started = false;
@@ -81,7 +67,6 @@ export default class Game extends cc.Component {
     private setupGame(boardSetup: BoardSetup) {
         this.map = this.mapNode.getComponent(MapLoader);
         this.map.renderMap(boardSetup);
-        this.mapUiPannable.setContentSize(this.map.mapWidthInPx, this.map.mapHeightInPx);
 
         this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_START_TURN, this.handleAnnounceStartTurn.bind(this)),
@@ -99,8 +84,6 @@ export default class Game extends cc.Component {
             this.client.on(Action.ANNOUNCE_END_TURN, this.handleAnnounceEndTurn.bind(this)),
         );
 
-        const startTiles = this.map.getStartTiles();
-        cc.log('start tiles are ', startTiles);
         this.client
             .request({
                 type: PacketType.REQUEST,
@@ -112,9 +95,9 @@ export default class Game extends cc.Component {
                 for (const gamePlayer of response.payload.gamePlayers) {
                     this.playerNodes.push(this.instantiatePlayer(gamePlayer));
                 }
-                // TODO pan to current player
-                this.panToPlayer(response.payload.firstPlayerId);
-                this.prepareForNextTurn();
+                this.panToPlayer(response.payload.firstPlayerId).then(() => {
+                    this.prepareForNextTurn();
+                });
             });
     }
 
@@ -136,7 +119,6 @@ export default class Game extends cc.Component {
         const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
         if (isCurrentPlayerTurn) {
             this.eventBus.emit(EVENT.START_CURRENT_PLAYER_TURN);
-            this.rollButton.node.active = isCurrentPlayerTurn;
             this.purchaseButton.node.active = isCurrentPlayerTurn;
             this.endTurnButton.node.active = isCurrentPlayerTurn;
         }
@@ -194,13 +176,12 @@ export default class Game extends cc.Component {
             this.eventBus.emit(EVENT.END_CURRENT_PLAYER_TURN);
         }
         // pan to the next player
-        this.panToPlayer(packet.payload.nextPlayerId);
-
-        this.prepareForNextTurn();
+        this.panToPlayer(packet.payload.nextPlayerId).then(() => {
+            this.prepareForNextTurn();
+        });
     }
 
     private requestRoll() {
-        cc.log('request Roll');
         this.client
             .request({
                 type: PacketType.REQUEST,
@@ -228,7 +209,6 @@ export default class Game extends cc.Component {
             })
             .then((response: ResponseWrapper) => {
                 if (response.ok()) {
-                    this.rollButton.node.active = false;
                     this.purchaseButton.node.active = false;
                     this.endTurnButton.node.active = false;
                 }
@@ -268,7 +248,6 @@ export default class Game extends cc.Component {
         this.started = true;
         this.eventBus = cc.find(EVENT_BUS);
         this.gameCamera = cc.find(GAME_CAMERA);
-        cc.log('event bus', this.eventBus);
         const debugNode = this.node.getChildByName('debug');
         if (debugNode) {
             this.node.removeChild(debugNode);
@@ -282,7 +261,6 @@ export default class Game extends cc.Component {
 
         this.eventBus.on(EVENT.DICE_ROLLED, this.requestRoll, this);
 
-        this.rollButton.node.on('click', this.requestRoll, this);
         this.purchaseButton.node.on('click', this.requestPurchase, this);
         this.endTurnButton.node.on('click', this.requestEndTurn, this);
     }

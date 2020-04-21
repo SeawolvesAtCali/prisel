@@ -17,9 +17,6 @@ export default class Player extends cc.Component {
 
     private characterAnim: cc.Animation = null;
 
-    // @property
-    // public text: string = 'hello';
-
     private playerName: string = '';
     private playerId: string = '';
     public color: string = null;
@@ -27,7 +24,6 @@ export default class Player extends cc.Component {
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {}
     public init(playerData: PlayerInfo, color: string) {
         this.playerName = playerData.name;
         this.playerId = playerData.id;
@@ -75,6 +71,4 @@ export default class Player extends cc.Component {
     public turnToRight() {
         this.character.setScale(1, 1);
     }
-
-    // update (dt) {}
 }

@@ -11,25 +11,17 @@ export default class DicePad extends cc.Component {
 
     // LIFE-CYCLE CALLBACKS:
 
-    protected onLoad() {
-        cc.log('dice pad loaded');
-    }
-
     protected start() {
-        cc.log('dice pad started');
         this.eventBus = cc.find(EVENT_BUS);
         this.dice = this.getComponentInChildren(Dice);
         this.node.on(cc.Node.EventType.TOUCH_START, this.roll, this);
         this.eventBus.on(EVENT.START_CURRENT_PLAYER_TURN, () => {
             this.node.active = true;
-            cc.log('activate dice pad');
             this.rolled = false;
         });
         this.eventBus.on(EVENT.END_CURRENT_PLAYER_TURN, () => {
             this.node.active = false;
-            cc.log('diactivate dice pad');
         });
-        cc.log('setting dice pad inactive');
         this.node.active = false;
     }
 
@@ -43,7 +35,6 @@ export default class DicePad extends cc.Component {
             // hopefully when animation ends, dice already receive event to
             // update the value.
             this.dice.updateSprite();
-            cc.log('emit rolled end');
             this.eventBus.emit(EVENT.DICE_ROLLED_END);
         });
     }

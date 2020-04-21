@@ -125,7 +125,6 @@ export default class MapLoader extends cc.Component {
     public moveToPos(node: cc.Node, pos: Coordinate) {
         const tileComp = this.tileMap.get(getTileKeyFromCoordinate(pos));
         if (tileComp) {
-            cc.log(`setting landingPost of selector ${tileComp.getLandingPos()}`);
             node.setPosition(tileComp.getLandingPos());
             node.zIndex = tileComp.getLandingZIndex();
         } else {

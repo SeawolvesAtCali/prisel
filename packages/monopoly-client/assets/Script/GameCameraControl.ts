@@ -3,7 +3,6 @@ import { AUTO_PANNING_PX_PER_SECOND } from './consts';
 
 const { ccclass, property } = cc._decorator;
 
-const FOLLOWING_THRESHOLD = 20;
 @ccclass
 export default class GameCameraControl extends cc.Component {
     private followingNode: cc.Node = null;

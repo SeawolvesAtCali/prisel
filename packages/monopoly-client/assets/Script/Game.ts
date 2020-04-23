@@ -10,6 +10,9 @@ import {
     PlayerPurchasePayload,
     PlayerEndTurnPayload,
     RollResponsePayload,
+    PurchaseResponsePayload,
+    Encounter,
+    PropertyForPurchaseEncounter,
 } from './packages/monopolyCommon';
 import { client, ClientState } from './Client';
 import { Client, Packet, PacketType, ResponseWrapper } from './packages/priselClient';
@@ -28,12 +31,6 @@ export default class Game extends cc.Component {
     @property(cc.Prefab)
     private playerPrefab: cc.Prefab = null;
 
-    @property(cc.Button)
-    private purchaseButton: cc.Button = null;
-
-    @property(cc.Button)
-    private endTurnButton: cc.Button = null;
-
     @property(cc.Node)
     private mapNode: cc.Node = null;
 
@@ -43,9 +40,10 @@ export default class Game extends cc.Component {
     private offPacketListeners: Array<() => void> = [];
     private map: MapLoader = null;
     private playerNodes: cc.Node[] = [];
+    private myPlayer: GamePlayerInfo = null;
 
     private eventBus: cc.Node = null;
-    private rollPromise: Promise<void> = null;
+    private rollAnimationPromise: Promise<void> = null;
     private gameCamera: cc.Node = null;
 
     protected onLoad() {
@@ -92,7 +90,12 @@ export default class Game extends cc.Component {
                 payload: {},
             })
             .then((response: ResponseWrapper<InitialStatePayload>) => {
+                // CHARACTER_COLORS[gamePlayer.character]
                 for (const gamePlayer of response.payload.gamePlayers) {
+                    if (gamePlayer.player.id === this.client.state.id) {
+                        this.myPlayer = gamePlayer;
+                        this.eventBus.emit(EVENT.UPDATE_MY_GAME_PLAYER_INFO, gamePlayer);
+                    }
                     this.playerNodes.push(this.instantiatePlayer(gamePlayer));
                 }
                 this.panToPlayer(response.payload.firstPlayerId).then(() => {
@@ -102,7 +105,7 @@ export default class Game extends cc.Component {
     }
 
     private prepareForNextTurn() {
-        this.rollPromise = null;
+        this.rollAnimationPromise = null;
         this.client.emit({
             type: PacketType.DEFAULT,
             action: Action.READY_TO_START_TURN,
@@ -119,8 +122,6 @@ export default class Game extends cc.Component {
         const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
         if (isCurrentPlayerTurn) {
             this.eventBus.emit(EVENT.START_CURRENT_PLAYER_TURN);
-            this.purchaseButton.node.active = isCurrentPlayerTurn;
-            this.endTurnButton.node.active = isCurrentPlayerTurn;
         }
     }
 
@@ -129,10 +130,10 @@ export default class Game extends cc.Component {
     }
 
     private async handleAnnounceRoll(packet: Packet<PlayerRollPayload>) {
-        if (this.rollPromise) {
-            await this.rollPromise;
+        if (this.rollAnimationPromise) {
+            await this.rollAnimationPromise;
         }
-        this.rollPromise = null;
+        this.rollAnimationPromise = null;
 
         const { id, path } = packet.payload;
         const playerNode = this.getPlayerNode(id);
@@ -140,23 +141,22 @@ export default class Game extends cc.Component {
         playerComponent.walk();
         const gameCameraControl = this.gameCamera.getComponent(GameCameraControl);
         gameCameraControl.startFollowing(playerNode);
-        this.map.moveAlongPath(
-            playerNode,
-            path,
-            (node, target: cc.Vec2) => {
-                const playerComp = node.getComponent(Player);
-                if (target.x - node.position.x > FLIP_THRESHHOLD) {
-                    playerComp.turnToRight();
-                }
-                if (node.position.x - target.x > FLIP_THRESHHOLD) {
-                    playerComp.turnToLeft();
-                }
-            },
-            () => {
-                playerComponent.stop();
-                gameCameraControl.stopFollowing();
-            },
-        );
+        await this.map.moveAlongPath(playerNode, path, (node, target: cc.Vec2) => {
+            const playerComp = node.getComponent(Player);
+            if (target.x - node.position.x > FLIP_THRESHHOLD) {
+                playerComp.turnToRight();
+            }
+            if (node.position.x - target.x > FLIP_THRESHHOLD) {
+                playerComp.turnToLeft();
+            }
+        });
+        playerComponent.stop();
+        gameCameraControl.stopFollowing();
+        if (id === this.client.state.id) {
+            // it's my player
+            await this.handleEncounters(packet.payload.encounters);
+            this.requestEndTurn();
+        }
     }
 
     private handleAnnouncePurchase(packet: Packet<PlayerPurchasePayload>) {
@@ -181,6 +181,42 @@ export default class Game extends cc.Component {
         });
     }
 
+    private handleEncounters(encounters: Encounter[]): Promise<void> {
+        return new Promise((resolve) => {
+            const handlePurchase = (propertyForPurchase: PropertyForPurchaseEncounter) => {
+                waitingCount--;
+                cc.log('purchasing');
+                this.requestPurchase(propertyForPurchase);
+                if (waitingCount === 0) {
+                    this.eventBus.off(EVENT.PURCHASE, handlePurchase);
+                    this.eventBus.off(EVENT.CANCEL_PURCHASE, handleCancelPurchase);
+                    resolve();
+                }
+            };
+            const handleCancelPurchase = () => {
+                waitingCount--;
+                if (waitingCount === 0) {
+                    this.eventBus.off(EVENT.PURCHASE, handlePurchase);
+                    this.eventBus.off(EVENT.CANCEL_PURCHASE, handleCancelPurchase);
+                    resolve();
+                }
+            };
+            let waitingCount = 0;
+            this.eventBus.on(EVENT.PURCHASE, handlePurchase);
+            this.eventBus.on(EVENT.CANCEL_PURCHASE, handleCancelPurchase);
+            for (const encounter of encounters) {
+                if (encounter.newPropertyForPurchase) {
+                    this.eventBus.emit(EVENT.PROMPT_PURCHASE, encounter.newPropertyForPurchase);
+                    waitingCount++;
+                }
+            }
+            if (waitingCount === 0) {
+                cc.log('no purchase, end turn');
+                resolve();
+            }
+        });
+    }
+
     private requestRoll() {
         this.client
             .request({
@@ -194,39 +230,39 @@ export default class Game extends cc.Component {
                     this.eventBus.emit(EVENT.DICE_ROLLED_RESPONSE, response.payload.steps);
                 }
             });
-        this.rollPromise = new Promise((resolve) => {
+        this.rollAnimationPromise = new Promise((resolve) => {
             this.eventBus.on(EVENT.DICE_ROLLED_END, resolve);
         });
     }
 
     private requestEndTurn() {
-        this.client
-            .request({
-                type: PacketType.REQUEST,
-                request_id: this.client.newId(),
-                action: Action.END_TURN,
-                payload: {},
-            })
-            .then((response: ResponseWrapper) => {
-                if (response.ok()) {
-                    this.purchaseButton.node.active = false;
-                    this.endTurnButton.node.active = false;
-                }
-            });
+        this.client.request({
+            type: PacketType.REQUEST,
+            request_id: this.client.newId(),
+            action: Action.END_TURN,
+            payload: {},
+        });
     }
 
-    private requestPurchase() {
-        const selectedPropertyTile = this.map.selectedPropertyTile;
-        if (selectedPropertyTile) {
-            this.client.request<PurchasePayload>({
+    private requestPurchase(propertyForPurchase: PropertyForPurchaseEncounter) {
+        const propertyPos = propertyForPurchase.properties[0].pos;
+
+        this.client
+            .request<PurchasePayload>({
                 type: PacketType.REQUEST,
                 request_id: this.client.newId(),
                 action: Action.PURCHASE,
                 payload: {
-                    propertyPos: selectedPropertyTile.getComponent(Tile).getTile().pos,
+                    propertyPos,
                 },
+            })
+            .then((response: ResponseWrapper<PurchaseResponsePayload>) => {
+                if (response.ok()) {
+                    this.eventBus.emit(EVENT.UPDATE_MY_MONEY, response.payload.remainingMoney);
+                } else {
+                    cc.log(response.getMessage());
+                }
             });
-        }
     }
 
     private instantiatePlayer(gamePlayer: GamePlayerInfo): cc.Node {
@@ -260,9 +296,6 @@ export default class Game extends cc.Component {
         this.funcWaitingForStart = [];
 
         this.eventBus.on(EVENT.DICE_ROLLED, this.requestRoll, this);
-
-        this.purchaseButton.node.on('click', this.requestPurchase, this);
-        this.endTurnButton.node.on('click', this.requestEndTurn, this);
     }
 
     protected onDestroy() {

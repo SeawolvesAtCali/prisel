@@ -142,8 +142,7 @@ export default class MapLoader extends cc.Component {
         node: cc.Node,
         coors: Coordinate[],
         onMove?: (node: cc.Node, next: cc.Vec2) => void,
-        callback?: (node: cc.Node) => void,
-    ) {
+    ): Promise<void> {
         // assuming server doesn't send the initial tile, just the other tiles
         // on the path
         const actionSequence: cc.FiniteTimeAction[] = [];
@@ -159,11 +158,12 @@ export default class MapLoader extends cc.Component {
             actionSequence.push(setZIndexAction(targetZIndex));
         }
 
-        if (callback) {
-            actionSequence.push(cc.callFunc(callback));
-        }
+        const promise = new Promise<void>((resolve) => {
+            actionSequence.push(cc.callFunc(resolve));
+        });
 
         node.runAction(cc.sequence(actionSequence));
+        return promise;
     }
     // update (dt) {}
 }

@@ -13,6 +13,22 @@ export const CHARACTER_COLORS = {
     4: 'yellow',
 };
 
+export const CHARACTER_AVATAR_SPRITE_NAME = {
+    0: 'alienGreen_badge1',
+    1: 'alienBlue_badge1',
+    2: 'alienBeige_badge1',
+    3: 'alienPink_badge1',
+    4: 'alienYellow_badge1',
+};
+
+export function getCharacterColor(character: number) {
+    return CHARACTER_COLORS[character % 5];
+}
+
+export function getCharacterAvatarSpriteName(character: number) {
+    return CHARACTER_AVATAR_SPRITE_NAME[character % 5];
+}
+
 // if the horizontal distance is more than FLIP_THRESHOLD when moving, consider
 // flipping the node.
 export const FLIP_THRESHHOLD = 10;
@@ -33,4 +49,9 @@ export enum EVENT {
 
     START_CURRENT_PLAYER_TURN = 'start_current_player_turn',
     END_CURRENT_PLAYER_TURN = 'end_current_player_turn',
+    UPDATE_MY_GAME_PLAYER_INFO = 'update_my_game_player_info', // arg1: GamePlayerInfo
+    UPDATE_MY_MONEY = 'update_my_money', // arg1 = money amound
+    PROMPT_PURCHASE = 'prompt_purchase', // arg1 = PropertyForPurchaseEncounter
+    PURCHASE = 'purchase', // arg1 = PropertyForPurchaseEncounter
+    CANCEL_PURCHASE = 'cancel_purchase',
 }

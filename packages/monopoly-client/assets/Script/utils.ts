@@ -55,3 +55,10 @@ export function playAnimation(node: cc.Node, animationName: string): Promise<nev
 export function toVec2(vec: cc.Vec3): cc.Vec2 {
     return cc.v2(vec.x, vec.y);
 }
+
+export function nullCheck<T>(value: T): T {
+    if (value === null || value === undefined) {
+        throw new Error('checking value not empty, but is ' + value);
+    }
+    return value;
+}

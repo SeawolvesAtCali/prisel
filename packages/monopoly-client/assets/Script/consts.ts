@@ -5,6 +5,8 @@ export const TILE_SIZE = 100;
 export const LANDING_POS_OFFSET = cc.v2(TILE_SIZE / 2, 0);
 export const MOVING_DURATION_PER_TILE = 0.5;
 
+export const CAMERA_FOLLOW_OFFSET = cc.v2(0, TILE_SIZE);
+
 export const CHARACTER_COLORS = {
     0: 'green',
     1: 'blue',
@@ -52,6 +54,6 @@ export enum EVENT {
     UPDATE_MY_GAME_PLAYER_INFO = 'update_my_game_player_info', // arg1: GamePlayerInfo
     UPDATE_MY_MONEY = 'update_my_money', // arg1 = money amound
     PROMPT_PURCHASE = 'prompt_purchase', // arg1 = PropertyForPurchaseEncounter
-    PURCHASE = 'purchase', // arg1 = PropertyForPurchaseEncounter
-    CANCEL_PURCHASE = 'cancel_purchase',
+    PURCHASE_DECISION = 'purchase_decision', // arg1 = PropertyForPurchaseEncounter || undefined. undefined means canceling purchase
+    FLUSH_CURRENT_TURN_ANIMATION = 'flush_current_turn_animation',
 }

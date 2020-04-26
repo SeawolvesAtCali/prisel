@@ -1,4 +1,4 @@
-import { Coordinate, PropertyInfo, GamePlayerInfo, Encounter } from './types';
+import { Coordinate, PropertyInfo, GamePlayerInfo, Encounter, Payment } from './types';
 
 export enum Action {
     UNSPECIFIED = '',
@@ -32,7 +32,11 @@ export enum Action {
     ANNOUNCE_START_TURN = 'announce_start_turn',
     ANNOUNCE_ROLL = 'announce_roll',
     ANNOUNCE_PURCHASE = 'announce_purchase',
-    ANNOUNCE_PAY_RENT = 'announce_payrent',
+
+    // announce a player pay rent to another player. Although this information
+    // is available in ANNOUNCE_ROLL's encounter, we still need a message to
+    // tell the landlord player their new networth.
+    ANNOUNCE_PAY_RENT = 'announce_pay_rent',
     // packet to announce a player finished turn.
     // this immediately follows END_TURN response from current player. After
     // receiving this packet, Other players should send back READY_TO_START_TURN
@@ -78,8 +82,8 @@ export interface PlayerRollPayload {
 
 export interface PlayerPayRentPayload {
     id: string;
-    rentPayment: number;
-    property: PropertyInfo;
+    payments: Payment[];
+    myCurrentMoney: number; // the updated money of the current player. This normally only affect payer and payee. All other players will receive an unchanged amount.
 }
 
 export interface InitialStatePayload {

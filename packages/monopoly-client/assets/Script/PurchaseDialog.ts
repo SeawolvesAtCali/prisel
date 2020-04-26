@@ -44,12 +44,12 @@ export default class PurchaseDialog extends cc.Component {
     }
 
     private handlePurchase() {
-        this.eventBus.emit(EVENT.PURCHASE, this.purchaseEncounter);
+        this.eventBus.emit(EVENT.PURCHASE_DECISION, this.purchaseEncounter);
         this.node.active = false;
     }
 
     private handleCancel() {
-        this.eventBus.emit(EVENT.CANCEL_PURCHASE);
+        this.eventBus.emit(EVENT.PURCHASE_DECISION);
         this.node.active = false;
     }
 

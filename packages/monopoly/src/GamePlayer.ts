@@ -5,7 +5,7 @@ import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Game from './Game';
 import PathNode from './PathNode';
 import { RollResponsePayload, PurchaseResponsePayload, PurchasePayload } from '../common/messages';
-import { PropertyInfo, Encounter } from '../common/types';
+import { PropertyInfo, Encounter, Payment } from '../common/types';
 import { samePos } from './utils';
 
 interface Props {
@@ -51,10 +51,15 @@ export class GamePlayer extends GameObject {
     }
 
     @log
-    private payRent(owner: GamePlayer, property: Property): PropertyInfo {
+    private payRent(owner: GamePlayer, property: Property): Payment {
         this.cash = this.cash - property.rent;
         owner.gainMoney(property.rent);
-        return toPropertyInfo(property);
+        return {
+            from: this.player.getId(),
+            to: owner.player.getId(),
+            forProperty: toPropertyInfo(property),
+            amount: property.rent,
+        };
     }
 
     @log
@@ -74,21 +79,21 @@ export class GamePlayer extends GameObject {
         const { properties } = this.pathNode;
         const encounters: Encounter[] = [];
         if (properties.length > 0) {
-            const payRentProperties: PropertyInfo[] = [];
+            const rentPayments: Payment[] = [];
             const propertiesForPurchase: PropertyInfo[] = [];
             // check for rent payment first
             for (const property of properties) {
                 if (property.owner && property.owner.id !== this.id) {
-                    payRentProperties.push(this.payRent(property.owner, property));
+                    rentPayments.push(this.payRent(property.owner, property));
                 }
                 if (!property.owner) {
                     propertiesForPurchase.push(toPropertyInfo(property));
                 }
             }
-            if (payRentProperties.length > 0) {
+            if (rentPayments.length > 0) {
                 encounters.push({
                     payRent: {
-                        properties: payRentProperties,
+                        payments: rentPayments,
                         remainingMoney: this.cash,
                     },
                 });

@@ -17,9 +17,17 @@ import {
 import { client, ClientState } from './Client';
 import { Client, Packet, PacketType, ResponseWrapper } from './packages/priselClient';
 import Player from './Player';
-import Tile from './Tile';
-import { CHARACTER_COLORS, FLIP_THRESHHOLD, EVENT_BUS, EVENT, GAME_CAMERA } from './consts';
+import {
+    CHARACTER_COLORS,
+    FLIP_THRESHHOLD,
+    EVENT_BUS,
+    EVENT,
+    GAME_CAMERA,
+    CAMERA_FOLLOW_OFFSET,
+} from './consts';
 import GameCameraControl from './GameCameraControl';
+import { nullCheck } from './utils';
+import { Chainable } from './Chainable';
 
 const { ccclass, property } = cc._decorator;
 
@@ -40,11 +48,11 @@ export default class Game extends cc.Component {
     private offPacketListeners: Array<() => void> = [];
     private map: MapLoader = null;
     private playerNodes: cc.Node[] = [];
-    private myPlayer: GamePlayerInfo = null;
 
     private eventBus: cc.Node = null;
     private rollAnimationPromise: Promise<void> = null;
-    private gameCamera: cc.Node = null;
+    private gameCamera: GameCameraControl = null;
+    private currentTurnChain: Chainable = null;
 
     protected onLoad() {
         this.client = client;
@@ -76,9 +84,6 @@ export default class Game extends cc.Component {
             this.client.on(Action.ANNOUNCE_PURCHASE, this.handleAnnouncePurchase.bind(this)),
         );
         this.offPacketListeners.push(
-            this.client.on(Action.ANNOUNCE_PAY_RENT, this.handleAnnouncePayRent.bind(this)),
-        );
-        this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_END_TURN, this.handleAnnounceEndTurn.bind(this)),
         );
 
@@ -93,7 +98,6 @@ export default class Game extends cc.Component {
                 // CHARACTER_COLORS[gamePlayer.character]
                 for (const gamePlayer of response.payload.gamePlayers) {
                     if (gamePlayer.player.id === this.client.state.id) {
-                        this.myPlayer = gamePlayer;
                         this.eventBus.emit(EVENT.UPDATE_MY_GAME_PLAYER_INFO, gamePlayer);
                     }
                     this.playerNodes.push(this.instantiatePlayer(gamePlayer));
@@ -115,11 +119,19 @@ export default class Game extends cc.Component {
 
     private panToPlayer(id: string): Promise<void> {
         const playerNode = this.getPlayerNode(id);
-        return this.gameCamera.getComponent(GameCameraControl).moveToNode(playerNode);
+        return this.gameCamera.moveToNode(playerNode, CAMERA_FOLLOW_OFFSET);
     }
 
     private handleAnnounceStartTurn(packet: Packet<PlayerStartTurnPayload>) {
         const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
+        this.currentTurnChain = Chainable.activeWhen(
+            new Promise((resolve) => {
+                this.eventBus.once(EVENT.FLUSH_CURRENT_TURN_ANIMATION, resolve);
+            }),
+        );
+        this.currentTurnChain.then(() => {
+            this.prepareForNextTurn();
+        });
         if (isCurrentPlayerTurn) {
             this.eventBus.emit(EVENT.START_CURRENT_PLAYER_TURN);
         }
@@ -130,32 +142,44 @@ export default class Game extends cc.Component {
     }
 
     private async handleAnnounceRoll(packet: Packet<PlayerRollPayload>) {
-        if (this.rollAnimationPromise) {
-            await this.rollAnimationPromise;
-        }
-        this.rollAnimationPromise = null;
-
         const { id, path } = packet.payload;
         const playerNode = this.getPlayerNode(id);
         const playerComponent = playerNode.getComponent(Player);
-        playerComponent.walk();
-        const gameCameraControl = this.gameCamera.getComponent(GameCameraControl);
-        gameCameraControl.startFollowing(playerNode);
-        await this.map.moveAlongPath(playerNode, path, (node, target: cc.Vec2) => {
-            const playerComp = node.getComponent(Player);
-            if (target.x - node.position.x > FLIP_THRESHHOLD) {
-                playerComp.turnToRight();
-            }
-            if (node.position.x - target.x > FLIP_THRESHHOLD) {
-                playerComp.turnToLeft();
-            }
-        });
-        playerComponent.stop();
-        gameCameraControl.stopFollowing();
+        this.currentTurnChain.chainOrRun(
+            async () => {
+                playerComponent.walk();
+                this.gameCamera.startFollowing(playerNode, CAMERA_FOLLOW_OFFSET);
+                await this.map.moveAlongPath(playerNode, path, (node, targetPos: cc.Vec2) => {
+                    const playerComp = node.getComponent(Player);
+                    if (targetPos.x - node.position.x > FLIP_THRESHHOLD) {
+                        playerComp.turnToRight();
+                    }
+                    if (node.position.x - targetPos.x > FLIP_THRESHHOLD) {
+                        playerComp.turnToLeft();
+                    }
+                });
+                playerComponent.stop();
+                this.gameCamera.stopFollowing();
+            },
+            () => {
+                this.map.moveToPos(playerNode, path[path.length - 1]);
+                this.gameCamera.moveToNode(playerNode, CAMERA_FOLLOW_OFFSET);
+            },
+            'walking',
+        );
         if (id === this.client.state.id) {
             // it's my player
-            await this.handleEncounters(packet.payload.encounters);
-            this.requestEndTurn();
+            cc.log('chain handleEncounter');
+            this.currentTurnChain
+                .chain(() => this.handleEncounters(packet.payload.encounters), 'handleEncounter')
+                .chain(async () => {
+                    this.requestEndTurn();
+                }, 'request end turn');
+        } else {
+            this.currentTurnChain.chain(
+                () => this.handleEncountersForOtherPlayer(packet.payload.encounters),
+                'handleEncounterForOtherPlayer',
+            );
         }
     }
 
@@ -168,52 +192,62 @@ export default class Game extends cc.Component {
         this.map.getPropertyTileAt(purchasdProperty.pos).setOwner(player.getComponent(Player));
     }
 
-    private handleAnnouncePayRent() {}
-
     private handleAnnounceEndTurn(packet: Packet<PlayerEndTurnPayload>) {
         const isCurrentPlayerTurn = packet.payload.currentPlayerId === this.client.state.id;
         if (isCurrentPlayerTurn) {
             this.eventBus.emit(EVENT.END_CURRENT_PLAYER_TURN);
         }
         // pan to the next player
-        this.panToPlayer(packet.payload.nextPlayerId).then(() => {
-            this.prepareForNextTurn();
-        });
+        cc.log('chain end turn panning');
+        this.currentTurnChain.chain(
+            () => this.panToPlayer(packet.payload.nextPlayerId),
+            'end turn panning',
+        );
+
+        this.eventBus.emit(EVENT.FLUSH_CURRENT_TURN_ANIMATION);
     }
 
     private handleEncounters(encounters: Encounter[]): Promise<void> {
         return new Promise((resolve) => {
-            const handlePurchase = (propertyForPurchase: PropertyForPurchaseEncounter) => {
-                waitingCount--;
-                cc.log('purchasing');
-                this.requestPurchase(propertyForPurchase);
-                if (waitingCount === 0) {
-                    this.eventBus.off(EVENT.PURCHASE, handlePurchase);
-                    this.eventBus.off(EVENT.CANCEL_PURCHASE, handleCancelPurchase);
-                    resolve();
-                }
-            };
-            const handleCancelPurchase = () => {
-                waitingCount--;
-                if (waitingCount === 0) {
-                    this.eventBus.off(EVENT.PURCHASE, handlePurchase);
-                    this.eventBus.off(EVENT.CANCEL_PURCHASE, handleCancelPurchase);
-                    resolve();
-                }
-            };
             let waitingCount = 0;
-            this.eventBus.on(EVENT.PURCHASE, handlePurchase);
-            this.eventBus.on(EVENT.CANCEL_PURCHASE, handleCancelPurchase);
+
             for (const encounter of encounters) {
                 if (encounter.newPropertyForPurchase) {
                     this.eventBus.emit(EVENT.PROMPT_PURCHASE, encounter.newPropertyForPurchase);
                     waitingCount++;
+                    this.eventBus.once(
+                        EVENT.PURCHASE_DECISION,
+                        (propertyForPurchase?: PropertyForPurchaseEncounter) => {
+                            waitingCount--;
+                            if (propertyForPurchase) {
+                                this.requestPurchase(propertyForPurchase);
+                            }
+                            if (waitingCount === 0) {
+                                resolve();
+                            }
+                        },
+                    );
+                }
+                if (encounter.payRent) {
+                    // right now, just deduct money from hud, no animation
+                    this.eventBus.emit(EVENT.UPDATE_MY_MONEY, encounter.payRent.remainingMoney);
                 }
             }
             if (waitingCount === 0) {
                 cc.log('no purchase, end turn');
                 resolve();
             }
+        });
+    }
+
+    private handleEncountersForOtherPlayer(encounters: Encounter[]): Promise<void> {
+        return new Promise((resolve) => {
+            for (const encounter of encounters) {
+                if (encounter.payRent) {
+                    cc.log('player pay rent');
+                }
+            }
+            resolve();
         });
     }
 
@@ -230,9 +264,12 @@ export default class Game extends cc.Component {
                     this.eventBus.emit(EVENT.DICE_ROLLED_RESPONSE, response.payload.steps);
                 }
             });
-        this.rollAnimationPromise = new Promise((resolve) => {
-            this.eventBus.on(EVENT.DICE_ROLLED_END, resolve);
-        });
+        this.currentTurnChain.chain(
+            new Promise((resolve) => {
+                this.eventBus.on(EVENT.DICE_ROLLED_END, resolve);
+            }),
+            'roll animation',
+        );
     }
 
     private requestEndTurn() {
@@ -282,8 +319,8 @@ export default class Game extends cc.Component {
 
     protected start() {
         this.started = true;
-        this.eventBus = cc.find(EVENT_BUS);
-        this.gameCamera = cc.find(GAME_CAMERA);
+        this.eventBus = nullCheck(cc.find(EVENT_BUS));
+        this.gameCamera = nullCheck(cc.find(GAME_CAMERA).getComponent(GameCameraControl));
         const debugNode = this.node.getChildByName('debug');
         if (debugNode) {
             this.node.removeChild(debugNode);

@@ -88,7 +88,7 @@ export interface GamePlayerInfo {
 }
 
 export interface PayRentEncounter {
-    properties: PropertyInfo[];
+    payments: Payment[];
     remainingMoney: number;
 }
 
@@ -98,4 +98,11 @@ export interface PropertyForPurchaseEncounter {
 export interface Encounter {
     newPropertyForPurchase?: PropertyForPurchaseEncounter;
     payRent?: PayRentEncounter;
+}
+
+export interface Payment {
+    from: string;
+    to: string;
+    amount: number;
+    forProperty?: PropertyInfo;
 }

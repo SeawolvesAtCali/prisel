@@ -134,8 +134,8 @@
       "__id__": 1
     },
     "_enabled": true,
-    "level1Sprite": {
-      "__uuid__": "17a6d520-b5a8-40fc-9544-0c1e552aacec"
+    "spriteAtlas": {
+      "__uuid__": "2a76583b-3f5f-48c4-b955-f8ed4c594efe"
     },
     "_id": ""
   },

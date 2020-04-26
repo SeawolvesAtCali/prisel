@@ -31,9 +31,6 @@ export default class MapLoader extends cc.Component {
     @property(cc.Prefab)
     private startTile = null;
 
-    @property(cc.Node)
-    private propertySelector: cc.Node = null;
-
     private startTiles: StartTile[] = null;
 
     private tileMap: Map<string, TileComponent> = null;
@@ -44,13 +41,7 @@ export default class MapLoader extends cc.Component {
     public mapWidthInPx = 0;
     private tilePositionOffset: cc.Vec2 = null;
 
-    private gameCamera: cc.Node = null;
-
     // LIFE-CYCLE CALLBACKS:
-
-    protected start() {
-        this.gameCamera = cc.find(GAME_CAMERA);
-    }
 
     public renderMap(boardSetup: BoardSetup) {
         if (!this.emptyTile || !this.roadTile || !this.propertyTile || !this.startTile) {
@@ -65,20 +56,6 @@ export default class MapLoader extends cc.Component {
 
         this.startTiles = [];
         this.tileMap = new Map();
-        const onSelect = (node: cc.Node) => {
-            this.selectedPropertyTile = node;
-            this.moveToPos(this.propertySelector, node.getComponent(TileComponent).getTile().pos);
-            this.propertySelector.active = true;
-            this.propertySelector.zIndex = SELECTOR_ZINDEX;
-            this.propertySelector
-                .getChildByName('selector head')
-                .getComponent(cc.Animation)
-                .play();
-            this.propertySelector
-                .getChildByName('selector shadow')
-                .getComponent(cc.Animation)
-                .play();
-        };
 
         for (const tile of tiles) {
             if (isRoadTile(tile)) {
@@ -87,8 +64,7 @@ export default class MapLoader extends cc.Component {
                 this.startTiles.push(tile);
                 this.renderTile(this.startTile, tile);
             } else if (isPropertyTile(tile)) {
-                const propertyTile = this.renderTile(this.propertyTile, tile);
-                propertyTile.getComponent(PropertyTile).onSelect = onSelect;
+                this.renderTile(this.propertyTile, tile);
             } else {
                 // assume it is unspecified tile
                 this.renderTile(this.emptyTile, tile);

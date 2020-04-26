@@ -13,7 +13,9 @@ import {
     PlayerPurchasePayload,
     PlayerRollPayload,
     RollResponsePayload,
+    PlayerPayRentPayload,
 } from '../common/messages';
+import { Payment } from '../common/types';
 
 export function syncAllPlayer(game: Game, action: Action): Promise<void> {
     return new Promise((resolve) => {
@@ -53,6 +55,25 @@ export function runPlayerTurn(game: Game, room: Room): Promise<void> {
                         encounters: response.payload.encounters,
                     },
                 });
+                if (response.payload.encounters.some((encounter) => encounter.payRent)) {
+                    const payments: Payment[] = [].concat(
+                        response.payload.encounters
+                            .filter((encounter) => encounter.payRent)
+                            .map((encounter) => encounter.payRent.payments),
+                    );
+                    broadcast<PlayerPayRentPayload>(
+                        currentGame.room.getPlayers(),
+                        (playerInGame) => ({
+                            type: PacketType.DEFAULT,
+                            action: Action.ANNOUNCE_PAY_RENT,
+                            payload: {
+                                id: player.id,
+                                payments,
+                                myCurrentMoney: currentGame.getGamePlayer(playerInGame).cash,
+                            },
+                        }),
+                    );
+                }
             }
         },
         isDone(_, response) {

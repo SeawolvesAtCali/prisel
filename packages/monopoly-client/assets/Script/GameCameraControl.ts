@@ -8,6 +8,7 @@ export default class GameCameraControl extends cc.Component {
     private followingNode: cc.Node = null;
     private resolveMoveToNode: (value?: void | PromiseLike<void>) => void = null;
     private moveToNodeTween: cc.Tween = null;
+    private offset: cc.Vec2 = null;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -15,7 +16,7 @@ export default class GameCameraControl extends cc.Component {
 
     protected start() {}
 
-    public startFollowing(node: cc.Node) {
+    public startFollowing(node: cc.Node, offset?: cc.Vec2) {
         if (this.moveToNodeTween) {
             this.moveToNodeTween.stop();
             this.moveToNodeTween = null;
@@ -25,27 +26,34 @@ export default class GameCameraControl extends cc.Component {
             this.resolveMoveToNode = null;
         }
         this.followingNode = node;
+        this.offset = offset;
     }
     public stopFollowing() {
         this.followingNode = null;
     }
 
-    private getTargetPositionInParentSpace(target: cc.Node) {
+    private getTargetPositionInParentSpace(target: cc.Node): cc.Vec2 {
         const targetPos = target.parent.convertToWorldSpaceAR(target.position);
-        return this.node.parent.convertToNodeSpaceAR(targetPos);
+        return toVec2(this.node.parent.convertToNodeSpaceAR(targetPos));
     }
     protected lateUpdate(dt: number) {
         if (this.followingNode) {
-            this.node.setPosition(this.getTargetPositionInParentSpace(this.followingNode));
+            const cameraPos = this.offset
+                ? this.getTargetPositionInParentSpace(this.followingNode).add(this.offset)
+                : this.getTargetPositionInParentSpace(this.followingNode);
+
+            this.node.setPosition(cameraPos);
         }
     }
 
-    public moveToNode(node: cc.Node): Promise<void> {
+    public moveToNode(node: cc.Node, offset?: cc.Vec2): Promise<void> {
         if (this.followingNode) {
             this.followingNode = null;
         }
 
-        const targetPos = toVec2(this.getTargetPositionInParentSpace(node));
+        const targetPos = offset
+            ? this.getTargetPositionInParentSpace(node).add(offset)
+            : this.getTargetPositionInParentSpace(node);
         const distance = targetPos.sub(this.node.position).mag();
         const duration = distance / AUTO_PANNING_PX_PER_SECOND;
         return new Promise((resolve) => {

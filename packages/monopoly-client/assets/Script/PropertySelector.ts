@@ -31,8 +31,7 @@ export default class PropertySelector extends cc.Component {
     protected start() {
         this.eventBus = cc.find(EVENT_BUS);
         this.eventBus.on(EVENT.PROMPT_PURCHASE, this.handlePropertyForPurchase, this);
-        this.eventBus.on(EVENT.CANCEL_PURCHASE, this.handleHide, this);
-        this.eventBus.on(EVENT.PURCHASE, this.handleHide, this);
+        this.eventBus.on(EVENT.PURCHASE_DECISION, this.handleHide, this);
         this.node.active = false;
     }
 

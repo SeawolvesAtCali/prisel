@@ -89,7 +89,6 @@ export interface GamePlayerInfo {
 
 export interface PayRentEncounter {
     payments: Payment[];
-    remainingMoney: number;
 }
 
 export interface PropertyForPurchaseEncounter {

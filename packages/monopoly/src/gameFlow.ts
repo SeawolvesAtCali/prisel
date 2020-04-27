@@ -45,7 +45,7 @@ export function runPlayerTurn(game: Game, room: Room): Promise<void> {
         postHandle(currentGame, response: ResponseWrapper<RollResponsePayload>, player) {
             if (response.ok()) {
                 // notify other players about current player's move
-                broadcast<PlayerRollPayload>(currentGame.room.getPlayers(), {
+                broadcast<PlayerRollPayload>(currentGame.room.getPlayers(), (playerInGame) => ({
                     type: PacketType.DEFAULT,
                     action: Action.ANNOUNCE_ROLL,
                     payload: {
@@ -53,8 +53,9 @@ export function runPlayerTurn(game: Game, room: Room): Promise<void> {
                         steps: response.payload.path.length,
                         path: response.payload.path,
                         encounters: response.payload.encounters,
+                        myMoney: currentGame.getGamePlayer(playerInGame).cash,
                     },
-                });
+                }));
                 if (response.payload.encounters.some((encounter) => encounter.payRent)) {
                     const payments: Payment[] = [].concat(
                         response.payload.encounters

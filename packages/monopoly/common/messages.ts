@@ -11,9 +11,17 @@ export enum Action {
     // initiate from client
     ROLL = 'roll',
 
+    // packet from server
+    // include encounters of current player after moved.
+    ENCOUNTER = 'encounter',
+
     // request/response
     // initiate from client
     PURCHASE = 'purchase',
+
+    // request/response
+    // initiate from server
+    PROMPT_PURCHASE = 'promp_purchase',
 
     // request/response
     // initiate from client
@@ -44,10 +52,25 @@ export enum Action {
     ANNOUNCE_END_TURN = 'announce_end_turn',
 }
 
+export interface PromptPurchasePayload {
+    property: PropertyInfo;
+    moneyAfterPurchase: number;
+}
+
+export interface PromptPurchaseResponsePayload {
+    purchase: boolean;
+}
+
 export interface RollResponsePayload {
     steps: number;
     path: Coordinate[]; // not including the current position
+    encounters?: Encounter[];
+}
+
+export interface EncounterPayload {
+    playerId: string;
     encounters: Encounter[];
+    myMoney: number;
 }
 
 export interface PurchasePayload {
@@ -77,7 +100,8 @@ export interface PlayerRollPayload {
     id: string;
     steps: number;
     path: Coordinate[];
-    encounters: Encounter[];
+    encounters?: Encounter[];
+    myMoney: number;
 }
 
 export interface PlayerPayRentPayload {

@@ -1,76 +1,24 @@
-import { MessageType } from '@prisel/server';
+import Game from '../Game';
+import { StateMachineState } from './StateMachineState';
 
-export interface StateConfig {
-    name: string;
-    description?: string;
-    transitions?: TransitionConfig[];
-}
-export interface TransitionConfig {
-    from?: string;
-    to: string;
-    condition: TransitionCondition;
-}
+export class StateMachine {
+    private currentState: StateMachineState;
+    private game: Game;
+    constructor(game: Game) {
+        this.game = game;
+    }
 
-export interface TransitionCondition {
-    type: string;
-}
+    public init(initialStateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {
+        this.currentState = new initialStateClass(this.game, this);
+    }
 
-export interface SyncPacketCondition extends TransitionCondition {
-    action?: any;
-    systemAction?: MessageType;
-}
+    public get state(): StateMachineState {
+        return this.currentState;
+    }
 
-export interface CurrentPlayerActionCondition extends TransitionCondition {
-    action?: any;
-    systemAction?: MessageType;
-}
-
-export interface ServerBroadcastCondition extends TransitionCondition {
-    message: string;
-}
-
-export interface SequenceCondition extends TransitionCondition {
-    sequence: TransitionCondition[];
-}
-
-export function serverBroadcast(message: string): ServerBroadcastCondition {
-    return {
-        type: 'server_broadcast',
-        message,
-    };
-}
-
-export function syncAction(action: any): SyncPacketCondition {
-    return {
-        type: 'sync_action',
-        action,
-    };
-}
-
-export function syncSystemAction(systemAction: MessageType): SyncPacketCondition {
-    return {
-        type: 'sync_action',
-        systemAction,
-    };
-}
-
-export function currentPlayerAction(action: any): CurrentPlayerActionCondition {
-    return {
-        type: 'current_player_action',
-        action,
-    };
-}
-
-export function currentPlayerSystemAction(systemAction: MessageType): CurrentPlayerActionCondition {
-    return {
-        type: 'current_player_action',
-        systemAction,
-    };
-}
-
-export function sequence(...conditions: TransitionCondition[]): SequenceCondition {
-    return {
-        type: 'sequence',
-        sequence: conditions,
-    };
+    public transition(stateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {
+        setImmediate(() => {
+            this.currentState = new stateClass(this.game, this);
+        });
+    }
 }

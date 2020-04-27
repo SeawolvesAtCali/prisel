@@ -5,7 +5,7 @@ import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Game from './Game';
 import PathNode from './PathNode';
 import { RollResponsePayload, PurchaseResponsePayload, PurchasePayload } from '../common/messages';
-import { PropertyInfo, Encounter, Payment } from '../common/types';
+import { PropertyInfo, Encounter, Payment, Coordinate } from '../common/types';
 import { samePos } from './utils';
 
 interface Props {
@@ -51,7 +51,7 @@ export class GamePlayer extends GameObject {
     }
 
     @log
-    private payRent(owner: GamePlayer, property: Property): Payment {
+    public payRent(owner: GamePlayer, property: Property): Payment {
         this.cash = this.cash - property.rent;
         owner.gainMoney(property.rent);
         return {
@@ -67,15 +67,20 @@ export class GamePlayer extends GameObject {
         this.cash += amount;
     }
 
+    public rollAndMove(): Coordinate[] {
+        const path = roll(this.pathNode);
+        this.rolled = true;
+        this.pathNode = path[path.length - 1];
+        return path.map((pathNode) => pathNode.tile.pos);
+    }
+
     @log
     public roll(game: Game, packet: Request): Response<RollResponsePayload> {
         if (this.rolled) {
             return Messages.getFailureFor(packet, `Player ${this.id} already rolled`);
         }
 
-        const path = roll(this.pathNode);
-        this.rolled = true;
-        this.pathNode = path[path.length - 1];
+        const pathCoordinates = this.rollAndMove();
         const { properties } = this.pathNode;
         const encounters: Encounter[] = [];
         if (properties.length > 0) {
@@ -94,7 +99,6 @@ export class GamePlayer extends GameObject {
                 encounters.push({
                     payRent: {
                         payments: rentPayments,
-                        remainingMoney: this.cash,
                     },
                 });
             }
@@ -109,10 +113,16 @@ export class GamePlayer extends GameObject {
         }
 
         return Messages.getSuccessFor<RollResponsePayload>(packet, {
-            steps: path.length,
-            path: path.map((pathNode) => pathNode.tile.pos),
+            steps: pathCoordinates.length,
+            path: pathCoordinates,
             encounters,
         });
+    }
+
+    public purchaseProperty(property: Property) {
+        this.cash = this.cash - property.cost;
+        property.setOwner(this);
+        this.owning.push(property);
     }
 
     @log
@@ -141,9 +151,7 @@ export class GamePlayer extends GameObject {
             );
         }
 
-        this.cash = this.cash - propertyToPurchase.cost;
-        propertyToPurchase.setOwner(this);
-        this.owning.push(propertyToPurchase);
+        this.purchaseProperty(propertyToPurchase);
         return Messages.getSuccessFor<PurchaseResponsePayload>(request, {
             property: toPropertyInfo(propertyToPurchase),
             remainingMoney: this.cash,

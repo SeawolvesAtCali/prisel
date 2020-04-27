@@ -173,6 +173,7 @@ export default class Game extends cc.Component {
             this.currentTurnChain
                 .chain(() => this.handleEncounters(packet.payload.encounters), 'handleEncounter')
                 .chain(async () => {
+                    // TODO server needs to handle notifying ending turn.
                     this.requestEndTurn();
                 }, 'request end turn');
         } else {
@@ -227,10 +228,6 @@ export default class Game extends cc.Component {
                             }
                         },
                     );
-                }
-                if (encounter.payRent) {
-                    // right now, just deduct money from hud, no animation
-                    this.eventBus.emit(EVENT.UPDATE_MY_MONEY, encounter.payRent.remainingMoney);
                 }
             }
             if (waitingCount === 0) {

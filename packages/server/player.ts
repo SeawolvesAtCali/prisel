@@ -18,6 +18,12 @@ export abstract class Player {
     public abstract joinRoom(roomId: RoomId): Room | null;
     public abstract leaveRoom(): void;
     public abstract emit<T extends Packet<any>>(packet: T): void;
+    /**
+     * Send a request to client
+     * @param request partial Request. no need to specify requst_id as it will
+     * be auto populated
+     * @param timeout timeout in ms. 0 for no timeout
+     */
     public abstract request<Payload = any>(
         request: Omit<Request<Payload>, 'request_id'>,
         timeout?: number,

@@ -54,32 +54,6 @@ export default class Game extends GameObject {
         return [...this.turnOrder.slice(1), this.turnOrder[0]][0];
     }
 
-    public startTurn(): void {
-        this.turn = startTurn(this, this.getCurrentPlayer());
-        const startTurnPacket: Packet<PlayerStartTurnPayload> = {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_START_TURN,
-            payload: {
-                id: this.turn.player.id,
-            },
-        };
-
-        broadcast(this.room.getPlayers(), startTurnPacket);
-    }
-
-    public endTurn(): void {
-        this.turn.end();
-        this.turn = null;
-        broadcast<PlayerEndTurnPayload>(this.room.getPlayers(), {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_END_TURN,
-            payload: {
-                currentPlayerId: this.getCurrentPlayer().id,
-                nextPlayerId: this.getNextPlayer().id,
-            },
-        });
-    }
-
     public isCurrentPlayer(player: GamePlayer) {
         return this.turnOrder[0].player.equals(player.player);
     }

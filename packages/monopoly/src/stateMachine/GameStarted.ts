@@ -1,5 +1,5 @@
 import { StateMachineState } from './StateMachineState';
-import { Packet, isRequest } from '@prisel/server';
+import { Packet, isRequest, isPacket } from '@prisel/server';
 import { Action, InitialStatePayload } from '../../common/messages';
 import { GamePlayer } from '../GamePlayer';
 import { PreRoll } from './PreRoll';

@@ -1,5 +1,6 @@
 import Game from '../Game';
 import { StateMachineState } from './StateMachineState';
+import { debug } from '@prisel/server';
 
 export class StateMachine {
     private currentState: StateMachineState;
@@ -10,6 +11,7 @@ export class StateMachine {
 
     public init(initialStateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {
         this.currentState = new initialStateClass(this.game, this);
+        this.currentState.onEnter();
     }
 
     public get state(): StateMachineState {
@@ -18,7 +20,15 @@ export class StateMachine {
 
     public transition(stateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {
         setImmediate(() => {
+            const previousState = this.currentState;
+            previousState.onExit();
             this.currentState = new stateClass(this.game, this);
+            debug(
+                `transition from ${previousState[Symbol.toStringTag]} to ${
+                    this.currentState[Symbol.toStringTag]
+                }`,
+            );
+            this.currentState.onEnter();
         });
     }
 }

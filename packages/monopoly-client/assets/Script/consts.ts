@@ -53,7 +53,7 @@ export enum EVENT {
     END_CURRENT_PLAYER_TURN = 'end_current_player_turn',
     UPDATE_MY_GAME_PLAYER_INFO = 'update_my_game_player_info', // arg1: GamePlayerInfo
     UPDATE_MY_MONEY = 'update_my_money', // arg1 = money amound
-    PROMPT_PURCHASE = 'prompt_purchase', // arg1 = PropertyForPurchaseEncounter
-    PURCHASE_DECISION = 'purchase_decision', // arg1 = PropertyForPurchaseEncounter || undefined. undefined means canceling purchase
-    FLUSH_CURRENT_TURN_ANIMATION = 'flush_current_turn_animation',
+    PROMPT_PURCHASE = 'prompt_purchase', // arg1: PromptPurchasePayload
+    PURCHASE_DECISION = 'purchase_decision', // arg1: boolean
+    NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN = 'no_more_packet_from_server_for_current_turn',
 }

@@ -284,7 +284,7 @@
 				<string>{100,110}</string>
 			</dict>
 
-			<key>property-level-2-blue.png</key>
+			<key>property-level-2-beige.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{424,131},{100,130}}</string>
@@ -298,7 +298,7 @@
 				<string>{100,130}</string>
 			</dict>
 
-			<key>property-level-2-green.png</key>
+			<key>property-level-2-blue.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{404,846},{100,130}}</string>
@@ -312,7 +312,7 @@
 				<string>{100,130}</string>
 			</dict>
 
-			<key>property-level-2-peige.png</key>
+			<key>property-level-2-green.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{341,585},{100,130}}</string>
@@ -354,7 +354,7 @@
 				<string>{100,130}</string>
 			</dict>
 
-			<key>property-level-3-blue.png</key>
+			<key>property-level-3-beige.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{644,257},{100,145}}</string>
@@ -368,7 +368,7 @@
 				<string>{100,145}</string>
 			</dict>
 
-			<key>property-level-3-green.png</key>
+			<key>property-level-3-blue.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{543,555},{100,145}}</string>
@@ -382,7 +382,7 @@
 				<string>{100,145}</string>
 			</dict>
 
-			<key>property-level-3-peige.png</key>
+			<key>property-level-3-green.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{626,111},{100,145}}</string>
@@ -424,7 +424,7 @@
 				<string>{100,145}</string>
 			</dict>
 
-			<key>property-owned-blue.png</key>
+			<key>property-owned-beige.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{240,468},{100,115}}</string>
@@ -438,7 +438,7 @@
 				<string>{100,115}</string>
 			</dict>
 
-			<key>property-owned-green.png</key>
+			<key>property-owned-blue.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{236,116},{100,115}}</string>
@@ -452,7 +452,7 @@
 				<string>{100,115}</string>
 			</dict>
 
-			<key>property-owned-peige.png</key>
+			<key>property-owned-green.png</key>
 			<dict>
 				<key>frame</key>
 				<string>{{236,0},{100,115}}</string>

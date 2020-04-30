@@ -17,6 +17,7 @@ export enum Action {
 
     // request/response
     // initiate from client
+    // deprecated
     PURCHASE = 'purchase',
 
     // request/response

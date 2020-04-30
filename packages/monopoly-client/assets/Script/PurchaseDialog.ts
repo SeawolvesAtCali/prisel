@@ -1,5 +1,9 @@
 import { EVENT_BUS, EVENT } from './consts';
-import { Encounter, PropertyForPurchaseEncounter } from './packages/monopolyCommon';
+import {
+    Encounter,
+    PropertyForPurchaseEncounter,
+    PromptPurchasePayload,
+} from './packages/monopolyCommon';
 
 const { ccclass, property } = cc._decorator;
 
@@ -18,7 +22,6 @@ export default class PurchaseDialog extends cc.Component {
     private propertyPriceLabel: cc.Label = null;
 
     private eventBus: cc.Node = null;
-    private purchaseEncounter: PropertyForPurchaseEncounter = null;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -32,24 +35,23 @@ export default class PurchaseDialog extends cc.Component {
         this.noButton.node.on(cc.Node.EventType.TOUCH_END, this.handleCancel, this);
     }
 
-    private promptPurchase(purchaseEncounter: PropertyForPurchaseEncounter) {
+    private promptPurchase(promptPurchase: PromptPurchasePayload) {
         this.node.active = true;
         // reset the button to normal state.
         this.purchaseButton.getComponentInChildren(
             cc.Sprite,
         ).spriteFrame = this.purchaseButton.normalSprite;
-        this.purchaseEncounter = purchaseEncounter;
-        this.propertyNameLabel.string = this.purchaseEncounter.properties[0].name;
-        this.propertyPriceLabel.string = `${this.purchaseEncounter.properties[0].cost}`;
+        this.propertyNameLabel.string = promptPurchase.property.name;
+        this.propertyPriceLabel.string = `${promptPurchase.property.cost}`;
     }
 
     private handlePurchase() {
-        this.eventBus.emit(EVENT.PURCHASE_DECISION, this.purchaseEncounter);
+        this.eventBus.emit(EVENT.PURCHASE_DECISION, true);
         this.node.active = false;
     }
 
     private handleCancel() {
-        this.eventBus.emit(EVENT.PURCHASE_DECISION);
+        this.eventBus.emit(EVENT.PURCHASE_DECISION, false);
         this.node.active = false;
     }
 

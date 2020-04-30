@@ -1,12 +1,5 @@
-// Learn TypeScript:
-//  - https://docs.cocos.com/creator/manual/en/scripting/typescript.html
-// Learn Attribute:
-//  - https://docs.cocos.com/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
-
 import { EVENT_BUS, EVENT } from './consts';
-import { PropertyForPurchaseEncounter } from './packages/monopolyCommon';
+import { PromptPurchasePayload } from './packages/monopolyCommon';
 import MapLoader from './MapLoader';
 
 const { ccclass, property } = cc._decorator;
@@ -35,11 +28,11 @@ export default class PropertySelector extends cc.Component {
         this.node.active = false;
     }
 
-    private handlePropertyForPurchase(propertyForPurchaseEncounter: PropertyForPurchaseEncounter) {
+    private handlePropertyForPurchase(promptPurchasePayload: PromptPurchasePayload) {
         this.node.active = true;
         this.headAnimation.play();
         this.shadowAnimation.play();
-        this.map.moveToPos(this.node, propertyForPurchaseEncounter.properties[0].pos);
+        this.map.moveToPos(this.node, promptPurchasePayload.property.pos);
     }
 
     private handleHide() {

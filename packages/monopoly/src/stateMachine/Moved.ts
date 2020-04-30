@@ -12,6 +12,8 @@ import {
     PlayerEndTurnPayload,
 } from '../../common/messages';
 import { samePos } from '../utils';
+import { PreTurn } from './PreTurn';
+import { debug } from '@prisel/server';
 
 export class Moved extends StateMachineState {
     public onEnter() {
@@ -71,21 +73,25 @@ export class Moved extends StateMachineState {
                     nextPlayerId: this.game.getNextPlayer().id,
                 },
             });
+            this.game.giveTurnToNext();
+            this.machine.transition(PreTurn);
         });
 
         // TODO when player doesn't have enough cash, declare bankrupcy
     }
 
     private announcePayRent(payments: Payment[]) {
-        broadcast<PlayerPayRentPayload>(this.game.room.getPlayers(), (player) => ({
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_PAY_RENT,
-            payload: {
-                id: this.game.getCurrentPlayer().id,
-                payments,
-                myCurrentMoney: this.game.getGamePlayer(player).cash,
-            },
-        }));
+        if (payments.length > 0) {
+            broadcast<PlayerPayRentPayload>(this.game.room.getPlayers(), (player) => ({
+                type: PacketType.DEFAULT,
+                action: Action.ANNOUNCE_PAY_RENT,
+                payload: {
+                    id: this.game.getCurrentPlayer().id,
+                    payments,
+                    myCurrentMoney: this.game.getGamePlayer(player).cash,
+                },
+            }));
+        }
     }
 
     private async promptForPurchases(propertiesForPurchase: PropertyInfo[]) {
@@ -109,6 +115,7 @@ export class Moved extends StateMachineState {
                 0, // 0 timeout means no timeout
             );
 
+            debug('receive response for purchase' + JSON.stringify(response.get()));
             // although client shouldn't send a error response, let's just
             // check the status as well
             if (response.ok()) {

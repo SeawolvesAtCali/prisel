@@ -1,7 +1,7 @@
 import Game from '../Game';
 import { Packet } from '@prisel/server';
 import { GamePlayer } from '../GamePlayer';
-import { StateMachine } from './stateMachine';
+import { StateMachine } from './StateMachine';
 
 export abstract class StateMachineState {
     protected game: Game;
@@ -11,6 +11,7 @@ export abstract class StateMachineState {
         this.machine = machine;
     }
     public onEnter() {}
+    public onExit() {}
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
         return false;
     }

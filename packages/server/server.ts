@@ -133,6 +133,8 @@ export class Server {
                     const { request_id: id } = packet;
                     if (context.requests.isWaitingFor(id)) {
                         context.requests.onResponse(packet);
+                    } else {
+                        debug(`response with id ${id} is unclaimed ${JSON.stringify(packet)}`);
                     }
                     return;
                 }

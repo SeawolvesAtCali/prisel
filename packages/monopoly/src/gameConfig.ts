@@ -1,17 +1,8 @@
-import {
-    GameConfig,
-    debug,
-    Request,
-    Packet,
-    broadcast,
-    Room,
-    PacketType,
-    isSupportedPacket,
-} from '@prisel/server';
+import { GameConfig, debug, Request, Packet, Player } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
-import { Action, PlayerStartTurnPayload, InitialStatePayload } from '../common/messages';
-import Game from './Game';
-import { syncAllPlayer, runPlayerTurn } from './gameFlow';
+import { Action } from '../common/messages';
+import { StateMachine } from './stateMachine/StateMachine';
+import { GameStarted } from './stateMachine/GameStarted';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
@@ -30,33 +21,22 @@ const MonopolyGameConfig: GameConfig = {
                 player.respond(packet, flatState);
                 debug('current game state is: \n%O', flatState);
             });
-            const initialState: InitialStatePayload = {
-                gamePlayers: Array.from(game.players.values()).map((player) => ({
-                    money: player.cash,
-                    player: {
-                        name: player.player.getName(),
-                        id: player.player.getId(),
-                    },
-                    pos: player.pathNode.tile.pos,
-                    character: player.character,
-                })),
-                firstPlayerId: game.getCurrentPlayer().id,
+            const stateMachine = new StateMachine(game);
+            stateMachine.init(GameStarted);
+
+            const handleGamePacket = (player: Player, packet: Packet) => {
+                if (!stateMachine.state.onPacket(packet, game.getGamePlayer(player))) {
+                    debug(
+                        `packet ${packet.action} is not processed by state ${
+                            stateMachine.state[Symbol.toStringTag]
+                        }`,
+                    );
+                }
             };
 
-            room.listenGamePacket<Request>(Action.GET_INITIAL_STATE, (player, packet) => {
-                player.respond(packet, initialState);
-            });
-
-            while (true) {
-                await syncAllPlayer(game, Action.READY_TO_START_TURN);
-                game.startTurn();
-                await runPlayerTurn(game, room);
-                debug('game config, player finished turn');
-                game.endTurn();
-
-                // check game over
-                game.giveTurnToNext();
-            }
+            Object.values(Action)
+                .filter((action) => action !== Action.UNSPECIFIED && action !== Action.DEBUG) // filter out UNSPECIFIED
+                .forEach((action) => room.listenGamePacket(action, handleGamePacket));
         })();
     },
     onEnd(room) {

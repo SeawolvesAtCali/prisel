@@ -25,7 +25,6 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "build": "parcel build index.html",
-        "check": "tsc --noEmit",
         "postbuild": "tsc --emitDeclarationOnly",
         "start": "parcel serve index.html",
         "test": "jest",

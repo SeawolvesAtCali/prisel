@@ -1,9 +1,18 @@
 import { Room, newRoom, RoomConfig, RoomId } from './room';
 import { Context } from './objects';
-import { Packet, Request, ResponseWrapper } from '@prisel/common';
+import {
+    Packet,
+    Request,
+    ResponseWrapper,
+    wrapResponse,
+    PacketType,
+    Response,
+    Code,
+} from '@prisel/common';
 import WebSocket from 'ws';
 import { emit } from './utils/networkUtils';
 import { getSuccessFor, getFailureFor } from './message';
+import debug from './debug';
 
 export type PlayerId = string;
 
@@ -18,6 +27,12 @@ export abstract class Player {
     public abstract joinRoom(roomId: RoomId): Room | null;
     public abstract leaveRoom(): void;
     public abstract emit<T extends Packet<any>>(packet: T): void;
+    /**
+     * Send a request to client
+     * @param request partial Request. no need to specify requst_id as it will
+     * be auto populated
+     * @param timeout timeout in ms. 0 for no timeout
+     */
     public abstract request<Payload = any>(
         request: Omit<Request<Payload>, 'request_id'>,
         timeout?: number,
@@ -103,7 +118,25 @@ class PlayerImpl extends Player {
             request_id: this.newRequestId(),
         };
         this.emit(fullRequest);
-        return this.context.requests.addRequest(fullRequest, timeout);
+        return this.context.requests.addRequest(fullRequest, timeout).catch((_) => {
+            debug('request timeout');
+            const responseForTimeout: Response = {
+                type: PacketType.RESPONSE,
+                request_id: fullRequest.request_id,
+                status: {
+                    code: Code.FAILED,
+                    message: 'timeout',
+                },
+                payload: {},
+            };
+            if (fullRequest.system_action !== undefined) {
+                responseForTimeout.system_action = fullRequest.system_action;
+            }
+            if (fullRequest.action !== undefined) {
+                responseForTimeout.action = fullRequest.action;
+            }
+            return wrapResponse(responseForTimeout);
+        });
     }
 
     public respond<Payload = never>(request: Request<any>, payload?: Payload) {

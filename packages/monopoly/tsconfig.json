@@ -1,7 +1,7 @@
 {
     "extends": "../../tsconfig",
+    "files": ["index.ts", "demo.ts"],
     "compilerOptions": {
-        "module": "commonjs",
         "rootDir": "./",
         "outDir": "./lib",
         "experimentalDecorators": true

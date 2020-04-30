@@ -1,6 +1,5 @@
 import { GamePlayer } from './GamePlayer';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
-import Node from './Node';
 import { flattenState } from './state';
 import { log } from './logGameObject';
 import {
@@ -16,28 +15,25 @@ import {
     RemoveListenerFunc,
     debug,
 } from '@prisel/server';
-import { Action, PlayerStartTurnPayload } from './messages';
+import { Action, PlayerStartTurnPayload, PlayerEndTurnPayload } from '../common/messages';
 import { startTurn, Turn } from './Turn';
 
 interface Props {
     id: string;
     players: Map<PlayerId, GamePlayer>;
     turnOrder: GamePlayer[];
-    map: Node;
     room: Room;
 }
 
 interface FlatGame extends FlatGameObject {
     players: { [playerId: string]: Ref<GamePlayer> };
     turnOrder: Array<Ref<GamePlayer>>;
-    map: Ref<Node>;
 }
 
 export default class Game extends GameObject {
     public id: string;
     public players: Map<string, GamePlayer>;
     public turnOrder: GamePlayer[];
-    public map: Node;
     public room: Room;
     public turn: Turn;
 
@@ -46,7 +42,6 @@ export default class Game extends GameObject {
         this.id = props.id;
         this.players = props.players;
         this.turnOrder = props.turnOrder;
-        this.map = props.map;
         this.room = props.room;
     }
 
@@ -55,22 +50,8 @@ export default class Game extends GameObject {
         this.turnOrder = [...this.turnOrder.slice(1), this.turnOrder[0]];
     }
 
-    public startTurn(): void {
-        this.turn = startTurn(this, this.getCurrentPlayer());
-        const startTurnPacket: Packet<PlayerStartTurnPayload> = {
-            type: PacketType.DEFAULT,
-            action: Action.PLAYER_START_TURN,
-            payload: {
-                id: this.turn.player.id,
-            },
-        };
-
-        broadcast(this.room.getPlayers(), startTurnPacket);
-    }
-
-    public endTurn(): void {
-        this.turn.end();
-        this.turn = null;
+    public getNextPlayer(): GamePlayer {
+        return [...this.turnOrder.slice(1), this.turnOrder[0]][0];
     }
 
     public isCurrentPlayer(player: GamePlayer) {
@@ -89,7 +70,6 @@ export default class Game extends GameObject {
         return {
             id: this.id,
             players,
-            map: this.ref(this.map),
             turnOrder: this.turnOrder.map(this.ref),
         };
     }

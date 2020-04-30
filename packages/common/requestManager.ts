@@ -30,7 +30,7 @@ export function newRequestManager(): RequestManager {
     }
 
     function onResponse(response: Response) {
-        const id = response.request_id;
+        const id = `${response.request_id}`;
         if (requestIdMap.has(id)) {
             const resolve = requestIdMap.get(id);
             requestIdMap.delete(id);

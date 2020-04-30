@@ -11,6 +11,7 @@
         "start:tic-tac-toe-client": "lerna run start --scope @prisel/tic-tac-toe-client --stream",
         "start:monopoly-server": "lerna run start --scope @prisel/monopoly --stream",
         "start:debugger": "lerna run start --scope @prisel/react --stream",
+        "start:map-creator": "lerna run start --scope @prisel/map-creator --stream",
         "clean": "lerna clean --yes && lerna exec -- rm -rf lib && rm -rf node_modules",
         "postinstall": "npm run build",
         "publish": "lerna publish",
@@ -88,7 +89,9 @@
         "@prisel/client": "file:packages/client",
         "@prisel/common": "file:packages/common",
         "@prisel/e2e": "file:packages/e2e",
+        "@prisel/map-creator": "file:packages/map-creator",
         "@prisel/monopoly": "file:packages/monopoly",
+        "@prisel/monopoly-client": "file:packages/monopoly-client",
         "@prisel/react": "file:packages/react",
         "@prisel/server": "file:packages/server",
         "@prisel/template": "file:packages/template",
@@ -105,8 +108,8 @@
         "@storybook/react": "^4.1.18",
         "@types/debug": "^4.1.4",
         "@types/jest": "^24.0.15",
-        "@types/jsonwebtoken": "^8.3.2",
         "@types/lodash": "^4.14.134",
+        "@types/node": "^13.9.3",
         "@types/prismjs": "^1.16.0",
         "@types/react": "^16.8.22",
         "@types/react-dom": "^16.8.4",
@@ -123,7 +126,6 @@
         "eslint-plugin-react": "^7.13.0",
         "jest": "^24.8.0",
         "jest-dev-server": "^4.2.0",
-        "jsonwebtoken": "^8.5.1",
         "lerna": "^3.15.0",
         "mock-socket": "^9.0.0",
         "parcel-bundler": "^1.12.3",
@@ -135,6 +137,8 @@
         "react-simple-code-editor": "^0.9.14",
         "rollup": "^1.16.2",
         "rollup-plugin-commonjs": "^9.3.4",
+        "rollup-plugin-copy": "^3.3.0",
+        "rollup-plugin-dts": "^1.3.0",
         "rollup-plugin-node-resolve": "^4.2.4",
         "rollup-plugin-typescript2": "^0.21.2",
         "ts-jest": "^23.1.4",
@@ -144,6 +148,6 @@
         "tslint-config-prettier": "~1.15.0",
         "typedoc": "^0.14.2",
         "typedoc-plugin-markdown": "^1.2.1",
-        "typescript": "^3.5.2"
+        "typescript": "^3.8.3"
     }
 }

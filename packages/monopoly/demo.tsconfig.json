@@ -1,0 +1,10 @@
+{
+    "extends": "../../tsconfig",
+    "files": ["index.ts"],
+    "compilerOptions": {
+        "module": "commonjs",
+        "rootDir": "./",
+        "outDir": "./lib",
+        "experimentalDecorators": true
+    }
+}

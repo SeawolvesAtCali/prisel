@@ -91,6 +91,7 @@ class Client<T = State> {
         if (this.isConnected) {
             return;
         }
+        // TODO if it is already connecting, we should also exit
         const connection = new WebSocket(this.serverUri);
 
         connection.onclose = () => {

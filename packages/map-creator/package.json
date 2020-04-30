@@ -1,0 +1,52 @@
+{
+    "name": "@prisel/map-creator",
+    "version": "0.1.3",
+    "private": true,
+    "description": "> TODO: description",
+    "author": "Yiou Chen <chen.yiou1992@gmail.com>",
+    "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/map-creator",
+    "license": "MIT",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "directories": {
+        "lib": "./",
+        "test": "__test__"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
+    },
+    "scripts": {
+        "generate-declaration": "node ./generateDeclaration.js",
+        "prebuild": "rm -rf ./lib & npm run generate-declaration",
+        "build": "parcel build index.html",
+        "start": "parcel serve index.html",
+        "test": "jest",
+        "lint": "tslint --project tsconfig.json",
+        "fix": "tslint --project tsconfig.json --fix"
+    },
+    "bugs": {
+        "url": "https://github.com/SeawolvesAtCali/prisel/issues"
+    },
+    "dependencies": {
+        "@prisel/monopoly": "file:../monopoly"
+    },
+    "devDependencies": {
+        "autoprefixer": "^9.6.1",
+        "parcel-bundler": "^1.12.3",
+        "postcss-modules": "^1.4.1",
+        "react": "^16.8.1",
+        "react-dom": "^16.8.1",
+        "rollup": "^1.1.2",
+        "rollup-plugin-commonjs": "^9.2.0",
+        "rollup-plugin-node-resolve": "^4.0.0",
+        "rollup-plugin-typescript2": "^0.19.2"
+    },
+    "peerDependencies": {
+        "react": "^16.8.1",
+        "react-dom": "^16.8.1"
+    }
+}

@@ -1,44 +1,42 @@
-import {
-    GameConfig,
-    debug,
-    Request,
-    Packet,
-    broadcast,
-    Room,
-    PacketType,
-    isSupportedPacket,
-} from '@prisel/server';
+import { GameConfig, debug, Request, Packet, Player } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
-import { Action, PlayerStartTurnPayload } from './messages';
-import Game from './Game';
-import { waitForEveryoneSetup, runPlayerTurn } from './gameFlow';
+import { Action } from '../common/messages';
+import { StateMachine } from './stateMachine/StateMachine';
+import { GameStarted } from './stateMachine/GameStarted';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
     maxPlayers: 4,
     canStart(room) {
-        return room.getPlayers().length > 1;
+        // TODO temporarily allow 1 person playing
+        return true;
+        // return room.getPlayers().length > 1;
     },
     onStart(room) {
-        const game = createIntialState(room);
-        room.setGame(game);
-        room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
-            const flatState = flattenState(game);
-            player.respond(packet, flatState);
-            debug('current game state is: \n%O', flatState);
-        });
         (async () => {
-            await waitForEveryoneSetup(game, room);
-            while (true) {
-                game.startTurn();
-                await runPlayerTurn(game, room);
-                game.endTurn();
+            const game = await createIntialState(room);
+            room.setGame(game);
+            room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
+                const flatState = flattenState(game);
+                player.respond(packet, flatState);
+                debug('current game state is: \n%O', flatState);
+            });
+            const stateMachine = new StateMachine(game);
+            stateMachine.init(GameStarted);
 
-                // TODO wait for everyone acknowledge turn end
+            const handleGamePacket = (player: Player, packet: Packet) => {
+                if (!stateMachine.state.onPacket(packet, game.getGamePlayer(player))) {
+                    debug(
+                        `packet ${packet.action} is not processed by state ${
+                            stateMachine.state[Symbol.toStringTag]
+                        }`,
+                    );
+                }
+            };
 
-                // check game over
-                game.giveTurnToNext();
-            }
+            Object.values(Action)
+                .filter((action) => action !== Action.UNSPECIFIED && action !== Action.DEBUG) // filter out UNSPECIFIED
+                .forEach((action) => room.listenGamePacket(action, handleGamePacket));
         })();
     },
     onEnd(room) {

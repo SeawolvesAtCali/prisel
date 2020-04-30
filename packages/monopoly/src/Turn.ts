@@ -1,6 +1,6 @@
 import Game from './Game';
 import { GamePlayer } from './GamePlayer';
-import { Action } from './messages';
+import { Action } from '../common/messages';
 import { ResponseWrapper, RemoveListenerFunc, Request, debug } from '@prisel/server';
 
 /**
@@ -55,11 +55,13 @@ export class Turn {
                         requestListener.isDone &&
                         requestListener.isDone(this.game, responseWrapper)
                     ) {
+                        debug('off listener for ' + packet.action);
                         offListener();
                         resolve();
                     }
                 },
             );
+            debug('adding offlistner for ' + requestListener.action);
             this.offListeners.add(offListener);
         });
     }
@@ -69,7 +71,7 @@ export class Turn {
             return;
         }
         this.isActive = false;
-        debug('Ending turn for %0', this.player.id);
+        debug('Ending turn for %0', this.player.id, this.offListeners);
         for (const off of this.offListeners) {
             off();
         }

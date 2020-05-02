@@ -3,11 +3,19 @@
 {
     "name": "Node.js 10 & TypeScript",
     "dockerFile": "Dockerfile",
+    // consistency is only effective on Mac and ignored by other host
+    // environment. Cached means that the macOS host's view of mount is
+    // authoritative. There may be delays before updates made on the hosts are
+    // visible within a container.
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
     "workspaceFolder": "/workspace",
+    // using name volumne to for node_modules to allow fast write access. This
+    // also mean that host will not be able to call things inside node_modules
+    // (no lerna), only container can.
     "mounts": [
         "source=prisel-node_modules,target=/workspace/node_modules,type=volume"
     ],
+    // forward container port 3000 (websocke port for monopoly) to host port 3000
     "forwardPorts": [
         3000
     ], // default ws port
@@ -21,10 +29,4 @@
         "dbaeumer.vscode-eslint",
         "ms-vscode.vscode-typescript-tslint-plugin"
     ]
-    // Use 'forwardPorts' to make a list of ports inside the container available locally.
-    // "forwardPorts": [],
-    // Use 'postCreateCommand' to run commands after the container is created.
-    // "postCreateCommand": "yarn install",
-    // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
-    // "remoteUser": "node"
 }

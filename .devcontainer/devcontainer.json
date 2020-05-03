@@ -3,12 +3,10 @@
 {
     "name": "Node.js 10 & TypeScript",
     "dockerFile": "Dockerfile",
-    // consistency is only effective on Mac and ignored by other host
-    // environment. Cached means that the macOS host's view of mount is
-    // authoritative. There may be delays before updates made on the hosts are
-    // visible within a container.
-    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
     "workspaceFolder": "/workspace",
+    // consistency is only effective on Mac and ignored by other host
+    // environment.
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
     // using name volumne to for node_modules to allow fast write access. This
     // also mean that host will not be able to call things inside node_modules
     // (no lerna), only container can.
@@ -19,7 +17,7 @@
     "forwardPorts": [
         3000
     ], // default ws port
-    "postCreateCommand": "npm ci",
+    "postCreateCommand": "sudo chown node node_modules && npm ci",
     // Set *default* container specific settings.json values on container create.
     "settings": {
         "terminal.integrated.shell.linux": "/bin/bash"
@@ -28,5 +26,6 @@
     "extensions": [
         "dbaeumer.vscode-eslint",
         "ms-vscode.vscode-typescript-tslint-plugin"
-    ]
+    ],
+    "remoteUser": "node"
 }

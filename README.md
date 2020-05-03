@@ -18,7 +18,7 @@ If you have [Visual Studio Code](https://code.visualstudio.com/), it's recommend
 1. Pull down this repo.
 1. Install Docker Desktop 2.0+ on Windows or macOS or Docker CE/EE 18.06+ as required by [this doc](https://code.visualstudio.com/docs/remote/containers#_system-requirements).
 1. Install VSCode [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
-1. Run `Remote-Containers: Open Workspace in Container...` command from Command Palette(`F1`) and select `prisel.code-workspace`
+1. Run `Remote-Containers: Open Folder in Container...` command from Command Palette(`F1`) and select the cloned priesl folder
 1. When container starts, it will run `npm ci` to install all dependencies
 1. Install [CocosDashboard](https://docs.cocos.com/creator/manual/en/getting-started/dashboard.html) and use it to download [CocosCreator 2.3.2](cocos-dashboard://download/2d_2.3.2). Both CocosDashboard and CocosCreator should be installed in your local environment. After that you can use CocosCreator to open the game project in `packages/monopoly-client/project.json`
 

@@ -1,0 +1,14 @@
+# ignore everything, and add exceptions below
+**
+
+# copy common
+!packages/common/lib
+!packages/common/package.json
+
+# copy server
+!packages/server/lib
+!packages/server/package.json
+
+# copy monopoly
+!packages/monopoly/dist
+!packages/monopoly/package.json

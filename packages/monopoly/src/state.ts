@@ -15,9 +15,11 @@ import {
 import PathNode, { create as createPathNode } from './PathNode';
 import Property, { create as createProperty } from './Property';
 import { getRand } from './utils';
+import { COMMON_DATA_DIR } from '../PATH';
+import path from 'path';
 
 const CASH = 1000;
-const MAP_PATH = './common/data/map/demoMap.json';
+const MAP_PATH = path.resolve(COMMON_DATA_DIR, 'map', 'demoMap.json');
 
 export function getTileKey(tile: Tile): string {
     return getTileKeyFromCoordinate(tile.pos);

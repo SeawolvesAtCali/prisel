@@ -35,7 +35,8 @@
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "devDependencies": {
-        "rollup": "^1.1.2",
-        "rollup-plugin-typescript2": "^0.19.2"
+        "rollup": "^2.7.6",
+        "rollup-plugin-typescript2": "^0.27.0",
+        "typescript": "^3.8.3"
     }
 }

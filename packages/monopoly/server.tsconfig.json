@@ -1,0 +1,10 @@
+{
+    "extends": "../../tsconfig",
+    "files": ["server.ts"],
+    "compilerOptions": {
+        "module": "commonjs",
+        "rootDir": "./",
+        "outDir": "./lib",
+        "experimentalDecorators": true
+    }
+}

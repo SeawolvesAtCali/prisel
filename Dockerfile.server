@@ -1,0 +1,38 @@
+# create monopoly server docker file
+# run from prisel root directory
+# env DOCKER_BUILDKIT=1 docker build -f Dockerfile.server -t prisel/monopoly-server .
+# this will create image prisel/monopoly-server:latest
+# locally run with
+# docker run -dp 3000:80 prisel/monopoly-server
+
+FROM node:10-alpine
+
+# copy common server and monopoly to container. Assumming all the build has been
+# done outside.
+WORKDIR /usr/src/common
+COPY packages/common ./
+RUN ["npm", "i", "--production"]
+
+WORKDIR /usr/src/server
+COPY packages/server ./
+RUN ["npm", "i", "--production"]
+
+WORKDIR /usr/src/monopoly
+COPY packages/monopoly ./
+RUN ["npm", "i", "--production"]
+
+# monopoly server ports
+# exposing for ws and wss
+EXPOSE 80 443
+
+WORKDIR /usr/src/monopoly/dist
+
+# https://docs.docker.com/engine/reference/builder/#env
+# Environment persistence can cause unexpected side effects. For example,
+# setting ENV DEBIAN_FRONTEND noninteractive may confuse apt-get users on a
+# Debian-based image. To set a value for a single command, use
+# RUN <key>=<value> <command>. 
+CMD ["env", "DEBUG=debug",  "node", "server.js"]
+
+
+

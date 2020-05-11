@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+    server:
+        image: prisel/monopoly-server
+        ports:
+            - 3000:80
+    client:
+        image: prisel/monopoly-client
+        ports:
+            - 80:80
+        # volumes:
+        #     - ./test-config.js:/usr/share/nginx/html/config.js

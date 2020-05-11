@@ -1,5 +1,9 @@
 import { Client } from './packages/priselClient';
-export const client = new Client<ClientState>('ws://localhost:3000');
+import { getConfig } from './config';
+
+const websocketHost = getConfig<string>('host', 'ws://localhost:3000');
+
+export const client = new Client<ClientState>(websocketHost);
 client.setState({
     isInRoom: false,
 });

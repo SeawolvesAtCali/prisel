@@ -5,7 +5,30 @@
 
 # To fully customize the contents of this image, use the following Dockerfile instead:
 # https://github.com/microsoft/vscode-dev-containers/tree/v0.112.0/containers/typescript-node-10/.devcontainer/Dockerfile
-FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-10
+FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:10
+
+# The javascript-node image includes a non-root node user with sudo access. Use 
+# the "remoteUser" property in devcontainer.json to use it. On Linux, the container 
+# user's GID/UIDs will be updated to match your local UID/GID when using the image
+# or dockerFile property. Update USER_UID/USER_GID below if you are using the
+# dockerComposeFile property or want the image itself to start with different ID
+# values. See https://aka.ms/vscode-remote/containers/non-root-user for details.
+ARG USERNAME=node
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# https://code.visualstudio.com/docs/remote/containers-advanced#_change-the-uidgid-of-an-existing-container-user
+# This seems needed if we run this Docker file through docker compose instead of vscode remote container config.
+# https://code.visualstudio.com/docs/remote/containers-advanced#_specifying-a-user-for-vs-code
+RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
+        groupmod --gid $USER_GID $USERNAME \
+        && usermod --uid $USER_UID --gid $USER_GID $USERNAME \
+        && chown -R $USER_UID:$USER_GID /home/$USERNAME; \
+    fi
+# EXPOSE doesn't actually expose the port. It serves as a documentation for
+# image user
+# websocket port
+EXPOSE 3000 
 
 # ** [Optional] Uncomment this section to install additional packages. **
 #

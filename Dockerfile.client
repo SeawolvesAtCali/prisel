@@ -1,0 +1,11 @@
+# create monopoly client docker file
+# run from prisel root directory
+# env DOCKER_BUILDKIT=1 docker build -f Dockerfile.client -t prisel/monopoly-client .
+# this will create image prisel/monopoly-client:latest
+# run with
+# docker run -dp 80:80  prisel/monopoly-client
+
+FROM nginx
+COPY packages/monopoly-client/build/web-mobile /usr/share/nginx/html
+
+EXPOSE 80

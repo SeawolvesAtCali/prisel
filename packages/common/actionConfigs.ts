@@ -113,4 +113,10 @@ export const ACTION_CONFIG: Record<messageTypes.ActionName, ActionConfig> = {
         isRest: true,
         payload: [response<messageTypes.RoomStateResponsePayload>('RoomStateResponsePayload')],
     },
+    GET_LOBBY_STATE: {
+        desc: 'Client request a snapshot of current lobby state.',
+        from: FROM.CLIENT,
+        isRest: true,
+        payload: [response<messageTypes.LobbyStateResponsePayload>('LobbyStateResponsePayload')],
+    },
 };

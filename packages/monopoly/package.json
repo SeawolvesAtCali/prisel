@@ -22,7 +22,7 @@
     "scripts": {
         "prebuild": "rm -rf ./lib",
         "build": "tsc && rollup -c",
-        "start": "env DEBUG=debug ts-node --project server.tsconfig.json server.ts ",
+        "start": "env DEBUG=debug PORT=3000 ts-node --project server.tsconfig.json server.ts ",
         "test": "jest",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix"

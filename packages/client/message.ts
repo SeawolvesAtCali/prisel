@@ -105,3 +105,11 @@ export function getGetRoomState(requestId: string): Request {
         request_id: requestId,
     };
 }
+
+export function getGetLobbyState(requestId: string): Request {
+    return {
+        type: PacketType.REQUEST,
+        system_action: MessageType.GET_LOBBY_STATE,
+        request_id: requestId,
+    };
+}

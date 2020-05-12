@@ -14,6 +14,7 @@ export enum MessageType {
     ANNOUNCE_GAME_START = 11,
     ERROR = 12,
     GET_ROOM_STATE = 13,
+    GET_LOBBY_STATE = 14,
 }
 
 export const serverInitiatedMessages = [
@@ -49,6 +50,12 @@ export interface PlayerInfo {
     id: string;
 }
 
+export interface LobbyRoomViewInfo {
+    room: RoomInfo;
+    playerCount: number;
+    maxPlayers: number;
+}
+
 // Token is used to prevent lost packets. When client receives a new
 // UpdateToken, they should compare if the previousToken matches the current
 // token saved in the client, if so, no packet was dropped, and they should
@@ -76,8 +83,13 @@ export interface RoomStateSnapshot {
     token: string;
 }
 
-// tslint:disable-next-line:no-empty-interface
-export interface RoomStateResponsePayload extends RoomStateSnapshot {}
+export type RoomStateResponsePayload = RoomStateSnapshot;
+
+export interface LobbyStateSnapshot {
+    rooms: LobbyRoomViewInfo[];
+}
+
+export type LobbyStateResponsePayload = LobbyStateSnapshot;
 
 export interface CreateRoomPayload {
     roomName: string;

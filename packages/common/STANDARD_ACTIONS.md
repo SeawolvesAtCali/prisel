@@ -14,3 +14,4 @@
 | ANNOUNCE_GAME_START | Server | Broadcast game start to players in the room |  |  | GAME_START |
 | ERROR | Server | Report error to client, usually responding to a packet. If an error is related to a request, a response should be used instead. | **packet**:ErrorPayload |  |  |
 | GET_ROOM_STATE | Client | Client request a snapshot of current room state. | **response**:RoomStateResponsePayload | ✓ |  |
+| GET_LOBBY_STATE | Client | Client request a snapshot of current lobby state. | **response**:LobbyStateResponsePayload | ✓ |  |

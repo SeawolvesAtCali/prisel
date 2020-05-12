@@ -24,6 +24,13 @@ export function getPlayer(context: Context, client: Socket): Player | void {
     }
 }
 
+export function getRooms(context: Context): Room[] {
+    if (!context) {
+        return [];
+    }
+    return Array.from(context.rooms.values());
+}
+
 /**
  * Get the client's room from the StateManager using client's socket connection.
  * @param context

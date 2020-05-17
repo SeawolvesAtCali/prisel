@@ -50,7 +50,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 300,
-      "height": 100
+      "height": 60
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -62,7 +62,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        0,
+        45.103,
         0,
         0,
         0,
@@ -109,9 +109,9 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
-      "b": 255,
+      "r": 132,
+      "g": 106,
+      "b": 208,
       "a": 255
     },
     "_contentSize": {
@@ -128,8 +128,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
+        -67.1,
         0,
-        5,
         0,
         0,
         0,
@@ -155,7 +155,7 @@
   },
   {
     "__type__": "cc.Label",
-    "_name": "",
+    "_name": "name label<Label>",
     "_objFlags": 0,
     "node": {
       "__id__": 2
@@ -197,12 +197,12 @@
     "_enabled": true,
     "alignMode": 1,
     "_target": null,
-    "_alignFlags": 18,
-    "_left": 0,
+    "_alignFlags": 10,
+    "_left": 20,
     "_right": 0,
     "_top": 0,
     "_bottom": 0,
-    "_verticalCenter": 5,
+    "_verticalCenter": 0,
     "_horizontalCenter": 0,
     "_isAbsLeft": true,
     "_isAbsRight": true,
@@ -227,7 +227,7 @@
   },
   {
     "__type__": "cc.Sprite",
-    "_name": "",
+    "_name": "PlayerInfo<Sprite>",
     "_objFlags": 0,
     "node": {
       "__id__": 1
@@ -241,7 +241,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "a869b07e-5ea2-441b-9984-000de07ceec9"
+      "__uuid__": "744de5db-de00-4645-8c1e-784a995954c8"
     },
     "_type": 1,
     "_sizeMode": 0,
@@ -270,7 +270,7 @@
     "_layoutSize": {
       "__type__": "cc.Size",
       "width": 300,
-      "height": 100
+      "height": 60
     },
     "_resize": 0,
     "_N$layoutType": 0,

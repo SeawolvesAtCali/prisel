@@ -1,7 +1,7 @@
 import { StateMachineState } from './StateMachineState';
 import { Encounter, Payment, PropertyInfo } from '../../common/types';
 import { toPropertyInfo } from '../Property';
-import { broadcast, PacketType, Packet, ResponseWrapper } from '@prisel/server';
+import { broadcast, PacketType, Packet, ResponseWrapper, debug } from '@prisel/server';
 import {
     EncounterPayload,
     Action,
@@ -10,13 +10,15 @@ import {
     PlayerPurchasePayload,
     PlayerPayRentPayload,
     PlayerEndTurnPayload,
+    PlayerBankruptPayload,
 } from '../../common/messages';
 import { samePos } from '../utils';
 import { PreTurn } from './PreTurn';
-import { debug } from '@prisel/server';
+import { GameOver } from './GameOver';
+import { GamePlayer } from '../GamePlayer';
 
 export class Moved extends StateMachineState {
-    public onEnter() {
+    public async onEnter() {
         // find encounters on player's spot.
         const currentPlayer = this.game.getCurrentPlayer();
         const currentPathNode = currentPlayer.pathNode;
@@ -62,22 +64,38 @@ export class Moved extends StateMachineState {
             }));
         }
         this.announcePayRent(rentPayments);
-        this.promptForPurchases(propertiesForPurchase).then(() => {
-            // player paid rent or purchased property. move on to next state
-            // where we wait for every player to finished animation
-            broadcast<PlayerEndTurnPayload>(this.game.room.getPlayers(), {
-                type: PacketType.DEFAULT,
-                action: Action.ANNOUNCE_END_TURN,
-                payload: {
-                    currentPlayerId: currentPlayer.id,
-                    nextPlayerId: this.game.getNextPlayer().id,
-                },
-            });
-            this.game.giveTurnToNext();
-            this.machine.transition(PreTurn);
+        await this.promptForPurchases(propertiesForPurchase);
+
+        if (currentPlayer.cash < 0) {
+            // player bankrupted.
+            this.announceBankrupt(currentPlayer);
+            this.machine.transition(GameOver);
+            return;
+        }
+        // player paid rent or purchased property. move on to next state
+        // where we wait for every player to finished animation
+        broadcast<PlayerEndTurnPayload>(this.game.room.getPlayers(), {
+            type: PacketType.DEFAULT,
+            action: Action.ANNOUNCE_END_TURN,
+            payload: {
+                currentPlayerId: currentPlayer.id,
+                nextPlayerId: this.game.getNextPlayer().id,
+            },
         });
+        this.game.giveTurnToNext();
+        this.machine.transition(PreTurn);
 
         // TODO when player doesn't have enough cash, declare bankrupcy
+    }
+
+    private announceBankrupt(player: GamePlayer) {
+        broadcast<PlayerBankruptPayload>(this.game.room.getPlayers(), {
+            type: PacketType.DEFAULT,
+            action: Action.ANNOUNCE_BANKRUPT,
+            payload: {
+                id: player.id,
+            },
+        });
     }
 
     private announcePayRent(payments: Payment[]) {
@@ -101,9 +119,9 @@ export class Moved extends StateMachineState {
                 // not enough money
                 continue;
             }
-            const response: ResponseWrapper<
-                PromptPurchaseResponsePayload
-            > = await currentPlayer.player.request<PromptPurchasePayload>(
+            const response: ResponseWrapper<PromptPurchaseResponsePayload> = await currentPlayer.player.request<
+                PromptPurchasePayload
+            >(
                 {
                     type: PacketType.REQUEST,
                     action: Action.PROMPT_PURCHASE,

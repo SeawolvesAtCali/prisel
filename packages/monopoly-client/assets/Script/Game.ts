@@ -16,6 +16,8 @@ import {
     PlayerPayRentPayload,
     PromptPurchasePayload,
     PromptPurchaseResponsePayload,
+    PlayerBankruptPayload,
+    GameOverPayload,
 } from './packages/monopolyCommon';
 import { client, ClientState } from './Client';
 import { Client, Packet, PacketType, ResponseWrapper, Request } from './packages/priselClient';
@@ -56,6 +58,8 @@ export default class Game extends cc.Component {
     private gameCamera: GameCameraControl = null;
     private currentTurnChain: Chainable = null;
 
+    private isGameOver = false;
+
     protected onLoad() {
         this.client = client;
         // load map data
@@ -94,6 +98,12 @@ export default class Game extends cc.Component {
         this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_END_TURN, this.handleAnnounceEndTurn.bind(this)),
         );
+        this.offPacketListeners.push(
+            this.client.on(Action.ANNOUNCE_BANKRUPT, this.handleAnnounceBankrupt.bind(this)),
+        );
+        this.offPacketListeners.push(
+            this.client.on(Action.ANNOUNCE_GAME_OVER, this.handleAnnounceGameOver.bind(this)),
+        );
 
         this.client
             .request({
@@ -116,12 +126,26 @@ export default class Game extends cc.Component {
             });
     }
 
-    private prepareForNextTurn() {
-        this.client.emit({
-            type: PacketType.DEFAULT,
-            action: Action.READY_TO_START_TURN,
-            payload: {},
-        });
+    private async prepareForNextTurn() {
+        if (this.isGameOver) {
+            const response = await this.client.request({
+                type: PacketType.REQUEST,
+                request_id: this.client.newId(),
+                action: Action.BACK_TO_ROOM,
+                payload: {},
+            });
+            if (response.ok()) {
+                cc.director.loadScene('room');
+            } else {
+                cc.log(response.getMessage());
+            }
+        } else {
+            this.client.emit({
+                type: PacketType.DEFAULT,
+                action: Action.READY_TO_START_TURN,
+                payload: {},
+            });
+        }
     }
 
     private panToPlayer(id: string): Promise<void> {
@@ -222,6 +246,24 @@ export default class Game extends cc.Component {
             this.panToPlayer(packet.payload.nextPlayerId);
         }, 'end turn panning');
 
+        this.eventBus.emit(EVENT.NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN);
+    }
+
+    private handleAnnounceBankrupt(packet: Packet<PlayerBankruptPayload>) {
+        this.currentTurnChain.chain(async () => {
+            cc.log('player bankrupted ' + packet.payload.id);
+        });
+    }
+
+    private handleAnnounceGameOver(packet: Packet<GameOverPayload>) {
+        this.currentTurnChain.chain(async () => {
+            cc.log('game over ', packet.payload);
+            this.eventBus.emit(EVENT.SHOW_RANKING, packet.payload.ranks);
+            await new Promise((resolve) => {
+                this.eventBus.once(EVENT.RANKING_CLOSED, resolve);
+            });
+            this.isGameOver = true;
+        });
         this.eventBus.emit(EVENT.NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN);
     }
 

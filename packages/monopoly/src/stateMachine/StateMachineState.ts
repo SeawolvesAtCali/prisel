@@ -10,7 +10,7 @@ export abstract class StateMachineState {
         this.game = game;
         this.machine = machine;
     }
-    public onEnter() {}
+    public onEnter(): Promise<void> | void {}
     public onExit() {}
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
         return false;

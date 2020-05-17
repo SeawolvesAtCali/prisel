@@ -105,3 +105,13 @@ export interface Payment {
     amount: number;
     forProperty?: PropertyInfo;
 }
+
+export interface Rank {
+    player: PlayerInfo;
+    character: number;
+    assets: {
+        cash: number;
+        property: number;
+        total: number;
+    };
+}

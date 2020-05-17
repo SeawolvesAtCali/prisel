@@ -1,4 +1,4 @@
-import { Coordinate, PropertyInfo, GamePlayerInfo, Encounter, Payment } from './types';
+import { Coordinate, PropertyInfo, GamePlayerInfo, Encounter, Payment, Rank } from './types';
 
 export enum Action {
     UNSPECIFIED = '',
@@ -31,6 +31,11 @@ export enum Action {
     // from client
     GET_INITIAL_STATE = 'get_initial_state',
 
+    // from client
+    // after displaying the ranking info, player request to go back to room
+    // scene to wait for the next game.
+    BACK_TO_ROOM = 'back_to_room',
+
     // from client. After receiving ANNOUNCE_END_TURN, client should flush any
     // animation about current player, and pan view to the next player. Then
     // send READY_TO_START_TURN to server. Server will synchronize and broadcase
@@ -51,6 +56,9 @@ export enum Action {
     // receiving this packet, Other players should send back READY_TO_START_TURN
     // when they finish animations of current player and pan to the next player.
     ANNOUNCE_END_TURN = 'announce_end_turn',
+    // a player go bankrupt, announce it to all players. This ends the game.
+    ANNOUNCE_BANKRUPT = 'announce_bankrupt',
+    ANNOUNCE_GAME_OVER = 'announce_game_over',
 }
 
 export interface PromptPurchasePayload {
@@ -116,6 +124,14 @@ export interface InitialStatePayload {
     firstPlayerId: string;
 }
 
+export interface PlayerBankruptPayload {
+    id: string;
+}
+
+export interface GameOverPayload {
+    ranks: Rank[];
+}
+
 // Server Client
 // <- GET_INITIAL_STATE
 // -> GET_INITIAL_STATE response
@@ -139,4 +155,6 @@ export interface InitialStatePayload {
 // -> ROLL response, including charge
 //
 // ...
-// => PLAYER_BANKRUPT
+// => ANNOUNCE_BANKRUPT
+// => ANNOUNCE_GAME_OVER
+//

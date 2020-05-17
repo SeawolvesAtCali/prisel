@@ -32,7 +32,7 @@ export function getTileKeyFromCoordinate(coor: Coordinate): string {
 // process all the tiles and reference each tile and property. Return the
 // starting pathNodes. All other PathNode and Property objects wouldn't be
 // garbage collected since they all have some refence with starting PathNodes.
-function processBoardSetup(boardSetup: BoardSetup): PathNode[] {
+function processBoardSetup(boardSetup: BoardSetup): [PathNode[], Property[]] {
     const startPathNodes: PathNode[] = [];
     const pathNodeMap: Map<string, PathNode> = new Map();
     const propertyMap: Map<string, Property> = new Map();
@@ -73,7 +73,7 @@ function processBoardSetup(boardSetup: BoardSetup): PathNode[] {
         pathNode.addProperty(property);
     }
 
-    return startPathNodes;
+    return [startPathNodes, Array.from(propertyMap.values())];
 }
 export async function createIntialState(room: Room): Promise<Game> {
     const rawBoardSetup = await fs.promises.readFile(MAP_PATH);
@@ -81,7 +81,7 @@ export async function createIntialState(room: Room): Promise<Game> {
         throw new Error('Cannot load map');
     }
     const boardSetup: BoardSetup = JSON.parse(rawBoardSetup.toString());
-    const startPathNodes = processBoardSetup(boardSetup);
+    const [startPathNodes, properties] = processBoardSetup(boardSetup);
     const players = room.getPlayers();
     const playerMap = new Map(
         players.map((player, index) => [
@@ -103,6 +103,7 @@ export async function createIntialState(room: Room): Promise<Game> {
         players: playerMap,
         turnOrder: Array.from(playerMap.values()),
         room,
+        properties,
     });
     return game;
 }

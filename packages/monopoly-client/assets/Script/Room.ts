@@ -115,11 +115,10 @@ export default class Room extends cc.Component {
         }
     }
 
-    public start() {
+    protected start() {
         cc.log('start');
         this.roomLabel.string = `${this.client.state.roomName} - ${this.client.state.roomId}`;
         this.loadRoomData();
-        this.startButton.node.on('click', this.startGame, this);
     }
 
     private addPlayer(player: PlayerInfoData) {
@@ -144,13 +143,22 @@ export default class Room extends cc.Component {
         }
     }
 
-    private startGame() {
-        this.client
-            .request(Messages.getGameStart(this.client.newId()))
-            .then((response: ResponseWrapper) => {
-                if (response.ok()) {
-                    cc.director.loadScene('game');
-                }
-            });
+    private async startGame() {
+        const response: ResponseWrapper = await this.client.request(
+            Messages.getGameStart(this.client.newId()),
+        );
+
+        if (response.ok()) {
+            cc.director.loadScene('game');
+        }
+    }
+
+    private async leaveRoom() {
+        const response: ResponseWrapper = await this.client.request(
+            Messages.getLeave(this.client.newId()),
+        );
+        if (response.ok()) {
+            cc.director.loadScene('lobby');
+        }
     }
 }

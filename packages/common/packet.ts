@@ -92,7 +92,7 @@ export function toDebugString(packet: Packet) {
     if (isResponse(packet)) {
         const status = packet.status;
         const statusMessage =
-            printCodeToString(status.code) + status.message ? ` ${status.message}` : '';
+            printCodeToString(status.code) + (status.message ? ` ${status.message}` : '');
         debugPacket.status = statusMessage;
     }
     return JSON.stringify(debugPacket);

@@ -1,3 +1,5 @@
+import { nullCheck } from './utils';
+
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -5,22 +7,14 @@ export default class PlayerInfo extends cc.Component {
     @property(cc.Label)
     public nameLabel: cc.Label = null;
 
-    @property(cc.Label)
-    public idLabel: cc.Label = null;
-
-    public id: number = -1;
+    public id: string = '';
 
     public init(name: string, id: string) {
         this.nameLabel.string = name;
-        this.idLabel.string = id;
-        this.node.active = true;
+        this.id = id;
     }
 
-    // LIFE-CYCLE CALLBACKS:
-
-    // onLoad () {}
-
-    public start() {}
-
-    // update (dt) {}
+    public start() {
+        nullCheck(this.nameLabel);
+    }
 }

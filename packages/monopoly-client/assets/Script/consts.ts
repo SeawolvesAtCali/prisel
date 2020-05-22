@@ -56,4 +56,9 @@ export enum EVENT {
     PROMPT_PURCHASE = 'prompt_purchase', // arg1: PromptPurchasePayload
     PURCHASE_DECISION = 'purchase_decision', // arg1: boolean
     NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN = 'no_more_packet_from_server_for_current_turn',
+    // Game over, show ranking of players' worth
+    SHOW_RANKING = 'show_ranking',
+    // ranking list close after timeout or player manually tap anywhere to close
+    // it. Player should then be brought back to room view.
+    RANKING_CLOSED = 'ranking_closed',
 }

@@ -17,12 +17,14 @@ import {
 } from '@prisel/server';
 import { Action, PlayerStartTurnPayload, PlayerEndTurnPayload } from '../common/messages';
 import { startTurn, Turn } from './Turn';
+import Property from './Property';
 
 interface Props {
     id: string;
     players: Map<PlayerId, GamePlayer>;
     turnOrder: GamePlayer[];
     room: Room;
+    properties: Property[];
 }
 
 interface FlatGame extends FlatGameObject {
@@ -36,6 +38,7 @@ export default class Game extends GameObject {
     public turnOrder: GamePlayer[];
     public room: Room;
     public turn: Turn;
+    public properties: Property[];
 
     constructor(props: Props) {
         super();
@@ -43,6 +46,7 @@ export default class Game extends GameObject {
         this.players = props.players;
         this.turnOrder = props.turnOrder;
         this.room = props.room;
+        this.properties = props.properties;
     }
 
     @log

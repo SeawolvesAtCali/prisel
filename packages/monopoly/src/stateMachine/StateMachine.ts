@@ -5,6 +5,7 @@ import { debug } from '@prisel/server';
 export class StateMachine {
     private currentState: StateMachineState;
     private game: Game;
+    private onEnd: () => void;
     constructor(game: Game) {
         this.game = game;
     }
@@ -14,8 +15,15 @@ export class StateMachine {
         this.currentState.onEnter();
     }
 
+    public setOnEnd(onEnd: () => void) {
+        this.onEnd = onEnd;
+    }
+
     public get state(): StateMachineState {
         return this.currentState;
+    }
+    public end() {
+        setImmediate(this.onEnd);
     }
 
     public transition(stateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {

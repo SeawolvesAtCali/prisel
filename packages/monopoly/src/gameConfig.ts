@@ -48,7 +48,9 @@ const MonopolyGameConfig: GameConfig = {
         room.removeAllGamePacketListener();
         room.setGame(null);
     },
-    onRemovePlayer(room, player) {},
+    onRemovePlayer(room, player) {
+        debug('player left', room, player);
+    },
 };
 
 export default MonopolyGameConfig;

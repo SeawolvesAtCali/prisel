@@ -43,6 +43,8 @@ export const AUTO_PANNING_PX_PER_SECOND = 1000;
 export const EVENT_BUS = 'Canvas/eventBus';
 export const GAME_CAMERA = 'Canvas/game camera';
 
+export const PERSISTENT_NODE = 'Persistent';
+
 export enum EVENT {
     DICE_ROLLED = 'dice_rolled',
     DICE_ROLLED_RESPONSE = 'dice_rolled_response', // arg1 = value

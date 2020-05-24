@@ -2,13 +2,13 @@ import { nullCheck } from './utils';
 import { EVENT_BUS, EVENT } from './consts';
 import { Rank } from './packages/monopolyCommon';
 import RankView from './RankView';
-import { setConfigs } from './components/configUtils';
 import { WidgetConfig } from './components/WidgetConfig';
 import { SpriteConfig } from './components/SpriteConfig';
 import { NodeConfig } from './components/NodeConfig';
 import { LabelConfig } from './components/LabelConfig';
 import { LayoutConfig } from './components/LayoutConfig';
 import SharedAssets from './SharedAssets';
+import { createDropShadow } from './components/DropShadow';
 
 const { ccclass, property } = cc._decorator;
 
@@ -28,22 +28,15 @@ export default class RankList extends cc.Component {
     }
 
     private render() {
-        const root = NodeConfig.create().addComponents(WidgetConfig.fullSize());
+        const root = NodeConfig.create(this.node.name).addComponents(WidgetConfig.fullSize());
 
-        // background
-        root.addChild()
-            .setName('background')
-            .addComponents(SpriteConfig.background(), WidgetConfig.fullSize());
-
-        // rank label
-        root.addChild()
-            .setName('ranking label')
-            .addComponents(LabelConfig.h1('RANKING'), WidgetConfig.centerTop(30));
+        root.addAllChildren(createDropShadow()) // background
+            .addChild('ranking label') // rank label
+            .addComponents(LabelConfig.h1('RANKING'), WidgetConfig.horizontalCenter(30));
 
         // rank list
         const rankListPath = root
-            .addChild()
-            .setName('ranking list')
+            .addChild('ranking list')
             .addComponents(
                 LayoutConfig.verticalContainer(10),
                 WidgetConfig.custom(100, 20, undefined, 20),

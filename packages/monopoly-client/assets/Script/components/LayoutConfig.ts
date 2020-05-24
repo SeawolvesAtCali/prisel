@@ -28,20 +28,30 @@ export class LayoutConfig extends ComponentConfig {
         return config;
     }
 
+    public static horizontal(spacing: number = 0, left: number = 0, right: number = 0) {
+        const config = new LayoutConfig();
+        config.type = cc.Layout.Type.HORIZONTAL;
+        config.resizeMode = cc.Layout.ResizeMode.NONE;
+        config.paddingLeft = left;
+        config.paddingRight = right;
+        config.spacingX = spacing;
+        return config;
+    }
+
     public update(comp: cc.Layout): void {
         comp.type = this.type;
         comp.resizeMode = this.resizeMode;
-        comp.paddingLeft = this.paddingLeft;
-        comp.paddingTop = this.paddingTop;
-        comp.paddingRight = this.paddingRight;
-        comp.paddingBottom = this.paddingBottom;
         comp.resizeMode = this.resizeMode;
-        switch (comp.type) {
+        switch (this.type) {
             case cc.Layout.Type.HORIZONTAL:
+                comp.paddingLeft = this.paddingLeft;
+                comp.paddingRight = this.paddingRight;
                 comp.horizontalDirection = this.horizontalDirection;
                 comp.spacingX = this.spacingX;
                 break;
             case cc.Layout.Type.VERTICAL:
+                comp.paddingTop = this.paddingTop;
+                comp.paddingBottom = this.paddingBottom;
                 comp.verticalDirection = this.verticalDirection;
                 comp.spacingY = this.spacingY;
                 break;

@@ -21,19 +21,36 @@ export class WidgetConfig extends ComponentConfig {
         return config;
     }
 
-    public static centerTop(top: number): WidgetConfig {
-        const config = new WidgetConfig();
-        config.top = top;
-        config.horizontalCenter = true;
-        return config;
+    public static horizontalCenter(top?: number, bottom?: number): WidgetConfig {
+        return this.custom(top, undefined, bottom, undefined, true);
     }
 
-    public static custom(top: number, right: number, bottom: number, left: number) {
+    public static center(): WidgetConfig {
+        return this.custom(undefined, undefined, undefined, undefined, true, true);
+    }
+
+    public static custom(
+        top?: number,
+        right?: number,
+        bottom?: number,
+        left?: number,
+        horizontalCenter?: boolean,
+        veritcalCenter?: boolean,
+    ) {
         const config = new WidgetConfig();
-        config.top = top;
-        config.right = right;
-        config.bottom = bottom;
-        config.left = left;
+        if (horizontalCenter) {
+            config.horizontalCenter = true;
+        } else {
+            config.right = right;
+            config.left = left;
+        }
+        if (veritcalCenter) {
+            config.veritcalCenter = true;
+        } else {
+            config.top = top;
+            config.bottom = bottom;
+        }
+
         return config;
     }
 
@@ -55,6 +72,14 @@ export class WidgetConfig extends ComponentConfig {
         if (widget.isAlignBottom) {
             widget.bottom = this.bottom;
         }
-        widget.enabled = true;
+
+        widget.isAlignHorizontalCenter = this.horizontalCenter;
+        widget.isAlignVerticalCenter = this.veritcalCenter;
+
+        // Default align mode is ON_WINDOW_RESIZE. This doesn't respond to
+        // contentSize change due to setContentSize or new items added to Layout
+        // CONTAINER
+        // Setting alignMode to ALWAYS to enable widget alignment when size change
+        widget.alignMode = cc.Widget.AlignMode.ALWAYS;
     }
 }

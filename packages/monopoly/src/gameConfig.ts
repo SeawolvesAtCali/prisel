@@ -7,7 +7,7 @@ import { GameStarted } from './stateMachine/GameStarted';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
-    maxPlayers: 4,
+    maxPlayers: 10,
     canStart(room) {
         // TODO temporarily allow 1 person playing
         return true;

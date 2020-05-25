@@ -23,7 +23,8 @@ export interface FlatPlayer extends FlatGameObject {
 }
 
 function roll(startingNode: PathNode): PathNode[] {
-    const steps = Math.trunc(Math.random() * 6) + 1;
+    // const steps = Math.trunc(Math.random() * 6) + 1;
+    const steps = 3;
     debug(`player will move ${steps}`);
     return startingNode.genPath(steps);
 }

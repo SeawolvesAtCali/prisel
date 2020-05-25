@@ -78,7 +78,7 @@ export default class Property extends GameObject {
         return !this.owner;
     }
     public upgradable(requester: GamePlayer): boolean {
-        return this.owner === requester && this.level < this.levels.length;
+        return this.owner === requester && this.level < this.levels.length - 1;
     }
 
     public getWorth(): number {

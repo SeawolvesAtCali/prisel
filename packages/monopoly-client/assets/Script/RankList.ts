@@ -51,11 +51,11 @@ export default class RankList extends cc.Component {
         this.list.removeAllChildren();
         ranks.forEach((rank, index) => {
             const rankNode = cc.instantiate(this.rankPrefab);
-            rankNode.getComponent(RankView).init(rank.player.name, rank.assets.cash, index);
+            rankNode.getComponent(RankView).init(rank.player.name, rank.assets.total, index);
             this.list.addChild(rankNode);
         });
-        // display the ranking for 3 seconds, and then close
-        this.scheduleOnce(this.closeView, 3);
+        // display the ranking for 5 seconds, and then close
+        this.scheduleOnce(this.closeView, 5);
     }
 
     private closeView() {

@@ -6,7 +6,7 @@ import {
 } from './packages/monopolyCommon';
 import Dialog from './Dialog';
 import { nullCheck } from './utils';
-import { createDialog, DialogPosition } from './components/Dialog';
+import { createDialog, DialogPosition } from './components/DialogUtil';
 import { NodeConfig } from './components/NodeConfig';
 import { WidgetConfig } from './components/WidgetConfig';
 import { SpriteConfig } from './components/SpriteConfig';
@@ -32,7 +32,7 @@ export default class PurchaseDialog extends cc.Component {
         createDialog({
             name: 'purchase dialog',
             title: promptPurchase.property.name,
-            actionText: 'BUY',
+            actionText: promptPurchase.property.isUpgrade ? 'UPGRADE' : 'BUY',
             position: DialogPosition.BOTTOM_CENTER,
             content: NodeConfig.create('price bar')
                 .setSize(new cc.Size(0, 35)) // width set by WidgetConfig

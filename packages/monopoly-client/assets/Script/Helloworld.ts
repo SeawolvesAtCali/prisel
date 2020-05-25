@@ -1,9 +1,8 @@
 import { client } from './Client';
 import { Client, Messages, ResponseWrapper, LoginResponsePayload } from './packages/priselClient';
 import { nullCheck } from './utils';
-import Dialog from './Dialog';
 import { PERSISTENT_NODE } from './consts';
-import { createDialog } from './components/Dialog';
+import { createDialog } from './components/DialogUtil';
 import { createInput } from './components/Input';
 import { WidgetConfig } from './components/WidgetConfig';
 import { NodeConfig } from './components/NodeConfig';

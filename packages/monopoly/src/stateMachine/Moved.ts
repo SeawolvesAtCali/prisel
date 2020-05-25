@@ -1,6 +1,5 @@
 import { StateMachineState } from './StateMachineState';
 import { Encounter, Payment, PropertyInfo } from '../../common/types';
-import { toPropertyInfo } from '../Property';
 import { broadcast, PacketType, Packet, ResponseWrapper, debug } from '@prisel/server';
 import {
     EncounterPayload,
@@ -27,32 +26,23 @@ export class Moved extends StateMachineState {
         const { properties } = currentPathNode;
         const encounters: Encounter[] = [];
         const rentPayments: Payment[] = [];
-        const propertiesForPurchase: PropertyInfo[] = [];
-        if (properties.length > 0) {
-            // check for rent payment first
-            for (const property of properties) {
-                if (property.owner && property.owner.id !== currentPlayer.id) {
-                    rentPayments.push(currentPlayer.payRent(property.owner, property));
-                }
-                if (!property.owner) {
-                    propertiesForPurchase.push(toPropertyInfo(property));
-                }
-            }
-            if (rentPayments.length > 0) {
-                encounters.push({
-                    payRent: {
-                        payments: rentPayments,
-                    },
-                });
-            }
-            if (propertiesForPurchase.length > 0) {
-                encounters.push({
-                    newPropertyForPurchase: {
-                        properties: propertiesForPurchase,
-                    },
-                });
+
+        // check for rent payment first
+        for (const property of properties) {
+            if (property.owner && property.owner.id !== currentPlayer.id) {
+                rentPayments.push(
+                    currentPlayer.payRent(property.owner, property.getPropertyInfoForRent()),
+                );
             }
         }
+        if (rentPayments.length > 0) {
+            encounters.push({
+                payRent: {
+                    payments: rentPayments,
+                },
+            });
+        }
+
         if (encounters.length > 0) {
             broadcast<EncounterPayload>(this.game.room.getPlayers(), (playerInGame) => ({
                 type: PacketType.DEFAULT,
@@ -65,6 +55,17 @@ export class Moved extends StateMachineState {
             }));
         }
         this.announcePayRent(rentPayments);
+
+        const propertiesForPurchase: PropertyInfo[] = [];
+
+        for (const property of properties) {
+            if (property.purchaseable() || property.upgradable(currentPlayer)) {
+                propertiesForPurchase.push(
+                    property.getPropertyInfoForPurchaseOrUpgrade(currentPlayer),
+                );
+            }
+        }
+
         await this.promptForPurchases(propertiesForPurchase);
         if (!this.isCurrentState()) {
             return;
@@ -148,7 +149,10 @@ export class Moved extends StateMachineState {
                     const propertyToPurchase = currentPlayer.pathNode.properties.find((property) =>
                         samePos(property.pos, unownedProperty.pos),
                     );
-                    currentPlayer.purchaseProperty(propertyToPurchase);
+                    currentPlayer.purchaseProperty(
+                        propertyToPurchase,
+                        propertyToPurchase.getPropertyInfoForPurchaseOrUpgrade(currentPlayer),
+                    );
                     // broadcast purchase
 
                     broadcast<PlayerPurchasePayload>(this.game.room.getPlayers(), {

@@ -1,12 +1,9 @@
-import { debug, Player, PlayerId, Request, Messages, Response } from '@prisel/server';
-import Property, { toPropertyInfo } from './Property';
+import { debug, Player, PlayerId } from '@prisel/server';
+import Property from './Property';
 import { log } from './logGameObject';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
-import Game from './Game';
 import PathNode from './PathNode';
-import { RollResponsePayload, PurchaseResponsePayload, PurchasePayload } from '../common/messages';
-import { PropertyInfo, Encounter, Payment, Coordinate, GamePlayerInfo } from '../common/types';
-import { samePos } from './utils';
+import { PropertyInfo, Payment, Coordinate, GamePlayerInfo } from '../common/types';
 
 interface Props {
     id: PlayerId;
@@ -51,13 +48,13 @@ export class GamePlayer extends GameObject {
     }
 
     @log
-    public payRent(owner: GamePlayer, property: Property): Payment {
+    public payRent(owner: GamePlayer, property: PropertyInfo): Payment {
         this.cash = this.cash - property.rent;
         owner.gainMoney(property.rent);
         return {
             from: this.player.getId(),
             to: owner.player.getId(),
-            forProperty: toPropertyInfo(property),
+            forProperty: property,
             amount: property.rent,
         };
     }
@@ -74,98 +71,16 @@ export class GamePlayer extends GameObject {
         return path.map((pathNode) => pathNode.tile.pos);
     }
 
-    @log
-    public roll(game: Game, packet: Request): Response<RollResponsePayload> {
-        if (this.rolled) {
-            return Messages.getFailureFor(packet, `Player ${this.id} already rolled`);
+    public purchaseProperty(property: Property, nextLevelPropertyInfo: PropertyInfo) {
+        this.cash = this.cash - nextLevelPropertyInfo.cost;
+        if (property.owner !== this) {
+            this.owning.push(property);
         }
-
-        const pathCoordinates = this.rollAndMove();
-        const { properties } = this.pathNode;
-        const encounters: Encounter[] = [];
-        if (properties.length > 0) {
-            const rentPayments: Payment[] = [];
-            const propertiesForPurchase: PropertyInfo[] = [];
-            // check for rent payment first
-            for (const property of properties) {
-                if (property.owner && property.owner.id !== this.id) {
-                    rentPayments.push(this.payRent(property.owner, property));
-                }
-                if (!property.owner) {
-                    propertiesForPurchase.push(toPropertyInfo(property));
-                }
-            }
-            if (rentPayments.length > 0) {
-                encounters.push({
-                    payRent: {
-                        payments: rentPayments,
-                    },
-                });
-            }
-            if (propertiesForPurchase.length > 0) {
-                encounters.push({
-                    newPropertyForPurchase: {
-                        properties: propertiesForPurchase,
-                    },
-                });
-            }
-            // TODO when player doesn't have enough cash, declare bankrupcy
+        if (nextLevelPropertyInfo.isUpgrade) {
+            property.upgrade(nextLevelPropertyInfo.currentLevel);
+        } else {
+            property.purchasedBy(this);
         }
-
-        return Messages.getSuccessFor<RollResponsePayload>(packet, {
-            steps: pathCoordinates.length,
-            path: pathCoordinates,
-            encounters,
-        });
-    }
-
-    public purchaseProperty(property: Property) {
-        this.cash = this.cash - property.cost;
-        property.setOwner(this);
-        this.owning.push(property);
-    }
-
-    @log
-    public purchase(
-        game: Game,
-        request: Request<PurchasePayload>,
-    ): Response<PurchaseResponsePayload> {
-        const { properties } = this.pathNode;
-        const propertyToPurchase = properties.find((property) =>
-            samePos(property.pos, request.payload.propertyPos),
-        );
-
-        if (!propertyToPurchase) {
-            return Messages.getFailureFor(
-                request,
-                `no property at location ${request.payload.propertyPos}`,
-            );
-        }
-        if (propertyToPurchase.owner) {
-            return Messages.getFailureFor(request, 'property is already owned');
-        }
-        if (propertyToPurchase.cost > this.cash) {
-            return Messages.getFailureFor(
-                request,
-                `not enough cash to purchase, current cash ${this.cash}, property price ${propertyToPurchase.cost}`,
-            );
-        }
-
-        this.purchaseProperty(propertyToPurchase);
-        return Messages.getSuccessFor<PurchaseResponsePayload>(request, {
-            property: toPropertyInfo(propertyToPurchase),
-            remainingMoney: this.cash,
-        });
-    }
-
-    @log
-    public endTurn(game: Game, packet: Request): Response {
-        if (this.rolled) {
-            this.rolled = false;
-            return Messages.getSuccessFor(packet);
-        }
-        // if not rolled, cannot end turn
-        return Messages.getFailureFor(packet, 'Not rolled yet');
     }
 
     public flat(): FlatPlayer {

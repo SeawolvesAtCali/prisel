@@ -18,6 +18,7 @@ import {
 import { Action, PlayerStartTurnPayload, PlayerEndTurnPayload } from '../common/messages';
 import { startTurn, Turn } from './Turn';
 import Property from './Property';
+import { StateMachine } from './stateMachine/StateMachine';
 
 interface Props {
     id: string;
@@ -39,6 +40,7 @@ export default class Game extends GameObject {
     public room: Room;
     public turn: Turn;
     public properties: Property[];
+    public stateMachine: StateMachine;
 
     constructor(props: Props) {
         super();

@@ -18,9 +18,17 @@ import {
     PromptPurchaseResponsePayload,
     PlayerBankruptPayload,
     GameOverPayload,
+    PlayerLeftPayload,
 } from './packages/monopolyCommon';
 import { client, ClientState } from './Client';
-import { Client, Packet, PacketType, ResponseWrapper, Request } from './packages/priselClient';
+import {
+    Client,
+    Packet,
+    PacketType,
+    ResponseWrapper,
+    Request,
+    Messages,
+} from './packages/priselClient';
 import Player from './Player';
 import {
     CHARACTER_COLORS,
@@ -103,6 +111,9 @@ export default class Game extends cc.Component {
         );
         this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_GAME_OVER, this.handleAnnounceGameOver.bind(this)),
+        );
+        this.offPacketListeners.push(
+            this.client.on(Action.ANNOUNCE_PLAYER_LEFT, this.handleAnnounceLeft.bind(this)),
         );
 
         this.client
@@ -267,6 +278,10 @@ export default class Game extends cc.Component {
         this.eventBus.emit(EVENT.NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN);
     }
 
+    private handleAnnounceLeft(packet: Packet<PlayerLeftPayload>) {
+        cc.log('player left', packet);
+    }
+
     private requestRoll() {
         this.client
             .request({
@@ -304,6 +319,13 @@ export default class Game extends cc.Component {
         }
     }
 
+    private async onLeave() {
+        const response = await this.client.request(Messages.getLeave(this.client.newId()));
+        if (response.ok()) {
+            cc.director.loadScene('lobby');
+        }
+    }
+
     protected start() {
         this.started = true;
         this.eventBus = nullCheck(cc.find(EVENT_BUS));
@@ -320,6 +342,7 @@ export default class Game extends cc.Component {
         this.funcWaitingForStart = [];
 
         this.eventBus.on(EVENT.DICE_ROLLED, this.requestRoll, this);
+        this.eventBus.on(EVENT.LEAVE_ROOM, this.onLeave, this);
     }
 
     protected onDestroy() {

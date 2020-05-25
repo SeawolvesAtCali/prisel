@@ -1,15 +1,19 @@
 import { StateMachineState } from './StateMachineState';
-import { Packet } from '@prisel/server';
-import { Action } from '../../common/messages';
+import { Packet, broadcast, PacketType } from '@prisel/server';
+import { Action, PlayerLeftPayload } from '../../common/messages';
 import { GamePlayer } from '../GamePlayer';
 import { PreRoll } from './PreRoll';
+import { GameOver } from './GameOver';
+import { Sync, syncGamePlayer } from './utils';
 
 export class PreTurn extends StateMachineState {
-    private syncSet = new Set<string>();
+    private sync: Sync;
+    public onEnter() {
+        this.sync = syncGamePlayer(this.game);
+    }
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
         if (packet.action === Action.READY_TO_START_TURN) {
-            this.syncSet.add(gamePlayer.id);
-            if (this.checkSynced()) {
+            if (this.sync.add(gamePlayer.id)) {
                 this.machine.transition(PreRoll);
             }
             return true;
@@ -18,18 +22,15 @@ export class PreTurn extends StateMachineState {
     }
 
     public onPlayerLeave(gamePlayer: GamePlayer) {
-        if (this.checkSynced()) {
-            this.machine.transition(PreRoll);
-        }
-    }
-
-    private checkSynced(): boolean {
-        for (const playerInGame of this.game.players.keys()) {
-            if (!this.syncSet.has(playerInGame)) {
-                return false;
-            }
-        }
-        return true;
+        // player left, let's just end the game
+        broadcast<PlayerLeftPayload>(this.game.room.getPlayers(), {
+            type: PacketType.DEFAULT,
+            action: Action.ANNOUNCE_PLAYER_LEFT,
+            payload: {
+                player: gamePlayer.getGamePlayerInfo(),
+            },
+        });
+        this.machine.transition(GameOver);
     }
 
     public get [Symbol.toStringTag]() {

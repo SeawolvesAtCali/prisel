@@ -33,6 +33,7 @@ export abstract class Room {
      * Called when everybody left room and the room is ready to be clean up.
      */
     public abstract close(): void;
+    public abstract get isClosed(): boolean;
     public abstract setGame<Game = any>(game: Game): void;
     public abstract getGame<Game = any>(): Game;
     public abstract listenGamePacket<T extends Packet<any> = Packet<any>>(
@@ -68,6 +69,7 @@ class RoomImpl extends Room {
     private game: any;
     private actionListeners: EventEmitter = new EventEmitter();
     private currentToken = 0;
+    private closed = false;
 
     constructor(context: Context, config: RoomConfig) {
         super();
@@ -135,6 +137,11 @@ class RoomImpl extends Room {
         this.actionListeners.removeAllListeners();
         this.gamePhase = GAME_PHASE.WAITING;
         this.context.rooms.delete(this.id);
+        this.closed = true;
+    }
+
+    get isClosed(): boolean {
+        return this.closed;
     }
 
     public listenGamePacket<T extends Packet<any> = Packet<any>>(

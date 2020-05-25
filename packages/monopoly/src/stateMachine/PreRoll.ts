@@ -3,11 +3,13 @@ import {
     PlayerRollPayload,
     RollResponsePayload,
     PlayerStartTurnPayload,
+    PlayerLeftPayload,
 } from '../../common/messages';
 import { Packet, isRequest, broadcast, PacketType } from '@prisel/server';
 import { GamePlayer } from '../GamePlayer';
 import { StateMachineState } from './StateMachineState';
 import { Moved } from './Moved';
+import { GameOver } from './GameOver';
 
 export class PreRoll extends StateMachineState {
     public onEnter() {
@@ -51,6 +53,17 @@ export class PreRoll extends StateMachineState {
                 }
         }
         return false;
+    }
+    public onPlayerLeave(gamePlayer: GamePlayer) {
+        // player left, let's just end the game
+        broadcast<PlayerLeftPayload>(this.game.room.getPlayers(), {
+            type: PacketType.DEFAULT,
+            action: Action.ANNOUNCE_PLAYER_LEFT,
+            payload: {
+                player: gamePlayer.getGamePlayerInfo(),
+            },
+        });
+        this.machine.transition(GameOver);
     }
     public get [Symbol.toStringTag]() {
         return 'PreRoll';

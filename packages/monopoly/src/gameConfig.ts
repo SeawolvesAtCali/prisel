@@ -1,5 +1,6 @@
 import { GameConfig, debug, Request, Packet, Player } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
+import Game from './Game';
 import { Action } from '../common/messages';
 import { StateMachine } from './stateMachine/StateMachine';
 import { GameStarted } from './stateMachine/GameStarted';
@@ -48,7 +49,12 @@ const MonopolyGameConfig: GameConfig = {
         room.removeAllGamePacketListener();
         room.setGame(null);
     },
-    onRemovePlayer(room, player) {},
+    onRemovePlayer(room, player) {
+        const game = room.getGame<Game>();
+        if (game && game.stateMachine) {
+            game.stateMachine.state.onPlayerLeave(game.getGamePlayer(player));
+        }
+    },
 };
 
 export default MonopolyGameConfig;

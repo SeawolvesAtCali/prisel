@@ -15,6 +15,7 @@ export const handleExit = (context: Context, socket: Socket) => (packet: Packet)
     const player = getPlayer(context, socket);
     if (room && player) {
         context.roomConfig.onExit(player);
+        context.gameConfig.onRemovePlayer(room, player);
         context.players.delete(player.getId());
     }
     SocketManager.removeBySocket(socket);

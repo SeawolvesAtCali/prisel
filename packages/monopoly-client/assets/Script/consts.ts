@@ -40,8 +40,10 @@ export const SELECTOR_ZINDEX = 1000;
 export const AUTO_PANNING_PX_PER_SECOND = 1000;
 
 // name of the node used for event emitting
-export const EVENT_BUS = 'Canvas/eventBus';
+export const EVENT_BUS = 'Canvas';
 export const GAME_CAMERA = 'Canvas/game camera';
+
+export const PERSISTENT_NODE = 'Persistent';
 
 export enum EVENT {
     DICE_ROLLED = 'dice_rolled',
@@ -61,4 +63,7 @@ export enum EVENT {
     // ranking list close after timeout or player manually tap anywhere to close
     // it. Player should then be brought back to room view.
     RANKING_CLOSED = 'ranking_closed',
+
+    // player click on the leave room button while in game
+    LEAVE_ROOM = 'leave_room',
 }

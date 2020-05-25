@@ -1,13 +1,14 @@
 import { StateMachineState } from './StateMachineState';
-import { broadcast, PacketType, Packet, Request, isRequest } from '@prisel/server';
+import { broadcast, PacketType, Packet, Request, isRequest, debug } from '@prisel/server';
 import { GameOverPayload, Action } from '../../common/messages';
 import { Rank } from '../../common/types';
 import { GamePlayer } from '../GamePlayer';
+import { Sync, syncGamePlayer } from './utils';
 
 export class GameOver extends StateMachineState {
-    private syncSet = new Set<string>();
-
+    private sync: Sync;
     public async onEnter() {
+        this.sync = syncGamePlayer(this.game);
         broadcast<GameOverPayload>(this.game.room.getPlayers(), {
             type: PacketType.DEFAULT,
             action: Action.ANNOUNCE_GAME_OVER,
@@ -58,9 +59,8 @@ export class GameOver extends StateMachineState {
 
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
         if (isRequest(packet) && packet.action === Action.BACK_TO_ROOM) {
-            this.syncSet.add(gamePlayer.id);
             gamePlayer.player.respond(packet);
-            if (this.checkSynced()) {
+            if (this.sync.add(gamePlayer.id)) {
                 this.machine.end();
             }
             return true;
@@ -69,18 +69,9 @@ export class GameOver extends StateMachineState {
     }
 
     public onPlayerLeave(gamePlayer: GamePlayer) {
-        if (this.checkSynced()) {
+        if (this.sync.isSynced()) {
             this.machine.end();
         }
-    }
-
-    private checkSynced(): boolean {
-        for (const playerInGame of this.game.players.keys()) {
-            if (!this.syncSet.has(playerInGame)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public get [Symbol.toStringTag](): string {

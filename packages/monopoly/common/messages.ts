@@ -59,8 +59,12 @@ export enum Action {
     // a player go bankrupt, announce it to all players. This ends the game.
     ANNOUNCE_BANKRUPT = 'announce_bankrupt',
     ANNOUNCE_GAME_OVER = 'announce_game_over',
+    ANNOUNCE_PLAYER_LEFT = 'announce_player_left',
 }
 
+export interface PlayerLeftPayload {
+    player: GamePlayerInfo;
+}
 export interface PromptPurchasePayload {
     property: PropertyInfo;
     moneyAfterPurchase: number;

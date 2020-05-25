@@ -12,6 +12,7 @@ export class StateMachine {
 
     public init(initialStateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {
         this.currentState = new initialStateClass(this.game, this);
+        this.game.stateMachine = this;
         this.currentState.onEnter();
     }
 

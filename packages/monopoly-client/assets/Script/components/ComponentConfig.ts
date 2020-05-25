@@ -1,4 +1,4 @@
-interface ComponentSubclass {
+export interface ComponentSubclass {
     prototype: cc.Component;
     new (): cc.Component;
 }

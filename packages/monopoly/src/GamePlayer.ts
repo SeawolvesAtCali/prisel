@@ -5,7 +5,7 @@ import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Game from './Game';
 import PathNode from './PathNode';
 import { RollResponsePayload, PurchaseResponsePayload, PurchasePayload } from '../common/messages';
-import { PropertyInfo, Encounter, Payment, Coordinate } from '../common/types';
+import { PropertyInfo, Encounter, Payment, Coordinate, GamePlayerInfo } from '../common/types';
 import { samePos } from './utils';
 
 interface Props {
@@ -175,6 +175,18 @@ export class GamePlayer extends GameObject {
             owning: this.owning.map(this.ref),
             cash: this.cash,
             rolled: this.rolled,
+        };
+    }
+
+    public getGamePlayerInfo(): GamePlayerInfo {
+        return {
+            money: this.cash,
+            player: {
+                name: this.player.getName(),
+                id: this.player.getId(),
+            },
+            pos: this.pathNode.tile.pos,
+            character: this.character,
         };
     }
 }

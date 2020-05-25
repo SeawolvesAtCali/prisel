@@ -1,3 +1,4 @@
-import debug from 'debug';
+import debugPkg from 'debug';
 
-export default debug('debug');
+export const debug = debugPkg('debug');
+export default debug;

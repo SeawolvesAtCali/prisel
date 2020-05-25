@@ -11,6 +11,7 @@ import {
     PlayerPayRentPayload,
     PlayerEndTurnPayload,
     PlayerBankruptPayload,
+    PlayerLeftPayload,
 } from '../../common/messages';
 import { samePos } from '../utils';
 import { PreTurn } from './PreTurn';
@@ -65,6 +66,9 @@ export class Moved extends StateMachineState {
         }
         this.announcePayRent(rentPayments);
         await this.promptForPurchases(propertiesForPurchase);
+        if (!this.isCurrentState()) {
+            return;
+        }
 
         if (currentPlayer.cash < 0) {
             // player bankrupted.
@@ -132,6 +136,9 @@ export class Moved extends StateMachineState {
                 },
                 0, // 0 timeout means no timeout
             );
+            if (!this.isCurrentState()) {
+                return;
+            }
 
             debug('receive response for purchase' + JSON.stringify(response.get()));
             // although client shouldn't send a error response, let's just
@@ -155,6 +162,18 @@ export class Moved extends StateMachineState {
                 }
             }
         }
+    }
+
+    public onPlayerLeave(gamePlayer: GamePlayer) {
+        // player left, let's just end the game
+        broadcast<PlayerLeftPayload>(this.game.room.getPlayers(), {
+            type: PacketType.DEFAULT,
+            action: Action.ANNOUNCE_PLAYER_LEFT,
+            payload: {
+                player: gamePlayer.getGamePlayerInfo(),
+            },
+        });
+        this.machine.transition(GameOver);
     }
 
     public get [Symbol.toStringTag]() {

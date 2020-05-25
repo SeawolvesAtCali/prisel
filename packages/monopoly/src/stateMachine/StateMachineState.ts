@@ -10,6 +10,14 @@ export abstract class StateMachineState {
         this.game = game;
         this.machine = machine;
     }
+    /**
+     * Called by state to verify that if it is the current state.
+     * state can still be running even if it is not a current state if we have
+     * some async operation that is not terminated when transition.
+     */
+    protected isCurrentState(): boolean {
+        return this.machine.state === this;
+    }
     public onEnter(): Promise<void> | void {}
     public onExit() {}
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {

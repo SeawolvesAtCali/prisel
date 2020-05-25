@@ -15,7 +15,7 @@ interface DialogProps {
     name?: string;
     title: string;
     position?: DialogPosition;
-    content?: NodeConfig;
+    content?: NodeConfig | NodeConfig[];
     actionText: string;
     onClose?: () => void;
     onAction?: () => void;
@@ -74,7 +74,11 @@ export function createDialog(props: DialogProps): NodeConfig<DialogExport> {
     }
 
     if (content) {
-        panel.addAllChildren(content);
+        if (Array.isArray(content)) {
+            panel.addAllChildren(...content);
+        } else {
+            panel.addAllChildren(content);
+        }
     }
     const actionButton = createButton({
         name: 'action button',

@@ -25,6 +25,14 @@ export class WidgetConfig extends ComponentConfig {
         return this.custom(top, undefined, bottom, undefined, true);
     }
 
+    public static verticalCenter(left?: number, right?: number): WidgetConfig {
+        return this.custom(undefined, right, undefined, left, false, true);
+    }
+
+    public static horizontalContraint(left?: number, right?: number): WidgetConfig {
+        return this.custom(undefined, right, undefined, left);
+    }
+
     public static center(): WidgetConfig {
         return this.custom(undefined, undefined, undefined, undefined, true, true);
     }

@@ -15,6 +15,16 @@ export class ButtonConfig extends ComponentConfig {
         return cc.Button;
     }
 
+    public static menuCloseButton(onTap: () => void): ButtonConfig {
+        const config = new ButtonConfig();
+        const assets = SharedAssets.instance();
+        config.normalSprite = nullCheck(assets.uiAtlas.getSpriteFrame('cross-light'));
+        config.pressedSprite = config.normalSprite;
+        config.hoverSprite = config.normalSprite;
+        config.onTap = onTap;
+        return config;
+    }
+
     public static dialogCloseButton(onTap: () => void): ButtonConfig {
         const config = new ButtonConfig();
         const assets = SharedAssets.instance();
@@ -35,6 +45,16 @@ export class ButtonConfig extends ComponentConfig {
         config.interactable = !!onTap;
         config.onTap = onTap;
 
+        return config;
+    }
+
+    public static labelButton(onTap?: () => void): ButtonConfig {
+        const config = new ButtonConfig();
+        const assets = SharedAssets.instance();
+        config.normalSprite = nullCheck(assets.uiAtlas.getSpriteFrame('shadow'));
+        config.pressedSprite = config.normalSprite;
+        config.hoverSprite = config.normalSprite;
+        config.onTap = onTap;
         return config;
     }
 

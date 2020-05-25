@@ -19,18 +19,16 @@ const { ccclass, property } = cc._decorator;
 export default class PurchaseDialog extends cc.Component {
     private eventBus: cc.Node = null;
     private dialog: cc.Node = null;
-    private canvas: cc.Node = null;
 
     protected start() {
         this.eventBus = cc.find(EVENT_BUS);
-        this.canvas = nullCheck(cc.find('Canvas'));
 
         this.eventBus.on(EVENT.PROMPT_PURCHASE, this.promptPurchase, this);
     }
 
     private promptPurchase(promptPurchase: PromptPurchasePayload) {
         this.dialog = new cc.Node();
-        this.canvas.addChild(this.dialog);
+        this.node.addChild(this.dialog);
         createDialog({
             name: 'purchase dialog',
             title: promptPurchase.property.name,
@@ -60,13 +58,13 @@ export default class PurchaseDialog extends cc.Component {
 
     private handlePurchase() {
         this.eventBus.emit(EVENT.PURCHASE_DECISION, true);
-        this.canvas.removeChild(this.dialog);
+        this.node.removeChild(this.dialog);
         this.dialog = undefined;
     }
 
     private handleCancel() {
         this.eventBus.emit(EVENT.PURCHASE_DECISION, false);
-        this.canvas.removeChild(this.dialog);
+        this.node.removeChild(this.dialog);
         this.dialog = undefined;
     }
 }

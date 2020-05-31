@@ -236,13 +236,13 @@ export default class Game extends cc.Component {
     }
 
     private handleAnnouncePurchase(packet: Packet<PlayerPurchasePayload>) {
-        const { property: purchasdProperty, id } = packet.payload;
+        const { property: purchasedProperty, id } = packet.payload;
         const player = this.playerNodes
             .find((playerNode) => playerNode.getComponent(Player).getId() === id)
             .getComponent(Player);
 
         this.currentTurnChain.chain(async () => {
-            this.map.getPropertyTileAt(purchasdProperty.pos).setOwner(player);
+            this.map.getPropertyTileAt(purchasedProperty.pos).setOwner(player, purchasedProperty);
         });
     }
 

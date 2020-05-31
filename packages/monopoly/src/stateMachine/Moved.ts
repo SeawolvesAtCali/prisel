@@ -1,6 +1,5 @@
 import { StateMachineState } from './StateMachineState';
-import { Encounter, Payment, PropertyInfo } from '../../common/types';
-import { toPropertyInfo } from '../Property';
+import { Encounter, Payment } from '../../common/types';
 import { broadcast, PacketType, Packet, ResponseWrapper, debug } from '@prisel/server';
 import {
     EncounterPayload,
@@ -17,6 +16,7 @@ import { samePos } from '../utils';
 import { PreTurn } from './PreTurn';
 import { GameOver } from './GameOver';
 import { GamePlayer } from '../GamePlayer';
+import Property from '../Property';
 
 export class Moved extends StateMachineState {
     public async onEnter() {
@@ -27,32 +27,23 @@ export class Moved extends StateMachineState {
         const { properties } = currentPathNode;
         const encounters: Encounter[] = [];
         const rentPayments: Payment[] = [];
-        const propertiesForPurchase: PropertyInfo[] = [];
-        if (properties.length > 0) {
-            // check for rent payment first
-            for (const property of properties) {
-                if (property.owner && property.owner.id !== currentPlayer.id) {
-                    rentPayments.push(currentPlayer.payRent(property.owner, property));
-                }
-                if (!property.owner) {
-                    propertiesForPurchase.push(toPropertyInfo(property));
-                }
-            }
-            if (rentPayments.length > 0) {
-                encounters.push({
-                    payRent: {
-                        payments: rentPayments,
-                    },
-                });
-            }
-            if (propertiesForPurchase.length > 0) {
-                encounters.push({
-                    newPropertyForPurchase: {
-                        properties: propertiesForPurchase,
-                    },
-                });
+
+        // check for rent payment first
+        for (const property of properties) {
+            if (property.owner && property.owner.id !== currentPlayer.id) {
+                rentPayments.push(
+                    currentPlayer.payRent(property.owner, property.getPropertyInfoForRent()),
+                );
             }
         }
+        if (rentPayments.length > 0) {
+            encounters.push({
+                payRent: {
+                    payments: rentPayments,
+                },
+            });
+        }
+
         if (encounters.length > 0) {
             broadcast<EncounterPayload>(this.game.room.getPlayers(), (playerInGame) => ({
                 type: PacketType.DEFAULT,
@@ -65,7 +56,8 @@ export class Moved extends StateMachineState {
             }));
         }
         this.announcePayRent(rentPayments);
-        await this.promptForPurchases(propertiesForPurchase);
+
+        await this.promptForPurchases(properties);
         if (!this.isCurrentState()) {
             return;
         }
@@ -116,13 +108,20 @@ export class Moved extends StateMachineState {
         }
     }
 
-    private async promptForPurchases(propertiesForPurchase: PropertyInfo[]) {
+    private async promptForPurchases(properties: Property[]) {
         const currentPlayer = this.game.getCurrentPlayer();
-        for (const unownedProperty of propertiesForPurchase) {
-            if (currentPlayer.cash < unownedProperty.cost) {
+
+        for (const property of properties) {
+            if (!property.purchaseable() && !property.upgradable(currentPlayer)) {
+                continue;
+            }
+
+            const propertyForPurchase = property.getPropertyInfoForPurchaseOrUpgrade(currentPlayer);
+            if (currentPlayer.cash < propertyForPurchase.cost) {
                 // not enough money
                 continue;
             }
+
             const response: ResponseWrapper<PromptPurchaseResponsePayload> = await currentPlayer.player.request<
                 PromptPurchasePayload
             >(
@@ -130,8 +129,8 @@ export class Moved extends StateMachineState {
                     type: PacketType.REQUEST,
                     action: Action.PROMPT_PURCHASE,
                     payload: {
-                        property: unownedProperty,
-                        moneyAfterPurchase: currentPlayer.cash - unownedProperty.cost,
+                        property: propertyForPurchase,
+                        moneyAfterPurchase: currentPlayer.cash - propertyForPurchase.cost,
                     },
                 },
                 0, // 0 timeout means no timeout
@@ -139,27 +138,27 @@ export class Moved extends StateMachineState {
             if (!this.isCurrentState()) {
                 return;
             }
-
             debug('receive response for purchase' + JSON.stringify(response.get()));
             // although client shouldn't send a error response, let's just
             // check the status as well
-            if (response.ok()) {
-                if (response.payload.purchase) {
-                    const propertyToPurchase = currentPlayer.pathNode.properties.find((property) =>
-                        samePos(property.pos, unownedProperty.pos),
-                    );
-                    currentPlayer.purchaseProperty(propertyToPurchase);
-                    // broadcast purchase
+            if (!response.ok()) {
+                return;
+            }
 
-                    broadcast<PlayerPurchasePayload>(this.game.room.getPlayers(), {
-                        type: PacketType.DEFAULT,
-                        action: Action.ANNOUNCE_PURCHASE,
-                        payload: {
-                            id: currentPlayer.id,
-                            property: unownedProperty,
-                        },
-                    });
-                }
+            if (response.payload.purchase) {
+                currentPlayer.purchaseProperty(
+                    property,
+                    property.getPropertyInfoForPurchaseOrUpgrade(currentPlayer),
+                );
+                // broadcast purchase
+                broadcast<PlayerPurchasePayload>(this.game.room.getPlayers(), {
+                    type: PacketType.DEFAULT,
+                    action: Action.ANNOUNCE_PURCHASE,
+                    payload: {
+                        id: currentPlayer.id,
+                        property: property.getBasicPropertyInfo(),
+                    },
+                });
             }
         }
     }

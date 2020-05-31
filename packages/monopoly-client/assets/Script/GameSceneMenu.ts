@@ -1,5 +1,5 @@
 import { NodeConfig } from './components/NodeConfig';
-import { createDialog } from './components/Dialog';
+import { createDialog } from './components/DialogUtil';
 import { WidgetConfig } from './components/WidgetConfig';
 import { SpriteConfig } from './components/SpriteConfig';
 import { createButton } from './components/Button';

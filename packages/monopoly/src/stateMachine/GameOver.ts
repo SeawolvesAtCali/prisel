@@ -28,7 +28,7 @@ export class GameOver extends StateMachineState {
             if (property.owner && playerPropertiesWorth.has(property.owner.id)) {
                 playerPropertiesWorth.set(
                     property.owner.id,
-                    playerPropertiesWorth.get(property.owner.id) + property.cost,
+                    playerPropertiesWorth.get(property.owner.id) + property.getWorth(),
                 );
             }
         }

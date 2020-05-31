@@ -1,4 +1,5 @@
 import Player from './Player';
+import { PropertyInfo } from './packages/monopolyCommon';
 
 const { ccclass, property } = cc._decorator;
 
@@ -13,12 +14,21 @@ export default class PropertyTile extends cc.Component {
         return this.owner;
     }
 
-    public setOwner(player: Player) {
+    public setOwner(player: Player, propertyInfo: PropertyInfo) {
         this.owner = player;
         this.getComponent(cc.Sprite).spriteFrame = this.spriteAtlas.getSpriteFrame(
-            `property-owned-${player.color}`,
+            `property-${this.levelString(propertyInfo)}-${player.color}`,
         );
     }
 
-    // update (dt) {}
+    private levelString(propertyInfo: PropertyInfo) {
+        switch (propertyInfo.currentLevel) {
+            case 0:
+                return 'owned';
+            case 1:
+                return 'level-2';
+            case 2:
+                return 'level-3';
+        }
+    }
 }

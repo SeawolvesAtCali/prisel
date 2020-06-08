@@ -1,0 +1,17 @@
+{
+    "files.exclude": {
+        "**/.cache": true,
+        "**/.rpt2_cache": true,
+        "**/*.meta": true,
+        "**/*.tgz": true,
+        "node_modules": true
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/.cache/**": true,
+        "**/dist/**": true
+    },
+    "eslint.enable": true
+}

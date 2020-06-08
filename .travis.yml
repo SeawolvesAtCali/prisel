@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-    - '10'
+    - '12.17.0'
 install:
     # npm ci removes node_modules and make sure package-lock.json matches package.json
     - npm ci
@@ -10,7 +10,17 @@ cache:
         # while node_modules does https://stackoverflow.com/a/42523517
         - '$HOME/.npm'
 script:
-    - npm run lint
     - npm run build
     - npm test
     - npm run automation
+    # - set -e
+    # - echo 'Checking for missing change logs...' && echo -en 'travis_fold:start:change\\r'
+    # - git fetch origin master:refs/remotes/origin/master -a
+    # - node common/scripts/install-run-rush.js change -v
+    # - echo -en 'travis_fold:end:change\\r'
+    # - echo 'Installing...' && echo -en 'travis_fold:start:install\\r'
+    # - node common/scripts/install-run-rush.js install
+    # - echo -en 'travis_fold:end:install\\r'
+    # - echo 'Building...' && echo -en 'travis_fold:start:build\\r'
+    # - node common/scripts/install-run-rush.js rebuild --verbose
+    # - echo -en 'travis_fold:end:build\\r'

@@ -1,0 +1,4 @@
+scripts:
+    default: env DEBUG=debug ts-node --project demo.tsconfig.json index.ts
+    clean: rm -rf ./lib
+    build: tsc

@@ -53,7 +53,7 @@ describe('player', () => {
         const player = newPlayer(mockContext(), { name: 'player', id: '1' });
         const packet = getWelcome();
         player.emit(packet);
-        jest.runAllImmediates();
+        jest.runAllTimers();
         expect(emit).toHaveBeenCalledWith(player.getSocket(), expect.objectContaining(packet));
     });
     test('request', () => {
@@ -65,7 +65,7 @@ describe('player', () => {
             payload: {},
         };
         player.request(request);
-        jest.runAllImmediates();
+        jest.runAllTimers();
         expect(emit).toHaveBeenCalledWith(
             player.getSocket(),
             expect.objectContaining({ request_id: expect.any(String) }),
@@ -84,7 +84,7 @@ describe('player', () => {
             system_action: MessageType.CREATE_ROOM,
         };
         player.respondFailure(request, '123');
-        jest.runAllImmediates();
+        jest.runAllTimers();
         expect(emit).toHaveBeenCalledWith(
             player.getSocket(),
             expect.objectContaining({

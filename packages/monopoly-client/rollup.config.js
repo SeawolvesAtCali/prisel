@@ -3,7 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import copy from 'rollup-plugin-copy';
 
-function buildJs(input, file) {
+function buildJs(input, file, ...otherPlugins) {
     return {
         input,
         output: [{ file, format: 'cjs' }],
@@ -14,11 +14,12 @@ function buildJs(input, file) {
                 preferBuiltins: true,
             }), // so Rollup can find dependencies
             commonjs(), // so Rollup can convert dependencies to an ES module
+            ...otherPlugins,
         ],
     };
 }
 
-function buildDef(input, file) {
+function buildDef(input, file, ...otherPlugins) {
     return {
         input,
         output: [
@@ -27,7 +28,7 @@ function buildDef(input, file) {
                 format: 'es',
             },
         ],
-        plugins: [dts()],
+        plugins: [dts(), ...otherPlugins],
     };
 }
 
@@ -35,19 +36,14 @@ const config = [
     buildJs('priselClient.js', 'assets/Script/packages/priselClient.js'),
     buildDef('../client/lib/index.d.ts', 'assets/Script/packages/priselClient.d.ts'),
     buildJs('monopolyCommon.js', 'assets/Script/packages/monopolyCommon.js'),
-    buildDef('../monopoly/lib/index.d.ts', 'assets/Script/packages/monopolyCommon.d.ts'),
-    {
-        input: 'resource.js',
-        output: {
-            file: 'assets/Script/packages/resource.js',
-            format: 'cjs',
-        },
-        plugins: [
-            copy({
-                targets: [{ src: '../monopoly/common/data/*', dest: 'assets/resources' }],
-            }),
-        ],
-    },
+    buildDef(
+        '../monopoly/lib/index.d.ts',
+        'assets/Script/packages/monopolyCommon.d.ts',
+        // piggy back the copy command to a target, because it needs to have an input.
+        copy({
+            targets: [{ src: '../monopoly/common/data/*', dest: 'assets/resources' }],
+        }),
+    ),
 ];
 
 export default config;

@@ -1,8 +1,12 @@
 {
-    "extends": "../../tsconfig",
+    "extends": "./tsconfig",
     "compilerOptions": {
-        "module": "commonjs",
         "rootDir": "./",
-        "outDir": "./lib"
-    }
+        "module": "commonjs",
+        "noEmit": true
+    },
+    "exclude": [
+        "node_modules",
+        "**/lib"
+    ]
 }

@@ -37,9 +37,13 @@
         "tslib": "^2.0.0",
         "typescript": "^3.8.3",
         "@prisel/gen-tsconfig": "0.0.0",
-        "@prisel/jest-preset": "0.0.0"
+        "@prisel/jest-preset": "0.0.0",
+        "ts-node": "^8.10.2"
     },
     "genTsconfig": {
+        "files": [
+            "index.ts"
+        ],
         "genDemo": true
     },
     "jest": {

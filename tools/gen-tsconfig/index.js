@@ -31,6 +31,7 @@ function readJson(file) {
  * files: Array<string> the files to include in the `npm run build` process
  * outDir: output directory used by `npm run build`. Default to `./lib`,
  * genDemo: true/false, default false, whether to generate demo.tsconfig.json
+ * genJs: generate js file when `npm run build`
  *
  * @param {object} pkgJson The package.json object
  * @param {string} projectRootDir The absolute path of package.json file
@@ -40,7 +41,7 @@ function genTsconfig(pkgJson, projectRootDir) {
     if (!genTsconfig) {
         throw new Error('package.json should have a genTsconfig field');
     }
-    const { files, outDir, genDemo } = genTsconfig;
+    const { files, outDir, genDemo, genJs } = genTsconfig;
 
     const baseConfig = {
         extends: '../../tsconfig',
@@ -59,7 +60,9 @@ function genTsconfig(pkgJson, projectRootDir) {
         buildConfig.files = files;
         buildConfig.compilerOptions = { ...buildConfig.compilerOptions, noEmit: false };
         buildConfig.compilerOptions.outDir = outDir ? outDir : DEFAULT_OUT_DIR;
-        buildConfig.compilerOptions.emitDeclarationOnly = true;
+        if (!genJs) {
+            buildConfig.compilerOptions.emitDeclarationOnly = true;
+        }
         outputTsconfig(buildConfig, path.resolve(projectRootDir, BUILD_CONFIG_NAME + '.json'));
     }
 

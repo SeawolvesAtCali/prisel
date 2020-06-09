@@ -44,7 +44,8 @@
         "jest": "^26.0.1",
         "@types/jest": "^22.2.3",
         "@prisel/gen-tsconfig": "0.0.0",
-        "@prisel/jest-preset": "0.0.0"
+        "@prisel/jest-preset": "0.0.0",
+        "ts-node": "^8.10.2"
     },
     "genTsconfig": {
         "files": [

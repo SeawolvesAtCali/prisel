@@ -9,7 +9,7 @@ dependencies:
   '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
   '@rush-temp/client': 'file:projects/client.tgz'
   '@rush-temp/common': 'file:projects/common.tgz'
-  '@rush-temp/e2e': 'file:projects/e2e.tgz_typescript@3.9.3'
+  '@rush-temp/e2e': 'file:projects/e2e.tgz'
   '@rush-temp/gen-tsconfig': 'file:projects/gen-tsconfig.tgz'
   '@rush-temp/jest-preset': 'file:projects/jest-preset.tgz_jest@26.0.1+typescript@3.9.3'
   '@rush-temp/map-creator': 'file:projects/map-creator.tgz'
@@ -55,6 +55,7 @@ dependencies:
   rollup-plugin-dts: 1.4.7_rollup@2.12.0+typescript@3.9.3
   rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@3.9.3
   ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+  ts-node: 8.10.2_typescript@3.9.3
   tslib: 2.0.0
   typedoc: 0.14.2
   typedoc-plugin-markdown: 1.2.1_typedoc@0.14.2
@@ -3604,6 +3605,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-5hYdAkZlcG8tOLujVDTgCT+uPX0VnpAH28gWsLfzpXYm7wP6mp5Q/gYyR7YQ0cKVJcXJnl3j2kpBan13PtQf6w==
+  /arg/4.1.3:
+    dev: false
+    resolution:
+      integrity: sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==
   /argparse/1.0.10:
     dependencies:
       sprintf-js: 1.0.3
@@ -5667,6 +5672,12 @@ packages:
       node: '>= 10.14.2'
     resolution:
       integrity: sha512-JC/eHYEC3aSS0vZGjuoc4vHA0yAQTzhQQldXMeMF+JlxLGJlCO38Gma82NV9gk1jGFz8mDzUMeaKXvjRRdJ2dg==
+  /diff/4.0.2:
+    dev: false
+    engines:
+      node: '>=0.3.1'
+    resolution:
+      integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==
   /diffie-hellman/5.0.3:
     dependencies:
       bn.js: 4.11.9
@@ -13634,6 +13645,22 @@ packages:
       typescript: '>=3.8 <4.0'
     resolution:
       integrity: sha512-JbhQdyDMYN5nfKXaAwCIyaWLGwevcT2/dbqRPsQeh6NZPUuXjZQZEfeLb75tz0ubCIgEELNm6xAzTe5NXs5Y4Q==
+  /ts-node/8.10.2_typescript@3.9.3:
+    dependencies:
+      arg: 4.1.3
+      diff: 4.0.2
+      make-error: 1.3.6
+      source-map-support: 0.5.19
+      typescript: 3.9.3
+      yn: 3.1.1
+    dev: false
+    engines:
+      node: '>=6.0.0'
+    hasBin: true
+    peerDependencies:
+      typescript: '>=2.7'
+    resolution:
+      integrity: sha512-ISJJGgkIpDdBhWVu3jufsWpK3Rzo7bdiIXJjQc0ynKxVOVcg2oIrf2H2cejminGrptVc6q6/uynAHNCuWGbpVA==
   /tslib/1.11.2:
     dev: false
     resolution:
@@ -14513,6 +14540,12 @@ packages:
       node: '>= 4.0.0'
     resolution:
       integrity: sha512-faQrqNMzcPCHGVC2aaOINk13K+aaBDUPjGWl0teOXywElLjyVAB6Oe2jj62jHYtwsU49jXhScYbvPENK+6zAvQ==
+  /yn/3.1.1:
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
   'file:projects/client.tgz':
     dependencies:
       '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
@@ -14531,7 +14564,7 @@ packages:
     dev: false
     name: '@rush-temp/client'
     resolution:
-      integrity: sha512-TdUY6XbhE0SPPL+yJfAKshCvidBvSsK5vFGTsQTuw5pvSZ+fOwe9WOQ7qNHJw4x2F5kVDFkCzKgbH0Ub8FfS6Q==
+      integrity: sha512-gMOH/MYKJmkEwV+gblk+7MvM4v9R46SP6InRF6G9rLwZLJTdma/FTNhNjavuRUjqkMa1FYhbVm3+Dqil2uqvzQ==
       tarball: 'file:projects/client.tgz'
     version: 0.0.0
   'file:projects/common.tgz':
@@ -14547,10 +14580,10 @@ packages:
     dev: false
     name: '@rush-temp/common'
     resolution:
-      integrity: sha512-R2q/K1noCay90+I7Mrj76VDY7wDyIXk3bHwigroIwUTqDE/kmfpoHuqNiwOgV1qRN82Tx5NWCjanlOR+p5ldQw==
+      integrity: sha512-chXen3Jf5prF62+Zyn/pr4vjzhH48HOmT4YWxgy33uDCDDXvp4eSCfa2EOAkgKEGCQP6taaLKDxE4bkbZepAZg==
       tarball: 'file:projects/common.tgz'
     version: 0.0.0
-  'file:projects/e2e.tgz_typescript@3.9.3':
+  'file:projects/e2e.tgz':
     dependencies:
       '@types/debug': 0.0.30
       '@types/jest': 22.2.3
@@ -14560,14 +14593,10 @@ packages:
       jest-dev-server: 4.4.0
       jest-environment-jsdom: 23.4.0
       lodash: 4.17.15
-      ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
     dev: false
-    id: 'file:projects/e2e.tgz'
     name: '@rush-temp/e2e'
-    peerDependencies:
-      typescript: '*'
     resolution:
-      integrity: sha512-nVbqNdFWrxs/a//KGC8hMfmbluTgnIgOpBPKnuq+okbd4eiEWt6mKG2V5Yx8IzXcEjPAy3Ob4xl/RUja9wlkOA==
+      integrity: sha512-NTXfoa7P/ilZOwlgE8JBdhEmtWDFTSj7ztIwJjC20wgewrutDzucO+5is7iLqCnNnF88IrVLhqvXzRMh1Xn0Iw==
       tarball: 'file:projects/e2e.tgz'
     version: 0.0.0
   'file:projects/gen-tsconfig.tgz':
@@ -14616,7 +14645,7 @@ packages:
     dev: false
     name: '@rush-temp/map-creator'
     resolution:
-      integrity: sha512-ww2aDJDafeRZvHUkITA/zX/TB1eC6L/CMl2DyN16wIqHTbLvce7PwZsrjFRrq5qvvgcYuMOLUoa7WEkPwzMvhw==
+      integrity: sha512-mS3Tnl0moUtzeJyg4G8OuHQRaIEdDv88qf7g+O1ZCTwYQ6y7K4dvaScYGSI7e57FJjVExZz/1jm9sgw9CoE8qw==
       tarball: 'file:projects/map-creator.tgz'
     version: 0.0.0
   'file:projects/monopoly-client.tgz_typescript@3.9.3':
@@ -14636,7 +14665,7 @@ packages:
     peerDependencies:
       typescript: '*'
     resolution:
-      integrity: sha512-A6vw2jXfmQhsixyahwkiets6By2eekg/2fHpzWmQ0qufPo35xTh1fDBOX26NII5Cf5cxlzchDr9DR0FlbZGa5w==
+      integrity: sha512-XlZ8nTW64n3N4/2SU5yEdxyQ0Ch09bdr+v10GjeDVQaky1+1vrBK+BBmMXsXSgpxa8OZhnezI22jDzRpitbNIg==
       tarball: 'file:projects/monopoly-client.tgz'
     version: 0.0.0
   'file:projects/monopoly.tgz':
@@ -14652,12 +14681,13 @@ packages:
       rollup-plugin-dts: 1.4.7_rollup@2.12.0+typescript@3.9.3
       rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@3.9.3
       ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+      ts-node: 8.10.2_typescript@3.9.3
       tslib: 2.0.0
       typescript: 3.9.3
     dev: false
     name: '@rush-temp/monopoly'
     resolution:
-      integrity: sha512-95LI/cfL/ARLwll0+MzBBhl++I3jlCsKXYKNTYgszP27blq7Vtad8PImva4tci44V5OpxSyLqcbOfmWO/IVh0w==
+      integrity: sha512-JDnB3YxRkYR/+rNSCebovhCFtGzGHDpUWr49xPgAR25Fhx3G10oLaNQee/taR3+OCYlDEYWxBFjZECyrSxBzIw==
       tarball: 'file:projects/monopoly.tgz'
     version: 0.0.0
   'file:projects/react.tgz':
@@ -14688,7 +14718,7 @@ packages:
     dev: false
     name: '@rush-temp/react'
     resolution:
-      integrity: sha512-FfMxhAPjbY0oZzaiSOk9Yky+T1Etw86f+7NLUqlOeKMazsOssuZG0sHbHwRlUk2WZ/SB9KmdA7Xv2yG//rAkoA==
+      integrity: sha512-kfUgeZIPHQjqIJztSqtiZ6vibaIbitEibq05kxCJIjk97Y2rl2s+czFH08ZkbHtyx65rOdg2UNC0By9BJ8V2sw==
       tarball: 'file:projects/react.tgz'
     version: 0.0.0
   'file:projects/server.tgz':
@@ -14707,6 +14737,7 @@ packages:
       rollup: 2.12.0
       rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@3.9.3
       ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+      ts-node: 8.10.2_typescript@3.9.3
       tslib: 2.0.0
       typedoc: 0.14.2
       typedoc-plugin-markdown: 1.2.1_typedoc@0.14.2
@@ -14715,7 +14746,7 @@ packages:
     dev: false
     name: '@rush-temp/server'
     resolution:
-      integrity: sha512-T3/wkGarg7Yu2pJDGAV9x1j79njZNZ//MNl6xB0eD/j/PA1D0XljkcKFhJCkMoqwqOv3es+sKJisNkA+vBdEEw==
+      integrity: sha512-h9Z+p1JykrFmMZeYqQypCusRIOTT7KFFAqTzR2Zk+qbUB8uJlvyTlgIGai65OQ5i/UWycbx0/rmg5XRSz3A8Cg==
       tarball: 'file:projects/server.tgz'
     version: 0.0.0
   'file:projects/tic-tac-toe-client.tgz':
@@ -14741,7 +14772,7 @@ packages:
     dev: false
     name: '@rush-temp/tic-tac-toe-client'
     resolution:
-      integrity: sha512-gh7ZqdvBD6E3Qtj/UFypitDA7zKJHaqvG6EMXrnQkUoUiUlKlVJGv8By4GUbGTAhT7JEwwT0joOvl8ymfj0+DQ==
+      integrity: sha512-ZYo3+5en8CwjdxXK3YE8KcMk/uqlBFk3TJxFOgTGMGHaTrSJpWXC69FJCrMrgPJ7NInIXP42NU0mzOiCsYIvGA==
       tarball: 'file:projects/tic-tac-toe-client.tgz'
     version: 0.0.0
   'file:projects/tic-tac-toe.tgz':
@@ -14750,12 +14781,13 @@ packages:
       jest: 26.0.1
       nps: 5.9.12
       ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+      ts-node: 8.10.2_typescript@3.9.3
       tslib: 2.0.0
       typescript: 3.9.3
     dev: false
     name: '@rush-temp/tic-tac-toe'
     resolution:
-      integrity: sha512-34CvT6acYiJriTfJSnZxA19VOU7PtBYHvGZSl+TDtYTg42oMAYUnMx8dHgQ0DQPATDJnUUTuY1qt3LI1/lKm7g==
+      integrity: sha512-YTQuoJ6ge8KYi228CdbBRrPUrTjF3VywVj9H+c+3bFaN1Q5GUeKnD1gVwUAopR9+xcwhy/tjd++iKi/Ap1YHCQ==
       tarball: 'file:projects/tic-tac-toe.tgz'
     version: 0.0.0
 registry: ''
@@ -14816,6 +14848,7 @@ specifiers:
   rollup-plugin-dts: ^1.4.0
   rollup-plugin-typescript2: ^0.27.0
   ts-jest: ^26.1.0
+  ts-node: ^8.10.2
   tslib: ^2.0.0
   typedoc: ^0.14.2
   typedoc-plugin-markdown: ^1.2.1

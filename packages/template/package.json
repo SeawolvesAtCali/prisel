@@ -29,5 +29,11 @@
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
+    },
+    "dependencies": {
+        "@prisel/jest-preset": "0.0.0"
+    },
+    "jest": {
+        "preset": "@prisel/jest-preset"
     }
 }

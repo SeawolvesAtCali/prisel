@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Card, Input, Button, Mentions } from 'antd';
 import Dialog from './Dialog';
 import Editor from 'react-simple-code-editor';
 import compile from './InsecureEval';
@@ -13,6 +12,13 @@ import { ToolbarItem } from '../Toolbar';
 import { TypedCommand } from '../commands';
 
 const regex = /\$([a-zA-Z_]+\w*)/g;
+
+interface CardProps {
+    children: React.ReactNode;
+}
+const Card: React.FC<CardProps> = ({ children }: CardProps) => {
+    return <div>{children}</div>;
+};
 
 function getAllToken(code: string): string[] {
     return Array.from((code as any).matchAll(regex)).map((match: any) => match[1] as string);
@@ -77,9 +83,9 @@ function CommandEditor(props: CommandEditorProp) {
                 onClose={handleClose}
                 containerClass={styles.commandEditorDialogContainer}
             >
-                <Card title="Command Editor" style={{ width: 500 }}>
+                <Card>
                     {savedCommands.filter(isCommand).map((command) => (
-                        <Button
+                        <button
                             key={command.title}
                             onClick={() => {
                                 setTitle(command.title);
@@ -87,9 +93,9 @@ function CommandEditor(props: CommandEditorProp) {
                             }}
                         >
                             {command.title}
-                        </Button>
+                        </button>
                     ))}
-                    <Input addonBefore="Command" onChange={handleTitleChange} />
+                    <input onChange={handleTitleChange} />
                     <div className="command-editor-param-section">
                         {tokens.map((token) => (
                             <span>{token}</span>
@@ -108,10 +114,8 @@ function CommandEditor(props: CommandEditorProp) {
                     />
                     {error}
                     <div className="command-editor-dialog-footer">
-                        <Button type="primary" onClick={handleSave}>
-                            Save
-                        </Button>
-                        <Button onClick={handleClose}>Cancel</Button>
+                        <button onClick={handleSave}>Save</button>
+                        <button onClick={handleClose}>Cancel</button>
                     </div>
                 </Card>
             </Dialog>

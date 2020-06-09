@@ -1,0 +1,4 @@
+scripts:
+    default: parcel serve index.html
+    clean: rm -rf ./dist
+    build: parcel build index.html

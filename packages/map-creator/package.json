@@ -3,50 +3,54 @@
     "version": "0.1.3",
     "private": true,
     "description": "> TODO: description",
-    "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "homepage": "https://github.com/SeawolvesAtCali/prisel/tree/master/packages/map-creator",
+    "bugs": {
+        "url": "https://github.com/SeawolvesAtCali/prisel/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
+    },
     "license": "MIT",
+    "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "directories": {
         "lib": "./",
         "test": "__test__"
     },
-    "publishConfig": {
-        "access": "public"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
-    },
     "scripts": {
-        "generate-declaration": "node ./generateDeclaration.js",
-        "prebuild": "rm -rf ./lib & npm run generate-declaration",
-        "build": "parcel build index.html",
-        "start": "parcel serve index.html",
-        "test": "jest",
+        "build": "nps clean genimagedeclaration build",
+        "fix": "tslint --project tsconfig.json --fix",
         "lint": "tslint --project tsconfig.json",
-        "fix": "tslint --project tsconfig.json --fix"
-    },
-    "bugs": {
-        "url": "https://github.com/SeawolvesAtCali/prisel/issues"
+        "start": "nps",
+        "test": "jest",
+        "gen-tsconfig": "gen-tsconfig"
     },
     "dependencies": {
-        "@prisel/monopoly": "file:../monopoly"
-    },
-    "devDependencies": {
-        "autoprefixer": "^9.7.6",
-        "parcel-bundler": "^1.12.4",
-        "postcss-modules": "^1.5.0",
-        "react": "^16.13.1",
-        "react-dom": "^16.13.1",
-        "rollup": "^2.7.6",
-        "rollup-plugin-commonjs": "^9.3.4",
-        "rollup-plugin-node-resolve": "^4.2.4",
-        "rollup-plugin-typescript2": "^0.27.0"
-    },
-    "peerDependencies": {
+        "@prisel/monopoly": "0.1.3",
         "react": "^16.13.1",
         "react-dom": "^16.13.1"
+    },
+    "devDependencies": {
+        "@types/react": "^16.8.24",
+        "@types/react-dom": "^16.9.8",
+        "autoprefixer": "^9.7.6",
+        "cssnano": "^4.1.10",
+        "nps": "^5.9.12",
+        "object-assign": "^4.1.1",
+        "parcel-bundler": "^1.12.4",
+        "postcss-modules": "^1.5.0",
+        "scheduler": "0.19.1",
+        "tslib": "^2.0.0",
+        "typescript": "^3.8.3",
+        "jest": "^26.0.1",
+        "@types/jest": "^22.2.3",
+        "@prisel/jest-preset": "0.0.0",
+        "@prisel/gen-tsconfig": "0.0.0"
+    },
+    "genTsconfig": {},
+    "jest": {
+        "preset": "@prisel/jest-preset"
     }
 }

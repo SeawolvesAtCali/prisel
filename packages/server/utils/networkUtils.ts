@@ -3,8 +3,7 @@ import { HEARTBEAT_INTERVAL, toDebugString } from '@prisel/common';
 import WebSocket from 'ws';
 import http from 'http';
 import Koa from 'koa';
-import { Packet, Request, Response } from '@prisel/common';
-import { getFailureFor } from '../message';
+import { Packet } from '@prisel/common';
 
 export function serialize(packet: Packet<any>): string {
     return JSON.stringify(packet);
@@ -22,7 +21,7 @@ export function createServerWithInternalHTTPServer({
     port: number;
 }): [WebSocket.Server, http.Server] {
     const app = new Koa();
-    app.use((ctx) => {
+    app.use((ctx: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>) => {
         ctx.body = 'Server is running';
     });
     const httpServer = http.createServer(app.callback());

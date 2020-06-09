@@ -1,9 +1,11 @@
 {
     "extends": "../../tsconfig",
-    "files": ["index.ts", "demo.ts"],
     "compilerOptions": {
         "rootDir": "./",
-        "outDir": "./lib",
-        "experimentalDecorators": true
-    }
+        "noEmit": true
+    },
+    "exclude": [
+        "node_modules",
+        "**/lib"
+    ]
 }

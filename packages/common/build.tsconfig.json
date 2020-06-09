@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig",
+    "compilerOptions": {
+        "rootDir": "./",
+        "noEmit": false,
+        "outDir": "./lib",
+        "emitDeclarationOnly": true
+    },
+    "exclude": [
+        "node_modules",
+        "**/lib"
+    ],
+    "files": [
+        "index.ts",
+        "examplePackets.ts"
+    ]
+}

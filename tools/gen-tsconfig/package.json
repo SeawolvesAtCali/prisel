@@ -1,0 +1,19 @@
+{
+    "name": "@prisel/gen-tsconfig",
+    "version": "0.0.0",
+    "description": "Generate tsconfig using fields inside package.json",
+    "main": "index.js",
+    "scripts": {
+        "build": ""
+    },
+    "author": "",
+    "genTsconfig": {
+        "files": [
+            "index.ts"
+        ]
+    },
+    "license": "MIT",
+    "bin": {
+        "gen-tsconfig": "./cli.js"
+    }
+}

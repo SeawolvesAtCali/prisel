@@ -1,10 +1,11 @@
 {
     "extends": "../../tsconfig",
-    "files": ["index.tsx"],
     "compilerOptions": {
         "rootDir": "./",
-        "outDir": "./lib",
-        "lib": ["dom", "es2015", "es2016", "es2017", "esnext.array", "es2017.object"],
-        "jsx": "react"
-    }
+        "noEmit": true
+    },
+    "exclude": [
+        "node_modules",
+        "**/lib"
+    ]
 }

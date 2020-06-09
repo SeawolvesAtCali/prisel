@@ -1,10 +1,12 @@
 {
-    "extends": "../../tsconfig",
-    "files": ["index.ts"],
+    "extends": "./tsconfig",
     "compilerOptions": {
-        "module": "commonjs",
         "rootDir": "./",
-        "outDir": "./lib",
-        "experimentalDecorators": true
-    }
+        "noEmit": true,
+        "module": "commonjs"
+    },
+    "exclude": [
+        "node_modules",
+        "**/lib"
+    ]
 }

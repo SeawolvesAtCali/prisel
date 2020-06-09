@@ -34,17 +34,13 @@
             "react"
         ]
     },
-    "publishConfig": {
-        "access": "public"
-    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
-        "prebuild": "rm -rf ./lib",
-        "start": "parcel serve index.html",
-        "build": "parcel build index.html",
+        "start": "nps",
+        "build": "nps clean build",
         "test": "jest",
         "fix": "tslint --project tsconfig.json --fix",
         "storybook": "start-storybook -p 9001 -c .storybook"
@@ -53,20 +49,29 @@
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
-        "@prisel/client": "file:../client",
+        "@prisel/client": "0.1.3",
         "normalize.css": "^8.0.1",
         "react": "^16.13.1",
         "react-dom": "^16.13.1"
     },
     "devDependencies": {
         "@babel/core": "^7.9.6",
+        "cssnano": "^4.1.10",
         "@babel/plugin-transform-runtime": "^7.9.6",
+        "@babel/runtime": "^7.10.2",
+        "regenerator-runtime": "^0.13.5",
         "@babel/preset-env": "^7.9.6",
         "@babel/preset-react": "^7.9.4",
         "@storybook/addon-actions": "^4.1.18",
         "@storybook/react": "^4.1.18",
         "babel-loader": "^8.1.0",
         "eslint-plugin-react": "^7.19.0",
-        "parcel-bundler": "^1.12.4"
+        "parcel-bundler": "^1.12.4",
+        "scheduler": "^0.19.1",
+        "jest": "^26.0.1",
+        "@prisel/jest-preset": "0.0.0"
+    },
+    "jest": {
+        "preset": "@prisel/jest-preset"
     }
 }

@@ -8,6 +8,21 @@ const externalDependencyList = [...Object.keys(pkg.dependencies)];
 
 const config = [
     {
+        // exporting common for monopoly-client. This should probably be broken
+        // into a separate package
+        input: 'index.ts',
+        plugins: [
+            typescript({
+                tsconfigOverride: {
+                    compilerOptions: {
+                        declaration: false,
+                    },
+                },
+            }),
+        ],
+        output: [{ file: pkg.main, format: 'cjs' }],
+    },
+    {
         input: 'server.ts',
         external: (id) =>
             externalDependencyList.some((dep) => id === dep || id.startsWith(`${dep}/`)),

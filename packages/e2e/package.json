@@ -18,23 +18,34 @@
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
-        "test": "env DEBUG=debug CI=true jest --runInBand",
-        "build": "tsc --noEmit",
+        "automation": "env DEBUG=debug CI=true jest --runInBand 2>&1",
+        "build": "tsc",
         "lint": "tslint --project tsconfig.json",
-        "fix": "tslint --project tsconfig.json --fix"
+        "fix": "tslint --project tsconfig.json --fix",
+        "gen-tsconfig": "gen-tsconfig"
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
     },
     "dependencies": {
-        "@prisel/client": "file:../client",
-        "@prisel/server": "file:../server",
+        "@prisel/client": "^0.1.3",
+        "@prisel/server": "^0.1.3",
         "debug": "^4.1.0",
-        "immer": "^1.8.2",
         "lodash": "^4.17.11"
     },
     "devDependencies": {
+        "@types/debug": "0.0.30",
+        "@types/lodash": "4.14.108",
         "jest-dev-server": "^4.4.0",
-        "jest-environment-jsdom": "^23.4.0"
+        "jest-environment-jsdom": "^23.4.0",
+        "jest": "^26.0.1",
+        "@types/jest": "^22.2.3",
+        "@prisel/gen-tsconfig": "0.0.0",
+        "@prisel/jest-preset": "0.0.0"
+    },
+    "genTsconfig": {},
+    "jest": {
+        "preset": "@prisel/jest-preset",
+        "testEnvironment": "./TestEnvironment.js"
     }
 }

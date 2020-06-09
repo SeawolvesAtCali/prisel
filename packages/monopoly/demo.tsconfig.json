@@ -2,8 +2,8 @@
     "extends": "./tsconfig",
     "compilerOptions": {
         "rootDir": "./",
-        "module": "commonjs",
-        "noEmit": true
+        "noEmit": true,
+        "module": "commonjs"
     },
     "exclude": [
         "node_modules",

@@ -46,6 +46,7 @@ function genTsconfig(pkgJson, projectRootDir) {
         extends: '../../tsconfig',
         compilerOptions: {
             rootDir: ROOT_DIR,
+            noEmit: true,
         },
         exclude: ['node_modules', '**/lib'],
     };
@@ -56,7 +57,7 @@ function genTsconfig(pkgJson, projectRootDir) {
         // should generate build.tsconfig.json
         const buildConfig = { ...baseConfig };
         buildConfig.files = files;
-        buildConfig.compilerOptions = { ...buildConfig.compilerOptions };
+        buildConfig.compilerOptions = { ...buildConfig.compilerOptions, noEmit: false };
         buildConfig.compilerOptions.outDir = outDir ? outDir : DEFAULT_OUT_DIR;
         buildConfig.compilerOptions.emitDeclarationOnly = true;
         outputTsconfig(buildConfig, path.resolve(projectRootDir, BUILD_CONFIG_NAME + '.json'));
@@ -71,7 +72,6 @@ function genTsconfig(pkgJson, projectRootDir) {
         demoConfig.compilerOptions = {
             ...baseConfig.compilerOptions,
             module: 'commonjs',
-            noEmit: true,
         };
         outputTsconfig(demoConfig, path.resolve(projectRootDir, DEMO_CONFIG_NAME + '.json'));
     }

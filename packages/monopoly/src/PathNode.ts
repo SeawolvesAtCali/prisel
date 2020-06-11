@@ -1,6 +1,6 @@
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import Property from './Property';
-import { Tile, Walkable } from '../common/types';
+import { Tile, Walkable } from '@prisel/monopoly-common';
 import { getRand } from './utils';
 
 export interface FlatPathNode extends FlatGameObject {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Mode } from './common';
 import styles from './App.css';
-import { Tile, TileType, RoadTile, PropertyTile, StartTile } from '@prisel/monopoly';
+import { Tile, TileType, RoadTile, PropertyTile, StartTile } from '@prisel/monopoly-common';
 import { DrawingModeContext } from './DrawingModeHandler';
 import { DrawPropertyHandler } from './DrawPropertyHandler';
 import { DrawStartHandler } from './DrawStartHandler';

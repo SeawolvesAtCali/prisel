@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CoordinatePair, Coordinate } from '@prisel/monopoly';
+import { CoordinatePair, Coordinate } from '@prisel/monopoly-common';
 import { TILE_SIZE_PX, GAP_PX } from './common';
 import styles from './App.css';
 
@@ -61,8 +61,9 @@ export const Arrow: React.FC<ArrowProps> = ({ path }) => {
     const arrowWidth = 50; // length
     const arrowHeight = 2;
     const arrowWingWidth = arrowHeight / 2;
-    const transform = `translate(${translateX - arrowWidth / 2}px, ${translateY -
-        arrowHeight / 2}px) rotate(${rotateDeg})`;
+    const transform = `translate(${translateX - arrowWidth / 2}px, ${
+        translateY - arrowHeight / 2
+    }px) rotate(${rotateDeg})`;
     return (
         <div
             className={styles.arrow}

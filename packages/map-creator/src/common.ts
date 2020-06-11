@@ -1,4 +1,4 @@
-import { Coordinate } from '@prisel/monopoly';
+import { Coordinate } from '@prisel/monopoly-common';
 import * as React from 'react';
 
 export enum Mode {

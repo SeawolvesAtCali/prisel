@@ -1,7 +1,7 @@
 import { GameConfig, debug, Request, Packet, Player } from '@prisel/server';
 import { createIntialState, flattenState } from './state';
 import Game from './Game';
-import { Action } from '../common/messages';
+import { Action } from '@prisel/monopoly-common';
 import { StateMachine } from './stateMachine/StateMachine';
 import { GameStarted } from './stateMachine/GameStarted';
 

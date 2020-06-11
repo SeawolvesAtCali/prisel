@@ -11,7 +11,7 @@ import {
     Tile,
     Coordinate,
     isPropertyTile,
-} from '../common/types';
+} from '@prisel/monopoly-common';
 import PathNode, { create as createPathNode } from './PathNode';
 import Property, { create as createProperty } from './Property';
 import { getRand } from './utils';

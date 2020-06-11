@@ -1,6 +1,6 @@
 import { StateMachineState } from './StateMachineState';
 import { Packet, isRequest, isPacket, broadcast, PacketType } from '@prisel/server';
-import { Action, InitialStatePayload, PlayerLeftPayload } from '../../common/messages';
+import { Action, InitialStatePayload, PlayerLeftPayload } from '@prisel/monopoly-common';
 import { GamePlayer } from '../GamePlayer';
 import { PreRoll } from './PreRoll';
 import { GameOver } from './GameOver';

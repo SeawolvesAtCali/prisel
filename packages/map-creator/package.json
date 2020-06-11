@@ -28,7 +28,7 @@
         "gen-tsconfig": "gen-tsconfig"
     },
     "dependencies": {
-        "@prisel/monopoly": "0.1.3",
+        "@prisel/monopoly-common": "0.0.0",
         "react": "^16.13.1",
         "react-dom": "^16.13.1"
     },

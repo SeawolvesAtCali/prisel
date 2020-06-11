@@ -37,11 +37,11 @@ const config = [
     buildDef('../client/lib/index.d.ts', 'assets/Script/packages/priselClient.d.ts'),
     buildJs('monopolyCommon.js', 'assets/Script/packages/monopolyCommon.js'),
     buildDef(
-        '../monopoly/lib/index.d.ts',
+        '../monopoly-common/lib/index.d.ts',
         'assets/Script/packages/monopolyCommon.d.ts',
         // piggy back the copy command to a target, because it needs to have an input.
         copy({
-            targets: [{ src: '../monopoly/common/data/*', dest: 'assets/resources' }],
+            targets: [{ src: '../monopoly-common/data/*', dest: 'assets/resources' }],
         }),
     ),
 ];

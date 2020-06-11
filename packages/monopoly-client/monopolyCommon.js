@@ -1,1 +1,1 @@
-export * from '@prisel/monopoly';
+export * from '@prisel/monopoly-common';

@@ -15,6 +15,7 @@ dependencies:
   '@rush-temp/map-creator': 'file:projects/map-creator.tgz'
   '@rush-temp/monopoly': 'file:projects/monopoly.tgz'
   '@rush-temp/monopoly-client': 'file:projects/monopoly-client.tgz_typescript@3.9.3'
+  '@rush-temp/monopoly-common': 'file:projects/monopoly-common.tgz'
   '@rush-temp/react': 'file:projects/react.tgz'
   '@rush-temp/server': 'file:projects/server.tgz'
   '@rush-temp/tic-tac-toe': 'file:projects/tic-tac-toe.tgz'
@@ -14668,6 +14669,19 @@ packages:
       integrity: sha512-XlZ8nTW64n3N4/2SU5yEdxyQ0Ch09bdr+v10GjeDVQaky1+1vrBK+BBmMXsXSgpxa8OZhnezI22jDzRpitbNIg==
       tarball: 'file:projects/monopoly-client.tgz'
     version: 0.0.0
+  'file:projects/monopoly-common.tgz':
+    dependencies:
+      '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
+      nps: 5.9.12
+      rollup: 2.12.0
+      tslib: 2.0.0
+      typescript: 3.9.3
+    dev: false
+    name: '@rush-temp/monopoly-common'
+    resolution:
+      integrity: sha512-PGYTLbjMjeg0/XKWxCsWMPRawiFZkJcc/g/fD5/KM8wvzydiXZTJZdy45NaYxeqgPC9DB/4oLP5Du2TyKdtuQQ==
+      tarball: 'file:projects/monopoly-common.tgz'
+    version: 0.0.0
   'file:projects/monopoly.tgz':
     dependencies:
       '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
@@ -14808,6 +14822,7 @@ specifiers:
   '@rush-temp/map-creator': 'file:./projects/map-creator.tgz'
   '@rush-temp/monopoly': 'file:./projects/monopoly.tgz'
   '@rush-temp/monopoly-client': 'file:./projects/monopoly-client.tgz'
+  '@rush-temp/monopoly-common': 'file:./projects/monopoly-common.tgz'
   '@rush-temp/react': 'file:./projects/react.tgz'
   '@rush-temp/server': 'file:./projects/server.tgz'
   '@rush-temp/tic-tac-toe': 'file:./projects/tic-tac-toe.tgz'

@@ -1,7 +1,8 @@
 import { StateMachineState } from './StateMachineState';
-import { Encounter, Payment } from '../../common/types';
 import { broadcast, PacketType, Packet, ResponseWrapper, debug } from '@prisel/server';
 import {
+    Encounter,
+    Payment,
     EncounterPayload,
     Action,
     PromptPurchasePayload,
@@ -11,7 +12,7 @@ import {
     PlayerEndTurnPayload,
     PlayerBankruptPayload,
     PlayerLeftPayload,
-} from '../../common/messages';
+} from '@prisel/monopoly-common';
 import { samePos } from '../utils';
 import { PreTurn } from './PreTurn';
 import { GameOver } from './GameOver';

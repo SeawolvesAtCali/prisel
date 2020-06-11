@@ -4,7 +4,7 @@ import {
     RollResponsePayload,
     PlayerStartTurnPayload,
     PlayerLeftPayload,
-} from '../../common/messages';
+} from '@prisel/monopoly-common';
 import { Packet, isRequest, broadcast, PacketType } from '@prisel/server';
 import { GamePlayer } from '../GamePlayer';
 import { StateMachineState } from './StateMachineState';

@@ -1,4 +1,4 @@
-import { PlayerInfo } from '@prisel/server';
+import { PlayerInfo } from '@prisel/common';
 
 export enum TileType {
     UNSPECIFIED = 0,

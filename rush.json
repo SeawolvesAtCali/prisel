@@ -423,6 +423,11 @@
             "reviewCategory": "tools"
         },
         {
+            "packageName": "@prisel/monopoly-common",
+            "projectFolder": "packages/monopoly-common",
+            "reviewCategory": "prototype"
+        },
+        {
             "packageName": "@prisel/monopoly",
             "projectFolder": "packages/monopoly",
             "reviewCategory": "prototype"

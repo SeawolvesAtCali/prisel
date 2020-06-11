@@ -1,8 +1,7 @@
 import { GamePlayer } from './GamePlayer';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import { log } from './logGameObject';
-import { PropertyInfo, Coordinate, PropertyLevel } from '../common/types';
-import { start } from 'repl';
+import { PropertyInfo, Coordinate, PropertyLevel } from '@prisel/monopoly-common';
 interface Props {
     id: string;
     cost: number;

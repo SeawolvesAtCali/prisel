@@ -60,7 +60,7 @@ export class GameOver extends StateMachineState {
         if (isRequest(packet) && packet.action === Action.BACK_TO_ROOM) {
             gamePlayer.player.respond(packet);
             if (this.sync.add(gamePlayer.id)) {
-                this.machine.end();
+                this.end();
             }
             return true;
         }
@@ -69,7 +69,7 @@ export class GameOver extends StateMachineState {
 
     public onPlayerLeave(gamePlayer: GamePlayer) {
         if (this.sync.isSynced()) {
-            this.machine.end();
+            this.end();
         }
     }
 

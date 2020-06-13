@@ -4,6 +4,10 @@ import {
     RollResponsePayload,
     PlayerStartTurnPayload,
     PlayerLeftPayload,
+    Anim,
+    toAnimationPacket,
+    animationMap,
+    AnimationPayload,
 } from '@prisel/monopoly-common';
 import { Packet, isRequest, broadcast, PacketType } from '@prisel/server';
 import { GamePlayer } from '../GamePlayer';
@@ -12,6 +16,7 @@ import { Moved } from './Moved';
 import { GameOver } from './GameOver';
 
 export class PreRoll extends StateMachineState {
+    private rolled = false;
     public onEnter() {
         // start the turn
         const startTurnPacket: Packet<PlayerStartTurnPayload> = {
@@ -22,15 +27,22 @@ export class PreRoll extends StateMachineState {
             },
         };
 
-        broadcast(this.game.room.getPlayers(), startTurnPacket);
+        const turnStartAnim = Anim.create('turn_start').setLength(animationMap.turn_start).build();
+        broadcast(this.game.room.getPlayers(), toAnimationPacket(turnStartAnim));
+        Anim.wait(turnStartAnim).promise.then(() => {
+            if (this.isCurrentState()) {
+                broadcast(this.game.room.getPlayers(), startTurnPacket);
+            }
+        });
     }
     // override
     public onPacket(packet: Packet, gamePlayer: GamePlayer) {
         const action = packet.action;
         switch (action) {
             case Action.ROLL:
-                if (isRequest(packet) && this.game.isCurrentPlayer(gamePlayer)) {
+                if (!this.rolled && isRequest(packet) && this.game.isCurrentPlayer(gamePlayer)) {
                     const pathCoordinates = gamePlayer.rollAndMove();
+                    this.rolled = true;
                     gamePlayer.player.respond<RollResponsePayload>(packet, {
                         steps: pathCoordinates.length,
                         path: pathCoordinates,
@@ -47,8 +59,22 @@ export class PreRoll extends StateMachineState {
                             myMoney: this.game.getGamePlayer(playerInGame).cash,
                         },
                     }));
+                    const rollAnim = Anim.sequence(
+                        Anim.create('dice_roll').setLength(animationMap.dice_roll),
+                        Anim.create('dice_down').setLength(animationMap.dice_down),
+                        Anim.create('move').setLength(animationMap.move * pathCoordinates.length),
+                    );
 
-                    this.machine.transition(Moved);
+                    broadcast<AnimationPayload>(
+                        this.game.room.getPlayers(),
+                        toAnimationPacket(rollAnim),
+                    );
+                    Anim.wait(rollAnim).promise.then(() => {
+                        if (this.isCurrentState()) {
+                            this.transition(Moved);
+                        }
+                    });
+
                     return true;
                 }
         }
@@ -63,7 +89,7 @@ export class PreRoll extends StateMachineState {
                 player: gamePlayer.getGamePlayerInfo(),
             },
         });
-        this.machine.transition(GameOver);
+        this.transition(GameOver);
     }
     public get [Symbol.toStringTag]() {
         return 'PreRoll';

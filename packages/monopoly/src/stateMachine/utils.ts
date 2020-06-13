@@ -5,6 +5,17 @@ export interface Sync {
     add(playerId: string): boolean;
 }
 
+/**
+ * Create a set to track players in the game. When all players are added, the
+ * isSynced property will become true.
+ *
+ * NOTE: Sync should be used rarely as we should allow players to temporarily
+ * disconnect, for example, when user switch tab and the game tab is put into
+ * background, the WebSocket will still receive packets but game loop is paused.
+ * In that case, we cannot expect user to send back sync response.
+ *
+ * @param game
+ */
 export function syncGamePlayer(game: Game): Sync {
     const syncSet = new Set<string>();
 

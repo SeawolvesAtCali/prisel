@@ -1,4 +1,12 @@
-import { Coordinate, PropertyInfo, GamePlayerInfo, Encounter, Payment, Rank } from './types';
+import {
+    Coordinate,
+    PropertyInfo,
+    GamePlayerInfo,
+    Encounter,
+    Payment,
+    Rank,
+    Animation,
+} from './types';
 
 export enum Action {
     UNSPECIFIED = '',
@@ -60,6 +68,7 @@ export enum Action {
     ANNOUNCE_BANKRUPT = 'announce_bankrupt',
     ANNOUNCE_GAME_OVER = 'announce_game_over',
     ANNOUNCE_PLAYER_LEFT = 'announce_player_left',
+    ANIMATION = 'animation', // server request client play an animation
 }
 
 export interface PlayerLeftPayload {
@@ -134,6 +143,10 @@ export interface PlayerBankruptPayload {
 
 export interface GameOverPayload {
     ranks: Rank[];
+}
+
+export interface AnimationPayload {
+    animation: Animation;
 }
 
 // Server Client

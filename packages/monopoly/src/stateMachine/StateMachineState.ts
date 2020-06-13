@@ -5,7 +5,7 @@ import { StateMachine } from './StateMachine';
 
 export abstract class StateMachineState {
     protected game: Game;
-    protected machine: StateMachine;
+    private machine: StateMachine;
     constructor(game: Game, machine: StateMachine) {
         this.game = game;
         this.machine = machine;
@@ -26,4 +26,13 @@ export abstract class StateMachineState {
     public onPlayerLeave(gamePlayer: GamePlayer) {}
     // implement this for state name
     public abstract get [Symbol.toStringTag](): string;
+
+    protected transition(state: new (game: Game, machine: StateMachine) => StateMachineState) {
+        if (this.isCurrentState()) {
+            this.machine.transition(state);
+        }
+    }
+    protected end() {
+        this.machine.end();
+    }
 }

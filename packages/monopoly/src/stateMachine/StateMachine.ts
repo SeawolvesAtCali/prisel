@@ -24,6 +24,8 @@ export class StateMachine {
         return this.currentState;
     }
     public end() {
+        this.currentState.onExit();
+        this.currentState = null;
         setImmediate(this.onEnd);
     }
 

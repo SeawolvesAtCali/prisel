@@ -1,5 +1,3 @@
-import { Room } from '@prisel/server';
-
 export interface FlatGameObject {
     id: string;
 }

@@ -2,6 +2,12 @@ import { PlayerInfo } from './packages/priselClient';
 
 const { ccclass, property } = cc._decorator;
 import { SpriteFrameEntry } from './SpriteFrameEntry';
+import { EVENT_BUS, EVENT, FLIP_THRESHHOLD } from './consts';
+import { Animation, AnimationName } from '@prisel/monopoly-common';
+import { getGame, lifecycle, nullCheck } from './utils';
+import { PlayerRollPayload } from '@prisel/monopoly-common';
+import { Anim } from '@prisel/monopoly-common';
+import MapLoader from './MapLoader';
 
 @ccclass
 export default class Player extends cc.Component {
@@ -21,8 +27,11 @@ export default class Player extends cc.Component {
     private playerId: string = '';
     public color: string = null;
     private idleSprite: cc.SpriteFrame = null;
+    public playerRollPayload: PlayerRollPayload = null;
 
-    // LIFE-CYCLE CALLBACKS:
+    private get eventBus() {
+        return cc.find(EVENT_BUS);
+    }
 
     public init(playerData: PlayerInfo, color: string) {
         this.playerName = playerData.name;
@@ -36,6 +45,7 @@ export default class Player extends cc.Component {
         return this.playerId;
     }
 
+    @lifecycle
     public start() {
         this.label.string = this.playerName;
         this.character = this.node.getChildByName('character');
@@ -49,6 +59,45 @@ export default class Player extends cc.Component {
         this.stale();
         this.walk = this.walk.bind(this);
         this.stop = this.stop.bind(this);
+        this.eventBus.on(EVENT.ANIMATION, async (anim: Animation) => {
+            switch (anim.name as AnimationName) {
+                case 'turn_start':
+                    if (this.isCurrentPlayer()) {
+                        const animState = this.getComponent(cc.Animation).play('turn_start');
+                        animState.speed = (animState.duration * 1000) / anim.length;
+                    }
+                    break;
+                case 'move':
+                    if (this.isCurrentPlayer()) {
+                        this.walk();
+                        await nullCheck(MapLoader.instance).moveAlongPath(
+                            this.node,
+                            this.playerRollPayload.path,
+                            anim.length,
+                            (node, targetPos: cc.Vec2) => {
+                                if (targetPos.x - node.position.x > FLIP_THRESHHOLD) {
+                                    this.turnToRight();
+                                }
+                                if (node.position.x - targetPos.x > FLIP_THRESHHOLD) {
+                                    this.turnToLeft();
+                                }
+                            },
+                        );
+
+                        const finalTile = nullCheck(
+                            MapLoader.instance.getTile(this.playerRollPayload.path.slice(-1)[0]),
+                        );
+                        this.node.setPosition(finalTile.getLandingPos());
+                        this.node.zIndex = finalTile.getLandingZIndex();
+
+                        this.stop();
+                    }
+            }
+        });
+    }
+
+    private isCurrentPlayer() {
+        return getGame().currentGamePlayer.getId() === this.getId();
     }
 
     private stale() {

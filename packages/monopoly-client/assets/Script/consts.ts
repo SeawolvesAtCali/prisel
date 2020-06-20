@@ -66,4 +66,5 @@ export enum EVENT {
 
     // player click on the leave room button while in game
     LEAVE_ROOM = 'leave_room',
+    ANIMATION = 'animation',
 }

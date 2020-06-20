@@ -6,13 +6,28 @@ import {
     Tile,
     StartTile,
     Coordinate,
+    Animation,
+    AnimationName,
 } from './packages/monopolyCommon';
 
 import { default as TileComponent } from './Tile';
-import { getTileKey, getTileKeyFromCoordinate, setZIndexAction, callOnMoveAction } from './utils';
-import { MOVING_DURATION_PER_TILE, SELECTOR_ZINDEX, TILE_SIZE, GAME_CAMERA } from './consts';
+import {
+    getTileKey,
+    getTileKeyFromCoordinate,
+    setZIndexAction,
+    callOnMoveAction,
+    lifecycle,
+    getGame,
+} from './utils';
+import {
+    MOVING_DURATION_PER_TILE,
+    SELECTOR_ZINDEX,
+    TILE_SIZE,
+    GAME_CAMERA,
+    EVENT_BUS,
+    EVENT,
+} from './consts';
 import PropertyTile from './PropertyTile';
-import Player from './Player';
 const { ccclass, property } = cc._decorator;
 
 // TODO: reposition this to be Map component, that handles only rendering map
@@ -41,7 +56,16 @@ export default class MapLoader extends cc.Component {
     public mapWidthInPx = 0;
     private tilePositionOffset: cc.Vec2 = null;
 
-    // LIFE-CYCLE CALLBACKS:
+    public static instance: MapLoader;
+
+    private get eventBus() {
+        return cc.find(EVENT_BUS);
+    }
+
+    @lifecycle
+    protected start() {
+        MapLoader.instance = this;
+    }
 
     public renderMap(boardSetup: BoardSetup) {
         if (!this.emptyTile || !this.roadTile || !this.propertyTile || !this.startTile) {
@@ -70,6 +94,12 @@ export default class MapLoader extends cc.Component {
                 this.renderTile(this.emptyTile, tile);
             }
         }
+        this.eventBus.on(EVENT.ANIMATION, (anim: Animation) => {
+            switch (anim.name as AnimationName) {
+                case 'invested':
+                    getGame().recentlyInvestedProperty.playInvestedEffect(anim.length);
+            }
+        });
     }
 
     private renderTile(tilePrefab: cc.Prefab, tile: Tile) {
@@ -97,9 +127,12 @@ export default class MapLoader extends cc.Component {
         }
     }
 
+    public getTile(pos: Coordinate): TileComponent {
+        return this.tileMap.get(getTileKeyFromCoordinate(pos));
+    }
     // position node at the tile. Node needs to be a child of map
     public moveToPos(node: cc.Node, pos: Coordinate) {
-        const tileComp = this.tileMap.get(getTileKeyFromCoordinate(pos));
+        const tileComp = this.getTile(pos);
         if (tileComp) {
             node.setPosition(tileComp.getLandingPos());
             node.zIndex = tileComp.getLandingZIndex();
@@ -117,8 +150,13 @@ export default class MapLoader extends cc.Component {
     public moveAlongPath(
         node: cc.Node,
         coors: Coordinate[],
+        durationInMs: number,
         onMove?: (node: cc.Node, next: cc.Vec2) => void,
     ): Promise<void> {
+        if (coors.length <= 0) {
+            return Promise.resolve();
+        }
+        const durationPerTile = durationInMs / 1000 / coors.length;
         // assuming server doesn't send the initial tile, just the other tiles
         // on the path
         const actionSequence: cc.FiniteTimeAction[] = [];
@@ -130,7 +168,7 @@ export default class MapLoader extends cc.Component {
             if (onMove) {
                 actionSequence.push(callOnMoveAction(targetPos, onMove));
             }
-            actionSequence.push(cc.moveTo(MOVING_DURATION_PER_TILE, targetPos));
+            actionSequence.push(cc.moveTo(durationPerTile, targetPos));
             actionSequence.push(setZIndexAction(targetZIndex));
         }
 

@@ -1,7 +1,8 @@
 import Game from '../Game';
-import { Packet } from '@prisel/server';
+import { Packet, broadcast } from '@prisel/server';
 import { GamePlayer } from '../GamePlayer';
 import { StateMachine } from './StateMachine';
+import { AnimationPayload } from '@prisel/monopoly-common';
 
 export abstract class StateMachineState {
     protected game: Game;
@@ -34,5 +35,14 @@ export abstract class StateMachineState {
     }
     protected end() {
         this.machine.end();
+    }
+
+    protected get broadcastAnimation(): (packet: Packet<AnimationPayload>) => void {
+        return (packet: Packet<AnimationPayload>) => {
+            if (packet === null || packet === undefined) {
+                throw new Error('cannot broadcast animation, found ' + packet);
+            }
+            broadcast(this.game.room.getPlayers(), packet);
+        };
     }
 }

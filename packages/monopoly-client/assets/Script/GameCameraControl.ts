@@ -1,7 +1,8 @@
-import { toVec2 } from './utils';
-import { AUTO_PANNING_PX_PER_SECOND } from './consts';
+import { toVec2, lifecycle, getGame } from './utils';
+import { AUTO_PANNING_PX_PER_SECOND, EVENT_BUS, EVENT, CAMERA_FOLLOW_OFFSET } from './consts';
+import { Animation, AnimationName, Anim } from '@prisel/monopoly-common';
 
-const { ccclass, property } = cc._decorator;
+const { ccclass } = cc._decorator;
 
 @ccclass
 export default class GameCameraControl extends cc.Component {
@@ -10,13 +11,31 @@ export default class GameCameraControl extends cc.Component {
     private moveToNodeTween: cc.Tween = null;
     private offset: cc.Vec2 = null;
 
-    // LIFE-CYCLE CALLBACKS:
+    private get eventBus(): cc.Node {
+        return cc.find(EVENT_BUS);
+    }
 
-    // onLoad () {}
+    @lifecycle
+    protected start() {
+        this.eventBus.on(EVENT.ANIMATION, async (anim: Animation) => {
+            switch (anim.name as AnimationName) {
+                case 'pan':
+                    if (getGame().nextPlayer) {
+                        this.moveToNode(getGame().nextPlayer, CAMERA_FOLLOW_OFFSET, anim.length);
+                    }
+                    break;
+                case 'move':
+                    const currentGamePlayerNode = getGame().currentGamePlayer.node;
+                    this.startFollowing(currentGamePlayerNode);
+                    await Anim.wait(anim).promise;
+                    this.stopFollowing();
+                    this.moveToNode(currentGamePlayerNode);
+                    break;
+            }
+        });
+    }
 
-    protected start() {}
-
-    public startFollowing(node: cc.Node, offset?: cc.Vec2) {
+    public startFollowing(node: cc.Node, offset: cc.Vec2 = CAMERA_FOLLOW_OFFSET) {
         if (this.moveToNodeTween) {
             this.moveToNodeTween.stop();
             this.moveToNodeTween = null;
@@ -28,6 +47,7 @@ export default class GameCameraControl extends cc.Component {
         this.followingNode = node;
         this.offset = offset;
     }
+
     public stopFollowing() {
         this.followingNode = null;
     }
@@ -36,6 +56,8 @@ export default class GameCameraControl extends cc.Component {
         const targetPos = target.parent.convertToWorldSpaceAR(target.position);
         return toVec2(this.node.parent.convertToNodeSpaceAR(targetPos));
     }
+
+    @lifecycle
     protected lateUpdate(dt: number) {
         if (this.followingNode) {
             const cameraPos = this.offset
@@ -46,16 +68,22 @@ export default class GameCameraControl extends cc.Component {
         }
     }
 
-    public moveToNode(node: cc.Node, offset?: cc.Vec2): Promise<void> {
+    public moveToNode(
+        node: cc.Node,
+        offset: cc.Vec2 = CAMERA_FOLLOW_OFFSET,
+        durationInMs?: number,
+    ): Promise<void> {
         if (this.followingNode) {
             this.followingNode = null;
         }
-
         const targetPos = offset
             ? this.getTargetPositionInParentSpace(node).add(offset)
             : this.getTargetPositionInParentSpace(node);
         const distance = targetPos.sub(this.node.position).mag();
-        const duration = distance / AUTO_PANNING_PX_PER_SECOND;
+        const duration =
+            durationInMs === undefined
+                ? distance / AUTO_PANNING_PX_PER_SECOND
+                : durationInMs / 1000;
         return new Promise((resolve) => {
             this.resolveMoveToNode = resolve;
             this.moveToNodeTween = cc

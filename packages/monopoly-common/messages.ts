@@ -49,6 +49,10 @@ export enum Action {
     // send READY_TO_START_TURN to server. Server will synchronize and broadcase
     // ANNOUNCE_START_TURN to all clients.
     READY_TO_START_TURN = 'ready_to_start_turn',
+    // from client. After setting up initial state, client should send this to
+    // server. When server receives READY_TO_START_GAME from all client, it will
+    // start game.
+    READY_TO_START_GAME = 'ready_to_start_game',
 
     // packet to annouce a player to start a turn.
     ANNOUNCE_START_TURN = 'announce_start_turn',

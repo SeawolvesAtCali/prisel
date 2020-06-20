@@ -14,12 +14,14 @@ export const animationMap = {
     pay_rent: 1000,
 };
 
-export class AnimationBuilder implements Animation {
-    private _name: keyof typeof animationMap;
+export type AnimationName = keyof typeof animationMap;
+
+export class AnimationBuilder<ArgType = any> implements Animation {
+    private _name: AnimationName;
     private _length: number = 0;
-    private _forever: boolean = true;
     private _type: AnimationType = AnimationType.DEFAULT;
     private _children: Animation[];
+    private _args: ArgType = undefined;
 
     public get name() {
         return this._name || '';
@@ -27,14 +29,15 @@ export class AnimationBuilder implements Animation {
     public get length() {
         return this._length;
     }
-    public get forever() {
-        return this._forever;
-    }
     public get type() {
         return this._type;
     }
     public get children() {
         return this._children;
+    }
+
+    public get args() {
+        return this._args;
     }
 
     public constructor(type: AnimationType = AnimationType.DEFAULT) {
@@ -47,20 +50,14 @@ export class AnimationBuilder implements Animation {
             this._children = [];
         }
     }
-    public setName(name: keyof typeof animationMap) {
+    public setName(name: AnimationName) {
         if (this._type === AnimationType.DEFAULT) {
             this._name = name;
         }
         return this;
     }
     public setLength(ms: number) {
-        this._forever = false;
         this._length = ms;
-        return this;
-    }
-    public setForever() {
-        this._length = 0;
-        this._forever = true;
         return this;
     }
     public addChildren(...children: Animation[]) {
@@ -69,13 +66,22 @@ export class AnimationBuilder implements Animation {
         }
         return this;
     }
+
+    public setArgs(args: ArgType) {
+        if (this._type === AnimationType.DEFAULT) {
+            this._args = args;
+        }
+        return this;
+    }
     public build(): Animation {
         const animation: Animation = {
             type: this._type,
-            forever: this._forever,
             name: this._name,
             length: this._length,
         };
+        if (this._args !== undefined && this._args !== null) {
+            animation.args = this._args;
+        }
         if (this._children) {
             animation.children = this._children.map((child) =>
                 child instanceof AnimationBuilder ? child.build() : child,
@@ -89,7 +95,7 @@ export class AnimationBuilder implements Animation {
 }
 
 export const Anim = {
-    create(name: keyof typeof animationMap): AnimationBuilder {
+    create(name: AnimationName): AnimationBuilder {
         return new AnimationBuilder(AnimationType.DEFAULT).setName(name);
     },
     all(...animations: Animation[]): Animation {
@@ -100,6 +106,11 @@ export const Anim = {
     },
     sequence(...animations: Animation[]): Animation {
         return new AnimationBuilder(AnimationType.SEQUENCE).addChildren(...animations).build();
+    },
+    processAndWait(processor: (packet: Packet<AnimationPayload>) => void, animation: Animation) {
+        const packet = toAnimationPacket(animation);
+        processor(packet);
+        return Anim.wait(animation);
     },
     wait(
         animation: Animation,
@@ -118,7 +129,7 @@ export const Anim = {
 function computeAnimationLength(animation: Animation): number {
     switch (animation.type) {
         case AnimationType.DEFAULT:
-            return animation.forever ? Infinity : animation.length;
+            return animation.length;
         case AnimationType.ALL:
             return Math.max(...animation.children.map(computeAnimationLength));
         case AnimationType.RACE:

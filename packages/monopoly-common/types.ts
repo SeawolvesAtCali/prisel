@@ -130,10 +130,10 @@ export enum AnimationType {
     RACE, // container that plays child animations and finish when one of them finishes. Other animations are truncated if possible
     ALL, // container that plays child animations and wait for the longest one to finish.
 }
-export interface Animation {
+export interface Animation<ArgType = any> {
     name?: string; // name of the individual animation,
     type: AnimationType;
-    forever?: boolean; // if forever, the animation won't automatically stop until the next animation packet come or it is used inside RACE
+    args?: ArgType;
     length?: number; // duration, specified when type is DEFAULT
     children?: Animation[];
 }

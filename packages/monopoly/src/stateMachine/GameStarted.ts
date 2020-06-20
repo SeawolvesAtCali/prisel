@@ -5,7 +5,6 @@ import {
     InitialStatePayload,
     PlayerLeftPayload,
     Anim,
-    AnimationPayload,
     toAnimationPacket,
     animationMap,
 } from '@prisel/monopoly-common';
@@ -14,20 +13,37 @@ import { PreRoll } from './PreRoll';
 import { GameOver } from './GameOver';
 import { Sync, syncGamePlayer } from './utils';
 
+const startAndPan = Anim.sequence(
+    Anim.create('game_start').setLength(animationMap.game_start),
+    Anim.create('pan').setLength(300),
+);
+const startAndPanPacket = toAnimationPacket(startAndPan);
+
+/**
+ * When game starts, each client should request GET_INITIAL_STATE. This is how
+ * server knows that a client is on game scene and ready to receive game
+ * packages.
+ * Server send initial state to client upon GET_INITIAL_STATE. When client
+ * finishes instantiating all the game objects (including loading maps), client
+ * should send back READY_TO_START_GAME.
+ * Server then sends animation to client, this includes showing "START!" as well
+ * as panning to the first player, upon READ_TO_START_GAME.
+ * When all clients send back READY_TO_START_GAME, and the animation for the
+ * last player(the last one that send back READY_TO_START_GAME) *should* finish,
+ * we go to the next state PreRoll.
+ *
+ * Usually we don't want to wait(sync) for all clients as we should allow client
+ * to temporarily disconnect (for example, switching tab). But this is the start
+ * of the game, so it would be good to catch any inactive player. Also we are
+ * not able to respond to GET_INITIAL_STATE after this state.
+ *
+ * animations: game_start, pan
+ */
 export class GameStarted extends StateMachineState {
     private sync: Sync;
-    private gameStartAnimationPromise: Promise<void>;
 
     public onEnter() {
         this.sync = syncGamePlayer(this.game);
-        const gameStartAnimation = Anim.create('game_start')
-            .setLength(animationMap.game_start)
-            .build();
-        broadcast<AnimationPayload>(
-            this.game.room.getPlayers(),
-            toAnimationPacket(gameStartAnimation),
-        );
-        this.gameStartAnimationPromise = Anim.wait(gameStartAnimation).promise;
     }
 
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
@@ -41,28 +57,21 @@ export class GameStarted extends StateMachineState {
                         firstPlayerId: this.game.getCurrentPlayer().id,
                     });
                 }
-
                 return true;
-            case Action.READY_TO_START_TURN:
-                if (!this.sync.isSynced() && this.sync.add(gamePlayer.id)) {
-                    (async () => {
-                        await this.gameStartAnimationPromise;
-                        if (!this.isCurrentState()) {
-                            return;
+            case Action.READY_TO_START_GAME:
+                (async () => {
+                    if (!this.sync.has(gamePlayer.id)) {
+                        gamePlayer.player.emit(startAndPanPacket);
+                        this.sync.add(gamePlayer.id);
+                        if (this.sync.isSynced()) {
+                            await Anim.wait(startAndPan).promise;
+                            if (!this.isCurrentState()) {
+                                return;
+                            }
+                            this.transition(PreRoll);
                         }
-                        // TODO(minor) calculate the duration based on distance
-                        const panToFirstPlayer = Anim.create('pan').setLength(300).build();
-                        broadcast<AnimationPayload>(
-                            this.game.room.getPlayers(),
-                            toAnimationPacket(panToFirstPlayer),
-                        );
-                        await Anim.wait(panToFirstPlayer).promise;
-                        if (!this.isCurrentState()) {
-                            return;
-                        }
-                        this.transition(PreRoll);
-                    })();
-                }
+                    }
+                })();
                 return true;
         }
         return false;

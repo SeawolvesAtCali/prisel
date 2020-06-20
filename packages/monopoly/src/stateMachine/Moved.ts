@@ -22,6 +22,27 @@ import { GamePlayer } from '../GamePlayer';
 import Property from '../Property';
 import { PreRoll } from './PreRoll';
 
+/**
+ * This state starts after the current player moves to the destination after
+ * roll and ends when camera pan to the next player on client side.
+ * Upon entering this state, we will check if the current player encounters
+ * anything.
+ * If player needs to pay rent, server broadcasts
+ * {@link Action.ANNOUNCE_PAY_RENT} to all clients.
+ * Then server broadcasts `pay_rent` animation.
+ * After `pay_rent` animation is finished (or not played), if player is
+ * bankrupted, we transition to GameOver state.
+ * Otherwise we check if the current player can invest in any property. Server
+ * will request the current player with {@link Action.PROMPT_PURCHASE}.
+ * If player confirms the investment, server broadcasts
+ * {@link Action.ANNOUNCE_PURCHASE} and `invested` animation.
+ * Finally server broadcasts {@link Action.ANNOUNCE_END_TURN} with the
+ * next_player_id. Server also broadcasts `pan` animation.
+ * When panning is done, move to next state PreRoll.
+ * Server give the turn to next player right before transitioning state.
+ *
+ * Animation: pay_rent, invested, pan
+ */
 export class Moved extends StateMachineState {
     public async onEnter() {
         // find encounters on player's spot.
@@ -48,35 +69,13 @@ export class Moved extends StateMachineState {
             });
         }
 
-        if (encounters.length > 0) {
-            broadcast<EncounterPayload>(this.game.room.getPlayers(), (playerInGame) => ({
-                type: PacketType.DEFAULT,
-                action: Action.ENCOUNTER,
-                payload: {
-                    playerId: currentPlayer.id,
-                    encounters,
-                    myMoney: this.game.getGamePlayer(playerInGame).cash,
-                },
-            }));
-        }
-
         if (rentPayments.length > 0) {
             this.announcePayRent(rentPayments);
-            const payRentAnimation = Anim.create('pay_rent')
-                .setLength(animationMap.pay_rent)
-                .build();
-            broadcast<AnimationPayload>(
-                this.game.room.getPlayers(),
-                toAnimationPacket(payRentAnimation),
-            );
-            await Anim.wait(payRentAnimation).promise;
-            if (!this.isCurrentState()) {
-                return;
-            }
-        }
+            await Anim.processAndWait(
+                this.broadcastAnimation,
+                Anim.create('pay_rent').setLength(animationMap.pay_rent).build(),
+            ).promise;
 
-        if (properties.some((property) => property.investable(currentPlayer))) {
-            await this.promptForPurchases(properties);
             if (!this.isCurrentState()) {
                 return;
             }
@@ -89,26 +88,13 @@ export class Moved extends StateMachineState {
             return;
         }
 
-        const currentPlayerPos = this.game.getCurrentPlayer().pathNode.tile.pos;
-        const nextPlayerPos = this.game.getNextPlayer().pathNode.tile.pos;
-        const panningToNextPlayer = Anim.create('pan')
-            .setLength(
-                Math.trunc(
-                    Math.sqrt(
-                        Math.pow(currentPlayerPos.row - nextPlayerPos.row, 2) +
-                            Math.pow(currentPlayerPos.col - nextPlayerPos.col, 2),
-                    ) * animationMap.pan,
-                ),
-            )
-            .build();
-        broadcast<AnimationPayload>(
-            this.game.room.getPlayers(),
-            toAnimationPacket(panningToNextPlayer),
-        );
-        await Anim.wait(panningToNextPlayer).promise;
-        if (!this.isCurrentState()) {
-            return;
+        if (properties.some((property) => property.investable(currentPlayer))) {
+            await this.promptForPurchases(properties);
+            if (!this.isCurrentState()) {
+                return;
+            }
         }
+
         broadcast<PlayerEndTurnPayload>(this.game.room.getPlayers(), {
             type: PacketType.DEFAULT,
             action: Action.ANNOUNCE_END_TURN,
@@ -117,6 +103,25 @@ export class Moved extends StateMachineState {
                 nextPlayerId: this.game.getNextPlayer().id,
             },
         });
+        const currentPlayerPos = this.game.getCurrentPlayer().pathNode.tile.pos;
+        const nextPlayerPos = this.game.getNextPlayer().pathNode.tile.pos;
+
+        await Anim.processAndWait(
+            this.broadcastAnimation,
+            Anim.create('pan')
+                .setLength(
+                    Math.trunc(
+                        Math.sqrt(
+                            Math.pow(currentPlayerPos.row - nextPlayerPos.row, 2) +
+                                Math.pow(currentPlayerPos.col - nextPlayerPos.col, 2),
+                        ) * animationMap.pan,
+                    ),
+                )
+                .build(),
+        ).promise;
+        if (!this.isCurrentState()) {
+            return;
+        }
         this.game.giveTurnToNext();
         this.transition(PreRoll);
     }
@@ -197,14 +202,11 @@ export class Moved extends StateMachineState {
                         property: property.getBasicPropertyInfo(),
                     },
                 });
-                const investedAnimation = Anim.create('invested')
-                    .setLength(animationMap.invested)
-                    .build();
-                broadcast<AnimationPayload>(
-                    this.game.room.getPlayers(),
-                    toAnimationPacket(investedAnimation),
-                );
-                await Anim.wait(investedAnimation).promise;
+
+                await Anim.processAndWait(
+                    this.broadcastAnimation,
+                    Anim.create('invested').setLength(animationMap.invested).build(),
+                ).promise;
                 if (!this.isCurrentState()) {
                     return;
                 }

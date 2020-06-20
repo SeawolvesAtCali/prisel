@@ -4,15 +4,11 @@ import {
     Action,
     InitialStatePayload,
     GamePlayerInfo,
-    PurchasePayload,
     PlayerStartTurnPayload,
     PlayerRollPayload,
     PlayerPurchasePayload,
     PlayerEndTurnPayload,
     RollResponsePayload,
-    PurchaseResponsePayload,
-    Encounter,
-    PropertyForPurchaseEncounter,
     PlayerPayRentPayload,
     PromptPurchasePayload,
     PromptPurchaseResponsePayload,
@@ -39,8 +35,9 @@ import {
     CAMERA_FOLLOW_OFFSET,
 } from './consts';
 import GameCameraControl from './GameCameraControl';
-import { nullCheck } from './utils';
+import { nullCheck, lifecycle } from './utils';
 import { Chainable } from './Chainable';
+import PropertyTile from './PropertyTile';
 
 const { ccclass, property } = cc._decorator;
 
@@ -63,11 +60,12 @@ export default class Game extends cc.Component {
     private playerNodes: cc.Node[] = [];
 
     private eventBus: cc.Node = null;
-    private gameCamera: GameCameraControl = null;
-    private currentTurnChain: Chainable = null;
 
-    private isGameOver = false;
+    public nextPlayer: cc.Node = null;
+    public currentGamePlayer: Player;
+    public recentlyInvestedProperty: PropertyTile;
 
+    @lifecycle
     protected onLoad() {
         this.client = client;
         // load map data
@@ -84,7 +82,7 @@ export default class Game extends cc.Component {
         cc.log('mapJsonPath is empty ' + this.mapJsonPath);
     }
 
-    private setupGame(boardSetup: BoardSetup) {
+    private async setupGame(boardSetup: BoardSetup) {
         this.map = this.mapNode.getComponent(MapLoader);
         this.map.renderMap(boardSetup);
 
@@ -116,64 +114,37 @@ export default class Game extends cc.Component {
             this.client.on(Action.ANNOUNCE_PLAYER_LEFT, this.handleAnnounceLeft.bind(this)),
         );
 
-        this.client
-            .request({
-                type: PacketType.REQUEST,
-                request_id: this.client.newId(),
-                action: Action.GET_INITIAL_STATE,
-                payload: {},
-            })
-            .then((response: ResponseWrapper<InitialStatePayload>) => {
-                // CHARACTER_COLORS[gamePlayer.character]
-                for (const gamePlayer of response.payload.gamePlayers) {
-                    if (gamePlayer.player.id === this.client.state.id) {
-                        this.eventBus.emit(EVENT.UPDATE_MY_GAME_PLAYER_INFO, gamePlayer);
-                    }
-                    this.playerNodes.push(this.instantiatePlayer(gamePlayer));
-                }
-                this.panToPlayer(response.payload.firstPlayerId).then(() => {
-                    this.prepareForNextTurn();
-                });
-            });
-    }
+        const response: ResponseWrapper<InitialStatePayload> = await this.client.request({
+            type: PacketType.REQUEST,
+            request_id: this.client.newId(),
+            action: Action.GET_INITIAL_STATE,
+            payload: {},
+        });
 
-    private async prepareForNextTurn() {
-        if (this.isGameOver) {
-            const response = await this.client.request({
-                type: PacketType.REQUEST,
-                request_id: this.client.newId(),
-                action: Action.BACK_TO_ROOM,
-                payload: {},
-            });
-            if (response.ok()) {
-                cc.director.loadScene('room');
-            } else {
-                cc.log(response.getMessage());
+        // CHARACTER_COLORS[gamePlayer.character]
+        for (const gamePlayer of response.payload.gamePlayers) {
+            if (gamePlayer.player.id === this.client.state.id) {
+                this.eventBus.emit(EVENT.UPDATE_MY_GAME_PLAYER_INFO, gamePlayer);
             }
-        } else {
-            this.client.emit({
-                type: PacketType.DEFAULT,
-                action: Action.READY_TO_START_TURN,
-                payload: {},
-            });
+            const newPlayer = this.instantiatePlayer(gamePlayer);
+            this.playerNodes.push(newPlayer);
         }
-    }
+        this.nextPlayer = this.getPlayerNode(response.payload.firstPlayerId);
 
-    private panToPlayer(id: string): Promise<void> {
-        const playerNode = this.getPlayerNode(id);
-        return this.gameCamera.moveToNode(playerNode, CAMERA_FOLLOW_OFFSET);
+        this.client.emit<Packet>({
+            type: PacketType.DEFAULT,
+            action: Action.READY_TO_START_GAME,
+            payload: {},
+        });
     }
 
     private handleAnnounceStartTurn(packet: Packet<PlayerStartTurnPayload>) {
         const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
-        this.currentTurnChain = Chainable.activeWhen(
-            new Promise((resolve) => {
-                this.eventBus.once(EVENT.NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN, resolve);
-            }),
-        );
-        this.currentTurnChain.then(() => {
-            this.prepareForNextTurn();
-        });
+        cc.log('setting current game player');
+        this.currentGamePlayer = this.playerNodes
+            .map((playerNode) => playerNode.getComponent(Player))
+            .find((player) => player.getId() === packet.payload.id);
+        cc.log('currentGameplayer', this.currentGamePlayer);
         if (isCurrentPlayerTurn) {
             this.eventBus.emit(EVENT.START_CURRENT_PLAYER_TURN);
         }
@@ -184,55 +155,30 @@ export default class Game extends cc.Component {
     }
 
     private async handleAnnounceRoll(packet: Packet<PlayerRollPayload>) {
-        const { id, path } = packet.payload;
+        const { id } = packet.payload;
+
         const playerNode = this.getPlayerNode(id);
         const playerComponent = playerNode.getComponent(Player);
-        this.currentTurnChain.chainOrRun(
-            async () => {
-                playerComponent.walk();
-                this.gameCamera.startFollowing(playerNode, CAMERA_FOLLOW_OFFSET);
-                await this.map.moveAlongPath(playerNode, path, (node, targetPos: cc.Vec2) => {
-                    const playerComp = node.getComponent(Player);
-                    if (targetPos.x - node.position.x > FLIP_THRESHHOLD) {
-                        playerComp.turnToRight();
-                    }
-                    if (node.position.x - targetPos.x > FLIP_THRESHHOLD) {
-                        playerComp.turnToLeft();
-                    }
-                });
-                playerComponent.stop();
-                this.gameCamera.stopFollowing();
-            },
-            () => {
-                this.map.moveToPos(playerNode, path[path.length - 1]);
-                this.gameCamera.moveToNode(playerNode, CAMERA_FOLLOW_OFFSET);
-            },
-            'walking',
-        );
+        playerComponent.playerRollPayload = packet.payload;
     }
 
     private handleAnnouncePayRent(packet: Packet<PlayerPayRentPayload>) {
-        this.currentTurnChain.chain(async () => {
-            this.eventBus.emit(EVENT.UPDATE_MY_MONEY, packet.payload.myCurrentMoney);
-        });
+        this.eventBus.emit(EVENT.UPDATE_MY_MONEY, packet.payload.myCurrentMoney);
     }
 
-    private handlePurchasePrompt(packet: Request<PromptPurchasePayload>) {
-        cc.log('prompting purchase');
-        this.currentTurnChain.chain(async () => {
-            this.eventBus.emit(EVENT.PROMPT_PURCHASE, packet.payload);
-            const purchase = await new Promise<boolean>((resolve) => {
-                this.eventBus.once(EVENT.PURCHASE_DECISION, resolve);
-            });
-            cc.log('purchase decision ' + purchase);
-
-            this.client.respond<PromptPurchaseResponsePayload>(packet, {
-                purchase: !!purchase,
-            });
-            if (purchase) {
-                this.eventBus.emit(EVENT.UPDATE_MY_MONEY, packet.payload.moneyAfterPurchase);
-            }
+    private async handlePurchasePrompt(packet: Request<PromptPurchasePayload>) {
+        this.eventBus.emit(EVENT.PROMPT_PURCHASE, packet.payload);
+        const purchase = await new Promise<boolean>((resolve) => {
+            this.eventBus.once(EVENT.PURCHASE_DECISION, resolve);
         });
+        cc.log('purchase decision ' + purchase);
+
+        this.client.respond<PromptPurchaseResponsePayload>(packet, {
+            purchase: !!purchase,
+        });
+        if (purchase) {
+            this.eventBus.emit(EVENT.UPDATE_MY_MONEY, packet.payload.moneyAfterPurchase);
+        }
     }
 
     private handleAnnouncePurchase(packet: Packet<PlayerPurchasePayload>) {
@@ -240,42 +186,42 @@ export default class Game extends cc.Component {
         const player = this.playerNodes
             .find((playerNode) => playerNode.getComponent(Player).getId() === id)
             .getComponent(Player);
-
-        this.currentTurnChain.chain(async () => {
-            this.map.getPropertyTileAt(purchasedProperty.pos).setOwner(player, purchasedProperty);
-        });
+        const property = this.map.getPropertyTileAt(purchasedProperty.pos);
+        property.setOwner(player, purchasedProperty);
+        this.recentlyInvestedProperty = property;
     }
 
     private handleAnnounceEndTurn(packet: Packet<PlayerEndTurnPayload>) {
         const isCurrentPlayerTurn = packet.payload.currentPlayerId === this.client.state.id;
-        // pan to the next player
-        cc.log('chain end turn panning');
-        this.currentTurnChain.chain(async () => {
-            if (isCurrentPlayerTurn) {
-                this.eventBus.emit(EVENT.END_CURRENT_PLAYER_TURN);
-            }
-            this.panToPlayer(packet.payload.nextPlayerId);
-        }, 'end turn panning');
+        this.nextPlayer = this.getPlayerNode(packet.payload.nextPlayerId);
+        if (isCurrentPlayerTurn) {
+            this.eventBus.emit(EVENT.END_CURRENT_PLAYER_TURN);
+        }
 
         this.eventBus.emit(EVENT.NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN);
     }
 
     private handleAnnounceBankrupt(packet: Packet<PlayerBankruptPayload>) {
-        this.currentTurnChain.chain(async () => {
-            cc.log('player bankrupted ' + packet.payload.id);
-        });
+        cc.log('player bankrupted ' + packet.payload.id);
     }
 
-    private handleAnnounceGameOver(packet: Packet<GameOverPayload>) {
-        this.currentTurnChain.chain(async () => {
-            cc.log('game over ', packet.payload);
-            this.eventBus.emit(EVENT.SHOW_RANKING, packet.payload.ranks);
-            await new Promise((resolve) => {
-                this.eventBus.once(EVENT.RANKING_CLOSED, resolve);
-            });
-            this.isGameOver = true;
+    private async handleAnnounceGameOver(packet: Packet<GameOverPayload>) {
+        cc.log('game over ', packet.payload);
+        this.eventBus.emit(EVENT.SHOW_RANKING, packet.payload.ranks);
+        await new Promise((resolve) => {
+            this.eventBus.once(EVENT.RANKING_CLOSED, resolve);
         });
-        this.eventBus.emit(EVENT.NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN);
+        const response = await this.client.request({
+            type: PacketType.REQUEST,
+            request_id: this.client.newId(),
+            action: Action.BACK_TO_ROOM,
+            payload: {},
+        });
+        if (response.ok()) {
+            cc.director.loadScene('room');
+        } else {
+            cc.log(response.getMessage());
+        }
     }
 
     private handleAnnounceLeft(packet: Packet<PlayerLeftPayload>) {
@@ -295,13 +241,6 @@ export default class Game extends cc.Component {
                     this.eventBus.emit(EVENT.DICE_ROLLED_RESPONSE, response.payload.steps);
                 }
             });
-        cc.log('chain dice roll animation');
-        this.currentTurnChain.chain(
-            new Promise((resolve) => {
-                this.eventBus.once(EVENT.DICE_ROLLED_END, resolve);
-            }),
-            'roll animation',
-        );
     }
 
     private instantiatePlayer(gamePlayer: GamePlayerInfo): cc.Node {
@@ -326,10 +265,10 @@ export default class Game extends cc.Component {
         }
     }
 
+    @lifecycle
     protected start() {
         this.started = true;
         this.eventBus = nullCheck(cc.find(EVENT_BUS));
-        this.gameCamera = nullCheck(cc.find(GAME_CAMERA).getComponent(GameCameraControl));
         const debugNode = this.node.getChildByName('debug');
         if (debugNode) {
             this.node.removeChild(debugNode);
@@ -345,12 +284,11 @@ export default class Game extends cc.Component {
         this.eventBus.on(EVENT.LEAVE_ROOM, this.onLeave, this);
     }
 
+    @lifecycle
     protected onDestroy() {
         for (const offListener of this.offPacketListeners) {
             offListener();
         }
         this.offPacketListeners = [];
     }
-
-    // update (dt) {}
 }

@@ -3,6 +3,7 @@ import Game from '../Game';
 export interface Sync {
     isSynced: () => boolean;
     add(playerId: string): boolean;
+    has(playerId: string): boolean;
 }
 
 /**
@@ -32,9 +33,11 @@ export function syncGamePlayer(game: Game): Sync {
         syncSet.add(playerId);
         return isSynced();
     };
+    const has = (playerId: string): boolean => syncSet.has(playerId);
 
     return {
         isSynced,
         add,
+        has,
     };
 }

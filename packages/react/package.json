@@ -23,7 +23,7 @@
         "lib"
     ],
     "scripts": {
-        "build": "nps clean build gendef",
+        "build": "nps ts-check clean build gendef",
         "fix": "tslint --project tsconfig.json --fix",
         "lint": "tslint --project tsconfig.json",
         "start": "nps",

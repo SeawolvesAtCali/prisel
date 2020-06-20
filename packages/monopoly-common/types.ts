@@ -1,4 +1,5 @@
 import { PlayerInfo } from '@prisel/common';
+import { AnimationName } from './animation';
 
 export enum TileType {
     UNSPECIFIED = 0,
@@ -131,7 +132,7 @@ export enum AnimationType {
     ALL, // container that plays child animations and wait for the longest one to finish.
 }
 export interface Animation<ArgType = any> {
-    name?: string; // name of the individual animation,
+    name?: AnimationName; // name of the individual animation,
     type: AnimationType;
     args?: ArgType;
     length?: number; // duration, specified when type is DEFAULT

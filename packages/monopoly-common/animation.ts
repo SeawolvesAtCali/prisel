@@ -1,8 +1,41 @@
-import { Animation, AnimationType } from './types';
-import { AnimationPayload, Action } from './messages';
-import { PacketType, Packet } from '@prisel/common';
+import { Coordinate, PropertyInfo, GamePlayerInfo } from './types';
 
-export const animationMap = {
+export interface AnimationArgs {
+    unspecified: void;
+    game_start: void;
+    dice_roll: {
+        player: GamePlayerInfo;
+    };
+    dice_down: {
+        steps: number;
+    };
+    move: {
+        start: Coordinate;
+        path: Coordinate[];
+    };
+    focus_land: {
+        property: PropertyInfo;
+    };
+    invested: {
+        property: PropertyInfo;
+    };
+    pan: {
+        target: Coordinate;
+    };
+    turn_start: {
+        player: GamePlayerInfo;
+    };
+    pay_rent: {
+        payer: GamePlayerInfo;
+        receiver: GamePlayerInfo;
+    };
+}
+
+export type AnimationName = keyof AnimationArgs;
+
+// utilities to work with animations
+export const animationMap: Record<AnimationName, number> = {
+    unspecified: 0,
     game_start: 1000,
     dice_roll: 1000,
     dice_down: 300,
@@ -13,156 +46,3 @@ export const animationMap = {
     turn_start: 200,
     pay_rent: 1000,
 };
-
-export type AnimationName = keyof typeof animationMap;
-
-export class AnimationBuilder<ArgType = any> implements Animation {
-    private _name: AnimationName;
-    private _length: number = 0;
-    private _type: AnimationType = AnimationType.DEFAULT;
-    private _children: Animation[];
-    private _args: ArgType = undefined;
-
-    public get name() {
-        return this._name || '';
-    }
-    public get length() {
-        return this._length;
-    }
-    public get type() {
-        return this._type;
-    }
-    public get children() {
-        return this._children;
-    }
-
-    public get args() {
-        return this._args;
-    }
-
-    public constructor(type: AnimationType = AnimationType.DEFAULT) {
-        this._type = type;
-        if (
-            this._type === AnimationType.RACE ||
-            this._type === AnimationType.ALL ||
-            this._type == AnimationType.SEQUENCE
-        ) {
-            this._children = [];
-        }
-    }
-    public setName(name: AnimationName) {
-        if (this._type === AnimationType.DEFAULT) {
-            this._name = name;
-        }
-        return this;
-    }
-    public setLength(ms: number) {
-        this._length = ms;
-        return this;
-    }
-    public addChildren(...children: Animation[]) {
-        if (Array.isArray(this._children)) {
-            this._children = this._children.concat(children);
-        }
-        return this;
-    }
-
-    public setArgs(args: ArgType) {
-        if (this._type === AnimationType.DEFAULT) {
-            this._args = args;
-        }
-        return this;
-    }
-    public build(): Animation {
-        const animation: Animation = {
-            type: this._type,
-            name: this._name,
-            length: this._length,
-        };
-        if (this._args !== undefined && this._args !== null) {
-            animation.args = this._args;
-        }
-        if (this._children) {
-            animation.children = this._children.map((child) =>
-                child instanceof AnimationBuilder ? child.build() : child,
-            );
-        }
-
-        Object.freeze(this);
-
-        return animation;
-    }
-}
-
-export const Anim = {
-    create(name: AnimationName): AnimationBuilder {
-        return new AnimationBuilder(AnimationType.DEFAULT).setName(name);
-    },
-    all(...animations: Animation[]): Animation {
-        return new AnimationBuilder(AnimationType.ALL).addChildren(...animations).build();
-    },
-    race(...animations: Animation[]): Animation {
-        return new AnimationBuilder(AnimationType.RACE).addChildren(...animations).build();
-    },
-    sequence(...animations: Animation[]): Animation {
-        return new AnimationBuilder(AnimationType.SEQUENCE).addChildren(...animations).build();
-    },
-    processAndWait(processor: (packet: Packet<AnimationPayload>) => void, animation: Animation) {
-        const packet = toAnimationPacket(animation);
-        processor(packet);
-        return Anim.wait(animation);
-    },
-    wait(
-        animation: Animation,
-    ): {
-        promise: Promise<void>;
-        cancel: () => void;
-    } {
-        const waitTime = computeAnimationLength(animation);
-        if (waitTime === Infinity) {
-            throw new Error('cannot wait for infinite animation');
-        }
-        return timeoutPromise(waitTime);
-    },
-};
-
-function computeAnimationLength(animation: Animation): number {
-    switch (animation.type) {
-        case AnimationType.DEFAULT:
-            return animation.length;
-        case AnimationType.ALL:
-            return Math.max(...animation.children.map(computeAnimationLength));
-        case AnimationType.RACE:
-            return Math.min(...animation.children.map(computeAnimationLength));
-        case AnimationType.SEQUENCE:
-            return animation.children.reduce(
-                (length: number, child: Animation) => length + computeAnimationLength(child),
-                0,
-            );
-    }
-}
-
-export function toAnimationPacket(animation: Animation): Packet<AnimationPayload> {
-    return {
-        type: PacketType.DEFAULT,
-        action: Action.ANIMATION,
-        payload: {
-            animation: animation instanceof AnimationBuilder ? animation.build() : animation,
-        },
-    };
-}
-
-function timeoutPromise(ms: number) {
-    let cancel: () => void;
-    const wrap = {
-        promise: new Promise<void>((resolve) => {
-            const timeout = setTimeout(resolve, ms);
-            cancel = () => {
-                clearTimeout(timeout);
-                resolve();
-            };
-        }),
-        cancel,
-    };
-    return wrap;
-}

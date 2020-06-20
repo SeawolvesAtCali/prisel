@@ -1,5 +1,6 @@
 scripts:
     default: parcel serve index.html
+    ts-check: tsc
     clean: rm -rf ./lib
     build: parcel build index.html
     gendef: tsc --project build.tsconfig.json

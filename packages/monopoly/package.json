@@ -18,7 +18,7 @@
         "test": "__test__"
     },
     "scripts": {
-        "build": "nps clean build",
+        "build": "nps ts-check clean build",
         "fix": "tslint --project tsconfig.json --fix",
         "lint": "tslint --project tsconfig.json",
         "start": "nps",

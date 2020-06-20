@@ -55,7 +55,9 @@ export class PreRoll extends StateMachineState {
 
         Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('turn_start').setLength(animationMap.turn_start).build(),
+            Anim.create('turn_start', { player: this.game.getCurrentPlayer().getGamePlayerInfo() })
+                .setLength(animationMap.turn_start)
+                .build(),
         );
     }
     // override
@@ -64,10 +66,12 @@ export class PreRoll extends StateMachineState {
         switch (action) {
             case Action.ROLL:
                 if (!this.rolled && isRequest(packet) && this.game.isCurrentPlayer(gamePlayer)) {
+                    const initialPos = gamePlayer.pathNode.tile.pos;
                     const pathCoordinates = gamePlayer.rollAndMove();
                     this.rolled = true;
+                    const steps = pathCoordinates.length;
                     gamePlayer.player.respond<RollResponsePayload>(packet, {
-                        steps: pathCoordinates.length,
+                        steps,
                         path: pathCoordinates,
                     });
 
@@ -77,7 +81,7 @@ export class PreRoll extends StateMachineState {
                         action: Action.ANNOUNCE_ROLL,
                         payload: {
                             id: gamePlayer.id,
-                            steps: pathCoordinates.length,
+                            steps,
                             path: pathCoordinates,
                             myMoney: this.game.getGamePlayer(playerInGame).cash,
                         },
@@ -87,11 +91,16 @@ export class PreRoll extends StateMachineState {
                         Anim.sequence(
                             // turn_start animation should be terminated when dice_roll
                             // is received.
-                            Anim.create('dice_roll').setLength(animationMap.dice_roll),
-                            Anim.create('dice_down').setLength(animationMap.dice_down),
-                            Anim.create('move').setLength(
-                                animationMap.move * pathCoordinates.length,
-                            ),
+                            Anim.create('dice_roll', {
+                                player: gamePlayer.getGamePlayerInfo(),
+                            }).setLength(animationMap.dice_roll),
+                            Anim.create('dice_down', {
+                                steps,
+                            }).setLength(animationMap.dice_down),
+                            Anim.create('move', {
+                                start: initialPos,
+                                path: pathCoordinates,
+                            }).setLength(animationMap.move * pathCoordinates.length),
                         ),
                     ).promise.then(() => {
                         if (this.isCurrentState()) {

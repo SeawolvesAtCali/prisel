@@ -13,12 +13,6 @@ import { PreRoll } from './PreRoll';
 import { GameOver } from './GameOver';
 import { Sync, syncGamePlayer } from './utils';
 
-const startAndPan = Anim.sequence(
-    Anim.create('game_start').setLength(animationMap.game_start),
-    Anim.create('pan').setLength(300),
-);
-const startAndPanPacket = toAnimationPacket(startAndPan);
-
 /**
  * When game starts, each client should request GET_INITIAL_STATE. This is how
  * server knows that a client is on game scene and ready to receive game
@@ -61,7 +55,13 @@ export class GameStarted extends StateMachineState {
             case Action.READY_TO_START_GAME:
                 (async () => {
                     if (!this.sync.has(gamePlayer.id)) {
-                        gamePlayer.player.emit(startAndPanPacket);
+                        const startAndPan = Anim.sequence(
+                            Anim.create('game_start').setLength(animationMap.game_start),
+                            Anim.create('pan', {
+                                target: this.game.getCurrentPlayer().pathNode.tile.pos,
+                            }).setLength(300),
+                        );
+                        gamePlayer.player.emit(toAnimationPacket(startAndPan));
                         this.sync.add(gamePlayer.id);
                         if (this.sync.isSynced()) {
                             await Anim.wait(startAndPan).promise;

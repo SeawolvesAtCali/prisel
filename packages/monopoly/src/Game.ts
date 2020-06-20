@@ -71,6 +71,9 @@ export default class Game extends GameObject {
     public getGamePlayer(player: Player): GamePlayer {
         return this.players.get(player.getId());
     }
+    public getGamePlayerById(id: string): GamePlayer {
+        return this.players.get(id);
+    }
 }
 
 export function create(props: Props) {

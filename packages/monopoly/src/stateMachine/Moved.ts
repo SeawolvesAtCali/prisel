@@ -50,7 +50,6 @@ export class Moved extends StateMachineState {
         const currentPathNode = currentPlayer.pathNode;
 
         const { properties } = currentPathNode;
-        const encounters: Encounter[] = [];
         const rentPayments: Payment[] = [];
 
         // check for rent payment first
@@ -61,19 +60,18 @@ export class Moved extends StateMachineState {
                 );
             }
         }
-        if (rentPayments.length > 0) {
-            encounters.push({
-                payRent: {
-                    payments: rentPayments,
-                },
-            });
-        }
 
         if (rentPayments.length > 0) {
             this.announcePayRent(rentPayments);
             await Anim.processAndWait(
                 this.broadcastAnimation,
-                Anim.create('pay_rent').setLength(animationMap.pay_rent).build(),
+                Anim.create('pay_rent', {
+                    // TODO: here we assume we are paying one player only
+                    payer: this.game.getGamePlayerById(rentPayments[0].from).getGamePlayerInfo(),
+                    receiver: this.game.getGamePlayerById(rentPayments[0].to).getGamePlayerInfo(),
+                })
+                    .setLength(animationMap.pay_rent)
+                    .build(),
             ).promise;
 
             if (!this.isCurrentState()) {
@@ -108,7 +106,9 @@ export class Moved extends StateMachineState {
 
         await Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('pan')
+            Anim.create('pan', {
+                target: nextPlayerPos,
+            })
                 .setLength(
                     Math.trunc(
                         Math.sqrt(
@@ -205,7 +205,9 @@ export class Moved extends StateMachineState {
 
                 await Anim.processAndWait(
                     this.broadcastAnimation,
-                    Anim.create('invested').setLength(animationMap.invested).build(),
+                    Anim.create('invested', { property: property.getBasicPropertyInfo() })
+                        .setLength(animationMap.invested)
+                        .build(),
                 ).promise;
                 if (!this.isCurrentState()) {
                     return;

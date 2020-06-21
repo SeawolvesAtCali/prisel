@@ -98,6 +98,7 @@ export class PreRoll extends StateMachineState {
                                 steps,
                             }).setLength(animationMap.dice_down),
                             Anim.create('move', {
+                                player: gamePlayer.getGamePlayerInfo(),
                                 start: initialPos,
                                 path: pathCoordinates,
                             }).setLength(animationMap.move * pathCoordinates.length),

@@ -61,12 +61,15 @@ export default class Game extends cc.Component {
 
     private eventBus: cc.Node = null;
 
-    public nextPlayer: cc.Node = null;
-    public currentGamePlayer: Player;
-    public recentlyInvestedProperty: PropertyTile;
+    private static instance: Game = null;
+
+    public static get() {
+        return Game.instance;
+    }
 
     @lifecycle
     protected onLoad() {
+        Game.instance = this;
         this.client = client;
         // load map data
         if (this.mapJsonPath) {
@@ -129,7 +132,6 @@ export default class Game extends cc.Component {
             const newPlayer = this.instantiatePlayer(gamePlayer);
             this.playerNodes.push(newPlayer);
         }
-        this.nextPlayer = this.getPlayerNode(response.payload.firstPlayerId);
 
         this.client.emit<Packet>({
             type: PacketType.DEFAULT,
@@ -140,18 +142,16 @@ export default class Game extends cc.Component {
 
     private handleAnnounceStartTurn(packet: Packet<PlayerStartTurnPayload>) {
         const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
-        cc.log('setting current game player');
-        this.currentGamePlayer = this.playerNodes
-            .map((playerNode) => playerNode.getComponent(Player))
-            .find((player) => player.getId() === packet.payload.id);
-        cc.log('currentGameplayer', this.currentGamePlayer);
         if (isCurrentPlayerTurn) {
             this.eventBus.emit(EVENT.START_CURRENT_PLAYER_TURN);
         }
     }
 
-    private getPlayerNode(id: string): cc.Node {
-        return this.playerNodes.find((node) => node.getComponent(Player).getId() === id);
+    public getPlayerNodes(): cc.Node[] {
+        return this.playerNodes;
+    }
+    public getPlayerNode(id: string): cc.Node {
+        return this.getPlayerNodes().find((node) => node.getComponent(Player).getId() === id);
     }
 
     private async handleAnnounceRoll(packet: Packet<PlayerRollPayload>) {
@@ -159,7 +159,7 @@ export default class Game extends cc.Component {
 
         const playerNode = this.getPlayerNode(id);
         const playerComponent = playerNode.getComponent(Player);
-        playerComponent.playerRollPayload = packet.payload;
+        playerComponent.pos = packet.payload.path.slice(-1)[0];
     }
 
     private handleAnnouncePayRent(packet: Packet<PlayerPayRentPayload>) {
@@ -188,12 +188,10 @@ export default class Game extends cc.Component {
             .getComponent(Player);
         const property = this.map.getPropertyTileAt(purchasedProperty.pos);
         property.setOwner(player, purchasedProperty);
-        this.recentlyInvestedProperty = property;
     }
 
     private handleAnnounceEndTurn(packet: Packet<PlayerEndTurnPayload>) {
         const isCurrentPlayerTurn = packet.payload.currentPlayerId === this.client.state.id;
-        this.nextPlayer = this.getPlayerNode(packet.payload.nextPlayerId);
         if (isCurrentPlayerTurn) {
             this.eventBus.emit(EVENT.END_CURRENT_PLAYER_TURN);
         }
@@ -246,7 +244,11 @@ export default class Game extends cc.Component {
     private instantiatePlayer(gamePlayer: GamePlayerInfo): cc.Node {
         const playerNode = this.map.addToMap(cc.instantiate(this.playerPrefab), gamePlayer.pos);
         const playerComponent = playerNode.getComponent(Player);
-        playerComponent.init(gamePlayer.player, CHARACTER_COLORS[gamePlayer.character]);
+        playerComponent.init(
+            gamePlayer.player,
+            CHARACTER_COLORS[gamePlayer.character],
+            gamePlayer.pos,
+        );
         return playerNode;
     }
 
@@ -286,6 +288,7 @@ export default class Game extends cc.Component {
 
     @lifecycle
     protected onDestroy() {
+        Game.instance = undefined;
         for (const offListener of this.offPacketListeners) {
             offListener();
         }

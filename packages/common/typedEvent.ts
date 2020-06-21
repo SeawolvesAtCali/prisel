@@ -1,7 +1,5 @@
-type UnsubscribeFunction = () => void;
-
 export interface SubscriberNode<Arg = any> {
-    on(eventKey: any, handler: (arg: Arg) => any): UnsubscribeFunction;
+    on(eventKey: any, handler: (arg: Arg) => any): any;
 }
 
 export interface PublisherNode<Arg = any> {
@@ -12,14 +10,14 @@ export function createEvent(
     event: any,
 ): {
     pub: (publisherNode: PublisherNode) => void;
-    sub: (subscriberNode: SubscriberNode, callback: () => void) => UnsubscribeFunction;
+    sub: (subscriberNode: SubscriberNode, callback: () => void) => any;
 };
 
 export function createEvent<Arg = any>(
     event: any,
 ): {
     pub: (publisherNode: PublisherNode, arg: Arg) => void;
-    sub: (subscriberNode: SubscriberNode, callback: (arg: Arg) => void) => UnsubscribeFunction;
+    sub: (subscriberNode: SubscriberNode, callback: (arg: Arg) => void) => any;
 };
 
 export function createEvent(event: any) {

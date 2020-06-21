@@ -2,12 +2,11 @@ import { PlayerInfo } from './packages/priselClient';
 
 const { ccclass, property } = cc._decorator;
 import { SpriteFrameEntry } from './SpriteFrameEntry';
-import { EVENT_BUS, EVENT, FLIP_THRESHHOLD } from './consts';
-import { Animation, AnimationName } from '@prisel/monopoly-common';
-import { getGame, lifecycle, nullCheck } from './utils';
-import { PlayerRollPayload } from '@prisel/monopoly-common';
-import { Anim } from '@prisel/monopoly-common';
+import { EVENT_BUS, FLIP_THRESHHOLD } from './consts';
+import { Coordinate } from './packages/monopolyCommon';
+import { lifecycle, nullCheck } from './utils';
 import MapLoader from './MapLoader';
+import { createAnimationEvent, animEmitter } from './animations';
 
 @ccclass
 export default class Player extends cc.Component {
@@ -27,18 +26,21 @@ export default class Player extends cc.Component {
     private playerId: string = '';
     public color: string = null;
     private idleSprite: cc.SpriteFrame = null;
-    public playerRollPayload: PlayerRollPayload = null;
+
+    public pos: Coordinate = null;
 
     private get eventBus() {
         return cc.find(EVENT_BUS);
     }
 
-    public init(playerData: PlayerInfo, color: string) {
+    public init(playerData: PlayerInfo, color: string, pos: Coordinate) {
         this.playerName = playerData.name;
         this.playerId = playerData.id;
         this.color = color;
         this.turnToLeft = this.turnToLeft.bind(this);
         this.turnToRight = this.turnToRight.bind(this);
+        cc.log('setting player initial pos', pos);
+        this.pos = pos;
     }
 
     public getId() {
@@ -59,45 +61,38 @@ export default class Player extends cc.Component {
         this.stale();
         this.walk = this.walk.bind(this);
         this.stop = this.stop.bind(this);
-        this.eventBus.on(EVENT.ANIMATION, async (anim: Animation) => {
-            switch (anim.name as AnimationName) {
-                case 'turn_start':
-                    if (this.isCurrentPlayer()) {
-                        const animState = this.getComponent(cc.Animation).play('turn_start');
-                        animState.speed = (animState.duration * 1000) / anim.length;
-                    }
-                    break;
-                case 'move':
-                    if (this.isCurrentPlayer()) {
-                        this.walk();
-                        await nullCheck(MapLoader.instance).moveAlongPath(
-                            this.node,
-                            this.playerRollPayload.path,
-                            anim.length,
-                            (node, targetPos: cc.Vec2) => {
-                                if (targetPos.x - node.position.x > FLIP_THRESHHOLD) {
-                                    this.turnToRight();
-                                }
-                                if (node.position.x - targetPos.x > FLIP_THRESHHOLD) {
-                                    this.turnToLeft();
-                                }
-                            },
-                        );
 
-                        const finalTile = nullCheck(
-                            MapLoader.instance.getTile(this.playerRollPayload.path.slice(-1)[0]),
-                        );
-                        this.node.setPosition(finalTile.getLandingPos());
-                        this.node.zIndex = finalTile.getLandingZIndex();
-
-                        this.stop();
-                    }
+        createAnimationEvent('turn_start').sub(animEmitter, (anim) => {
+            if (this.getId() === anim.args.player.player.id) {
+                const animState = this.getComponent(cc.Animation).play('turn_start');
+                animState.speed = (animState.duration * 1000) / anim.length;
             }
         });
-    }
 
-    private isCurrentPlayer() {
-        return getGame().currentGamePlayer.getId() === this.getId();
+        createAnimationEvent('move').sub(animEmitter, async (anim) => {
+            if (this.getId() === anim.args.player.player.id) {
+                this.walk();
+                await nullCheck(MapLoader.get()).moveAlongPath(
+                    this.node,
+                    anim.args.path,
+                    anim.length,
+                    (node, targetPos: cc.Vec2) => {
+                        if (targetPos.x - node.position.x > FLIP_THRESHHOLD) {
+                            this.turnToRight();
+                        }
+                        if (node.position.x - targetPos.x > FLIP_THRESHHOLD) {
+                            this.turnToLeft();
+                        }
+                    },
+                );
+
+                const finalTile = nullCheck(MapLoader.get().getTile(anim.args.path.slice(-1)[0]));
+                this.node.setPosition(finalTile.getLandingPos());
+                this.node.zIndex = finalTile.getLandingZIndex();
+
+                this.stop();
+            }
+        });
     }
 
     private stale() {

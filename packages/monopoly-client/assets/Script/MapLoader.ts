@@ -6,8 +6,6 @@ import {
     Tile,
     StartTile,
     Coordinate,
-    Animation,
-    AnimationName,
 } from './packages/monopolyCommon';
 
 import { default as TileComponent } from './Tile';
@@ -17,17 +15,10 @@ import {
     setZIndexAction,
     callOnMoveAction,
     lifecycle,
-    getGame,
 } from './utils';
-import {
-    MOVING_DURATION_PER_TILE,
-    SELECTOR_ZINDEX,
-    TILE_SIZE,
-    GAME_CAMERA,
-    EVENT_BUS,
-    EVENT,
-} from './consts';
+import { TILE_SIZE, EVENT_BUS } from './consts';
 import PropertyTile from './PropertyTile';
+import { createAnimationEvent, animEmitter } from './animations';
 const { ccclass, property } = cc._decorator;
 
 // TODO: reposition this to be Map component, that handles only rendering map
@@ -56,15 +47,20 @@ export default class MapLoader extends cc.Component {
     public mapWidthInPx = 0;
     private tilePositionOffset: cc.Vec2 = null;
 
-    public static instance: MapLoader;
+    private static instance: MapLoader;
 
-    private get eventBus() {
-        return cc.find(EVENT_BUS);
+    public static get() {
+        return MapLoader.instance;
     }
 
     @lifecycle
-    protected start() {
+    protected onLoad() {
         MapLoader.instance = this;
+    }
+
+    @lifecycle
+    protected onDestroy() {
+        MapLoader.instance = undefined;
     }
 
     public renderMap(boardSetup: BoardSetup) {
@@ -94,10 +90,10 @@ export default class MapLoader extends cc.Component {
                 this.renderTile(this.emptyTile, tile);
             }
         }
-        this.eventBus.on(EVENT.ANIMATION, (anim: Animation) => {
-            switch (anim.name as AnimationName) {
-                case 'invested':
-                    getGame().recentlyInvestedProperty.playInvestedEffect(anim.length);
+        createAnimationEvent('invested').sub(animEmitter, (anim) => {
+            const property = this.getPropertyTileAt(anim.args.property.pos);
+            if (property) {
+                property.playInvestedEffect(anim.length);
             }
         });
     }

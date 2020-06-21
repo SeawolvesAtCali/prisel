@@ -10,6 +10,7 @@ export interface AnimationArgs {
         steps: number;
     };
     move: {
+        player: GamePlayerInfo;
         start: Coordinate;
         path: Coordinate[];
     };

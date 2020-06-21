@@ -82,10 +82,6 @@ export function lifecycle(container, key, other1) {
     }
 }
 
-export function getGame() {
-    return nullCheck(cc.find('Canvas').getComponent(Game));
-}
-
 export function assertNever(x: never): never {
     throw new Error('Unexpected value ' + x);
 }

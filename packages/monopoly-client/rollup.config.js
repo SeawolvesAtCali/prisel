@@ -8,11 +8,7 @@ function buildJs(input, file, ...otherPlugins) {
         input,
         output: [{ file, format: 'cjs' }],
         plugins: [
-            resolve({
-                // need to specify preferBuiltins
-                // https://github.com/rollup/rollup-plugin-node-resolve/issues/196
-                preferBuiltins: true,
-            }), // so Rollup can find dependencies
+            resolve(),
             commonjs(), // so Rollup can convert dependencies to an ES module
             ...otherPlugins,
         ],

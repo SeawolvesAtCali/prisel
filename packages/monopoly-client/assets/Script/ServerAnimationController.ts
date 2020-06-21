@@ -1,15 +1,15 @@
 import { ClientState, client } from './Client';
-import { Client, Packet } from '@prisel/client';
+import { Client, Packet } from './packages/priselClient';
 import { nullCheck, lifecycle, assertNever } from './utils';
 import {
     Action,
     AnimationPayload,
     Animation,
     AnimationType,
-    animationMap,
     Anim,
-} from '@prisel/monopoly-common';
+} from './packages/monopolyCommon';
 import { EVENT_BUS, EVENT } from './consts';
+import { animEmitter } from './animations';
 
 const { ccclass, property } = cc._decorator;
 
@@ -39,6 +39,7 @@ export default class ServerAnimationController extends cc.Component {
     protected onDestroy() {
         cc.log('remove animation');
         this.removeAnimationListener();
+        animEmitter.removeAllListeners();
     }
 
     private handleAnimation(anim: Animation): Promise<unknown> {
@@ -46,6 +47,7 @@ export default class ServerAnimationController extends cc.Component {
             case AnimationType.DEFAULT:
                 cc.log('server animation ', anim.name, anim.length);
                 this.eventBus.emit(EVENT.ANIMATION, anim);
+                animEmitter.emit(anim.name, anim);
                 return Anim.wait(anim).promise;
             case AnimationType.SEQUENCE:
                 return (async () => {
@@ -57,6 +59,8 @@ export default class ServerAnimationController extends cc.Component {
                 return Promise.race(anim.children.map(this.handleAnimation.bind(this)));
             case AnimationType.ALL:
                 return Promise.all<void>(anim.children.map(this.handleAnimation.bind(this)));
+            default:
+                assertNever(anim.type);
         }
     }
 }

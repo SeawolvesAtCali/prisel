@@ -1,6 +1,6 @@
-import { nullCheck, getGame } from './utils';
-import { EVENT_BUS, EVENT } from './consts';
-import { Animation, AnimationName } from '@prisel/monopoly-common';
+import { nullCheck } from './utils';
+import { EVENT_BUS } from './consts';
+import { createAnimationEvent, animEmitter } from './animations';
 
 const { ccclass } = cc._decorator;
 
@@ -21,20 +21,12 @@ export default class CaptionAnimation extends cc.Component {
         this.anim = nullCheck(this.label.getComponent(cc.Animation));
         this.node.active = false;
         this.eventBus = nullCheck(cc.find(EVENT_BUS));
-        this.eventBus.on(EVENT.ANIMATION, (anim: Animation) => {
-            switch (anim.name as AnimationName) {
-                case 'game_start':
-                    this.node.active = true;
-                    this.animate('START!', anim.length);
-                    break;
-                case 'dice_down':
-                    this.node.active = true;
-                    this.animate(
-                        '' + getGame().currentGamePlayer.playerRollPayload.steps,
-                        anim.length,
-                    );
-                    break;
-            }
+        createAnimationEvent('game_start').sub(animEmitter, (anim) => {
+            this.node.active = true;
+            this.animate('START!', anim.length);
+        });
+        createAnimationEvent('dice_down').sub(animEmitter, (anim) => {
+            this.animate('' + anim.args.steps, anim.length);
         });
     }
 }

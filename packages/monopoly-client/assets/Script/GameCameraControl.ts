@@ -1,8 +1,12 @@
-import { toVec2, lifecycle, getGame } from './utils';
-import { AUTO_PANNING_PX_PER_SECOND, EVENT_BUS, EVENT, CAMERA_FOLLOW_OFFSET } from './consts';
-import { Animation, AnimationName, Anim } from '@prisel/monopoly-common';
+import { toVec2, lifecycle } from './utils';
+import { AUTO_PANNING_PX_PER_SECOND, CAMERA_FOLLOW_OFFSET } from './consts';
+import { Anim, samePos } from './packages/monopolyCommon';
+import { createAnimationEvent, animEmitter } from './animations';
 
-const { ccclass } = cc._decorator;
+import Game from './Game';
+import Player from './Player';
+
+const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class GameCameraControl extends cc.Component {
@@ -11,26 +15,36 @@ export default class GameCameraControl extends cc.Component {
     private moveToNodeTween: cc.Tween = null;
     private offset: cc.Vec2 = null;
 
-    private get eventBus(): cc.Node {
-        return cc.find(EVENT_BUS);
-    }
-
     @lifecycle
     protected start() {
-        this.eventBus.on(EVENT.ANIMATION, async (anim: Animation) => {
-            switch (anim.name as AnimationName) {
-                case 'pan':
-                    if (getGame().nextPlayer) {
-                        this.moveToNode(getGame().nextPlayer, CAMERA_FOLLOW_OFFSET, anim.length);
+        createAnimationEvent('pan').sub(animEmitter, (anim) => {
+            const playerAtTile = Game.get()
+                .getPlayerNodes()
+                .find((node) => {
+                    const player = node.getComponent(Player);
+                    if (!player) {
+                        cc.error('player node does not have Player component', player);
+                        return false;
                     }
-                    break;
-                case 'move':
-                    const currentGamePlayerNode = getGame().currentGamePlayer.node;
-                    this.startFollowing(currentGamePlayerNode);
-                    await Anim.wait(anim).promise;
-                    this.stopFollowing();
-                    this.moveToNode(currentGamePlayerNode);
-                    break;
+                    if (!player.pos) {
+                        cc.error('player node does not have pos', player);
+                        return false;
+                    }
+                    return samePos(player.pos, anim.args.target);
+                });
+            if (playerAtTile) {
+                this.moveToNode(playerAtTile, CAMERA_FOLLOW_OFFSET, anim.length);
+            } else {
+                cc.error('cannot find player at position ', anim.args.target);
+            }
+        });
+        createAnimationEvent('move').sub(animEmitter, async (anim) => {
+            const currentGamePlayerNode = Game.get().getPlayerNode(anim.args.player.player.id);
+            if (currentGamePlayerNode) {
+                this.startFollowing(currentGamePlayerNode);
+                await Anim.wait(anim).promise;
+                this.stopFollowing();
+                this.moveToNode(currentGamePlayerNode);
             }
         });
     }

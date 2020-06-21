@@ -24,7 +24,7 @@
         "lib"
     ],
     "scripts": {
-        "build": "nps clean build gendef",
+        "build": "nps ts-check clean build gendef",
         "docgen": "typedoc index.ts",
         "fix": "tslint --project tsconfig.json --fix",
         "lint": "tslint --project tsconfig.json",

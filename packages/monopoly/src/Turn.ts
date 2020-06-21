@@ -1,6 +1,6 @@
 import Game from './Game';
 import { GamePlayer } from './GamePlayer';
-import { Action } from '../common/messages';
+import { Action } from '@prisel/monopoly-common';
 import { ResponseWrapper, RemoveListenerFunc, Request, debug } from '@prisel/server';
 
 /**

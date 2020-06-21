@@ -16,10 +16,12 @@ export default class DicePad extends cc.Component {
         this.dice = this.getComponentInChildren(Dice);
         this.node.on(cc.Node.EventType.TOUCH_START, this.roll, this);
         this.eventBus.on(EVENT.START_CURRENT_PLAYER_TURN, () => {
+            cc.log('start turn');
             this.node.active = true;
             this.rolled = false;
         });
         this.eventBus.on(EVENT.END_CURRENT_PLAYER_TURN, () => {
+            cc.log('end turn');
             this.node.active = false;
         });
         this.node.active = false;

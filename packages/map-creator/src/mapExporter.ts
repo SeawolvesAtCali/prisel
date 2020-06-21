@@ -7,7 +7,7 @@ import {
     isWalkable,
     PropertyTile,
     isPropertyTile,
-} from '@prisel/monopoly';
+} from '@prisel/monopoly-common';
 import { AllFileName } from '../images';
 
 const toKey = (tile: Coordinate) => `${tile.row}-${tile.col}`;

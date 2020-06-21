@@ -2,6 +2,11 @@ import { PlayerInfo } from './packages/priselClient';
 
 const { ccclass, property } = cc._decorator;
 import { SpriteFrameEntry } from './SpriteFrameEntry';
+import { EVENT_BUS, FLIP_THRESHHOLD } from './consts';
+import { Coordinate } from './packages/monopolyCommon';
+import { lifecycle, nullCheck } from './utils';
+import MapLoader from './MapLoader';
+import { createAnimationEvent, animEmitter } from './animations';
 
 @ccclass
 export default class Player extends cc.Component {
@@ -22,20 +27,27 @@ export default class Player extends cc.Component {
     public color: string = null;
     private idleSprite: cc.SpriteFrame = null;
 
-    // LIFE-CYCLE CALLBACKS:
+    public pos: Coordinate = null;
 
-    public init(playerData: PlayerInfo, color: string) {
+    private get eventBus() {
+        return cc.find(EVENT_BUS);
+    }
+
+    public init(playerData: PlayerInfo, color: string, pos: Coordinate) {
         this.playerName = playerData.name;
         this.playerId = playerData.id;
         this.color = color;
         this.turnToLeft = this.turnToLeft.bind(this);
         this.turnToRight = this.turnToRight.bind(this);
+        cc.log('setting player initial pos', pos);
+        this.pos = pos;
     }
 
     public getId() {
         return this.playerId;
     }
 
+    @lifecycle
     public start() {
         this.label.string = this.playerName;
         this.character = this.node.getChildByName('character');
@@ -49,6 +61,38 @@ export default class Player extends cc.Component {
         this.stale();
         this.walk = this.walk.bind(this);
         this.stop = this.stop.bind(this);
+
+        createAnimationEvent('turn_start').sub(animEmitter, (anim) => {
+            if (this.getId() === anim.args.player.player.id) {
+                const animState = this.getComponent(cc.Animation).play('turn_start');
+                animState.speed = (animState.duration * 1000) / anim.length;
+            }
+        });
+
+        createAnimationEvent('move').sub(animEmitter, async (anim) => {
+            if (this.getId() === anim.args.player.player.id) {
+                this.walk();
+                await nullCheck(MapLoader.get()).moveAlongPath(
+                    this.node,
+                    anim.args.path,
+                    anim.length,
+                    (node, targetPos: cc.Vec2) => {
+                        if (targetPos.x - node.position.x > FLIP_THRESHHOLD) {
+                            this.turnToRight();
+                        }
+                        if (node.position.x - targetPos.x > FLIP_THRESHHOLD) {
+                            this.turnToLeft();
+                        }
+                    },
+                );
+
+                const finalTile = nullCheck(MapLoader.get().getTile(anim.args.path.slice(-1)[0]));
+                this.node.setPosition(finalTile.getLandingPos());
+                this.node.zIndex = finalTile.getLandingZIndex();
+
+                this.stop();
+            }
+        });
     }
 
     private stale() {

@@ -1,5 +1,8 @@
 import Player from './Player';
 import { PropertyInfo } from './packages/monopolyCommon';
+import { nullCheck } from './utils';
+import Tile from './Tile';
+import { LANDING_POS_OFFSET } from './consts';
 
 const { ccclass, property } = cc._decorator;
 
@@ -7,6 +10,9 @@ const { ccclass, property } = cc._decorator;
 export default class PropertyTile extends cc.Component {
     @property(cc.SpriteAtlas)
     private spriteAtlas: cc.SpriteAtlas = null;
+
+    @property(cc.Prefab)
+    private particle: cc.Prefab = null;
 
     private owner: Player = null;
 
@@ -30,5 +36,11 @@ export default class PropertyTile extends cc.Component {
             case 2:
                 return 'level-3';
         }
+    }
+
+    public playInvestedEffect(durationInMs?: number) {
+        const particleNode = cc.instantiate(nullCheck(this.particle));
+        this.node.addChild(particleNode);
+        particleNode.setPosition(LANDING_POS_OFFSET);
     }
 }

@@ -1,0 +1,33 @@
+{
+    "name": "@prisel/monopoly-common",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Common code shared between monopoly server and client",
+    "main": "./lib/index.js",
+    "scripts": {
+        "build": "nps clean build gendef",
+        "gen-tsconfig": "gen-tsconfig"
+    },
+    "files": [
+        "./lib",
+        "./data"
+    ],
+    "author": "Yiou Chen <chen.yiou1992@gmail.com>",
+    "license": "MIT",
+    "dependencies": {
+        "@prisel/common": "^0.1.3"
+    },
+    "devDependencies": {
+        "tslib": "^2.0.0",
+        "typescript": "^3.8.3",
+        "nps": "^5.9.12",
+        "@prisel/gen-tsconfig": "0.0.0",
+        "rollup": "^2.7.6",
+        "@rollup/plugin-commonjs": "^11.1.0"
+    },
+    "genTsconfig": {
+        "files": [
+            "index.ts"
+        ]
+    }
+}

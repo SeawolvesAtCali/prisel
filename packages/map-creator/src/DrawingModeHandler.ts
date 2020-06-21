@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TileType } from '@prisel/monopoly';
+import { TileType } from '@prisel/monopoly-common';
 
 export interface DrawingModeContext {
     setSelectedMode: React.Dispatch<React.SetStateAction<TileType>>;

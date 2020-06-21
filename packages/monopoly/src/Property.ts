@@ -1,8 +1,7 @@
 import { GamePlayer } from './GamePlayer';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import { log } from './logGameObject';
-import { PropertyInfo, Coordinate, PropertyLevel } from '../common/types';
-import { start } from 'repl';
+import { PropertyInfo, Coordinate, PropertyLevel } from '@prisel/monopoly-common';
 interface Props {
     id: string;
     cost: number;
@@ -80,6 +79,9 @@ export default class Property extends GameObject {
     public upgradable(requester: GamePlayer): boolean {
         return this.owner === requester && this.level < this.levels.length - 1;
     }
+    public investable(requester: GamePlayer): boolean {
+        return this.purchaseable() || this.upgradable(requester);
+    }
 
     public getWorth(): number {
         // the worth of a property is the sum of the cost taken to
@@ -98,7 +100,7 @@ export default class Property extends GameObject {
         };
     }
 
-    public getPropertyInfoForPurchaseOrUpgrade(requester: GamePlayer): PropertyInfo {
+    public getPropertyInfoForInvesting(requester: GamePlayer): PropertyInfo {
         if (this.level >= this.levels.length) {
             return undefined;
         }

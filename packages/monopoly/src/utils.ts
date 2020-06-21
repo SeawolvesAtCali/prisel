@@ -1,4 +1,4 @@
-import { Coordinate } from '../common/types';
+import { Coordinate } from '@prisel/monopoly-common';
 
 export function samePos(pos1: Coordinate, pos2: Coordinate): boolean {
     if (!pos1 || !pos2) {

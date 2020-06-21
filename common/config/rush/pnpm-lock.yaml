@@ -5,7 +5,6 @@ dependencies:
   '@babel/preset-react': 7.10.1_@babel+core@7.10.2
   '@babel/runtime': 7.10.2
   '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
-  '@rollup/plugin-json': 4.1.0_rollup@2.12.0
   '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
   '@rush-temp/client': 'file:projects/client.tgz'
   '@rush-temp/common': 'file:projects/common.tgz'
@@ -15,6 +14,7 @@ dependencies:
   '@rush-temp/map-creator': 'file:projects/map-creator.tgz'
   '@rush-temp/monopoly': 'file:projects/monopoly.tgz'
   '@rush-temp/monopoly-client': 'file:projects/monopoly-client.tgz_typescript@3.9.3'
+  '@rush-temp/monopoly-common': 'file:projects/monopoly-common.tgz'
   '@rush-temp/react': 'file:projects/react.tgz'
   '@rush-temp/server': 'file:projects/server.tgz'
   '@rush-temp/tic-tac-toe': 'file:projects/tic-tac-toe.tgz'
@@ -33,6 +33,7 @@ dependencies:
   cssnano: 4.1.10
   debug: 4.1.1
   eslint-plugin-react: 7.20.0
+  events: 3.1.0
   jest: 26.0.1
   jest-dev-server: 4.4.0
   jest-environment-jsdom: 23.4.0
@@ -14645,7 +14646,7 @@ packages:
     dev: false
     name: '@rush-temp/map-creator'
     resolution:
-      integrity: sha512-mS3Tnl0moUtzeJyg4G8OuHQRaIEdDv88qf7g+O1ZCTwYQ6y7K4dvaScYGSI7e57FJjVExZz/1jm9sgw9CoE8qw==
+      integrity: sha512-AI+M6Vbr14J+Rwtwt4YGV7vF3BMgN7RrmzcKHu8F7GQJHmGJEZ950T4ptQY6kwdAb7AIMDkRWg29yOeNUYXIpg==
       tarball: 'file:projects/map-creator.tgz'
     version: 0.0.0
   'file:projects/monopoly-client.tgz_typescript@3.9.3':
@@ -14653,6 +14654,7 @@ packages:
       '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
       '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
       '@types/jest': 22.2.3
+      events: 3.1.0
       jest: 26.0.1
       rollup: 2.12.0
       rollup-plugin-copy: 3.3.0
@@ -14665,8 +14667,21 @@ packages:
     peerDependencies:
       typescript: '*'
     resolution:
-      integrity: sha512-XlZ8nTW64n3N4/2SU5yEdxyQ0Ch09bdr+v10GjeDVQaky1+1vrBK+BBmMXsXSgpxa8OZhnezI22jDzRpitbNIg==
+      integrity: sha512-s+NSSOFZ+7OhtqDSZ/noCv/rTF9mnL0VUQp69wCn5o7ZiX+Jai1gyKU6jxnfcGXXcw/IDokgxPV99Bq2wJRCgw==
       tarball: 'file:projects/monopoly-client.tgz'
+    version: 0.0.0
+  'file:projects/monopoly-common.tgz':
+    dependencies:
+      '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
+      nps: 5.9.12
+      rollup: 2.12.0
+      tslib: 2.0.0
+      typescript: 3.9.3
+    dev: false
+    name: '@rush-temp/monopoly-common'
+    resolution:
+      integrity: sha512-7cxuzQgmxoWg2G/xiBc3FjwKWyayDnABx2W8B7bG/VEyPHbhhnQOsNVUXPieCsH3L2BHaCHufcGlQjhqV23aUg==
+      tarball: 'file:projects/monopoly-common.tgz'
     version: 0.0.0
   'file:projects/monopoly.tgz':
     dependencies:
@@ -14687,7 +14702,7 @@ packages:
     dev: false
     name: '@rush-temp/monopoly'
     resolution:
-      integrity: sha512-JDnB3YxRkYR/+rNSCebovhCFtGzGHDpUWr49xPgAR25Fhx3G10oLaNQee/taR3+OCYlDEYWxBFjZECyrSxBzIw==
+      integrity: sha512-y8/r/lq9YLqa7UlodMZU7gKIRgZJQPm6IHLpSXzfAyCY0sw1n48cwZ5LBQk9JUptbvvAG8kWNhXt3liSgatodQ==
       tarball: 'file:projects/monopoly.tgz'
     version: 0.0.0
   'file:projects/react.tgz':
@@ -14798,7 +14813,6 @@ specifiers:
   '@babel/preset-react': ^7.9.4
   '@babel/runtime': ^7.10.2
   '@rollup/plugin-commonjs': ^11.1.0
-  '@rollup/plugin-json': ^4.0.3
   '@rollup/plugin-node-resolve': ^7.1.3
   '@rush-temp/client': 'file:./projects/client.tgz'
   '@rush-temp/common': 'file:./projects/common.tgz'
@@ -14808,6 +14822,7 @@ specifiers:
   '@rush-temp/map-creator': 'file:./projects/map-creator.tgz'
   '@rush-temp/monopoly': 'file:./projects/monopoly.tgz'
   '@rush-temp/monopoly-client': 'file:./projects/monopoly-client.tgz'
+  '@rush-temp/monopoly-common': 'file:./projects/monopoly-common.tgz'
   '@rush-temp/react': 'file:./projects/react.tgz'
   '@rush-temp/server': 'file:./projects/server.tgz'
   '@rush-temp/tic-tac-toe': 'file:./projects/tic-tac-toe.tgz'
@@ -14826,6 +14841,7 @@ specifiers:
   cssnano: ^4.1.10
   debug: ^4.1.0
   eslint-plugin-react: ^7.19.0
+  events: 3.1.0
   jest: ^26.0.1
   jest-dev-server: ^4.4.0
   jest-environment-jsdom: ^23.4.0

@@ -3,7 +3,8 @@
     "compilerOptions": {
         "rootDir": "./",
         "noEmit": false,
-        "outDir": "./lib"
+        "outDir": "./lib",
+        "emitDeclarationOnly": true
     },
     "exclude": [
         "node_modules",

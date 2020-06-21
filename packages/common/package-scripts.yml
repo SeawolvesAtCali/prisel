@@ -1,5 +1,6 @@
 scripts:
     clean: rm -rf ./lib
+    ts-check: tsc
     build: rollup --config --silent
     gendef: tsc --project build.tsconfig.json
     gendoc: node ./generateSystemActionDoc.js

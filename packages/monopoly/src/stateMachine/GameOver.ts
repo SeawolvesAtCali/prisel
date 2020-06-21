@@ -1,7 +1,6 @@
 import { StateMachineState } from './StateMachineState';
-import { broadcast, PacketType, Packet, Request, isRequest, debug } from '@prisel/server';
-import { GameOverPayload, Action } from '../../common/messages';
-import { Rank } from '../../common/types';
+import { broadcast, PacketType, Packet, isRequest } from '@prisel/server';
+import { Rank, GameOverPayload, Action } from '@prisel/monopoly-common';
 import { GamePlayer } from '../GamePlayer';
 import { Sync, syncGamePlayer } from './utils';
 
@@ -61,7 +60,7 @@ export class GameOver extends StateMachineState {
         if (isRequest(packet) && packet.action === Action.BACK_TO_ROOM) {
             gamePlayer.player.respond(packet);
             if (this.sync.add(gamePlayer.id)) {
-                this.machine.end();
+                this.end();
             }
             return true;
         }
@@ -70,7 +69,7 @@ export class GameOver extends StateMachineState {
 
     public onPlayerLeave(gamePlayer: GamePlayer) {
         if (this.sync.isSynced()) {
-            this.machine.end();
+            this.end();
         }
     }
 

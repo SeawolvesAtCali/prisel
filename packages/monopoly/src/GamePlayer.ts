@@ -3,7 +3,7 @@ import Property from './Property';
 import { log } from './logGameObject';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
 import PathNode from './PathNode';
-import { PropertyInfo, Payment, Coordinate, GamePlayerInfo } from '../common/types';
+import { PropertyInfo, Payment, Coordinate, GamePlayerInfo } from '@prisel/monopoly-common';
 
 interface Props {
     id: PlayerId;

@@ -1,13 +1,41 @@
 import { StateMachineState } from './StateMachineState';
-import { Packet, isRequest, isPacket, broadcast, PacketType } from '@prisel/server';
-import { Action, InitialStatePayload, PlayerLeftPayload } from '../../common/messages';
+import { Packet, isRequest, broadcast, PacketType } from '@prisel/server';
+import {
+    Action,
+    InitialStatePayload,
+    PlayerLeftPayload,
+    Anim,
+    toAnimationPacket,
+    animationMap,
+} from '@prisel/monopoly-common';
 import { GamePlayer } from '../GamePlayer';
 import { PreRoll } from './PreRoll';
 import { GameOver } from './GameOver';
 import { Sync, syncGamePlayer } from './utils';
 
+/**
+ * When game starts, each client should request GET_INITIAL_STATE. This is how
+ * server knows that a client is on game scene and ready to receive game
+ * packages.
+ * Server send initial state to client upon GET_INITIAL_STATE. When client
+ * finishes instantiating all the game objects (including loading maps), client
+ * should send back READY_TO_START_GAME.
+ * Server then sends animation to client, this includes showing "START!" as well
+ * as panning to the first player, upon READ_TO_START_GAME.
+ * When all clients send back READY_TO_START_GAME, and the animation for the
+ * last player(the last one that send back READY_TO_START_GAME) *should* finish,
+ * we go to the next state PreRoll.
+ *
+ * Usually we don't want to wait(sync) for all clients as we should allow client
+ * to temporarily disconnect (for example, switching tab). But this is the start
+ * of the game, so it would be good to catch any inactive player. Also we are
+ * not able to respond to GET_INITIAL_STATE after this state.
+ *
+ * animations: game_start, pan
+ */
 export class GameStarted extends StateMachineState {
     private sync: Sync;
+
     public onEnter() {
         this.sync = syncGamePlayer(this.game);
     }
@@ -23,12 +51,27 @@ export class GameStarted extends StateMachineState {
                         firstPlayerId: this.game.getCurrentPlayer().id,
                     });
                 }
-
                 return true;
-            case Action.READY_TO_START_TURN:
-                if (this.sync.add(gamePlayer.id)) {
-                    this.machine.transition(PreRoll);
-                }
+            case Action.READY_TO_START_GAME:
+                (async () => {
+                    if (!this.sync.has(gamePlayer.id)) {
+                        const startAndPan = Anim.sequence(
+                            Anim.create('game_start').setLength(animationMap.game_start),
+                            Anim.create('pan', {
+                                target: this.game.getCurrentPlayer().pathNode.tile.pos,
+                            }).setLength(300),
+                        );
+                        gamePlayer.player.emit(toAnimationPacket(startAndPan));
+                        this.sync.add(gamePlayer.id);
+                        if (this.sync.isSynced()) {
+                            await Anim.wait(startAndPan).promise;
+                            if (!this.isCurrentState()) {
+                                return;
+                            }
+                            this.transition(PreRoll);
+                        }
+                    }
+                })();
                 return true;
         }
         return false;
@@ -43,7 +86,7 @@ export class GameStarted extends StateMachineState {
                 player: gamePlayer.getGamePlayerInfo(),
             },
         });
-        this.machine.transition(GameOver);
+        this.transition(GameOver);
     }
 
     public get [Symbol.toStringTag]() {

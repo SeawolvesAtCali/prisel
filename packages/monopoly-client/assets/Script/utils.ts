@@ -1,4 +1,6 @@
 import { Tile, Coordinate } from './packages/monopolyCommon';
+import { EVENT_BUS } from './consts';
+import Game from './Game';
 
 export function getTileKey(tile: Tile): string {
     return getTileKeyFromCoordinate(tile.pos);
@@ -61,4 +63,25 @@ export function nullCheck<T>(value: T): T {
         throw new Error('checking value not empty, but is ' + value);
     }
     return value;
+}
+
+const LIFECYCLE_SET = new Set([
+    'onLoad',
+    'start',
+    'update',
+    'lateUpdate',
+    'onDestroy',
+    'onEnable',
+    'onDisable',
+]);
+export function lifecycle(container, key, other1) {
+    if (CC_DEBUG && !LIFECYCLE_SET.has(key)) {
+        throw new Error(
+            'Method ' + key + ' of ' + container.constructor.name + ' is not a lifecycle method',
+        );
+    }
+}
+
+export function assertNever(x: never): never {
+    throw new Error('Unexpected value ' + x);
 }

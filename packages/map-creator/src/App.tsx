@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coordinate, CoordinatePair, BoardSetup, Tile } from '@prisel/monopoly';
+import { Coordinate, CoordinatePair, BoardSetup, Tile } from '@prisel/monopoly-common';
 import styles from './App.css';
 import { Mode, equal, download, useArrayRef } from './common';
 import { TileView, TileExport } from './Tile';

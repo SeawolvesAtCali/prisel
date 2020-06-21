@@ -1,22 +1,7 @@
 import { GamePlayer } from './GamePlayer';
 import GameObject, { FlatGameObject, Ref } from './GameObject';
-import { flattenState } from './state';
 import { log } from './logGameObject';
-import {
-    PlayerId,
-    Player,
-    Room,
-    ResponseWrapper,
-    Request,
-    Messages,
-    Packet,
-    PacketType,
-    broadcast,
-    RemoveListenerFunc,
-    debug,
-} from '@prisel/server';
-import { Action, PlayerStartTurnPayload, PlayerEndTurnPayload } from '../common/messages';
-import { startTurn, Turn } from './Turn';
+import { PlayerId, Player, Room } from '@prisel/server';
 import Property from './Property';
 import { StateMachine } from './stateMachine/StateMachine';
 
@@ -38,7 +23,6 @@ export default class Game extends GameObject {
     public players: Map<string, GamePlayer>;
     public turnOrder: GamePlayer[];
     public room: Room;
-    public turn: Turn;
     public properties: Property[];
     public stateMachine: StateMachine;
 
@@ -86,6 +70,9 @@ export default class Game extends GameObject {
 
     public getGamePlayer(player: Player): GamePlayer {
         return this.players.get(player.getId());
+    }
+    public getGamePlayerById(id: string): GamePlayer {
+        return this.players.get(id);
     }
 }
 

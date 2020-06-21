@@ -1,5 +1,5 @@
 import { DrawingModeHandler } from './DrawingModeHandler';
-import { TileType } from '@prisel/monopoly';
+import { TileType } from '@prisel/monopoly-common';
 
 export const DrawRoadHandler: DrawingModeHandler = {
     onDraw: (row, col, currentMode, context) => {

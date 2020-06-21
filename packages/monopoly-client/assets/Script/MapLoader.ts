@@ -148,6 +148,7 @@ export default class MapLoader extends cc.Component {
         coors: Coordinate[],
         durationInMs: number,
         onMove?: (node: cc.Node, next: cc.Vec2) => void,
+        onEnd?: () => void,
     ): Promise<void> {
         if (coors.length <= 0) {
             return Promise.resolve();
@@ -168,12 +169,19 @@ export default class MapLoader extends cc.Component {
             actionSequence.push(setZIndexAction(targetZIndex));
         }
 
-        const promise = new Promise<void>((resolve) => {
+        return new Promise<void>((resolve) => {
             actionSequence.push(cc.callFunc(resolve));
-        });
+            const action = node.runAction(cc.sequence(actionSequence));
 
-        node.runAction(cc.sequence(actionSequence));
-        return promise;
+            setTimeout(() => {
+                // the game might be in background, so update is not triggered.
+                if (!action.isDone() && node.active) {
+                    node.stopAction(action);
+                    this.moveToPos(node, coors.slice(-1)[0]);
+                    resolve();
+                }
+            }, durationInMs + 50);
+        });
     }
     // update (dt) {}
 }

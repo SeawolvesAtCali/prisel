@@ -1,10 +1,11 @@
 import { toVec2, lifecycle } from './utils';
-import { AUTO_PANNING_PX_PER_SECOND, CAMERA_FOLLOW_OFFSET } from './consts';
-import { Anim, samePos } from './packages/monopolyCommon';
+import { AUTO_PANNING_PX_PER_SECOND, CAMERA_FOLLOW_OFFSET, LANDING_POS_OFFSET } from './consts';
+import { Anim, samePos, Coordinate } from './packages/monopolyCommon';
 import { createAnimationEvent, animEmitter } from './animations';
 
 import Game from './Game';
 import Player from './Player';
+import MapLoader from './MapLoader';
 
 const { ccclass, property } = cc._decorator;
 
@@ -18,25 +19,7 @@ export default class GameCameraControl extends cc.Component {
     @lifecycle
     protected start() {
         createAnimationEvent('pan').sub(animEmitter, (anim) => {
-            const playerAtTile = Game.get()
-                .getPlayerNodes()
-                .find((node) => {
-                    const player = node.getComponent(Player);
-                    if (!player) {
-                        cc.error('player node does not have Player component', player);
-                        return false;
-                    }
-                    if (!player.pos) {
-                        cc.error('player node does not have pos', player);
-                        return false;
-                    }
-                    return samePos(player.pos, anim.args.target);
-                });
-            if (playerAtTile) {
-                this.moveToNode(playerAtTile, CAMERA_FOLLOW_OFFSET, anim.length);
-            } else {
-                cc.error('cannot find player at position ', anim.args.target);
-            }
+            this.moveToTileAtPos(anim.args.target, anim.length);
         });
         createAnimationEvent('move').sub(animEmitter, async (anim) => {
             const currentGamePlayerNode = Game.get().getPlayerNode(anim.args.player.player.id);
@@ -44,9 +27,19 @@ export default class GameCameraControl extends cc.Component {
                 this.startFollowing(currentGamePlayerNode);
                 await Anim.wait(anim).promise;
                 this.stopFollowing();
-                this.moveToNode(currentGamePlayerNode);
+                this.moveToTileAtPos(anim.args.path.slice(-1)[0]);
             }
         });
+    }
+
+    private moveToTileAtPos(pos: Coordinate, durationInMs?: number) {
+        if (pos && MapLoader.get().getTile(pos)) {
+            this.moveToNode(
+                MapLoader.get().getTile(pos).node,
+                CAMERA_FOLLOW_OFFSET.add(LANDING_POS_OFFSET),
+                durationInMs,
+            );
+        }
     }
 
     public startFollowing(node: cc.Node, offset: cc.Vec2 = CAMERA_FOLLOW_OFFSET) {

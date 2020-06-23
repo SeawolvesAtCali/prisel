@@ -175,7 +175,7 @@ export function useClient(url, connectedRef) {
         /** @type {ResponseWrapper<LoginResponsePayload>} */
         const loginInfo = await client.request(Messages.getLogin(client.newId(), username));
         if (connectedRef.current) {
-            return { id: loginInfo.payload.userId, name };
+            return { id: loginInfo.payload.userId, name: username };
         }
         throw new Error('disconnected while trying to login');
     }

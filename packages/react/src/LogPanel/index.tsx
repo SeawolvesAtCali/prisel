@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Suggestion from '../Suggestion';
 import { Packet } from '@prisel/client';
-import styles from './index.css';
+import styles from './index.module.css';
 import cn from '../utils/classname';
 import Chip from '../Chip';
 import debounce from 'lodash/debounce';

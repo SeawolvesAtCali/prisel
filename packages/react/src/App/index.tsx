@@ -3,7 +3,7 @@ import GameContext from '../GameContext';
 import { HostContainer, GuestContainer } from '../ClientContainer';
 import generateUsername from '../ClientContainer/username';
 import { Toolbar, ToolbarItem } from '../Toolbar';
-import styles from './index.css';
+import styles from './index.module.css';
 import { CommandEditor, useCommandEditor } from '../commandEditor';
 
 function App() {

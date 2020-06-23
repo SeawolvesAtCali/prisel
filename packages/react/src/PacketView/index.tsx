@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Packet, PacketType, isResponse, wrapResponse, messageTypeMap } from '@prisel/client';
 import { Pill, Preset } from '../Pill';
-import styles from './index.css';
+import styles from './index.module.css';
 import cn from '../utils/classname';
 
 interface PacketTypeLabelProps {

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import styles from './index.css';
+import styles from './index.module.css';
 import cn from '../utils/classname';
 
 export interface BorderBox {

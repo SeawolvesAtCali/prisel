@@ -1,5 +1,5 @@
 import * as React from 'react';
-import styles from './index.css';
+import styles from './index.module.css';
 import Chip from '../Chip';
 import suggestionProviders, { SuggestionProvider } from '../suggestionProviders';
 import Suggestion from '../Suggestion';

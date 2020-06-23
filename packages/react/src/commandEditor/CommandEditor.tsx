@@ -6,7 +6,7 @@ import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import './highlight.css';
-import styles from './style.css';
+import styles from './style.module.css';
 import { Command, isCommand } from './commandManager';
 import { ToolbarItem } from '../Toolbar';
 import { TypedCommand } from '../commands';

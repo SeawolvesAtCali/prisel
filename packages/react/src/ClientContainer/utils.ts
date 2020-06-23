@@ -20,8 +20,14 @@ export interface ClientState {
 
 type PacketListener = (packet: Packet) => void;
 class DebuggerClient extends Client<ClientState> {
-    public onEmit: PacketListener;
-    public onPacket: PacketListener;
+    private onEmit: PacketListener;
+    private onPacket: PacketListener;
+
+    constructor(onEmit: PacketListener, onPacket: PacketListener) {
+        super();
+        this.onEmit = onEmit;
+        this.onPacket = onPacket;
+    }
     // override
     public emit<P extends Packet = any>(packet: P) {
         if (this.onEmit) {
@@ -44,9 +50,7 @@ export function createClient(
     onEmit: (packet: Packet) => void,
     onPacket: (packet: Packet) => void,
 ): Client {
-    const client = new DebuggerClient();
-    client.onEmit = onEmit;
-    client.onPacket = onPacket;
+    const client = new DebuggerClient(onEmit, onPacket);
     client.setState({ username, connecting: false, loggingIn: false, loggedIn: false });
     return client;
 }
@@ -77,7 +81,7 @@ export async function login(client: Client<ClientState>): Promise<Client<ClientS
         Messages.getLogin(client.newId(), username),
     );
 
-    if (loginResponse.ok()) {
+    if (loginResponse.ok() && loginResponse.payload) {
         client.setState({
             loggingIn: false,
             userId: loginResponse.payload.userId,
@@ -92,7 +96,7 @@ export async function createRoom(client: Client<ClientState>) {
         CreateRoomPayload
     >(Messages.getCreateRoom(client.newId(), 'default-room'));
 
-    if (response.ok()) {
+    if (response.ok() && response.payload) {
         return response.payload.room.id;
     }
 

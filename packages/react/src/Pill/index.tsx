@@ -49,7 +49,7 @@ export const Pill: React.FC<PillProps> = (props) => {
     const finalClassName = className ? cn(styles.pill, className) : styles.pill;
 
     return (
-        <span className={finalClassName} style={colors[props.preset]} {...rest}>
+        <span className={finalClassName} style={colors[preset]} {...rest}>
             {props.children}
         </span>
     );

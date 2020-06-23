@@ -13,7 +13,7 @@ interface GameContext {
     roomInfo?: RoomInfo;
     gameType?: string;
     roomType?: string;
-    setRoomId?: (roomId: GameContext['roomId']) => void;
+    setRoomId?: (roomId: string) => void;
 }
 
 const context = createContext<GameContext>({});

@@ -75,12 +75,14 @@ interface LogPanelControl {
 const AUTO_SCROLL_THRESHHOLD = 50;
 
 function LogPanel({ messages }: LogPanelProps) {
-    const containerRef = React.useRef(null);
+    const containerRef = React.useRef<HTMLElement | null>(null);
     const [scrolledToBottom, setScrolledToBottom] = React.useState(true);
     const scrollToBottom = React.useCallback(() => {
         const container = containerRef.current;
-        container.scrollTop = container.scrollHeight - container.clientHeight;
-    }, []);
+        if (container) {
+            container.scrollTop = container.scrollHeight - container.clientHeight;
+        }
+    }, [containerRef]);
     React.useEffect(() => {
         if (scrolledToBottom) {
             scrollToBottom();
@@ -90,6 +92,9 @@ function LogPanel({ messages }: LogPanelProps) {
         () =>
             debounce(() => {
                 const container = containerRef.current;
+                if (!container) {
+                    return;
+                }
                 if (
                     Math.abs(
                         container.scrollHeight - container.clientHeight - container.scrollTop,
@@ -100,7 +105,7 @@ function LogPanel({ messages }: LogPanelProps) {
                     setScrolledToBottom(false);
                 }
             }),
-        [],
+        [containerRef],
     );
 
     return (

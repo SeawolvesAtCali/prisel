@@ -38,6 +38,10 @@ interface JsonViewInternalProps {
 const JsonViewInternal: React.FC<JsonViewInternalProps> = (props) => {
     const { value, isTopLevel = false } = props;
     const [collapsed, setCollapsed] = React.useState(false);
+    const handleCollapse = React.useCallback(() => {
+        setCollapsed(!collapsed);
+    }, [collapsed]);
+
     if (value === undefined) {
         return <span>undefined</span>;
     }
@@ -50,10 +54,6 @@ const JsonViewInternal: React.FC<JsonViewInternalProps> = (props) => {
     if (typeof value === 'number' || typeof value === 'boolean') {
         return <span className={styles.number}>{value}</span>;
     }
-
-    const handleCollapse = React.useCallback(() => {
-        setCollapsed(!collapsed);
-    }, [collapsed]);
 
     const indentClassName = cn({ [styles.indent]: !isTopLevel });
     if (Array.isArray(value)) {

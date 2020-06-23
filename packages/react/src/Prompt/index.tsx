@@ -68,7 +68,7 @@ interface PromptProps {
 function setNextEditingChip(
     currentEditingIndex: number,
     chips: Suggestion[],
-    setEditingChip: React.Dispatch<React.SetStateAction<Suggestion>>,
+    setEditingChip: React.Dispatch<React.SetStateAction<Suggestion | null>>,
 ) {
     if (currentEditingIndex !== undefined) {
         const nextChip =
@@ -82,7 +82,7 @@ function setNextEditingChip(
 function Prompt({ onSubmit }: PromptProps) {
     const [input, setInput] = React.useState('');
     const [chips, setChips] = React.useState<Suggestion[]>([]);
-    const [editingChip, setEditingChip] = React.useState<Suggestion>(null);
+    const [editingChip, setEditingChip] = React.useState<Suggestion | null>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
     const suggestions = generateSuggestions(suggestionProviders, chips, input);
 
@@ -100,7 +100,7 @@ function Prompt({ onSubmit }: PromptProps) {
         (suggestion: Suggestion) => {
             const newChips = chips.slice();
 
-            let fistInsertedIndex;
+            let firstInsertedIndex = 0;
             if (editingChip) {
                 const editingIndex = newChips.findIndex((chip) => chip === editingChip);
                 if (editingIndex >= 0) {
@@ -108,20 +108,22 @@ function Prompt({ onSubmit }: PromptProps) {
                         ...selectSuggestion(suggestion, chips, input)[0],
                         key: editingChip.key,
                     };
-                    fistInsertedIndex = editingIndex;
+                    firstInsertedIndex = editingIndex;
                 }
             } else {
                 const currentLength = newChips.length;
                 newChips.push(...selectSuggestion(suggestion, chips, input));
-                fistInsertedIndex = currentLength;
+                firstInsertedIndex = currentLength;
             }
 
             if (editingChip || suggestion.type === 'command') {
-                setNextEditingChip(fistInsertedIndex, newChips, setEditingChip);
+                setNextEditingChip(firstInsertedIndex, newChips, setEditingChip);
             }
             setChips(newChips);
             setInput('');
-            inputRef.current.focus();
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
         },
         [chips, input, editingChip],
     );
@@ -137,7 +139,9 @@ function Prompt({ onSubmit }: PromptProps) {
         if (editingChip) {
             setEditingChip(null);
         }
-        inputRef.current.focus();
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -175,7 +179,9 @@ function Prompt({ onSubmit }: PromptProps) {
                         onClick={() => {
                             if (chip.type === 'placeholderParam') {
                                 setEditingChip(editingChip === chip ? null : chip);
-                                inputRef.current.focus();
+                                if (inputRef.current) {
+                                    inputRef.current.focus();
+                                }
                             }
                         }}
                     />

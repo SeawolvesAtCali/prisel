@@ -20,7 +20,7 @@ interface HostContainerProps extends BorderBox {
     username: string;
 }
 
-function useRun(client: Client, addToLogs: AddToLogs) {
+function useRun(client: Client | null, addToLogs: AddToLogs) {
     const onRun = useCallback(
         (suggestions: Suggestion[]) => {
             if (!client) {
@@ -71,7 +71,7 @@ function useLog(): [MessageWithMetaData[], AddToLogs] {
 export function HostContainer({ username, displayBorder }: HostContainerProps) {
     const { setRoomId } = useContext(GameContext);
     const [logs, addToLogs] = useLog();
-    const [client, setClient] = useState<Client<ClientState>>(null);
+    const [client, setClient] = useState<Client<ClientState> | null>(null);
     useEffect(() => {
         (async () => {
             let shouldLogEmit = true;
@@ -92,7 +92,9 @@ export function HostContainer({ username, displayBorder }: HostContainerProps) {
             await connect(myClient);
             setClient(myClient);
             await login(myClient);
-            setRoomId(await createRoom(myClient));
+            if (setRoomId) {
+                setRoomId(await createRoom(myClient));
+            }
             // stop logging emit because emit will be log when command is executed.
             shouldLogEmit = false;
         })();
@@ -114,7 +116,7 @@ interface GuestContainerProps extends BorderBox {
 
 export function GuestContainer({ username, roomId, displayBorder }: GuestContainerProps) {
     const [logs, addToLogs] = useLog();
-    const [client, setClient] = useState<Client<ClientState>>(null);
+    const [client, setClient] = useState<Client<ClientState> | null>(null);
     useEffect(() => {
         (async () => {
             let shouldLogEmit = true;

@@ -17,6 +17,7 @@
         "automation": "rush automation --verbose",
         "postinstall": "rush install",
         "build": "rush rebuild",
+        "build:tic-tac-toe": "rush build --to @prisel/tic-tac-toe-client",
         "clean": "rm -rf node_modules && rush clean",
         "deploy:server": "cd packages/tic-tac-toe && rushx start",
         "fix": "rush fix",

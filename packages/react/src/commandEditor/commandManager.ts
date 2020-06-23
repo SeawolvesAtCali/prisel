@@ -76,7 +76,8 @@ export class CommandManager {
 
     constructor(storage: Storage) {
         this.storage = storage;
-        const parsedCommandMap = JSON.parse(this.storage.getItem(STORAGE_KEY)) || {};
+        const savedCommandMapString: string = this.storage.getItem(STORAGE_KEY) || '{}';
+        const parsedCommandMap = JSON.parse(savedCommandMapString);
         if (isCommandMap(parsedCommandMap)) {
             this.commands = mergeMap(preloadedCommands, objectToMap(parsedCommandMap));
         } else {

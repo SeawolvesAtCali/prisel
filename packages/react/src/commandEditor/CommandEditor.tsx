@@ -39,7 +39,7 @@ function CommandEditor(props: CommandEditorProp) {
     const [open, setOpen] = React.useState(false);
     const [json, setJson] = React.useState('');
     const [error, setError] = React.useState('');
-    const [tokens, setTokens] = React.useState([]);
+    const [tokens, setTokens] = React.useState<string[]>([]);
     const [title, setTitle] = React.useState('');
 
     const handleClose = React.useCallback(() => {

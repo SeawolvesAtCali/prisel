@@ -13,44 +13,39 @@
     },
     "license": "MIT",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
-    "main": "./lib/index.js",
-    "types": "./lib/index.d.ts",
-    "directories": {
-        "lib": "./",
-        "test": "__test__"
-    },
-    "scripts": {
-        "build": "nps clean genimagedeclaration build",
-        "fix": "tslint --project tsconfig.json --fix",
-        "lint": "tslint --project tsconfig.json",
-        "start": "nps",
-        "test": "jest",
-        "gen-tsconfig": "gen-tsconfig"
-    },
     "dependencies": {
         "@prisel/monopoly-common": "0.0.0",
-        "react": "^16.13.1",
-        "react-dom": "^16.13.1"
-    },
-    "devDependencies": {
-        "@types/react": "^16.8.24",
+        "@testing-library/jest-dom": "^4.2.4",
+        "@testing-library/react": "^9.5.0",
+        "@testing-library/user-event": "^7.2.1",
+        "@types/jest": "^24.9.1",
+        "@types/node": "^12.12.47",
+        "@types/react": "^16.9.38",
         "@types/react-dom": "^16.9.8",
-        "autoprefixer": "^9.7.6",
-        "cssnano": "^4.1.10",
-        "nps": "^5.9.12",
-        "object-assign": "^4.1.1",
-        "parcel-bundler": "^1.12.4",
-        "postcss-modules": "^1.5.0",
-        "scheduler": "0.19.1",
-        "tslib": "^2.0.0",
-        "typescript": "^3.8.3",
-        "jest": "^26.0.1",
-        "@types/jest": "^22.2.3",
-        "@prisel/jest-preset": "0.0.0",
-        "@prisel/gen-tsconfig": "0.0.0"
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1",
+        "react-scripts": "3.4.1",
+        "typescript": "^3.7.5"
     },
-    "genTsconfig": {},
-    "jest": {
-        "preset": "@prisel/jest-preset"
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "env CI=true react-scripts test --passWithNoTests",
+        "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
     }
 }

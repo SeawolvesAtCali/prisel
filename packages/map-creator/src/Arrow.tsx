@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { CoordinatePair, Coordinate } from '@prisel/monopoly-common';
+import { CoordinatePair } from '@prisel/monopoly-common';
 import { TILE_SIZE_PX, GAP_PX } from './common';
-import styles from './App.css';
+import styles from './App.module.css';
 
 interface ArrowProps {
     path: CoordinatePair;
@@ -42,7 +42,6 @@ function getDeg(dRow: number, dCol: number): string {
         return '45deg';
     }
     throw new Error('cannot draw arrow');
-    return '';
 }
 
 export const Arrow: React.FC<ArrowProps> = ({ path }) => {

@@ -45,7 +45,7 @@
         "tslib": "^2.0.0",
         "typescript": "^3.8.3",
         "jest": "^26.0.1",
-        "@types/jest": "^22.2.3",
+        "@types/jest": "^24.9.1",
         "@prisel/gen-tsconfig": "0.0.0",
         "@prisel/jest-preset": "0.0.0"
     },

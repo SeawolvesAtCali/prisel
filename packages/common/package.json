@@ -37,7 +37,7 @@
         "typescript": "^3.8.3",
         "nps": "^5.9.12",
         "jest": "^26.0.1",
-        "@types/jest": "^22.2.3",
+        "@types/jest": "^24.9.1",
         "@prisel/jest-preset": "0.0.0",
         "@prisel/gen-tsconfig": "0.0.0"
     },

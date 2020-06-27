@@ -13,6 +13,9 @@ export default class Player extends cc.Component {
     @property(cc.Label)
     private label: cc.Label = null;
 
+    @property(cc.Label)
+    private statusLabel: cc.Label = null;
+
     @property(SpriteFrameEntry)
     private sprites: SpriteFrameEntry[] = [];
 
@@ -50,6 +53,7 @@ export default class Player extends cc.Component {
     @lifecycle
     public start() {
         this.label.string = this.playerName;
+        nullCheck(this.statusLabel).string = '';
         this.character = this.node.getChildByName('character');
         this.characterSprite = this.character.getComponent(cc.Sprite);
         this.characterAnim = this.character.getComponent(cc.Animation);
@@ -64,7 +68,15 @@ export default class Player extends cc.Component {
 
         createAnimationEvent('turn_start').sub(animEmitter, (anim) => {
             if (this.getId() === anim.args.player.player.id) {
-                const animState = this.getComponent(cc.Animation).play('turn_start');
+                const animState = this.getComponent(cc.Animation).playAdditive('turn_start');
+                animState.speed = (animState.duration * 1000) / anim.length;
+            }
+        });
+
+        createAnimationEvent('dice_down').sub(animEmitter, (anim) => {
+            if (this.getId() === anim.args.player.player.id) {
+                this.statusLabel.string = '' + anim.args.steps;
+                const animState = this.getComponent(cc.Animation).playAdditive('status_popup');
                 animState.speed = (animState.duration * 1000) / anim.length;
             }
         });

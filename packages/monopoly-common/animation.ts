@@ -8,6 +8,7 @@ export interface AnimationArgs {
     };
     dice_down: {
         steps: number;
+        player: GamePlayerInfo;
     };
     move: {
         player: GamePlayerInfo;
@@ -39,7 +40,7 @@ export const animationMap: Record<AnimationName, number> = {
     unspecified: 0,
     game_start: 1000,
     dice_roll: 1000,
-    dice_down: 300,
+    dice_down: 1000,
     move: 500, // per tile
     focus_land: 100,
     invested: 1000,

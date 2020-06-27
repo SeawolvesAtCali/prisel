@@ -87,7 +87,7 @@ function LogPanel({ messages }: LogPanelProps) {
         if (scrolledToBottom) {
             scrollToBottom();
         }
-    }, [messages]);
+    }, [messages, scrollToBottom, scrolledToBottom]);
     const handleScroll = React.useMemo(
         () =>
             debounce(() => {

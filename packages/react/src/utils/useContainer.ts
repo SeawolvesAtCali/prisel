@@ -7,7 +7,7 @@ export default function useContainer(className: string = '', display: boolean = 
             div.className = className;
         }
         return div;
-    }, []);
+    }, [className]);
 
     React.useEffect(() => {
         if (display) {
@@ -16,7 +16,7 @@ export default function useContainer(className: string = '', display: boolean = 
                 document.body.removeChild(container);
             };
         }
-    }, [display]);
+    }, [display, container]);
 
     return container;
 }

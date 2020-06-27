@@ -95,7 +95,7 @@ function Prompt({ onSubmit }: PromptProps) {
         if (inputRef.current) {
             inputRef.current.focus();
         }
-    }, [chips]);
+    }, [chips, onSubmit]);
     const handleSelect = React.useCallback(
         (suggestion: Suggestion) => {
             const newChips = chips.slice();

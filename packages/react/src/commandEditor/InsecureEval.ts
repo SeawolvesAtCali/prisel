@@ -17,6 +17,7 @@ function has(target: any, key: string) {
 export default function compile(src: string) {
     const sandboxedSrc = `with (sandbox) { return (${src});}`;
 
+    // eslint-disable-next-line no-new-func
     const code = new Function('sandbox', sandboxedSrc);
 
     return (context: Map<string, any>) => {

@@ -55,7 +55,7 @@ function useRun(client: Client | null, addToLogs: AddToLogs) {
                 },
             );
         },
-        [client],
+        [client, addToLogs],
     );
     return onRun;
 }
@@ -98,7 +98,7 @@ export function HostContainer({ username, displayBorder }: HostContainerProps) {
             // stop logging emit because emit will be log when command is executed.
             shouldLogEmit = false;
         })();
-    }, []);
+    }, [addToLogs, setRoomId, username]);
     const onRun = useRun(client, addToLogs);
 
     return (
@@ -140,7 +140,7 @@ export function GuestContainer({ username, roomId, displayBorder }: GuestContain
             // stop logging emit because emit will be log when command is executed.
             shouldLogEmit = false;
         })();
-    }, []);
+    }, [addToLogs, roomId, username]);
     const onRun = useRun(client, addToLogs);
 
     return (

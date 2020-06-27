@@ -69,7 +69,7 @@ function CommandEditor(props: CommandEditorProp) {
             return;
         }
         handleClose();
-    }, [json, tokens, title]);
+    }, [json, tokens, title, handleClose, onSave]);
 
     const handleTitleChange = React.useCallback((e) => {
         setTitle(e.target.value);

@@ -15,7 +15,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "test": "env CI=true react-scripts test --passWithNoTests",
+        "test": "env CI=true react-scripts test --passWithNoTests --reporters=jest-standard-reporter",
         "eject": "react-scripts eject"
     },
     "dependencies": {
@@ -35,7 +35,8 @@
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
         "react-scripts": "3.4.1",
-        "typescript": "^3.8.3"
+        "typescript": "^3.8.3",
+        "jest-standard-reporter": "^1.0.4"
     },
     "eslintConfig": {
         "extends": "react-app"

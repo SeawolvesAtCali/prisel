@@ -14,7 +14,7 @@
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "scripts": {
         "start": "react-scripts start",
-        "build": "react-scripts build",
+        "build": "react-scripts build 2>&1",
         "test": "env CI=true react-scripts test --passWithNoTests --reporters=jest-standard-reporter",
         "eject": "react-scripts eject"
     },

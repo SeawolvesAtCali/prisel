@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Coordinate, CoordinatePair, BoardSetup, Tile } from '@prisel/monopoly-common';
-import styles from './App.css';
+import { Coordinate, CoordinatePair, BoardSetup } from '@prisel/monopoly-common';
+import styles from './App.module.css';
 import { Mode, equal, download, useArrayRef } from './common';
 import { TileView, TileExport } from './Tile';
 import { Arrow } from './Arrow';
@@ -30,13 +30,17 @@ interface ExportInterface {
     export: () => BoardSetup;
 }
 
+function isNotNullRef<T>(nullableRef: { current: T | null }): nullableRef is { current: T } {
+    return nullableRef.current !== null;
+}
+
 export const BoardView = React.forwardRef<ExportInterface, BoardViewProps>((props, ref) => {
     const { mode, width, height } = props;
     const [drawing, setDrawing] = React.useState(false);
-    const pairRef = React.useRef<Coordinate>(null);
+    const pairRef = React.useRef<Coordinate | null>(null);
     const [paths, setPaths] = React.useState<CoordinatePair[]>([]);
     const tileRefs = useArrayRef<TileExport>(height * width);
-    const boardRef = React.useRef();
+    const boardRef = React.useRef<HTMLDivElement | null>(null);
 
     const handleMouseDown = React.useCallback(() => {
         setDrawing(true);
@@ -103,14 +107,16 @@ export const BoardView = React.forwardRef<ExportInterface, BoardViewProps>((prop
             return {
                 export: () =>
                     toBoardSetup(
-                        tileRefs.current.filter(Boolean).map((tileRef) => tileRef.current.export()),
+                        tileRefs.current
+                            .filter(isNotNullRef)
+                            .map((tileRef) => tileRef.current.export()),
                         width,
                         height,
                         paths,
                     ),
             };
         },
-        [paths, width, height],
+        [paths, width, height, tileRefs],
     );
 
     return (
@@ -159,7 +165,7 @@ export const BoardView = React.forwardRef<ExportInterface, BoardViewProps>((prop
 
 export const Container: React.FC = () => {
     const [mode, setMode] = React.useState(Mode.ROAD);
-    const boardRef = React.useRef<ExportInterface>();
+    const boardRef = React.useRef<ExportInterface | null>(null);
     const [width, setWidth] = React.useState(10);
     const [height, setHeight] = React.useState(10);
     return (
@@ -204,7 +210,9 @@ export const Container: React.FC = () => {
                 ))}
                 <button
                     onClick={() => {
-                        download('map-export.json', JSON.stringify(boardRef.current.export()));
+                        if (isNotNullRef(boardRef)) {
+                            download('map-export.json', JSON.stringify(boardRef.current.export()));
+                        }
                     }}
                 >
                     Export

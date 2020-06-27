@@ -11,17 +11,6 @@ export const phases = {
  * @typedef {import('@prisel/client').PlayerInfo} PlayerInfo
  */
 
-const initialRoomState = {
-    /** @type {string | undefined} */
-    id: undefined,
-    /** @type {string | undefined} */
-    name: undefined,
-    /** @type {string | undefined} */
-    host: undefined,
-    /** @type {PlayerInfo[]} */
-    players: [],
-};
-
 export function useConnected(initial = false) {
     const connectedRef = useRef(initial);
     return [connectedRef.current, (newConnected) => (connectedRef.current = newConnected)];
@@ -120,14 +109,14 @@ export function useGameState(client, onEnd) {
                 setWinner(newState.winner);
             }
         });
-    }, []);
+    }, [client]);
 
     useEffect(() => {
         return client.on('GAME_OVER', (packet) => {
             setGameState(initialGameState);
             endRef.current(winner);
         });
-    }, [winner]);
+    }, [winner, client]);
 
     return { gameState, handleMove };
 }
@@ -155,7 +144,7 @@ async function clientSetup(client) {
 export function useClient(url, connectedRef) {
     const client = useMemo(() => {
         return new Client(url);
-    }, []);
+    }, [url]);
     useEffect(() => {
         clientSetup(client).then(() => {
             connectedRef.current = true;
@@ -167,7 +156,7 @@ export function useClient(url, connectedRef) {
                 connectedRef.current = false;
             }
         };
-    }, [client]);
+    }, [client, connectedRef]);
     async function login(username) {
         if (!connectedRef.current) {
             return;
@@ -175,7 +164,7 @@ export function useClient(url, connectedRef) {
         /** @type {ResponseWrapper<LoginResponsePayload>} */
         const loginInfo = await client.request(Messages.getLogin(client.newId(), username));
         if (connectedRef.current) {
-            return { id: loginInfo.payload.userId, name };
+            return { id: loginInfo.payload.userId, name: username };
         }
         throw new Error('disconnected while trying to login');
     }

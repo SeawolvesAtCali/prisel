@@ -1,40 +1,22 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Client, Messages, PacketType, Code } from '@prisel/client';
+import React, { useState, useRef, useEffect } from 'react';
+import { Messages } from '@prisel/client';
 import Context from './context';
 import Login from './Login';
 import Lobby from './Lobby';
 import Room from './Room';
 import Game from './Game';
-import {
-    getInitialRoomState,
-    onRoomStateChange,
-    phases,
-    useConnected,
-    useRoomState,
-    useUserInfo,
-    useClient,
-    useGameState,
-} from './state';
+import { phases, useRoomState, useUserInfo, useClient, useGameState } from './state';
 
 function App() {
     const [phase, setPhase] = useState(phases.LOGIN);
     const connectedRef = useRef(false);
-    const {
-        roomId,
-        roomName,
-        players,
-        host,
-        onJoin,
-        onRoomStateChange,
-        onLeave,
-        onCreateRoom,
-    } = useRoomState();
-    const { id, name, setUserInfo } = useUserInfo();
+    const { roomId, roomName, players, host, onJoin, onRoomStateChange, onLeave } = useRoomState();
+    const { id, setUserInfo } = useUserInfo();
 
     const { client, login } = useClient(process.env.SERVER, connectedRef);
     useEffect(() => {
         return client.onRoomStateChange(onRoomStateChange);
-    }, [client]);
+    }, [client, onRoomStateChange]);
     useEffect(() => {
         return client.onGameStart(() => {
             setPhase(phases.GAME);
@@ -99,6 +81,8 @@ function App() {
                 return <Room onStart={handleStart} onLeave={handleLeave} />;
             case phases.GAME:
                 return <Game onMove={handleMove} />;
+            default:
+                return null;
         }
     })();
     return <Context.Provider value={context}>{Phase}</Context.Provider>;

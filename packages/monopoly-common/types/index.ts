@@ -1,5 +1,7 @@
 export * from './animation';
 export * from './boardSetup';
+export * from './chance';
+export * from './collectable';
 export * from './coordinate';
 export * from './coordinatePair';
 export * from './gamePlayerInfo';

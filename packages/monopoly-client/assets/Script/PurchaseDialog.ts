@@ -1,11 +1,5 @@
 import { EVENT_BUS, EVENT } from './consts';
-import {
-    Encounter,
-    PropertyForPurchaseEncounter,
-    PromptPurchasePayload,
-} from '@prisel/monopoly-common';
-import Dialog from './Dialog';
-import { nullCheck } from './utils';
+import { PromptPurchasePayload } from '@prisel/monopoly-common';
 import { createDialog, DialogPosition } from './components/DialogUtil';
 import { NodeConfig } from './components/NodeConfig';
 import { WidgetConfig } from './components/WidgetConfig';

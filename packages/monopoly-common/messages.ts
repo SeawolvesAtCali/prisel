@@ -1,12 +1,4 @@
-import {
-    Coordinate,
-    PropertyInfo,
-    GamePlayerInfo,
-    Encounter,
-    Payment,
-    Rank,
-    Animation,
-} from './types';
+import { Coordinate, PropertyInfo, GamePlayerInfo, Payment, Rank, Animation } from './types';
 
 export enum Action {
     UNSPECIFIED = '',
@@ -21,6 +13,7 @@ export enum Action {
 
     // packet from server
     // include encounters of current player after moved.
+    // deprecated
     ENCOUNTER = 'encounter',
 
     // request/response
@@ -90,13 +83,6 @@ export interface PromptPurchaseResponsePayload {
 export interface RollResponsePayload {
     steps: number;
     path: Coordinate[]; // not including the current position
-    encounters?: Encounter[];
-}
-
-export interface EncounterPayload {
-    playerId: string;
-    encounters: Encounter[];
-    myMoney: number;
 }
 
 export interface PurchasePayload {
@@ -126,7 +112,6 @@ export interface PlayerRollPayload {
     id: string;
     steps: number;
     path: Coordinate[];
-    encounters?: Encounter[];
     myMoney: number;
 }
 

@@ -1,9 +1,7 @@
 import { StateMachineState } from './StateMachineState';
 import { broadcast, PacketType, ResponseWrapper, debug } from '@prisel/server';
 import {
-    Encounter,
     Payment,
-    EncounterPayload,
     Action,
     PromptPurchasePayload,
     PromptPurchaseResponsePayload,
@@ -45,7 +43,6 @@ import { PreRoll } from './PreRoll';
  */
 export class Moved extends StateMachineState {
     public async onEnter() {
-        // find encounters on player's spot.
         const currentPlayer = this.game.getCurrentPlayer();
         const currentPathNode = currentPlayer.pathNode;
 

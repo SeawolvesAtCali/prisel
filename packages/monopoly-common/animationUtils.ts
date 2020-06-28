@@ -1,8 +1,9 @@
-import { AnimationType, Animation } from './types';
-import { AnimationName, AnimationArgs } from './animation';
+import { AnimationType, Animation } from './types/index';
+import { AnimationName, AnimationArgs } from './animationSpec';
 import { Packet, PacketType } from '@prisel/common';
 import { AnimationPayload, Action } from './messages';
 
+// Utilities for working with animations
 export class AnimationBuilder<ArgType = any> implements Animation {
     private _name: AnimationName = 'unspecified';
     private _length: number = 0;

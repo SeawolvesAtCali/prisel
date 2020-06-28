@@ -7,7 +7,7 @@ import {
     Messages,
     LobbyRoomViewInfo,
     JoinPayload,
-} from './packages/priselClient';
+} from '@prisel/client';
 
 const { ccclass, property } = cc._decorator;
 

@@ -1,1 +1,1 @@
-Resource direction, to be ignore
+Resource directory, to be ignore

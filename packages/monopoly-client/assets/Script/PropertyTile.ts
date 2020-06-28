@@ -1,5 +1,5 @@
 import Player from './Player';
-import { PropertyInfo } from './packages/monopolyCommon';
+import { PropertyInfo } from '@prisel/monopoly-common';
 import { nullCheck } from './utils';
 import Tile from './Tile';
 import { LANDING_POS_OFFSET } from './consts';

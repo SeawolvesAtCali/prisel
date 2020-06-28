@@ -1,4 +1,4 @@
-import { Client } from './packages/priselClient';
+import { Client } from '@prisel/client';
 import { getConfig } from './config';
 
 const websocketHost = getConfig<string>('host', 'ws://localhost:3000');

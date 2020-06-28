@@ -1,4 +1,4 @@
-import { Tile, Coordinate } from './packages/monopolyCommon';
+import { Tile, Coordinate } from '@prisel/monopoly-common';
 import { EVENT_BUS } from './consts';
 import Game from './Game';
 

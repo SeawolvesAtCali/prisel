@@ -7,7 +7,7 @@ import {
     LobbyStateResponsePayload,
     CreateRoomPayload,
     CreateRoomResponsePayload,
-} from './packages/priselClient';
+} from '@prisel/client';
 import { nullCheck } from './utils';
 import RoomView from './RoomView';
 import Dialog from './Dialog';

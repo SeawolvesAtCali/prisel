@@ -96,6 +96,7 @@ export class PreRoll extends StateMachineState {
                             }).setLength(animationMap.dice_roll),
                             Anim.create('dice_down', {
                                 steps,
+                                player: gamePlayer.getGamePlayerInfo(),
                             }).setLength(animationMap.dice_down),
                             Anim.create('move', {
                                 player: gamePlayer.getGamePlayerInfo(),

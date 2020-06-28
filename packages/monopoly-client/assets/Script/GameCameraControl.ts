@@ -1,6 +1,6 @@
 import { toVec2, lifecycle } from './utils';
 import { AUTO_PANNING_PX_PER_SECOND, CAMERA_FOLLOW_OFFSET, LANDING_POS_OFFSET } from './consts';
-import { Anim, samePos, Coordinate } from './packages/monopolyCommon';
+import { Anim, samePos, Coordinate } from '@prisel/monopoly-common';
 import { createAnimationEvent, animEmitter } from './animations';
 
 import Game from './Game';

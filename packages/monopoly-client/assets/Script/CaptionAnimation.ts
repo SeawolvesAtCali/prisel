@@ -25,8 +25,5 @@ export default class CaptionAnimation extends cc.Component {
             this.node.active = true;
             this.animate('START!', anim.length);
         });
-        createAnimationEvent('dice_down').sub(animEmitter, (anim) => {
-            this.animate('' + anim.args.steps, anim.length);
-        });
     }
 }

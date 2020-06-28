@@ -1,4 +1,4 @@
-import { Tile as TileData } from './packages/monopolyCommon';
+import { Tile as TileData } from '@prisel/monopoly-common';
 import { TILE_SIZE, LANDING_POS_OFFSET } from './consts';
 
 const { ccclass, property } = cc._decorator;

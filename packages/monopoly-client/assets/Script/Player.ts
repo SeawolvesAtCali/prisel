@@ -1,9 +1,9 @@
-import { PlayerInfo } from './packages/priselClient';
+import { PlayerInfo } from '@prisel/client';
 
 const { ccclass, property } = cc._decorator;
 import { SpriteFrameEntry } from './SpriteFrameEntry';
 import { EVENT_BUS, FLIP_THRESHHOLD } from './consts';
-import { Coordinate } from './packages/monopolyCommon';
+import { Coordinate } from '@prisel/monopoly-common';
 import { lifecycle, nullCheck } from './utils';
 import MapLoader from './MapLoader';
 import { createAnimationEvent, animEmitter } from './animations';

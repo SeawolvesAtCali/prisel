@@ -14,7 +14,7 @@
         "test": "echo no test",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix",
-        "build": "rollup --config --silent"
+        "build": "echo we should copy map from monopoly-common"
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"
@@ -23,19 +23,5 @@
         "@prisel/client": "^0.1.3",
         "@prisel/monopoly-common": "^0.0.0",
         "events": "3.1.0"
-    },
-    "devDependencies": {
-        "rollup": "^2.7.6",
-        "@rollup/plugin-commonjs": "^11.1.0",
-        "rollup-plugin-copy": "^3.3.0",
-        "rollup-plugin-dts": "^1.4.0",
-        "@rollup/plugin-node-resolve": "^7.1.3",
-        "rollup-plugin-typescript2": "^0.27.0",
-        "jest": "^26.0.1",
-        "@types/jest": "^24.9.1",
-        "@prisel/jest-preset": "0.0.0"
-    },
-    "jest": {
-        "preset": "@prisel/jest-preset"
     }
 }

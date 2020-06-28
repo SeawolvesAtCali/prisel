@@ -15,16 +15,9 @@ import {
     PlayerBankruptPayload,
     GameOverPayload,
     PlayerLeftPayload,
-} from './packages/monopolyCommon';
+} from '@prisel/monopoly-common';
 import { client, ClientState } from './Client';
-import {
-    Client,
-    Packet,
-    PacketType,
-    ResponseWrapper,
-    Request,
-    Messages,
-} from './packages/priselClient';
+import { Client, Packet, PacketType, ResponseWrapper, Request, Messages } from '@prisel/client';
 import Player from './Player';
 import {
     CHARACTER_COLORS,

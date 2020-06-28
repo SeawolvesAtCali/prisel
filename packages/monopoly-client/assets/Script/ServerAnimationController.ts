@@ -1,13 +1,7 @@
 import { ClientState, client } from './Client';
-import { Client, Packet } from './packages/priselClient';
+import { Client, Packet } from '@prisel/client';
 import { nullCheck, lifecycle, assertNever } from './utils';
-import {
-    Action,
-    AnimationPayload,
-    Animation,
-    AnimationType,
-    Anim,
-} from './packages/monopolyCommon';
+import { Action, AnimationPayload, Animation, AnimationType, Anim } from '@prisel/monopoly-common';
 import { EVENT_BUS, EVENT } from './consts';
 import { animEmitter } from './animations';
 

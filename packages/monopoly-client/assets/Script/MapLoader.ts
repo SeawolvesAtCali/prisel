@@ -6,7 +6,7 @@ import {
     Tile,
     StartTile,
     Coordinate,
-} from './packages/monopolyCommon';
+} from '@prisel/monopoly-common';
 
 import { default as TileComponent } from './Tile';
 import {

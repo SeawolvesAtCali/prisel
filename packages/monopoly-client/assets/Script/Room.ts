@@ -5,7 +5,7 @@ import {
     RoomStateResponsePayload,
     ResponseWrapper,
     RoomChangePayload,
-} from './packages/priselClient';
+} from '@prisel/client';
 import PlayerInfo from './PlayerInfo';
 
 const { ccclass, property } = cc._decorator;

@@ -3,7 +3,7 @@ import {
     Encounter,
     PropertyForPurchaseEncounter,
     PromptPurchasePayload,
-} from './packages/monopolyCommon';
+} from '@prisel/monopoly-common';
 import Dialog from './Dialog';
 import { nullCheck } from './utils';
 import { createDialog, DialogPosition } from './components/DialogUtil';

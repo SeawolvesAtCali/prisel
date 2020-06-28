@@ -1,6 +1,6 @@
 import { nullCheck } from './utils';
 import { EVENT_BUS, EVENT } from './consts';
-import { Rank } from './packages/monopolyCommon';
+import { Rank } from '@prisel/monopoly-common';
 import RankView from './RankView';
 import { WidgetConfig } from './components/WidgetConfig';
 import { SpriteConfig } from './components/SpriteConfig';

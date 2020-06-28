@@ -1,5 +1,5 @@
 import { EVENT_BUS, EVENT } from './consts';
-import { PromptPurchasePayload } from './packages/monopolyCommon';
+import { PromptPurchasePayload } from '@prisel/monopoly-common';
 import MapLoader from './MapLoader';
 
 const { ccclass, property } = cc._decorator;

@@ -7,7 +7,7 @@ import {
     RoomChangePayload,
     CreateRoomPayload,
     CreateRoomResponsePayload,
-} from './packages/priselClient';
+} from '@prisel/client';
 import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;

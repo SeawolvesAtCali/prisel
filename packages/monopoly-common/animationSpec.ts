@@ -1,5 +1,10 @@
 import { Coordinate, PropertyInfo, GamePlayerInfo } from './types';
 
+export enum EmotionType {
+    UNSPECIFIED,
+    CHEER,
+    ANGRY,
+}
 // Define types of animations
 
 export interface AnimationArgs {
@@ -42,6 +47,11 @@ export interface AnimationArgs {
         payer: GamePlayerInfo;
         receiver: GamePlayerInfo;
     };
+    // a general purpose animation to play to show player's emotion
+    player_emotion: {
+        player: GamePlayerInfo;
+        emotion: EmotionType;
+    };
 }
 
 export type AnimationName = keyof AnimationArgs;
@@ -58,4 +68,5 @@ export const animationMap: Record<AnimationName, number> = {
     pan: 100, // per tile
     turn_start: 200,
     pay_rent: 1000,
+    player_emotion: 1000,
 };

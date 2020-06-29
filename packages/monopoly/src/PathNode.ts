@@ -50,20 +50,43 @@ export default class PathNode extends GameObject {
         this.properties.push(property);
     }
 
-    public genPath(steps: number) {
+    /**
+     * generate path not including current node using genNextPathNode funtion.If
+     * the function return undefined, generation is stopped.
+     */
+    public genPathWith(
+        getNextPathNode: (currentPathNode: PathNode, length: number) => PathNode | void,
+    ): PathNode[] {
         const path: PathNode[] = [];
         let current: PathNode = this;
-        for (let i = 0; i < steps; i++) {
-            if (current.next.length > 0) {
-                // Choose a random next
-                current = getRand(current.next);
-                path.push(current);
+        while (true) {
+            const next = getNextPathNode(current, path.length);
+            if (next) {
+                path.push(next);
+                current = next;
             } else {
-                // the board is incorrectly defined because we cannot find the next node
                 break;
             }
         }
         return path;
+    }
+
+    public genPath(steps: number) {
+        return this.genPathWith((current, length) =>
+            length === steps
+                ? undefined
+                : // Choose a random next
+                  getRand(current.next),
+        );
+    }
+
+    public genPathReverse(steps: number) {
+        return this.genPathWith((current, length) =>
+            length === steps
+                ? undefined
+                : // Choose a random next
+                  getRand(current.prev),
+        );
     }
 
     public flat(): FlatPathNode {

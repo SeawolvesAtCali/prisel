@@ -4,6 +4,7 @@ import { GamePlayer } from '../GamePlayer';
 import { StateMachine } from './StateMachine';
 import { AnimationPayload } from '@prisel/monopoly-common';
 
+export type StateMachineConstructor = new (game: Game, machine: StateMachine) => StateMachineState;
 export abstract class StateMachineState {
     protected game: Game;
     private machine: StateMachine;
@@ -28,7 +29,7 @@ export abstract class StateMachineState {
     // implement this for state name
     public abstract get [Symbol.toStringTag](): string;
 
-    protected transition(state: new (game: Game, machine: StateMachine) => StateMachineState) {
+    protected transition(state: StateMachineConstructor) {
         if (this.isCurrentState()) {
             this.machine.transition(state);
         }

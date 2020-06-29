@@ -11,6 +11,8 @@ import {
     Tile,
     Coordinate,
     isPropertyTile,
+    Chance,
+    ChanceInput,
 } from '@prisel/monopoly-common';
 import PathNode, { create as createPathNode } from './PathNode';
 import Property, { create as createProperty } from './Property';
@@ -75,6 +77,7 @@ function processBoardSetup(boardSetup: BoardSetup): [PathNode[], Property[]] {
 
     return [startPathNodes, Array.from(propertyMap.values())];
 }
+
 export async function createIntialState(room: Room): Promise<Game> {
     const rawBoardSetup = await fs.promises.readFile(MAP_PATH);
     if (!rawBoardSetup) {

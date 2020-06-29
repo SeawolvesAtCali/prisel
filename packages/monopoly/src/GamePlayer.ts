@@ -67,8 +67,15 @@ export class GamePlayer extends GameObject {
     public rollAndMove(): Coordinate[] {
         const path = roll(this.pathNode);
         this.rolled = true;
-        this.pathNode = path[path.length - 1];
-        return path.map((pathNode) => pathNode.tile.pos);
+        return this.move(path);
+    }
+
+    public move(path: PathNode[]) {
+        if (path.length > 0) {
+            this.pathNode = path[path.length - 1];
+            return path.map((pathNode) => pathNode.tile.pos);
+        }
+        return [];
     }
 
     public purchaseProperty(property: Property, nextLevelPropertyInfo: PropertyInfo) {

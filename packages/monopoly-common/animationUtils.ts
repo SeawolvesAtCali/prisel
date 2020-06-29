@@ -99,6 +99,22 @@ interface CreateAnimation {
         arg: AnimationArgs[_AnimationName],
     ): AnimationBuilder<AnimationArgs[_AnimationName]>;
     [x: string]: any;
+    all(...animations: Animation[]): Animation;
+    race(...animations: Animation[]): Animation;
+    sequence(...animations: Animation[]): Animation;
+    processAndWait(
+        processor: (packet: Packet<AnimationPayload>) => void,
+        animation: Animation,
+    ): {
+        promise: Promise<void>;
+        cancel: () => void;
+    };
+    wait(
+        animation: Animation,
+    ): {
+        promise: Promise<void>;
+        cancel: () => void;
+    };
 }
 
 export const Anim: CreateAnimation = {
@@ -109,26 +125,21 @@ export const Anim: CreateAnimation = {
         }
         return builder;
     },
-    all(...animations: Animation[]): Animation {
+    all(...animations) {
         return new AnimationBuilder(AnimationType.ALL).addChildren(...animations).build();
     },
-    race(...animations: Animation[]): Animation {
+    race(...animations) {
         return new AnimationBuilder(AnimationType.RACE).addChildren(...animations).build();
     },
-    sequence(...animations: Animation[]): Animation {
+    sequence(...animations) {
         return new AnimationBuilder(AnimationType.SEQUENCE).addChildren(...animations).build();
     },
-    processAndWait(processor: (packet: Packet<AnimationPayload>) => void, animation: Animation) {
+    processAndWait(processor, animation) {
         const packet = toAnimationPacket(animation);
         processor(packet);
         return Anim.wait(animation);
     },
-    wait(
-        animation: Animation,
-    ): {
-        promise: Promise<void>;
-        cancel: () => void;
-    } {
+    wait(animation) {
         const waitTime = computeAnimationLength(animation);
         if (waitTime === Infinity) {
             throw new Error('cannot wait for infinite animation');

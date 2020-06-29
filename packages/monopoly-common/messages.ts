@@ -1,4 +1,12 @@
-import { Coordinate, PropertyInfo, GamePlayerInfo, Payment, Rank, Animation } from './types';
+import {
+    Coordinate,
+    PropertyInfo,
+    GamePlayerInfo,
+    Payment,
+    Rank,
+    Animation,
+    Chance,
+} from './types';
 
 export enum Action {
     UNSPECIFIED = '',
@@ -65,6 +73,7 @@ export enum Action {
     ANNOUNCE_BANKRUPT = 'announce_bankrupt',
     ANNOUNCE_GAME_OVER = 'announce_game_over',
     ANNOUNCE_PLAYER_LEFT = 'announce_player_left',
+    ANNOUNCE_CHANCE = 'announce_chance',
     ANIMATION = 'animation', // server request client play an animation
 }
 
@@ -136,6 +145,11 @@ export interface GameOverPayload {
 
 export interface AnimationPayload {
     animation: Animation;
+}
+
+export interface PlayerReceiveChancePayload {
+    id: string;
+    chance: Chance<any>;
 }
 
 // Server Client

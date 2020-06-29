@@ -14,11 +14,15 @@ import {
     animationMap,
     AnimationPayload,
     toAnimationPacket,
+    PropertyTile,
 } from '@prisel/monopoly-common';
 import { GameOver } from './GameOver';
 import { GamePlayer } from '../GamePlayer';
 import Property from '../Property';
 import { PreRoll } from './PreRoll';
+import { chanceList } from '../changeList';
+import { getRand } from '../utils';
+import { chanceHandlers } from '../chanceHandlers';
 
 /**
  * This state starts after the current player moves to the destination after
@@ -47,48 +51,35 @@ export class Moved extends StateMachineState {
         const currentPathNode = currentPlayer.pathNode;
 
         const { properties } = currentPathNode;
-        const rentPayments: Payment[] = [];
 
-        // check for rent payment first
-        for (const property of properties) {
-            if (property.owner && property.owner.id !== currentPlayer.id) {
-                rentPayments.push(
-                    currentPlayer.payRent(property.owner, property.getPropertyInfoForRent()),
-                );
-            }
-        }
-
-        if (rentPayments.length > 0) {
-            this.announcePayRent(rentPayments);
-            await Anim.processAndWait(
-                this.broadcastAnimation,
-                Anim.create('pay_rent', {
-                    // TODO: here we assume we are paying one player only
-                    payer: this.game.getGamePlayerById(rentPayments[0].from).getGamePlayerInfo(),
-                    receiver: this.game.getGamePlayerById(rentPayments[0].to).getGamePlayerInfo(),
-                })
-                    .setLength(animationMap.pay_rent)
-                    .build(),
-            ).promise;
-
+        const handlePayRentPromise = this.handlePayRents(properties, currentPlayer);
+        if (handlePayRentPromise) {
+            await handlePayRentPromise;
             if (!this.isCurrentState()) {
                 return;
             }
         }
 
-        if (currentPlayer.cash < 0) {
-            // player bankrupted.
-            this.announceBankrupt(currentPlayer);
-            this.transition(GameOver);
+        if (this.checkGameOver()) {
             return;
         }
 
-        if (properties.some((property) => property.investable(currentPlayer))) {
-            await this.promptForPurchases(properties);
+        const investPromise = this.handleInvest(properties, currentPlayer);
+        if (investPromise) {
+            await investPromise;
             if (!this.isCurrentState()) {
                 return;
             }
         }
+
+        // TODO remove these lines after testing chance.
+        // const shouldContinue = await this.handleChance();
+        // if (!this.isCurrentState()) {
+        //     return;
+        // }
+        // if (!shouldContinue) {
+        //     return;
+        // }
 
         broadcast<PlayerEndTurnPayload>(this.game.room.getPlayers(), {
             type: PacketType.DEFAULT,
@@ -121,6 +112,78 @@ export class Moved extends StateMachineState {
         }
         this.game.giveTurnToNext();
         this.transition(PreRoll);
+    }
+
+    private checkGameOver() {
+        for (const player of this.game.players.values()) {
+            if (player.cash < 0) {
+                // player bankrupted.
+                this.announceBankrupt(player);
+                this.transition(GameOver);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // return true if should continue current state
+    private async handleChance(): Promise<boolean> {
+        // randomly select a chance
+        const chanceInput = getRand(chanceList);
+        const maybeState = await chanceHandlers[chanceInput.type](this.game, chanceInput);
+        if (!this.isCurrentState()) {
+            return false;
+        }
+        // check game over
+        if (this.checkGameOver()) {
+            return false;
+        }
+        if (maybeState) {
+            this.transition(maybeState);
+            return false;
+        }
+        return true;
+    }
+
+    private handlePayRents(
+        properties: Property[],
+        currentPlayer: GamePlayer,
+    ): Promise<void> | void {
+        const rentPayments: Payment[] = [];
+
+        // check for rent payment first
+        for (const property of properties) {
+            if (property.owner && property.owner.id !== currentPlayer.id) {
+                rentPayments.push(
+                    currentPlayer.payRent(property.owner, property.getPropertyInfoForRent()),
+                );
+            }
+        }
+
+        if (rentPayments.length <= 0) {
+            return;
+        }
+        this.announcePayRent(rentPayments);
+        return Anim.processAndWait(
+            this.broadcastAnimation,
+            Anim.create('pay_rent', {
+                // TODO: here we assume we are paying one player only
+                payer: this.game.getGamePlayerById(rentPayments[0].from).getGamePlayerInfo(),
+                receiver: this.game.getGamePlayerById(rentPayments[0].to).getGamePlayerInfo(),
+            })
+                .setLength(animationMap.pay_rent)
+                .build(),
+        ).promise;
+    }
+
+    private handleInvest(
+        properties: Property[],
+        currentPlayer: GamePlayer,
+    ): Promise<void> | undefined {
+        if (!properties.some((property) => property.investable(currentPlayer))) {
+            return;
+        }
+        return this.promptForPurchases(properties);
     }
 
     private announceBankrupt(player: GamePlayer) {

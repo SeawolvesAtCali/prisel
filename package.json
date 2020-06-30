@@ -15,13 +15,13 @@
     "author": "",
     "scripts": {
         "automation": "rush automation --verbose",
-        "postinstall": "rush install",
-        "build": "rush rebuild",
-        "build:tic-tac-toe": "rush build --to @prisel/tic-tac-toe-client",
+        "install": "node common/scripts/install-run-rush.js install",
+        "build": "node common/scripts/install-run-rush.js rebuild --verbose",
+        "build:tic-tac-toe": "node common/scripts/install-run-rush.js build --to @prisel/tic-tac-toe-client",
         "clean": "rm -rf node_modules && rush clean",
         "deploy:server": "cd packages/tic-tac-toe && rushx start",
-        "fix": "rush fix",
-        "lint": "rush lint",
+        "fix": "node common/scripts/install-run-rush.js fix",
+        "lint": "node common/scripts/install-run-rush.js lint",
         "prepublishOnly": "npm ci && npm run build && npm run lint",
         "publish": "echo no implemented",
         "start:debugger": "cd packages/react && rushx start",
@@ -30,7 +30,7 @@
         "start:server": "cd packages/server && rushx start",
         "start:tic-tac-toe-client": "cd packages/tic-tac-toe-client && rushx start",
         "start:tic-tac-toe-server": "cd packages/tic-tac-toe && rushx start",
-        "test": "rush test --verbose"
+        "test": "node common/scripts/install-run-rush.js test --verbose"
     },
     "prettier": {
         "arrowParens": "always",
@@ -78,9 +78,5 @@
                 }
             ]
         }
-    },
-    "dependencies": {},
-    "devDependencies": {
-        "@microsoft/rush": "^5.24.3"
     }
 }

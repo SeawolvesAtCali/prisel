@@ -1,0 +1,14 @@
+{
+    "name": "@prisel/configs",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": ""
+    },
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "prettier": "2.0.5"
+    }
+}

@@ -1,5 +1,5 @@
+import { EVENT, EVENT_BUS } from './consts';
 import { playAnimation } from './utils';
-import { EVENT_BUS, EVENT } from './consts';
 
 const { ccclass, property } = cc._decorator;
 

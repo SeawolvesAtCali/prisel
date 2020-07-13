@@ -1,11 +1,9 @@
-import { toVec2, lifecycle } from './utils';
+import { Anim, Coordinate } from '@prisel/monopoly-common';
+import { animEmitter, createAnimationEvent } from './animations';
 import { AUTO_PANNING_PX_PER_SECOND, CAMERA_FOLLOW_OFFSET, LANDING_POS_OFFSET } from './consts';
-import { Anim, samePos, Coordinate } from '@prisel/monopoly-common';
-import { createAnimationEvent, animEmitter } from './animations';
-
 import Game from './Game';
-import Player from './Player';
 import MapLoader from './MapLoader';
+import { lifecycle, toVec2 } from './utils';
 
 const { ccclass, property } = cc._decorator;
 

@@ -1,4 +1,4 @@
-import { nullCheck } from './utils';
+import { existOrThrow } from '@prisel/monopoly-common';
 
 const { ccclass, property } = cc._decorator;
 
@@ -15,6 +15,6 @@ export default class PlayerInfo extends cc.Component {
     }
 
     public start() {
-        nullCheck(this.nameLabel);
+        existOrThrow(this.nameLabel, 'nameLabel is missing');
     }
 }

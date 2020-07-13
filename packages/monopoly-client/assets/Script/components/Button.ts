@@ -1,9 +1,9 @@
-import { WidgetConfig } from './WidgetConfig';
-import { NodeConfig } from './NodeConfig';
-import { ButtonConfig } from './ButtonConfig';
-import { SpriteConfig } from './SpriteConfig';
-import { LabelConfig, LabelTheme, themeToColor } from './LabelConfig';
 import { nullCheck } from '../utils';
+import { ButtonConfig } from './ButtonConfig';
+import { LabelConfig, LabelTheme, themeToColor } from './LabelConfig';
+import { NodeConfig } from './NodeConfig';
+import { SpriteConfig } from './SpriteConfig';
+import { WidgetConfig } from './WidgetConfig';
 
 interface ButtonProps {
     name?: string;

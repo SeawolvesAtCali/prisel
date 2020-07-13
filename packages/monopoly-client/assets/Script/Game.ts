@@ -1,36 +1,29 @@
-import MapLoader from './MapLoader';
+import { Client, Messages, Packet, PacketType, Request, ResponseWrapper } from '@prisel/client';
 import {
-    BoardSetup,
     Action,
-    InitialStatePayload,
+    BoardSetup,
+    GameOverPayload,
     GamePlayerInfo,
-    PlayerStartTurnPayload,
-    PlayerRollPayload,
-    PlayerPurchasePayload,
+    InitialStatePayload,
+    PathNode,
+    PlayerBankruptPayload,
     PlayerEndTurnPayload,
-    RollResponsePayload,
+    PlayerLeftPayload,
     PlayerPayRentPayload,
+    PlayerPurchasePayload,
+    PlayerRollPayload,
+    PlayerStartTurnPayload,
     PromptPurchasePayload,
     PromptPurchaseResponsePayload,
-    PlayerBankruptPayload,
-    GameOverPayload,
-    PlayerLeftPayload,
+    Property,
+    RollResponsePayload,
+    World,
 } from '@prisel/monopoly-common';
 import { client, ClientState } from './Client';
-import { Client, Packet, PacketType, ResponseWrapper, Request, Messages } from '@prisel/client';
+import { CHARACTER_COLORS, EVENT, EVENT_BUS } from './consts';
+import MapLoader from './MapLoader';
 import Player from './Player';
-import {
-    CHARACTER_COLORS,
-    FLIP_THRESHHOLD,
-    EVENT_BUS,
-    EVENT,
-    GAME_CAMERA,
-    CAMERA_FOLLOW_OFFSET,
-} from './consts';
-import GameCameraControl from './GameCameraControl';
-import { nullCheck, lifecycle } from './utils';
-import { Chainable } from './Chainable';
-import PropertyTile from './PropertyTile';
+import { lifecycle, nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
@@ -51,6 +44,8 @@ export default class Game extends cc.Component {
     private offPacketListeners: Array<() => void> = [];
     private map: MapLoader = null;
     private playerNodes: cc.Node[] = [];
+
+    public world: World = null;
 
     private eventBus: cc.Node = null;
 
@@ -79,8 +74,12 @@ export default class Game extends cc.Component {
     }
 
     private async setupGame(boardSetup: BoardSetup) {
+        this.world = new World()
+            .registerObject(PathNode)
+            .registerObject(Property)
+            .deserialize(boardSetup.world);
         this.map = this.mapNode.getComponent(MapLoader);
-        this.map.renderMap(boardSetup);
+        this.map.renderMap(this.world, boardSetup);
 
         this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_START_TURN, this.handleAnnounceStartTurn.bind(this)),

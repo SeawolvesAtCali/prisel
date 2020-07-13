@@ -1,12 +1,12 @@
 import { PlayerInfo } from '@prisel/client';
+import { Coordinate } from '@prisel/monopoly-common';
+import { animEmitter, createAnimationEvent } from './animations';
+import { EVENT_BUS, FLIP_THRESHHOLD } from './consts';
+import MapLoader from './MapLoader';
+import { SpriteFrameEntry } from './SpriteFrameEntry';
+import { lifecycle, nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
-import { SpriteFrameEntry } from './SpriteFrameEntry';
-import { EVENT_BUS, FLIP_THRESHHOLD } from './consts';
-import { Coordinate } from '@prisel/monopoly-common';
-import { lifecycle, nullCheck } from './utils';
-import MapLoader from './MapLoader';
-import { createAnimationEvent, animEmitter } from './animations';
 
 @ccclass
 export default class Player extends cc.Component {

@@ -1,6 +1,6 @@
-import { EventEmitter } from 'events';
 import { createEvent } from '@prisel/client';
-import { AnimationArgs, AnimationName, Animation } from '@prisel/monopoly-common';
+import { Animation, AnimationArgs, AnimationName } from '@prisel/monopoly-common';
+import { EventEmitter } from 'events';
 
 export function createAnimationEvent<K extends AnimationName>(animationName: K) {
     return createEvent<Animation<AnimationArgs[K]>>(animationName);

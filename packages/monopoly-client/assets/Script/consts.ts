@@ -15,6 +15,10 @@ export const CHARACTER_COLORS = {
     4: 'yellow',
 };
 
+export const TILE_Z_INDEX_OFFSET = 0;
+export const PROPERTY_Z_INDEX_OFFSET = 1;
+export const PLAYER_Z_INDEX_OFFSET = 5;
+
 export const CHARACTER_AVATAR_SPRITE_NAME = {
     0: 'alienGreen_badge1',
     1: 'alienBlue_badge1',

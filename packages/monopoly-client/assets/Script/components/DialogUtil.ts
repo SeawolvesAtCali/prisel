@@ -1,11 +1,11 @@
-import { NodeConfig, NodeConfigExport } from './NodeConfig';
-import { createDropShadow } from './DropShadow';
-import { SpriteConfig } from './SpriteConfig';
-import { LayoutConfig } from './LayoutConfig';
-import { WidgetConfig } from './WidgetConfig';
-import { LabelConfig, themeToColor, LabelTheme } from './LabelConfig';
 import { createButton } from './Button';
 import { ButtonConfig } from './ButtonConfig';
+import { createDropShadow } from './DropShadow';
+import { LabelConfig, LabelTheme, themeToColor } from './LabelConfig';
+import { LayoutConfig } from './LayoutConfig';
+import { NodeConfig, NodeConfigExport } from './NodeConfig';
+import { SpriteConfig } from './SpriteConfig';
+import { WidgetConfig } from './WidgetConfig';
 
 export enum DialogPosition {
     CENTER,

@@ -1,6 +1,5 @@
-import { Tile, Coordinate } from '@prisel/monopoly-common';
-import { EVENT_BUS } from './consts';
-import Game from './Game';
+import { Coordinate, Tile } from '@prisel/monopoly-common';
+import { TILE_SIZE } from './consts';
 
 export function getTileKey(tile: Tile): string {
     return getTileKeyFromCoordinate(tile.pos);
@@ -84,4 +83,8 @@ export function lifecycle(container, key, other1) {
 
 export function assertNever(x: never): never {
     throw new Error('Unexpected value ' + x);
+}
+
+export function getTileAnchorPos(coor: Coordinate) {
+    return new cc.Vec2(coor.col * TILE_SIZE, -(coor.row + 1) * TILE_SIZE);
 }

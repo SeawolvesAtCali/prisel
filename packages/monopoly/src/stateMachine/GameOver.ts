@@ -1,7 +1,7 @@
+import { Action, GameOverPayload, Property, Rank } from '@prisel/monopoly-common';
+import { broadcast, isRequest, Packet, PacketType } from '@prisel/server';
+import { GamePlayer } from '../gameObjects/GamePlayer';
 import { StateMachineState } from './StateMachineState';
-import { broadcast, PacketType, Packet, isRequest } from '@prisel/server';
-import { Rank, GameOverPayload, Action } from '@prisel/monopoly-common';
-import { GamePlayer } from '../GamePlayer';
 import { Sync, syncGamePlayer } from './utils';
 
 export class GameOver extends StateMachineState {
@@ -23,7 +23,7 @@ export class GameOver extends StateMachineState {
         for (const player of this.game.players.keys()) {
             playerPropertiesWorth.set(player, 0);
         }
-        for (const property of this.game.properties) {
+        for (const property of this.game.world.getAll(Property)) {
             if (property.owner && playerPropertiesWorth.has(property.owner.id)) {
                 playerPropertiesWorth.set(
                     property.owner.id,

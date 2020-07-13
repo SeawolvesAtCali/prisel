@@ -26,6 +26,7 @@ dependencies:
   '@types/prismjs': 1.16.1
   '@types/react': 16.9.38
   '@types/react-dom': 16.9.8
+  '@types/shortid': 0.0.29
   '@types/ws': 6.0.4
   debug: 4.1.1
   events: 3.1.0
@@ -48,6 +49,7 @@ dependencies:
   rollup-plugin-copy: 3.3.0
   rollup-plugin-dts: 1.4.7_rollup@2.12.0+typescript@3.9.3
   rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@3.9.3
+  shortid: 2.2.15
   ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
   ts-node: 8.10.2_typescript@3.9.3
   tslib: 2.0.0
@@ -3003,6 +3005,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-lD3LWdg6j8r0VRBFahJVaxoW0SIcswxKaFUrmKl33RJVeeoNYQAz4uqCJ5Z6v4oIBOsC5GozX+I5SorIKiTcQA==
+  /@types/shortid/0.0.29:
+    dev: false
+    resolution:
+      integrity: sha1-gJPuBBam4r8qpjOBCRFLP7/6Dps=
   /@types/stack-utils/1.0.1:
     dev: false
     resolution:
@@ -10502,6 +10508,10 @@ packages:
     optional: true
     resolution:
       integrity: sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
+  /nanoid/2.1.11:
+    dev: false
+    resolution:
+      integrity: sha512-s/snB+WGm6uwi0WjsZdaVcuf3KJXlfGl2LcxgwkEwJF0D/BWzVWAZW/XY4bFaiR7s0Jk3FPvlnepg1H1b1UwlA==
   /nanomatch/1.2.13:
     dependencies:
       arr-diff: 4.0.0
@@ -14314,6 +14324,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-vFwSUfQvqybiICwZY5+DAWIPLKsWO31Q91JSKl3UYv+K5c2QRPzn0qzec6QPu1Qc9eHYItiP3NdJqNVqetYAww==
+  /shortid/2.2.15:
+    dependencies:
+      nanoid: 2.1.11
+    dev: false
+    resolution:
+      integrity: sha512-5EaCy2mx2Jgc/Fdn9uuDuNIIfWBpzY4XIlhoqtXF6qsf+/+SGZ+FxDdX/ZsMZiWupIWNqAEmiNY4RC+LSmCeOw==
   /side-channel/1.0.2:
     dependencies:
       es-abstract: 1.17.5
@@ -16602,14 +16618,16 @@ packages:
   'file:projects/monopoly-common.tgz':
     dependencies:
       '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
+      '@types/shortid': 0.0.29
       nps: 5.9.12
       rollup: 2.12.0
+      shortid: 2.2.15
       tslib: 2.0.0
       typescript: 3.9.3
     dev: false
     name: '@rush-temp/monopoly-common'
     resolution:
-      integrity: sha512-7cxuzQgmxoWg2G/xiBc3FjwKWyayDnABx2W8B7bG/VEyPHbhhnQOsNVUXPieCsH3L2BHaCHufcGlQjhqV23aUg==
+      integrity: sha512-yXlCf0WhRVQ537TNtcPsppa1HGHxfLH8wSw3fZ5iKcsNoQ0hxUOxtIkTNFq3iX58MEIYib0Z/Sezq4G+Y8T9mw==
       tarball: 'file:projects/monopoly-common.tgz'
     version: 0.0.0
   'file:projects/monopoly.tgz':
@@ -16762,6 +16780,7 @@ specifiers:
   '@types/prismjs': ^1.9.0
   '@types/react': ^16.9.38
   '@types/react-dom': ^16.9.8
+  '@types/shortid': ^0.0.29
   '@types/ws': ^6.0.1
   debug: ^4.1.0
   events: 3.1.0
@@ -16784,6 +16803,7 @@ specifiers:
   rollup-plugin-copy: ^3.3.0
   rollup-plugin-dts: ^1.4.0
   rollup-plugin-typescript2: ^0.27.0
+  shortid: ^2.2.15
   ts-jest: ^26.1.0
   ts-node: ^8.10.2
   tslib: ^2.0.0

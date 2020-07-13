@@ -1,11 +1,11 @@
-import { EVENT_BUS, EVENT } from './consts';
 import { PromptPurchasePayload } from '@prisel/monopoly-common';
 import { createDialog, DialogPosition } from './components/DialogUtil';
-import { NodeConfig } from './components/NodeConfig';
-import { WidgetConfig } from './components/WidgetConfig';
-import { SpriteConfig } from './components/SpriteConfig';
+import { LabelConfig, LabelTheme, themeToColor } from './components/LabelConfig';
 import { LayoutConfig } from './components/LayoutConfig';
-import { LabelConfig, themeToColor, LabelTheme } from './components/LabelConfig';
+import { NodeConfig } from './components/NodeConfig';
+import { SpriteConfig } from './components/SpriteConfig';
+import { WidgetConfig } from './components/WidgetConfig';
+import { EVENT, EVENT_BUS } from './consts';
 
 const { ccclass, property } = cc._decorator;
 

@@ -1,14 +1,18 @@
 import {
     BoardSetup,
-    Tile,
-    CoordinatePair,
     Coordinate,
-    Walkable,
-    isWalkable,
-    PropertyTile,
+    CoordinatePair,
+    exist,
+    existOrThrow,
     isPropertyTile,
+    isStartTile,
+    isWalkable,
+    PathNode,
+    Property,
+    Ref,
+    Tile,
+    World,
 } from '@prisel/monopoly-common';
-import { AllFileName } from '../images';
 
 const toKey = (tile: Coordinate) => `${tile.row}-${tile.col}`;
 
@@ -19,144 +23,119 @@ export function toBoardSetup(
     height: number,
     paths: CoordinatePair[],
 ): BoardSetup {
-    const tileMap: Map<string, Walkable & Tile> = new Map();
-    const propertySet: Set<PropertyTile> = new Set();
+    const tileIdMap: Map<string, Ref<PathNode>> = new Map();
+    const propertyIdMap: Map<string, Ref<Property>> = new Map();
+    const world = new World();
+    world.registerObject(PathNode).registerObject(Property);
+
     for (const tile of tiles) {
+        const tilePosKey = toKey(tile.pos);
+        // create GameObjects
+        const tileObject = world.create(PathNode);
+        tileIdMap.set(tilePosKey, world.getRef(PathNode, tileObject));
+
+        tileObject.position = tile.pos;
         if (isWalkable(tile)) {
-            tileMap.set(toKey(tile.pos), tile);
+            tileObject.path = {
+                next: [],
+                prev: [],
+            };
+        }
+        if (isStartTile(tile)) {
+            tileObject.start = {};
         }
         if (isPropertyTile(tile)) {
-            propertySet.add(tile);
+            const propertyObject = world.create(Property);
+            propertyIdMap.set(tilePosKey, world.getRef(Property, propertyObject));
+            propertyObject.name = 'generic property';
+            propertyObject.dimension = {
+                anchor: tile.pos,
+                size: { height: 1, width: 1 },
+            };
+            const defaultCost = 100;
+            const defaultRent = 10;
+            propertyObject.propertyLevel = {
+                current: -1,
+                levels: [
+                    {
+                        cost: defaultCost,
+                        rent: defaultRent,
+                    },
+                    {
+                        cost: defaultCost / 2,
+                        rent: defaultRent * 5,
+                    },
+                    {
+                        cost: defaultCost / 2,
+                        rent: defaultRent * 10,
+                    },
+                ],
+            };
         }
     }
 
     // go through paths and add the connections
     for (const path of paths) {
         const { 0: fromCoor, 1: toCoor } = path;
-        const fromTile = tileMap.get(toKey(fromCoor));
-        const toTile = tileMap.get(toKey(toCoor));
-        if (fromTile && toTile) {
-            fromTile.next.push(toCoor);
-            toTile.prev.push(fromCoor);
+        const fromTileObjectRef = tileIdMap.get(toKey(fromCoor)) ?? null;
+        const toTileObjectRef = tileIdMap.get(toKey(toCoor)) ?? null;
+        if (exist(fromTileObjectRef) && exist(toTileObjectRef)) {
+            fromTileObjectRef()?.path?.next?.push(toTileObjectRef);
+            toTileObjectRef()?.path?.prev?.push(fromTileObjectRef);
         } else {
-            throw new Error(`cannot get tile for ${toKey(path[0])} or ${toKey(path[1])}`);
+            throw new Error(`cannot get fromTileObjectRef or toTileObjectRef`);
         }
     }
-
-    // set sprites
-    for (const tile of tiles) {
-        if (isWalkable(tile)) {
-            tile.sprite = getRoadSprite(tile);
-            continue;
-        }
-        if (isPropertyTile(tile)) {
-            const propertyImage: AllFileName = 'property';
-            tile.sprite = propertyImage;
-            continue;
-        }
-        const defaultSprite: AllFileName = 'slice1';
-        tile.sprite = defaultSprite;
-    }
-
-    // sort tiles from smaller row to larger row, smaller col to larger col.
-    // Making it easier to render further tiles first
-    tiles.sort((tile1, tile2) => {
-        if (tile1.pos.row !== tile2.pos.row) {
-            return tile1.pos.row - tile2.pos.row;
-        }
-        return tile1.pos.col - tile2.pos.col;
-    });
 
     // Populate road property mapping.
     // Run through all properties, see if there are road next to it, if there
     // is, create a mapping
-    const roadPropertyMapping: CoordinatePair[] = [];
     function addNeighborWalkable(pos: Coordinate, dRow: number, dCol: number): void {
-        const walkable = tileMap.get(toKey({ row: pos.row + dRow, col: pos.col + dCol }));
-        if (walkable) {
-            roadPropertyMapping.push([walkable.pos, pos]);
+        const walkablePosKey = toKey({ row: pos.row + dRow, col: pos.col + dCol });
+        const propertyPosKey = toKey(pos);
+        const tileObjectRef = tileIdMap.get(walkablePosKey);
+        const propertyObjectRef = propertyIdMap.get(propertyPosKey);
+        if (tileObjectRef && propertyObjectRef) {
+            const tileObject = tileObjectRef();
+            if (tileObject) {
+                const hasProperties = tileObject.hasProperties ?? [];
+                tileObject.hasProperties = hasProperties;
+                tileObject.hasProperties.push(propertyObjectRef);
+            } else {
+                throw new Error(
+                    'Constructing property & tile association failed. No tileObject from ref',
+                );
+            }
         }
     }
-    for (const property of Array.from(propertySet)) {
-        // up
-        addNeighborWalkable(property.pos, -1, 0);
-        // down
-        addNeighborWalkable(property.pos, 1, 0);
-        // left
-        addNeighborWalkable(property.pos, 0, -1);
-        // right
-        addNeighborWalkable(property.pos, 0, 1);
+    for (const property of world.getAll(Property) ?? []) {
+        if (existOrThrow(property.dimension, 'property.dimension not set')) {
+            // up
+            addNeighborWalkable(property.dimension.anchor, -1, 0);
+            // down
+            addNeighborWalkable(property.dimension.anchor, 1, 0);
+            // left
+            addNeighborWalkable(property.dimension.anchor, 0, -1);
+            // right
+            addNeighborWalkable(property.dimension.anchor, 0, 1);
+        }
+    }
+
+    for (const tile of world.getAll(PathNode) ?? []) {
+        if (!tile.check()) {
+            throw new Error('tile missing required mixin');
+        }
+    }
+
+    for (const property of world.getAll(Property) ?? []) {
+        if (!property.check()) {
+            throw new Error('property missing required mixin');
+        }
     }
 
     return {
-        tiles,
         width,
         height,
-        roadPropertyMapping,
+        world: world.serialize(),
     };
-}
-function getRoadSprite(tile: Walkable & Tile): AllFileName {
-    let up = false;
-    let down = false;
-    let left = false;
-    let right = false;
-    const pos = tile.pos;
-    for (const prev of tile.prev) {
-        if (prev.col === pos.col && prev.row === pos.row + 1) {
-            down = true;
-        }
-        if (prev.col === pos.col && prev.row === pos.row - 1) {
-            up = true;
-        }
-        if (prev.row === pos.row && prev.col === pos.col + 1) {
-            right = true;
-        }
-        if (prev.row === pos.row && prev.col === pos.col - 1) {
-            left = true;
-        }
-    }
-
-    for (const next of tile.next) {
-        if (next.col === pos.col && next.row === pos.row + 1) {
-            down = true;
-        }
-        if (next.col === pos.col && next.row === pos.row - 1) {
-            up = true;
-        }
-        if (next.row === pos.row && next.col === pos.col + 1) {
-            right = true;
-        }
-        if (next.row === pos.row && next.col === pos.col - 1) {
-            left = true;
-        }
-    }
-    if (up && down && left && right) {
-        return 'all-direction';
-    }
-    if (up && down && left) {
-        return 't-left';
-    }
-    if (up && down && right) {
-        return 't-right';
-    }
-    if (up && down) {
-        return 'vertical';
-    }
-    if (left && right) {
-        return 'horizontal';
-    }
-    if (left && up) {
-        return 'left-up';
-    }
-    if (left && down) {
-        return 'left-down';
-    }
-    if (right && up) {
-        return 'right-up';
-    }
-    if (right && down) {
-        return 'right-down';
-    }
-    window.alert('cannot find sprite for file ' + JSON.stringify(tile));
-    throw new Error('cannot find sprite for file ' + JSON.stringify(tile));
 }

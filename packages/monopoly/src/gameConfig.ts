@@ -1,5 +1,5 @@
 import { GameConfig, debug, Request, Packet, Player } from '@prisel/server';
-import { createIntialState, flattenState } from './state';
+import { createIntialState } from './state';
 import Game from './Game';
 import { Action } from '@prisel/monopoly-common';
 import { StateMachine } from './stateMachine/StateMachine';
@@ -17,11 +17,11 @@ const MonopolyGameConfig: GameConfig = {
         (async () => {
             const game = await createIntialState(room);
             room.setGame(game);
-            room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
-                const flatState = flattenState(game);
-                player.respond(packet, flatState);
-                debug('current game state is: \n%O', flatState);
-            });
+            // room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
+            //     const flatState = flattenState(game);
+            //     player.respond(packet, flatState);
+            //     debug('current game state is: \n%O', flatState);
+            // });
             const stateMachine = new StateMachine(game);
 
             const handleGamePacket = (player: Player, packet: Packet) => {

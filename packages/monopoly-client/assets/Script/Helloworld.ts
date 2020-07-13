@@ -1,12 +1,10 @@
+import { Client, LoginResponsePayload, Messages, ResponseWrapper } from '@prisel/client';
 import { client } from './Client';
-import { Client, Messages, ResponseWrapper, LoginResponsePayload } from '@prisel/client';
-import { nullCheck } from './utils';
-import { PERSISTENT_NODE } from './consts';
 import { createDialog } from './components/DialogUtil';
 import { createInput } from './components/Input';
 import { WidgetConfig } from './components/WidgetConfig';
-import { NodeConfig } from './components/NodeConfig';
-import { SpriteConfig } from './components/SpriteConfig';
+import { PERSISTENT_NODE } from './consts';
+import { nullCheck } from './utils';
 const { ccclass, property } = cc._decorator;
 
 @ccclass

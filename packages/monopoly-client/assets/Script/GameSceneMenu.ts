@@ -1,15 +1,10 @@
-import { NodeConfig } from './components/NodeConfig';
-import { createDialog } from './components/DialogUtil';
-import { WidgetConfig } from './components/WidgetConfig';
-import { SpriteConfig } from './components/SpriteConfig';
 import { createButton } from './components/Button';
 import { ButtonConfig } from './components/ButtonConfig';
-import { LayoutConfig } from './components/LayoutConfig';
-import { LabelConfig } from './components/LabelConfig';
-import { SimpleComponentConfig } from './components/SimpleComponentConfig';
-import BlockEvent from './BlockEvent';
 import { createDropShadow } from './components/DropShadow';
-import { EVENT_BUS, EVENT } from './consts';
+import { LabelConfig } from './components/LabelConfig';
+import { LayoutConfig } from './components/LayoutConfig';
+import { WidgetConfig } from './components/WidgetConfig';
+import { EVENT, EVENT_BUS } from './consts';
 
 const { ccclass, property } = cc._decorator;
 

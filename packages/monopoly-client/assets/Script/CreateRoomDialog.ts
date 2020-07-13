@@ -1,13 +1,11 @@
-import { client, ClientState } from './Client';
 import {
     Client,
-    Messages,
-    RoomStateResponsePayload,
-    ResponseWrapper,
-    RoomChangePayload,
     CreateRoomPayload,
     CreateRoomResponsePayload,
+    Messages,
+    ResponseWrapper,
 } from '@prisel/client';
+import { client, ClientState } from './Client';
 import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;

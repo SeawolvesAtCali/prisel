@@ -1,5 +1,5 @@
+import { ChanceInput, ChanceInputArgs } from '@prisel/monopoly-common';
 import Game from '../Game';
-import { ChanceInputArgs, ChanceInput } from '@prisel/monopoly-common';
 import { StateMachineConstructor } from '../stateMachine/StateMachineState';
 
 export type ChanceHandler<T extends keyof ChanceInputArgs> = (

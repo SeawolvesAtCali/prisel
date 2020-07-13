@@ -1,8 +1,8 @@
 import { ComponentConfig } from './ComponentConfig';
 import { setConfigs } from './configUtils';
-import { WidgetConfig } from './WidgetConfig';
-import { LayoutConfig } from './LayoutConfig';
 import { LabelConfig } from './LabelConfig';
+import { LayoutConfig } from './LayoutConfig';
+import { WidgetConfig } from './WidgetConfig';
 
 export interface NodeConfigExport {
     [childName: string]: string;

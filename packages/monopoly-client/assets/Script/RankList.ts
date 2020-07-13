@@ -1,14 +1,13 @@
-import { nullCheck } from './utils';
-import { EVENT_BUS, EVENT } from './consts';
 import { Rank } from '@prisel/monopoly-common';
-import RankView from './RankView';
-import { WidgetConfig } from './components/WidgetConfig';
-import { SpriteConfig } from './components/SpriteConfig';
-import { NodeConfig } from './components/NodeConfig';
+import { createDropShadow } from './components/DropShadow';
 import { LabelConfig } from './components/LabelConfig';
 import { LayoutConfig } from './components/LayoutConfig';
+import { NodeConfig } from './components/NodeConfig';
+import { WidgetConfig } from './components/WidgetConfig';
+import { EVENT, EVENT_BUS } from './consts';
+import RankView from './RankView';
 import SharedAssets from './SharedAssets';
-import { createDropShadow } from './components/DropShadow';
+import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 

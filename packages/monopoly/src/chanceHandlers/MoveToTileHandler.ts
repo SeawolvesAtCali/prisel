@@ -1,25 +1,26 @@
-import { ChanceHandler } from './ChanceHander';
-import { getRand, checkType } from '../utils';
-import { broadcast, PacketType } from '@prisel/server';
 import {
-    PlayerReceiveChancePayload,
-    ChanceArgs,
+    Action,
     Anim,
     animationMap,
+    ChanceArgs,
+    PlayerReceiveChancePayload,
+    TileType,
 } from '@prisel/monopoly-common';
-import { Action } from '@prisel/monopoly-common';
+import { broadcast, PacketType } from '@prisel/server';
 import { Moved } from '../stateMachine/Moved';
+import { checkType, getRand } from '../utils';
+import { ChanceHandler } from './ChanceHander';
 
 const MAX_PATH_LENGTH = 1000;
 export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, input) => {
     const currentPlayer = game.getCurrentPlayer();
-    const currentLocation = currentPlayer.pathNode.tile.pos;
+    const currentLocation = currentPlayer.pathNode.position;
 
     const path = currentPlayer.pathNode.genPathWith((current, length) => {
         if ((length > 0 && current.id === input.inputArgs.tileId) || length >= MAX_PATH_LENGTH) {
             return undefined;
         }
-        return getRand(current.next);
+        return getRand(current.path.next)();
     });
 
     if (path.length === 0) {
@@ -38,7 +39,7 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
                 display: input.display,
                 type: 'move_to_tile',
                 args: checkType<ChanceArgs['move_to_tile']>({
-                    tile: path[path.length - 1].tile,
+                    tile: { type: TileType.ROAD, pos: path[path.length - 1].position },
                 }),
             },
         },

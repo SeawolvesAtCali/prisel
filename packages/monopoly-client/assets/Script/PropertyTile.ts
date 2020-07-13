@@ -1,8 +1,7 @@
+import { Coordinate, PropertyInfo } from '@prisel/monopoly-common';
+import { LANDING_POS_OFFSET, PROPERTY_Z_INDEX_OFFSET } from './consts';
 import Player from './Player';
-import { PropertyInfo } from '@prisel/monopoly-common';
 import { nullCheck } from './utils';
-import Tile from './Tile';
-import { LANDING_POS_OFFSET } from './consts';
 
 const { ccclass, property } = cc._decorator;
 
@@ -16,6 +15,15 @@ export default class PropertyTile extends cc.Component {
 
     private owner: Player = null;
 
+    public coor: Coordinate = null;
+
+    public init(coor: Coordinate) {
+        this.coor = coor;
+    }
+
+    public getZIndex() {
+        return this.coor.row * 10 + PROPERTY_Z_INDEX_OFFSET;
+    }
     public getOwner() {
         return this.owner;
     }

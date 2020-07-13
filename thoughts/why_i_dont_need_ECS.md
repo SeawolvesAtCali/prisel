@@ -192,3 +192,34 @@ Without using components, the (de)serialization becomes a bit more complex. Beca
 to implement (de)serialization. Although this might not be a bad thing as we can do some sanity
 check during (de)serialization. When I use game engines, one mistake I made the most is forgot to
 attach the newly created component to an entity.
+
+## What I can learn from ECS
+
+Although I don't think I need a fullblown ECS, I can get some nuggets from it. For example, it is
+useful to have a world that manages all the entities, instead of having some entities owning others.
+
+```
+world
+ - players
+    - player1
+    - player2
+ - houses
+    - house1
+    - house2
+```
+
+is better than
+
+```
+player1
+ - owned
+  - house1
+player2
+ - owned
+   - house2
+```
+
+Having a flat structure makes easier to apply global operations to game objects, such as
+serialization and deserialization. Each game object should use id to reference other objects instead
+of references. This allows object to be garbage collected if we simply remove it from the world. It
+also aids initialization from text file format.

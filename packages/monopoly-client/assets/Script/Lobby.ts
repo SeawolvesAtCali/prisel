@@ -1,16 +1,15 @@
-import { EVENT_BUS, EVENT } from './consts';
-import { client, ClientState } from './Client';
 import {
     Client,
-    Messages,
-    ResponseWrapper,
-    LobbyStateResponsePayload,
     CreateRoomPayload,
     CreateRoomResponsePayload,
+    LobbyStateResponsePayload,
+    Messages,
+    ResponseWrapper,
 } from '@prisel/client';
-import { nullCheck } from './utils';
-import RoomView from './RoomView';
+import { client, ClientState } from './Client';
 import Dialog from './Dialog';
+import RoomView from './RoomView';
+import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 

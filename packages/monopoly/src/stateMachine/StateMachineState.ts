@@ -1,6 +1,6 @@
 import Game from '../Game';
 import { Packet, broadcast } from '@prisel/server';
-import { GamePlayer } from '../GamePlayer';
+import { GamePlayer } from '../gameObjects/GamePlayer';
 import { StateMachine } from './StateMachine';
 import { AnimationPayload } from '@prisel/monopoly-common';
 

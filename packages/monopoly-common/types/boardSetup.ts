@@ -1,9 +1,7 @@
-import { Tile } from './tile';
-import { CoordinatePair } from './coordinatePair';
+import { SerializedWorld } from '../world';
 
 export interface BoardSetup {
     height: number;
     width: number;
-    tiles: Tile[];
-    roadPropertyMapping: CoordinatePair[];
+    world: SerializedWorld;
 }

@@ -1,13 +1,13 @@
 import {
-    Anim,
-    EmotionType,
-    animationMap,
-    PlayerReceiveChancePayload,
     Action,
-    ChanceArgs,
+    Anim,
+    animationMap,
     CashExchangeDirection,
+    ChanceArgs,
+    EmotionType,
+    PlayerReceiveChancePayload,
 } from '@prisel/monopoly-common';
-import { broadcast, PacketType, Player, debug } from '@prisel/server';
+import { broadcast, debug, PacketType, Player } from '@prisel/server';
 import { ChanceHandler } from './ChanceHander';
 
 function checkType<T>(a: T): T {

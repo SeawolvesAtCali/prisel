@@ -1,7 +1,7 @@
-import { AnimationType, Animation } from './types/index';
-import { AnimationName, AnimationArgs } from './animationSpec';
 import { Packet, PacketType } from '@prisel/common';
-import { AnimationPayload, Action } from './messages';
+import { AnimationArgs, AnimationName } from './animationSpec';
+import { Action, AnimationPayload } from './messages';
+import { Animation, AnimationType } from './types/index';
 
 // Utilities for working with animations
 export class AnimationBuilder<ArgType = any> implements Animation {
@@ -9,7 +9,7 @@ export class AnimationBuilder<ArgType = any> implements Animation {
     private _length: number = 0;
     private _type: AnimationType = AnimationType.DEFAULT;
     private _children: Animation[];
-    private _args: ArgType = undefined;
+    private _args?: ArgType = undefined;
 
     public get name() {
         return this._name;
@@ -151,15 +151,17 @@ export const Anim: CreateAnimation = {
 function computeAnimationLength(animation: Animation): number {
     switch (animation.type) {
         case AnimationType.DEFAULT:
-            return animation.length;
+            return animation.length ?? 0;
         case AnimationType.ALL:
-            return Math.max(...animation.children.map(computeAnimationLength));
+            return Math.max(...(animation?.children?.map(computeAnimationLength) ?? [0]));
         case AnimationType.RACE:
-            return Math.min(...animation.children.map(computeAnimationLength));
+            return Math.min(...(animation?.children?.map(computeAnimationLength) ?? [0]));
         case AnimationType.SEQUENCE:
-            return animation.children.reduce(
-                (length: number, child: Animation) => length + computeAnimationLength(child),
-                0,
+            return (
+                animation?.children?.reduce(
+                    (length: number, child: Animation) => length + computeAnimationLength(child),
+                    0,
+                ) ?? 0
             );
     }
 }
@@ -175,15 +177,16 @@ export function toAnimationPacket(animation: Animation): Packet<AnimationPayload
 }
 
 function timeoutPromise(ms: number) {
-    let cancel: () => void;
+    let cancel: () => void = () => {};
+    const promise = new Promise<void>((resolve) => {
+        const timeout = setTimeout(resolve, ms);
+        cancel = () => {
+            clearTimeout(timeout);
+            resolve();
+        };
+    });
     const wrap = {
-        promise: new Promise<void>((resolve) => {
-            const timeout = setTimeout(resolve, ms);
-            cancel = () => {
-                clearTimeout(timeout);
-                resolve();
-            };
-        }),
+        promise,
         cancel,
     };
     return wrap;

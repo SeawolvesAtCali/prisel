@@ -1,5 +1,5 @@
-import { nullCheck } from './utils';
 import { PERSISTENT_NODE } from './consts';
+import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 

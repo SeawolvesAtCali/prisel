@@ -1,6 +1,6 @@
-import { nullCheck } from './utils';
+import { animEmitter, createAnimationEvent } from './animations';
 import { EVENT_BUS } from './consts';
-import { createAnimationEvent, animEmitter } from './animations';
+import { nullCheck } from './utils';
 
 const { ccclass } = cc._decorator;
 

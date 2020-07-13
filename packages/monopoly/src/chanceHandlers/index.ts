@@ -1,9 +1,9 @@
-import { debug } from '@prisel/server';
 import { ChanceInputArgs } from '@prisel/monopoly-common';
-import { ChanceHandler } from './ChanceHander';
-import { moveToTileHandler } from './MoveToTileHandler';
+import { debug } from '@prisel/server';
 import { cashExchangeHandler } from './CashExchangeHandler';
+import { ChanceHandler } from './ChanceHander';
 import { moveStepsHandler } from './MoveStepsHandler';
+import { moveToTileHandler } from './MoveToTileHandler';
 
 export const chanceHandlers: Record<keyof ChanceInputArgs, ChanceHandler<any>> = {
     unspecified: async () => {

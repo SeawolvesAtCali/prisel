@@ -1,28 +1,26 @@
-import { StateMachineState } from './StateMachineState';
-import { broadcast, PacketType, ResponseWrapper, debug } from '@prisel/server';
 import {
-    Payment,
     Action,
-    PromptPurchasePayload,
-    PromptPurchaseResponsePayload,
-    PlayerPurchasePayload,
-    PlayerPayRentPayload,
-    PlayerEndTurnPayload,
-    PlayerBankruptPayload,
-    PlayerLeftPayload,
     Anim,
     animationMap,
-    AnimationPayload,
-    toAnimationPacket,
-    PropertyTile,
+    exist,
+    Payment,
+    PlayerBankruptPayload,
+    PlayerEndTurnPayload,
+    PlayerLeftPayload,
+    PlayerPayRentPayload,
+    PlayerPurchasePayload,
+    PromptPurchasePayload,
+    PromptPurchaseResponsePayload,
+    Property,
 } from '@prisel/monopoly-common';
-import { GameOver } from './GameOver';
-import { GamePlayer } from '../GamePlayer';
-import Property from '../Property';
-import { PreRoll } from './PreRoll';
-import { chanceList } from '../changeList';
-import { getRand } from '../utils';
+import { broadcast, debug, PacketType, ResponseWrapper } from '@prisel/server';
 import { chanceHandlers } from '../chanceHandlers';
+import { chanceList } from '../changeList';
+import { GamePlayer } from '../gameObjects/GamePlayer';
+import { getRand } from '../utils';
+import { GameOver } from './GameOver';
+import { PreRoll } from './PreRoll';
+import { StateMachineState } from './StateMachineState';
 
 /**
  * This state starts after the current player moves to the destination after
@@ -50,26 +48,28 @@ export class Moved extends StateMachineState {
         const currentPlayer = this.game.getCurrentPlayer();
         const currentPathNode = currentPlayer.pathNode;
 
-        const { properties } = currentPathNode;
+        const { hasProperties } = currentPathNode;
 
-        const handlePayRentPromise = this.handlePayRents(properties, currentPlayer);
-        if (handlePayRentPromise) {
-            await handlePayRentPromise;
-            if (!this.isCurrentState()) {
-                return;
+        if (exist(hasProperties)) {
+            const properties = hasProperties.map((propertyRef) => propertyRef());
+            const handlePayRentPromise = this.handlePayRents(properties, currentPlayer);
+            if (handlePayRentPromise) {
+                await handlePayRentPromise;
+                if (!this.isCurrentState()) {
+                    return;
+                }
+            }
+
+            const investPromise = this.handleInvest(properties, currentPlayer);
+            if (investPromise) {
+                await investPromise;
+                if (!this.isCurrentState()) {
+                    return;
+                }
             }
         }
-
         if (this.checkGameOver()) {
             return;
-        }
-
-        const investPromise = this.handleInvest(properties, currentPlayer);
-        if (investPromise) {
-            await investPromise;
-            if (!this.isCurrentState()) {
-                return;
-            }
         }
 
         // TODO remove these lines after testing chance.
@@ -89,8 +89,8 @@ export class Moved extends StateMachineState {
                 nextPlayerId: this.game.getNextPlayer().id,
             },
         });
-        const currentPlayerPos = this.game.getCurrentPlayer().pathNode.tile.pos;
-        const nextPlayerPos = this.game.getNextPlayer().pathNode.tile.pos;
+        const currentPlayerPos = this.game.getCurrentPlayer().pathNode.position;
+        const nextPlayerPos = this.game.getNextPlayer().pathNode.position;
 
         await Anim.processAndWait(
             this.broadcastAnimation,
@@ -155,7 +155,10 @@ export class Moved extends StateMachineState {
         for (const property of properties) {
             if (property.owner && property.owner.id !== currentPlayer.id) {
                 rentPayments.push(
-                    currentPlayer.payRent(property.owner, property.getPropertyInfoForRent()),
+                    currentPlayer.payRent(
+                        property.owner as GamePlayer,
+                        property.getPropertyInfoForRent(),
+                    ),
                 );
             }
         }

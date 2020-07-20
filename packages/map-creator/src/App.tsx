@@ -1,10 +1,10 @@
+import { BoardSetup, Coordinate, CoordinatePair } from '@prisel/monopoly-common';
 import * as React from 'react';
-import { Coordinate, CoordinatePair, BoardSetup } from '@prisel/monopoly-common';
 import styles from './App.module.css';
-import { Mode, equal, download, useArrayRef } from './common';
-import { TileView, TileExport } from './Tile';
 import { Arrow } from './Arrow';
+import { download, equal, Mode, useArrayRef } from './common';
 import { toBoardSetup } from './mapExporter';
+import { TileExport, TileView } from './TileView';
 
 function range(start: number, end: number): number[] {
     const arr = [];

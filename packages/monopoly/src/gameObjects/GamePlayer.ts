@@ -31,6 +31,7 @@ function roll(startingNode: PathNode): PathNode[] {
 
 export interface GamePlayer {}
 export class GamePlayer extends GameObject {
+    public static TYPE: string = 'game_player';
     public get type() {
         return 'game_player';
     }

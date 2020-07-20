@@ -3,6 +3,7 @@ import * as React from 'react';
 
 export enum Mode {
     UNSPECIFIED = 'none',
+    BLANK = 'blank',
     ROAD = 'road',
     ERASE_ROAD = 'eraser',
     PROPERTY = 'property',

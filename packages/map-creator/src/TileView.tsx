@@ -1,11 +1,11 @@
+import { PropertyTile, RoadTile, StartTile, Tile, TileType } from '@prisel/monopoly-common';
 import * as React from 'react';
-import { Mode } from './common';
 import styles from './App.module.css';
-import { Tile, TileType, RoadTile, PropertyTile, StartTile } from '@prisel/monopoly-common';
+import { Mode } from './common';
 import { DrawingModeContext } from './DrawingModeHandler';
 import { DrawPropertyHandler } from './DrawPropertyHandler';
-import { DrawStartHandler } from './DrawStartHandler';
 import { DrawRoadHandler } from './DrawRoadHandler';
+import { DrawStartHandler } from './DrawStartHandler';
 import { EraseHandler } from './EraseHandler';
 
 interface TileViewProps {

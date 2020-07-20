@@ -1,16 +1,16 @@
+import { Id } from '../Id';
+import { Property2, PropertyClass } from '../Property';
+import { Ref, RefIdSymbol } from '../Ref';
+import { World } from '../World';
 import { hasMixin, serializedHasMixin } from './hasMixin';
-import { Id } from './Id';
 import { MixinConfig } from './MixinConfig';
-import { Property } from './Property';
-import { Ref, RefIdSymbol } from './Ref';
-import { World } from './World';
 
 export interface HasPropertiesMixin {
-    hasProperties: Ref<Property>[];
+    hasProperties: Ref<Property2>[];
 }
 
 export interface SerializedHasPropertiesMixin {
-    hasProperties: Id<Property>[];
+    hasProperties: Id<Property2>[];
 }
 
 export const HasPropertiesMixinConfig: MixinConfig<
@@ -29,7 +29,9 @@ export const HasPropertiesMixinConfig: MixinConfig<
     deserialize(serialized, world: World) {
         if (serializedHasMixin(serialized, HasPropertiesMixinConfig)) {
             return {
-                hasProperties: serialized.hasProperties.map((id) => world.getRef(Property, id)),
+                hasProperties: serialized.hasProperties.map((id) =>
+                    world.getRef(PropertyClass, id),
+                ),
             };
         }
     },

@@ -1,6 +1,6 @@
-import { GameObject } from './GameObject';
-import { serializedHasMixin } from './hasMixin';
-import { MixinConfig } from './MixinConfig';
+import { GameObject, GameObjectClass } from './GameObject';
+import { serializedHasMixin } from './mixins/hasMixin';
+import { MixinConfig } from './mixins/MixinConfig';
 import { Serialized } from './serialize';
 import { World } from './World';
 
@@ -19,12 +19,12 @@ function applyDeserialized<
     }
 }
 
-export function deserialize<T extends GameObject>(
-    clazz: new () => T,
+export function deserialize<ClassT extends GameObjectClass<any>>(
+    clazz: ClassT,
     serialized: Serialized,
     configs: Array<MixinConfig<any, any, any>>,
     world: World,
-): T {
+): InstanceType<ClassT> {
     const object = world.create(clazz, serialized.id);
     for (const config of configs) {
         applyDeserialized(object, serialized, config, world);

@@ -1,5 +1,5 @@
-import { Coordinate } from '../types';
-import { Size } from '../types/size';
+import { Coordinate } from '../../types';
+import { Size } from '../../types/size';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
 

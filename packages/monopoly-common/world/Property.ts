@@ -1,13 +1,17 @@
 import { exist, existOrLog } from '../exist';
 import { PropertyInfo } from '../types';
+import { createClass } from './createClass';
 import { deserialize } from './deserialize';
-import { DimensionMixin, DimensionMixinConfig } from './DimensionMixin';
 import { GameObject } from './GameObject';
-import { hasMixin } from './hasMixin';
-import { NameMixin, NameMixinConfig } from './NameMixin';
-import { PropertyLevelMixin, PropertyLevelMixinConfig } from './PropertyLevelMixin';
+import { DimensionMixin, DimensionMixinConfig } from './mixins/DimensionMixin';
+import { hasMixin } from './mixins/hasMixin';
+import { required } from './mixins/MixinConfig';
+import { NameMixin, NameMixinConfig } from './mixins/NameMixin';
+import { OwnerMixinConfig } from './mixins/OwnerMixin';
+import { PropertyLevelMixin, PropertyLevelMixinConfig } from './mixins/PropertyLevelMixin';
 import { serialize, Serialized } from './serialize';
 import { World } from './World';
+
 function missing(funcName: string, missingValue: string): string {
     return `${funcName} failed due to ${missingValue} is null or undefined`;
 }
@@ -16,6 +20,7 @@ export interface Property
         Partial<PropertyLevelMixin>,
         Partial<NameMixin> {}
 export class Property extends GameObject {
+    public static TYPE: string = 'property';
     public get type() {
         return 'property';
     }
@@ -142,3 +147,88 @@ export class Property extends GameObject {
         );
     }
 }
+
+export const PropertyClass = createClass('property', [
+    required(DimensionMixinConfig),
+    required(PropertyLevelMixinConfig),
+    required(NameMixinConfig),
+    OwnerMixinConfig,
+]);
+
+export type Property2 = InstanceType<typeof PropertyClass>;
+
+export const Properties = {
+    purchasedBy(property: Property2, owner: GameObject) {
+        property.propertyLevel.current = 0;
+        property.owner = owner.id;
+    },
+
+    upgrade(property: Property2, newLevel: number) {
+        property.propertyLevel.current = newLevel;
+    },
+
+    purchaseable(property: Property2): boolean {
+        return !exist(property.owner);
+    },
+    upgradable(property: Property2, requester: GameObject): boolean {
+        return (
+            exist(property.owner) &&
+            property.owner === requester.id &&
+            property.propertyLevel.current < property.propertyLevel.levels.length - 1
+        );
+    },
+    investable(property: Property2, requester: GameObject): boolean {
+        return Properties.purchaseable(property) || Properties.upgradable(property, requester);
+    },
+
+    getWorth(property: Property2): number {
+        // the worth of a property is the sum of the cost taken to
+        // purchase/upgrade the property.
+        return property.propertyLevel.levels.reduce(
+            (prev, cur, level) =>
+                level <= property.propertyLevel.current ? prev + cur.cost : prev,
+            0,
+        );
+    },
+
+    getBasicPropertyInfo(
+        property: Property2,
+    ): Required<Pick<PropertyInfo, 'name' | 'pos' | 'currentLevel'>> {
+        return {
+            name: property.name,
+            pos: property.dimension.anchor,
+            currentLevel: property.propertyLevel.current,
+        };
+    },
+
+    getPropertyInfoForInvesting(property: Property2, requester: GameObject): PropertyInfo | null {
+        const basicPropertyInfo = Properties.getBasicPropertyInfo(property);
+
+        if (property.propertyLevel.current >= property.propertyLevel.levels.length) {
+            return null;
+        }
+
+        const nextLevel = basicPropertyInfo.currentLevel + 1;
+        return {
+            ...basicPropertyInfo,
+            currentLevel: nextLevel,
+            levels: property.propertyLevel.levels,
+            ...property.propertyLevel.levels[nextLevel],
+            isUpgrade: Properties.upgradable(property, requester),
+        };
+    },
+
+    getPropertyInfoForRent(property: Property2): PropertyInfo | null {
+        const basicPropertyInfo = Properties.getBasicPropertyInfo(property);
+        if (
+            basicPropertyInfo.currentLevel < 0 ||
+            basicPropertyInfo.currentLevel >= property.propertyLevel.levels.length
+        ) {
+            return null;
+        }
+        return {
+            ...basicPropertyInfo,
+            rent: property.propertyLevel.levels[basicPropertyInfo.currentLevel].rent,
+        };
+    },
+};

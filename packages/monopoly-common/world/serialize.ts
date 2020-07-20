@@ -1,7 +1,7 @@
 import { GameObject } from './GameObject';
-import { hasMixin } from './hasMixin';
 import { Id } from './Id';
-import { MixinConfig } from './MixinConfig';
+import { hasMixin } from './mixins/hasMixin';
+import { MixinConfig } from './mixins/MixinConfig';
 
 export function serialize<GameObjectType extends GameObject>(
     object: GameObjectType,

@@ -1,6 +1,6 @@
 import { MixinConfig } from './MixinConfig';
 
-export function hasMixin<MixinT, SerializedT, Type extends keyof MixinT & keyof SerializedT>(
+export function hasMixin<MixinT, SerializedT, Type extends string>(
     object: any,
     config: MixinConfig<MixinT, SerializedT, Type>,
 ): object is MixinT {
@@ -11,11 +11,10 @@ export function hasMixin<MixinT, SerializedT, Type extends keyof MixinT & keyof 
     );
 }
 
-export function serializedHasMixin<
-    MixinT,
-    SerializedT,
-    Type extends keyof MixinT & keyof SerializedT
->(serialized: any, config: MixinConfig<MixinT, SerializedT, Type>): serialized is SerializedT {
+export function serializedHasMixin<MixinT, SerializedT, Type extends string>(
+    serialized: any,
+    config: MixinConfig<MixinT, SerializedT, Type>,
+): serialized is SerializedT {
     return (
         serialized.hasOwnProperty(config.type) &&
         serialized[config.type] !== undefined &&

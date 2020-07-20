@@ -1,4 +1,4 @@
-import { Coordinate } from '../types';
+import { Coordinate } from '../../types';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
 

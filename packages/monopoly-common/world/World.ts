@@ -7,6 +7,7 @@ import { Serialized } from './serialize';
 export interface SerializedWorld {
     [key: string]: Array<Serialized<GameObject>>;
 }
+
 /**
  * World holds all game objects. Provide easy access to game object through ids
  */
@@ -16,11 +17,8 @@ export class World {
     private gameObjectTypeRegistry: Map<string, GameObjectClass<any>> = new Map();
     private serializedTypes = new Set<string>();
 
-    public registerObject<T extends GameObject>(
-        clazz: GameObjectClass<T>,
-        enableSerialization = true,
-    ) {
-        const type = new clazz().type;
+    public registerObject<T extends GameObjectClass<any>>(clazz: T, enableSerialization = true) {
+        const type = clazz.TYPE;
         this.gameObjectTypeRegistry.set(type, clazz);
         this.idMap.set(type, new Set());
         if (enableSerialization) {
@@ -41,10 +39,13 @@ export class World {
         return genId();
     }
 
-    public get<T extends GameObject>(clazz: GameObjectClass<T>, id: Id<T>): T | null {
+    public get<T extends GameObjectClass<any>>(
+        clazz: T,
+        id: Id<InstanceType<T>>,
+    ): InstanceType<T> | null {
         const object = this.objectMap.get(id);
         if (object instanceof clazz) {
-            return object;
+            return object as InstanceType<T>;
         }
         return null;
     }
@@ -64,18 +65,23 @@ export class World {
             .filter(Boolean);
     }
 
-    public getAll<T extends GameObject>(typeOrClazz: string | { new (): T }): T[] | undefined {
-        const typeString = typeof typeOrClazz === 'string' ? typeOrClazz : new typeOrClazz().type;
+    public getAll<T extends GameObjectClass<any>>(
+        typeOrClazz: string | T,
+    ): InstanceType<T>[] | undefined {
+        const typeString = typeof typeOrClazz === 'string' ? typeOrClazz : typeOrClazz.TYPE;
         const set = this.idMap.get(typeString);
         if (set) {
-            return this.getAllFromSet<T>(set);
+            return this.getAllFromSet<InstanceType<T>>(set);
         }
     }
 
     /** Create a GameObject of given type, and add to world */
-    public create<T extends GameObject>(clazz: { new (): T }, id?: Id<T>): T {
+    public create<T extends GameObjectClass<any>>(
+        clazz: T,
+        id?: Id<InstanceType<T>>,
+    ): InstanceType<T> {
         const object = new clazz();
-        const objectId = this.createId<T>(id);
+        const objectId = this.createId<InstanceType<T>>(id);
         object.id = objectId;
         this.objectMap.set(objectId, object);
         this.getRespectiveSet(object)?.add(objectId);
@@ -83,10 +89,10 @@ export class World {
         return object;
     }
 
-    public createRef<T extends GameObject>(
-        clazz: { new (): T; deserialize: any },
-        id?: Id<T>,
-    ): Ref<T> {
+    public createRef<T extends GameObjectClass<any>>(
+        clazz: T,
+        id?: Id<InstanceType<T>>,
+    ): Ref<InstanceType<T>> {
         return this.getRef(clazz, this.create(clazz, id));
     }
 
@@ -104,12 +110,12 @@ export class World {
         }
     }
 
-    public getRef<T extends GameObject>(
-        clazz: { new (): T; deserialize: any },
-        keyOrObject: Id<T> | T,
-    ): Ref<T> {
+    public getRef<T extends GameObjectClass<any>>(
+        clazz: T,
+        keyOrObject: Id<InstanceType<T>> | InstanceType<T>,
+    ): Ref<InstanceType<T>> {
         const id = typeof keyOrObject === 'string' ? keyOrObject : keyOrObject.id;
-        const ref = <Ref<T>>(() => this.get(clazz, id));
+        const ref = <Ref<InstanceType<T>>>(() => this.get(clazz, id));
         ref[RefIdSymbol] = id;
         return ref;
     }

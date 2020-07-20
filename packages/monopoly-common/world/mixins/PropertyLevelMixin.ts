@@ -1,4 +1,4 @@
-import { PropertyLevel } from '../types';
+import { PropertyLevel } from '../../types';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
 

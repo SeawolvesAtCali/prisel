@@ -28,7 +28,10 @@ export abstract class GameObject {
     }
 }
 
-export interface GameObjectClass<T extends GameObject = never> {
-    new (): T;
-    deserialize(serialized: Serialized<T>, world: World): T;
-}
+export type GameObjectClass<T> = T extends GameObject
+    ? {
+          new (): T;
+          TYPE: string;
+          deserialize(serialized: Serialized<T>, world: World): T;
+      }
+    : never;

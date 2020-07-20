@@ -1,20 +1,20 @@
+import { Id } from '../Id';
+import { Tile2, TileClass } from '../PathNode';
+import { Ref, RefIdSymbol } from '../Ref';
 import { hasMixin, serializedHasMixin } from './hasMixin';
-import { Id } from './Id';
 import { MixinConfig } from './MixinConfig';
-import { PathNode } from './PathNode';
-import { Ref, RefIdSymbol } from './Ref';
 
 export interface PathMixin {
     path: {
-        prev: Ref<PathNode>[];
-        next: Ref<PathNode>[];
+        prev: Ref<Tile2>[];
+        next: Ref<Tile2>[];
     };
 }
 
 export interface SerializedPathMixin {
     path: {
-        prev: Id<PathNode>[];
-        next: Id<PathNode>[];
+        prev: Id<Tile2>[];
+        next: Id<Tile2>[];
     };
 }
 
@@ -34,8 +34,8 @@ export const PathMixinConfig: MixinConfig<PathMixin, SerializedPathMixin, 'path'
         if (serializedHasMixin(serialized, PathMixinConfig)) {
             return {
                 path: {
-                    prev: serialized.path.prev.map((id) => world.getRef(PathNode, id)),
-                    next: serialized.path.next.map((id) => world.getRef(PathNode, id)),
+                    prev: serialized.path.prev.map((id) => world.getRef(TileClass, id)),
+                    next: serialized.path.next.map((id) => world.getRef(TileClass, id)),
                 },
             };
         }

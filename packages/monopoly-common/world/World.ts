@@ -39,15 +39,9 @@ export class World {
         return genId();
     }
 
-    public get<T extends GameObjectClass<any>>(
-        clazz: T,
-        id: Id<InstanceType<T>>,
-    ): InstanceType<T> | null {
+    public get<T extends GameObjectClass<any>>(id: Id<InstanceType<T>>): InstanceType<T> | null {
         const object = this.objectMap.get(id);
-        if (object instanceof clazz) {
-            return object as InstanceType<T>;
-        }
-        return null;
+        return (object as InstanceType<T>) || null;
     }
 
     private getRespectiveSet(object: GameObject) {
@@ -65,14 +59,13 @@ export class World {
             .filter(Boolean);
     }
 
-    public getAll<T extends GameObjectClass<any>>(
-        typeOrClazz: string | T,
-    ): InstanceType<T>[] | undefined {
+    public getAll<T extends GameObjectClass<any>>(typeOrClazz: string | T): InstanceType<T>[] {
         const typeString = typeof typeOrClazz === 'string' ? typeOrClazz : typeOrClazz.TYPE;
         const set = this.idMap.get(typeString);
         if (set) {
             return this.getAllFromSet<InstanceType<T>>(set);
         }
+        return [];
     }
 
     /** Create a GameObject of given type, and add to world */
@@ -93,7 +86,7 @@ export class World {
         clazz: T,
         id?: Id<InstanceType<T>>,
     ): Ref<InstanceType<T>> {
-        return this.getRef(clazz, this.create(clazz, id));
+        return this.getRef(this.create(clazz, id));
     }
 
     public remove<T extends GameObject>(idOrGameObject: Id | T) {
@@ -111,11 +104,10 @@ export class World {
     }
 
     public getRef<T extends GameObjectClass<any>>(
-        clazz: T,
         keyOrObject: Id<InstanceType<T>> | InstanceType<T>,
     ): Ref<InstanceType<T>> {
         const id = typeof keyOrObject === 'string' ? keyOrObject : keyOrObject.id;
-        const ref = <Ref<InstanceType<T>>>(() => this.get(clazz, id));
+        const ref = <Ref<InstanceType<T>>>(() => this.get(id));
         ref[RefIdSymbol] = id;
         return ref;
     }
@@ -125,7 +117,7 @@ export class World {
         for (const serializedObjectType of Array.from(this.serializedTypes)) {
             Object.assign(serialized, {
                 [serializedObjectType]:
-                    this.getAll(serializedObjectType)?.map((object) => object.serialize()) ?? [],
+                    this.getAll(serializedObjectType).map((object) => object.serialize()) ?? [],
             });
         }
         return serialized;

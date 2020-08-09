@@ -67,22 +67,22 @@ export const TileView = React.forwardRef<TileExport, TileViewProps>((props, ref)
         if (drawingMode === Mode.UNSPECIFIED || !isMouseDown) {
             return;
         }
-        if (drawingModeHandlerMap[drawingMode]) {
-            const handler = drawingModeHandlerMap[drawingMode];
-            if (handler.disableMouseOver) {
-                return;
-            }
-            handler.onDraw(row, column, selected, drawingModeContext);
-        }
+        // if (drawingModeHandlerMap[drawingMode]) {
+        //     const handler = drawingModeHandlerMap[drawingMode];
+        //     if (handler.disableMouseOver) {
+        //         return;
+        //     }
+        //     handler.onDraw(row, column, selected, drawingModeContext);
+        // }
     }, [drawingMode, isMouseDown, row, column, selected, drawingModeContext]);
     const handleMouseDown = React.useCallback(() => {
         if (drawingMode === Mode.UNSPECIFIED) {
             return;
         }
-        if (drawingModeHandlerMap[drawingMode]) {
-            const handler = drawingModeHandlerMap[drawingMode];
-            handler.onDraw(row, column, selected, drawingModeContext);
-        }
+        // if (drawingModeHandlerMap[drawingMode]) {
+        //     const handler = drawingModeHandlerMap[drawingMode];
+        //     handler.onDraw(row, column, selected, drawingModeContext);
+        // }
     }, [drawingMode, row, column, selected, drawingModeContext]);
 
     React.useImperativeHandle(

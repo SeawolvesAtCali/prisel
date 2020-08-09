@@ -6,4 +6,5 @@ export * from './PathNode';
 export * from './Property';
 export * from './Ref';
 export * from './serialize';
+export * from './Tile2';
 export * from './World';

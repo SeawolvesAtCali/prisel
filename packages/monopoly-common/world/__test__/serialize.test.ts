@@ -1,4 +1,4 @@
-import { TileClass } from '../PathNode';
+import { TileClass } from '../Tile2';
 import { World } from '../World';
 
 test('serialize', () => {

@@ -1,5 +1,5 @@
 import { Id } from '../Id';
-import { Property2, PropertyClass } from '../Property';
+import { Property2 } from '../Property';
 import { Ref, RefIdSymbol } from '../Ref';
 import { World } from '../World';
 import { hasMixin, serializedHasMixin } from './hasMixin';
@@ -29,9 +29,7 @@ export const HasPropertiesMixinConfig: MixinConfig<
     deserialize(serialized, world: World) {
         if (serializedHasMixin(serialized, HasPropertiesMixinConfig)) {
             return {
-                hasProperties: serialized.hasProperties.map((id) =>
-                    world.getRef(PropertyClass, id),
-                ),
+                hasProperties: serialized.hasProperties.map((id) => world.getRef(id)),
             };
         }
     },

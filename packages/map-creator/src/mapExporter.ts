@@ -32,7 +32,7 @@ export function toBoardSetup(
         const tilePosKey = toKey(tile.pos);
         // create GameObjects
         const tileObject = world.create(PathNode);
-        tileIdMap.set(tilePosKey, world.getRef(PathNode, tileObject));
+        tileIdMap.set(tilePosKey, world.getRef(tileObject));
 
         tileObject.position = tile.pos;
         if (isWalkable(tile)) {
@@ -46,7 +46,7 @@ export function toBoardSetup(
         }
         if (isPropertyTile(tile)) {
             const propertyObject = world.create(Property);
-            propertyIdMap.set(tilePosKey, world.getRef(Property, propertyObject));
+            propertyIdMap.set(tilePosKey, world.getRef(propertyObject));
             propertyObject.name = 'generic property';
             propertyObject.dimension = {
                 anchor: tile.pos,
@@ -80,8 +80,8 @@ export function toBoardSetup(
         const fromTileObjectRef = tileIdMap.get(toKey(fromCoor)) ?? null;
         const toTileObjectRef = tileIdMap.get(toKey(toCoor)) ?? null;
         if (exist(fromTileObjectRef) && exist(toTileObjectRef)) {
-            fromTileObjectRef()?.path?.next?.push(toTileObjectRef);
-            toTileObjectRef()?.path?.prev?.push(fromTileObjectRef);
+            // fromTileObjectRef()?.path?.next?.push(toTileObjectRef);
+            // toTileObjectRef()?.path?.prev?.push(fromTileObjectRef);
         } else {
             throw new Error(`cannot get fromTileObjectRef or toTileObjectRef`);
         }
@@ -100,7 +100,7 @@ export function toBoardSetup(
             if (tileObject) {
                 const hasProperties = tileObject.hasProperties ?? [];
                 tileObject.hasProperties = hasProperties;
-                tileObject.hasProperties.push(propertyObjectRef);
+                // tileObject.hasProperties.push(propertyObjectRef);
             } else {
                 throw new Error(
                     'Constructing property & tile association failed. No tileObject from ref',

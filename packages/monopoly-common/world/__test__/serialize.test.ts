@@ -3,12 +3,12 @@ import { World } from '../World';
 
 test('serialize', () => {
     const world = new World().registerObject(TileClass);
-    const pathNode = world.create(TileClass);
-    pathNode.path = {
+    const tile = world.create(TileClass);
+    tile.path = {
         prev: [world.createRef(TileClass)],
         next: [world.createRef(TileClass)],
     };
-    expect(pathNode.serialize()).toMatchObject({
+    expect(tile.serialize()).toMatchObject({
         id: expect.any(String),
         type: 'tile',
         path: {
@@ -20,8 +20,8 @@ test('serialize', () => {
 
 test('serialize no mixin', () => {
     const world = new World().registerObject(TileClass);
-    const pathNode = world.create(TileClass);
-    expect(pathNode.serialize()).toMatchObject({
+    const tile = world.create(TileClass);
+    expect(tile.serialize()).toMatchObject({
         id: expect.any(String),
         type: 'tile',
     });

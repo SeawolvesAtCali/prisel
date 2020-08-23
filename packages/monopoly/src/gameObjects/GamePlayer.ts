@@ -3,12 +3,14 @@ import {
     deserialize,
     GameObject,
     GamePlayerInfo,
-    PathNode,
     Payment,
-    Property,
+    Properties,
+    Property2,
     PropertyInfo,
     serialize,
     Serialized,
+    Tile2,
+    Tiles,
     World,
 } from '@prisel/monopoly-common';
 import { debug, Player, PlayerId } from '@prisel/server';
@@ -16,17 +18,17 @@ import { debug, Player, PlayerId } from '@prisel/server';
 interface Props {
     id: PlayerId;
     player: Player;
-    pathNode: PathNode;
-    owning: Property[];
+    pathTile: Tile2;
+    owning: Property2[];
     cash: number;
     character: number;
     rolled: boolean;
 }
 
-function roll(startingNode: PathNode): PathNode[] {
+function roll(startingNode: Tile2): Tile2[] {
     const steps = Math.trunc(Math.random() * 6) + 1;
     debug(`player will move ${steps}`);
-    return startingNode.genPath(steps);
+    return Tiles.genPath(startingNode, steps);
 }
 
 export interface GamePlayer {}
@@ -35,8 +37,8 @@ export class GamePlayer extends GameObject {
     public get type() {
         return 'game_player';
     }
-    public pathNode: PathNode;
-    public owning: Property[];
+    public pathTile: Tile2;
+    public owning: Property2[];
     public cash: number;
     public rolled: boolean;
     public player: Player;
@@ -44,7 +46,7 @@ export class GamePlayer extends GameObject {
 
     public init(props: Props) {
         this.id = props.id;
-        this.pathNode = props.pathNode;
+        this.pathTile = props.pathTile;
         this.owning = props.owning || [];
         this.cash = props.cash;
         this.rolled = props.rolled;
@@ -69,28 +71,28 @@ export class GamePlayer extends GameObject {
     }
 
     public rollAndMove(): Coordinate[] {
-        const path = roll(this.pathNode);
+        const path = roll(this.pathTile);
         this.rolled = true;
         return this.move(path);
     }
 
-    public move(path: PathNode[]) {
+    public move(path: Tile2[]) {
         if (path.length > 0) {
-            this.pathNode = path[path.length - 1];
-            return path.map((pathNode) => pathNode.position);
+            this.pathTile = path[path.length - 1];
+            return path.map((pathTile) => pathTile.position);
         }
         return [];
     }
 
-    public purchaseProperty(property: Property, nextLevelPropertyInfo: PropertyInfo) {
+    public purchaseProperty(property: Property2, nextLevelPropertyInfo: PropertyInfo) {
         this.cash = this.cash - nextLevelPropertyInfo.cost;
-        if (property.owner !== this) {
+        if (property.owner !== this.id) {
             this.owning.push(property);
         }
         if (nextLevelPropertyInfo.isUpgrade) {
-            property.upgrade(nextLevelPropertyInfo.currentLevel);
+            Properties.upgrade(property, nextLevelPropertyInfo.currentLevel);
         } else {
-            property.purchasedBy(this);
+            Properties.purchasedBy(property, this);
         }
     }
 
@@ -101,7 +103,7 @@ export class GamePlayer extends GameObject {
                 name: this.player.getName(),
                 id: this.player.getId(),
             },
-            pos: this.pathNode.position,
+            pos: this.pathTile.position,
             character: this.character,
         };
     }

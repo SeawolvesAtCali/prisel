@@ -3,8 +3,9 @@ import {
     Anim,
     animationMap,
     ChanceArgs,
-    PathNode,
     PlayerReceiveChancePayload,
+    Tile2,
+    Tiles,
 } from '@prisel/monopoly-common';
 import { broadcast, PacketType } from '@prisel/server';
 import { Moved } from '../stateMachine/Moved';
@@ -14,14 +15,14 @@ import { ChanceHandler } from './ChanceHander';
 export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input) => {
     const inputArgs = input.inputArgs;
     const currentPlayer = game.getCurrentPlayer();
-    const startLocation = currentPlayer.pathNode.position;
-    let path: PathNode[] = [];
+    const startLocation = currentPlayer.pathTile.position;
+    let path: Tile2[] = [];
     if (inputArgs.steps > 0) {
-        path = currentPlayer.pathNode.genPath(inputArgs.steps);
+        path = Tiles.genPath(currentPlayer.pathTile, inputArgs.steps);
         currentPlayer.move(path);
     }
     if (inputArgs.steps < 0) {
-        path = currentPlayer.pathNode.genPathReverse(-inputArgs.steps);
+        path = Tiles.genPathReverse(currentPlayer.pathTile, -inputArgs.steps);
         currentPlayer.move(path);
     }
 
@@ -46,7 +47,7 @@ export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input)
         Anim.create('move', {
             player: currentPlayer.getGamePlayerInfo(),
             start: startLocation,
-            path: path.map((pathNode) => pathNode.position),
+            path: path.map((pathTile) => pathTile.position),
         }).setLength(animationMap.move * path.length),
     ).promise;
     return Moved;

@@ -1,5 +1,5 @@
-import { Tile } from './types';
 import { CollectableType } from './types/collectable';
+import { PositionMixin } from './world/mixins';
 
 // args to be sent to client to update the client state.
 export interface ChanceArgs {
@@ -7,7 +7,7 @@ export interface ChanceArgs {
     // move to each of the tiles sequentially and perform actions on the each
     // tiles. Normally, player would only go to one tile.
     move_to_tile: {
-        tile: Tile;
+        tile: PositionMixin;
     };
     // pay x some money; get some money from all players; pay bank; get from bank
     cash_exchange: {

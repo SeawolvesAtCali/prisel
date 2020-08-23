@@ -141,4 +141,17 @@ export class World {
         }
         return this;
     }
+
+    /**
+     * return a new world by copying all gameObjects in the world. GameObjects are
+     * serialzied and deserialized. If a gameObject has lossy serialization or
+     * deserialization, the copy might not be identical
+     */
+    public copy() {
+        const newWorld = new World();
+        for (const objectClass of this.gameObjectTypeRegistry.values()) {
+            newWorld.registerObject(objectClass);
+        }
+        return newWorld.deserialize(this.serialize());
+    }
 }

@@ -3,11 +3,10 @@ import * as React from 'react';
 import { AppContext } from './AppContext';
 import { Canvas } from './Canvas';
 import { download } from './common';
-import { ExportCallback } from './ExportCallback';
 import { PropertyEditor } from './gameObjectEditors/PropertyEditor';
 import { TileEditor } from './gameObjectEditors/TileEditor';
-import { isNotNullRef } from './isNotNullRef';
 import { LayerType } from './Layer';
+import { toBoardSetup } from './mapExporter';
 import { toolSupportedLayer, ToolType } from './tools/Tool';
 import { useWorld } from './useWorld';
 
@@ -15,7 +14,6 @@ export const Container: React.FC = () => {
     const [tool, setTool] = React.useState(ToolType.EMPTY_TILE_BRUSH);
     const world = useWorld();
     const [layer, setLayer] = React.useState(LayerType.TILE);
-    const boardRef = React.useRef<ExportCallback | null>(null);
     const [width, setWidth] = React.useState(10);
     const [height, setHeight] = React.useState(10);
     const [selectedObject, setSelectedObject] = React.useState<GameObject | undefined>(undefined);
@@ -49,12 +47,10 @@ export const Container: React.FC = () => {
                     />
                     <button
                         onClick={() => {
-                            if (isNotNullRef(boardRef)) {
-                                download(
-                                    'map-export.json',
-                                    JSON.stringify(boardRef.current.export()),
-                                );
-                            }
+                            download(
+                                'map-export.json',
+                                JSON.stringify(toBoardSetup(world, width, height)),
+                            );
                         }}
                     >
                         Export
@@ -108,7 +104,6 @@ export const Container: React.FC = () => {
                 </section>
                 <section>
                     <Canvas />
-                    {/* <BoardView mode={mode} ref={boardRef} width={width} height={height} /> */}
                 </section>
                 <section>
                     {selectedObject instanceof TileClass && <TileEditor tile={selectedObject} />}

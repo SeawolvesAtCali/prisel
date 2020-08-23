@@ -64,7 +64,7 @@ export class PreRoll extends StateMachineState {
         switch (action) {
             case Action.ROLL:
                 if (!this.rolled && isRequest(packet) && this.game.isCurrentPlayer(gamePlayer)) {
-                    const initialPos = gamePlayer.pathNode.position;
+                    const initialPos = gamePlayer.pathTile.position;
                     const pathCoordinates = gamePlayer.rollAndMove();
                     this.rolled = true;
                     const steps = pathCoordinates.length;

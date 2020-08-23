@@ -58,7 +58,7 @@ export class GameStarted extends StateMachineState {
                         const startAndPan = Anim.sequence(
                             Anim.create('game_start').setLength(animationMap.game_start),
                             Anim.create('pan', {
-                                target: this.game.getCurrentPlayer().pathNode.position,
+                                target: this.game.getCurrentPlayer().pathTile.position,
                             }).setLength(300),
                         );
                         gamePlayer.player.emit(toAnimationPacket(startAndPan));

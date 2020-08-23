@@ -9,4 +9,3 @@ export * from './payment';
 export * from './propertyInfo';
 export * from './rank';
 export * from './size';
-export * from './tile';

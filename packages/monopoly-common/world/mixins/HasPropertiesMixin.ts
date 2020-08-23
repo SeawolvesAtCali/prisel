@@ -1,5 +1,5 @@
 import { Id } from '../Id';
-import { Property2 } from '../Property';
+import { Property2 } from '../Property2';
 import { Ref, RefIdSymbol } from '../Ref';
 import { World } from '../World';
 import { hasMixin, serializedHasMixin } from './hasMixin';

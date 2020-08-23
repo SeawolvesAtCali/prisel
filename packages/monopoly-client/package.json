@@ -14,7 +14,7 @@
         "test": "echo no test",
         "lint": "tslint --project tsconfig.json",
         "fix": "tslint --project tsconfig.json --fix",
-        "build": "cp -r ../monopoly-common/data/ ./assets/resources/"
+        "build": "tsc --p check.tsconfig.json && cp -r ../monopoly-common/data/ ./assets/resources/"
     },
     "bugs": {
         "url": "https://github.com/SeawolvesAtCali/prisel/issues"

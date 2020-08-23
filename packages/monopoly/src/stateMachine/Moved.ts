@@ -11,7 +11,8 @@ import {
     PlayerPurchasePayload,
     PromptPurchasePayload,
     PromptPurchaseResponsePayload,
-    Property,
+    Properties,
+    Property2,
 } from '@prisel/monopoly-common';
 import { broadcast, debug, PacketType, ResponseWrapper } from '@prisel/server';
 import { chanceHandlers } from '../chanceHandlers';
@@ -46,9 +47,9 @@ import { StateMachineState } from './StateMachineState';
 export class Moved extends StateMachineState {
     public async onEnter() {
         const currentPlayer = this.game.getCurrentPlayer();
-        const currentPathNode = currentPlayer.pathNode;
+        const currentPathTile = currentPlayer.pathTile;
 
-        const { hasProperties } = currentPathNode;
+        const { hasProperties } = currentPathTile;
 
         if (exist(hasProperties)) {
             const properties = hasProperties.map((propertyRef) => propertyRef());
@@ -89,8 +90,8 @@ export class Moved extends StateMachineState {
                 nextPlayerId: this.game.getNextPlayer().id,
             },
         });
-        const currentPlayerPos = this.game.getCurrentPlayer().pathNode.position;
-        const nextPlayerPos = this.game.getNextPlayer().pathNode.position;
+        const currentPlayerPos = this.game.getCurrentPlayer().pathTile.position;
+        const nextPlayerPos = this.game.getNextPlayer().pathTile.position;
 
         await Anim.processAndWait(
             this.broadcastAnimation,
@@ -146,18 +147,18 @@ export class Moved extends StateMachineState {
     }
 
     private handlePayRents(
-        properties: Property[],
+        properties: Property2[],
         currentPlayer: GamePlayer,
     ): Promise<void> | void {
         const rentPayments: Payment[] = [];
 
         // check for rent payment first
         for (const property of properties) {
-            if (property.owner && property.owner.id !== currentPlayer.id) {
+            if (property.owner && property.owner !== currentPlayer.id) {
                 rentPayments.push(
                     currentPlayer.payRent(
-                        property.owner as GamePlayer,
-                        property.getPropertyInfoForRent(),
+                        this.game.world.get<typeof GamePlayer>(property.owner),
+                        Properties.getPropertyInfoForRent(property),
                     ),
                 );
             }
@@ -180,10 +181,10 @@ export class Moved extends StateMachineState {
     }
 
     private handleInvest(
-        properties: Property[],
+        properties: Property2[],
         currentPlayer: GamePlayer,
     ): Promise<void> | undefined {
-        if (!properties.some((property) => property.investable(currentPlayer))) {
+        if (!properties.some((property) => Properties.investable(property, currentPlayer))) {
             return;
         }
         return this.promptForPurchases(properties);
@@ -211,15 +212,18 @@ export class Moved extends StateMachineState {
         }));
     }
 
-    private async promptForPurchases(properties: Property[]) {
+    private async promptForPurchases(properties: Property2[]) {
         const currentPlayer = this.game.getCurrentPlayer();
 
         for (const property of properties) {
-            if (!property.investable(currentPlayer)) {
+            if (!Properties.investable(property, currentPlayer)) {
                 continue;
             }
 
-            const propertyForPurchase = property.getPropertyInfoForInvesting(currentPlayer);
+            const propertyForPurchase = Properties.getPropertyInfoForInvesting(
+                property,
+                currentPlayer,
+            );
             if (currentPlayer.cash < propertyForPurchase.cost) {
                 // not enough money
                 continue;
@@ -254,7 +258,7 @@ export class Moved extends StateMachineState {
             if (response.payload.purchase) {
                 currentPlayer.purchaseProperty(
                     property,
-                    property.getPropertyInfoForInvesting(currentPlayer),
+                    Properties.getPropertyInfoForInvesting(property, currentPlayer),
                 );
                 // broadcast purchase
                 broadcast<PlayerPurchasePayload>(this.game.room.getPlayers(), {
@@ -262,13 +266,13 @@ export class Moved extends StateMachineState {
                     action: Action.ANNOUNCE_PURCHASE,
                     payload: {
                         id: currentPlayer.id,
-                        property: property.getBasicPropertyInfo(),
+                        property: Properties.getBasicPropertyInfo(property),
                     },
                 });
 
                 await Anim.processAndWait(
                     this.broadcastAnimation,
-                    Anim.create('invested', { property: property.getBasicPropertyInfo() })
+                    Anim.create('invested', { property: Properties.getBasicPropertyInfo(property) })
                         .setLength(animationMap.invested)
                         .build(),
                 ).promise;

@@ -2,11 +2,9 @@ import {
     BoardSetup,
     Coordinate,
     genId,
-    hasMixin,
-    PathNode,
-    Property,
-    StartMixinConfig,
-    Tile,
+    Mixins,
+    PropertyClass,
+    TileClass,
     World,
 } from '@prisel/monopoly-common';
 import { Room } from '@prisel/server';
@@ -20,10 +18,6 @@ import { getRand } from './utils';
 const CASH = 500;
 const MAP_PATH = path.resolve(COMMON_DATA_DIR, 'map', 'demoMap.json');
 
-export function getTileKey(tile: Tile): string {
-    return getTileKeyFromCoordinate(tile.pos);
-}
-
 export function getTileKeyFromCoordinate(coor: Coordinate): string {
     return `${coor.row}-${coor.col}`;
 }
@@ -35,13 +29,13 @@ export async function createIntialState(room: Room): Promise<Game> {
     }
     const boardSetup: BoardSetup = JSON.parse(rawBoardSetup.toString());
     const world = new World()
-        .registerObject(PathNode)
+        .registerObject(TileClass)
         .registerObject(GamePlayer)
-        .registerObject(Property)
+        .registerObject(PropertyClass)
         .deserialize(boardSetup.world);
-    const startPathNodes = world
-        .getAll(PathNode)
-        .filter((tile) => hasMixin(tile, StartMixinConfig));
+    const startPathTiles = world
+        .getAll(TileClass)
+        .filter((tile) => Mixins.hasMixin(tile, Mixins.StartMixinConfig));
     const players = room.getPlayers();
     const playerMap = new Map(
         players.map((player, index) => [
@@ -52,7 +46,7 @@ export async function createIntialState(room: Room): Promise<Game> {
                 player,
                 owning: [],
                 rolled: false,
-                pathNode: getRand(startPathNodes),
+                pathTile: getRand(startPathTiles),
                 character: index,
             }),
         ]),

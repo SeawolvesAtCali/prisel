@@ -1,9 +1,5 @@
-import { Coordinate, Tile } from '@prisel/monopoly-common';
+import { Coordinate } from '@prisel/monopoly-common';
 import { TILE_SIZE } from './consts';
-
-export function getTileKey(tile: Tile): string {
-    return getTileKeyFromCoordinate(tile.pos);
-}
 
 export function getTileKeyFromCoordinate(coor: Coordinate): string {
     return `${coor.row}-${coor.col}`;

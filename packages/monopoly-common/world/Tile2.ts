@@ -18,18 +18,18 @@ export const TileClass = createClass('tile', [
 export type Tile2 = InstanceType<typeof TileClass>;
 
 /**
- * generate path not including current node using genNextPathNode funtion.If
+ * generate path not including current node using genNextPathTile funtion.If
  * the function return undefined, generation is stopped.
  */
 export const Tiles = {
     genPathWith(
         tile: Tile2,
-        getNextPathNode: (currentPathNode: Tile2, length: number) => Tile2 | undefined,
+        genNextPathTile: (currentPathTile: Tile2, length: number) => Tile2 | undefined,
     ): Tile2[] {
         const path: Tile2[] = [];
         let current: Tile2 = tile;
         while (true) {
-            const next = getNextPathNode(current, path.length);
+            const next = genNextPathTile(current, path.length);
             if (next) {
                 path.push(next);
                 current = next;

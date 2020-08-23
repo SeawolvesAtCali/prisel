@@ -5,7 +5,6 @@ import {
     GameOverPayload,
     GamePlayerInfo,
     InitialStatePayload,
-    PathNode,
     PlayerBankruptPayload,
     PlayerEndTurnPayload,
     PlayerLeftPayload,
@@ -15,8 +14,9 @@ import {
     PlayerStartTurnPayload,
     PromptPurchasePayload,
     PromptPurchaseResponsePayload,
-    Property,
+    PropertyClass,
     RollResponsePayload,
+    TileClass,
     World,
 } from '@prisel/monopoly-common';
 import { client, ClientState } from './Client';
@@ -75,8 +75,8 @@ export default class Game extends cc.Component {
 
     private async setupGame(boardSetup: BoardSetup) {
         this.world = new World()
-            .registerObject(PathNode)
-            .registerObject(Property)
+            .registerObject(TileClass)
+            .registerObject(PropertyClass)
             .deserialize(boardSetup.world);
         this.map = this.mapNode.getComponent(MapLoader);
         this.map.renderMap(this.world, boardSetup);

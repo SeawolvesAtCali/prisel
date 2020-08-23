@@ -1,17 +1,17 @@
 import {
     BoardSetup,
     Coordinate,
-    hasMixin,
-    PathMixinConfig,
-    PathNode,
-    Property,
-    StartMixinConfig,
+    Mixins,
+    Property2,
+    PropertyClass,
+    Tile2,
+    TileClass,
     World,
 } from '@prisel/monopoly-common';
 import { animEmitter, createAnimationEvent } from './animations';
 import { TILE_SIZE } from './consts';
 import PropertyTile from './PropertyTile';
-import { default as TileComponent } from './Tile';
+import TileWrapper from './Tile';
 import {
     callOnMoveAction,
     getTileAnchorPos,
@@ -39,7 +39,7 @@ export default class MapLoader extends cc.Component {
     @property(cc.Prefab)
     private startTile = null;
 
-    private tileMap: Map<string, TileComponent> = new Map();
+    private tileMap: Map<string, TileWrapper> = new Map();
     private propertyMap: Map<string, PropertyTile> = new Map();
 
     public selectedPropertyTile: cc.Node = null;
@@ -75,10 +75,10 @@ export default class MapLoader extends cc.Component {
         this.tilePositionOffset = cc.v2(-this.mapWidthInPx / 2, this.mapHeightInPx / 2);
         this.node.setContentSize(this.mapWidthInPx, this.mapHeightInPx);
 
-        for (const tile of world.getAll(PathNode)) {
-            if (hasMixin(tile as any, StartMixinConfig)) {
+        for (const tile of world.getAll(TileClass)) {
+            if (Mixins.hasMixin(tile as any, Mixins.StartMixinConfig)) {
                 this.renderTile(this.startTile, tile, world);
-            } else if (hasMixin(tile, PathMixinConfig)) {
+            } else if (Mixins.hasMixin(tile, Mixins.PathMixinConfig)) {
                 this.renderTile(this.roadTile, tile, world);
             } else {
                 // assume it is unspecified tile
@@ -86,7 +86,7 @@ export default class MapLoader extends cc.Component {
             }
         }
 
-        for (const property of world.getAll(Property)) {
+        for (const property of world.getAll(PropertyClass)) {
             this.renderProperty(property);
         }
         createAnimationEvent('invested').sub(animEmitter, (anim) => {
@@ -97,9 +97,9 @@ export default class MapLoader extends cc.Component {
         });
     }
 
-    private renderTile(tilePrefab: cc.Prefab, tile: PathNode, world: World) {
+    private renderTile(tilePrefab: cc.Prefab, tile: Tile2, world: World) {
         const tileNode = cc.instantiate(tilePrefab);
-        const tileComp = tileNode.getComponent(TileComponent);
+        const tileComp = tileNode.getComponent(TileWrapper);
         if (!tileComp) {
             throw new Error("current tile doesn't have Tile script attached");
         }
@@ -111,7 +111,7 @@ export default class MapLoader extends cc.Component {
         return tileNode;
     }
 
-    private renderProperty(property: Property) {
+    private renderProperty(property: Property2) {
         const propertyNode = cc.instantiate(this.propertyTile);
         const propertyComp = propertyNode.getComponent(PropertyTile);
         if (!propertyComp) {
@@ -132,7 +132,7 @@ export default class MapLoader extends cc.Component {
         }
     }
 
-    public getTile(pos: Coordinate): TileComponent {
+    public getTile(pos: Coordinate): TileWrapper {
         return this.tileMap.get(getTileKeyFromCoordinate(pos));
     }
     // position node at the tile. Node needs to be a child of map

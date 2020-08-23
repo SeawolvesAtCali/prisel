@@ -1,3 +1,4 @@
+import deepCopy from 'deepcopy';
 import { Coordinate } from '../../types';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
@@ -17,20 +18,14 @@ export const PositionMixinConfig: MixinConfig<
     serialize(comp) {
         if (hasMixin(comp, PositionMixinConfig)) {
             return {
-                position: {
-                    row: comp.position.row,
-                    col: comp.position.col,
-                },
+                position: deepCopy(comp.position),
             };
         }
     },
     deserialize(serialized) {
         if (serializedHasMixin(serialized, PositionMixinConfig)) {
             return {
-                position: {
-                    row: serialized.position.row,
-                    col: serialized.position.col,
-                },
+                position: deepCopy(serialized.position),
             };
         }
     },

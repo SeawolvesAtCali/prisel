@@ -1,3 +1,4 @@
+import deepCopy from 'deepcopy';
 import { PropertyLevel } from '../../types';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
@@ -20,20 +21,14 @@ export const PropertyLevelMixinConfig: MixinConfig<
     serialize(object) {
         if (hasMixin(object, PropertyLevelMixinConfig)) {
             return {
-                propertyLevel: {
-                    current: object.propertyLevel.current,
-                    levels: object.propertyLevel.levels.map((level) => ({ ...level })),
-                },
+                propertyLevel: deepCopy(object.propertyLevel),
             };
         }
     },
     deserialize(serialized) {
         if (serializedHasMixin(serialized, PropertyLevelMixinConfig)) {
             return {
-                propertyLevel: {
-                    current: serialized.propertyLevel.current,
-                    levels: serialized.propertyLevel.levels.map((level) => ({ ...level })),
-                },
+                propertyLevel: deepCopy(serialized.propertyLevel),
             };
         }
     },

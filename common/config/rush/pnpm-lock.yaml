@@ -29,6 +29,7 @@ dependencies:
   '@types/shortid': 0.0.29
   '@types/ws': 6.0.4
   debug: 4.1.1
+  deepcopy: 2.1.0
   events: 3.1.0
   jest: 26.0.1
   jest-dev-server: 4.4.0
@@ -5561,6 +5562,12 @@ packages:
     dev: false
     resolution:
       integrity: sha1-s2nW+128E+7PUk+RsHD+7cNXzzQ=
+  /deepcopy/2.1.0:
+    dependencies:
+      type-detect: 4.0.8
+    dev: false
+    resolution:
+      integrity: sha512-8cZeTb1ZKC3bdSCP6XOM1IsTczIO73fdqtwa2B0N15eAz7gmyhQo+mc5gnFuulsgN3vIQYmTgbmQVKalH1dKvQ==
   /deepmerge/4.2.2:
     dev: false
     engines:
@@ -16628,6 +16635,7 @@ packages:
       '@types/jest': 24.9.1
       '@types/shortid': 0.0.29
       debug: 4.1.1
+      deepcopy: 2.1.0
       jest: 26.0.1
       nps: 5.9.12
       rollup: 2.12.0
@@ -16637,7 +16645,7 @@ packages:
     dev: false
     name: '@rush-temp/monopoly-common'
     resolution:
-      integrity: sha512-p9WXsEk2pW3nrDEHMS0stDurkozR0VZYNhOhMYKmlGh0NgmtCorbY3fojbfj7bjZRQ1t28Y7BRpr0vNQyk2Jgg==
+      integrity: sha512-bx5BJN6f8gUjp87I3zY7TXYaVyhdfmQ46X1KBlv1CasGXYdFTqZmP3345z78IEKbOf6mkXHmZBVjZkd2paeYXw==
       tarball: 'file:projects/monopoly-common.tgz'
     version: 0.0.0
   'file:projects/monopoly.tgz':
@@ -16793,6 +16801,7 @@ specifiers:
   '@types/shortid': ^0.0.29
   '@types/ws': ^6.0.1
   debug: ^4.1.0
+  deepcopy: ^2.1.0
   events: 3.1.0
   jest: ^26.0.1
   jest-dev-server: ^4.4.0

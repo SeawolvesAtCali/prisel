@@ -1,3 +1,4 @@
+import deepCopy from 'deepcopy';
 import { Coordinate } from '../../types';
 import { Size } from '../../types/size';
 import { hasMixin, serializedHasMixin } from './hasMixin';
@@ -26,20 +27,14 @@ export const DimensionMixinConfig: MixinConfig<
     serialize(object) {
         if (hasMixin(object, DimensionMixinConfig)) {
             return {
-                dimension: {
-                    anchor: { ...object.dimension.anchor },
-                    size: { ...object.dimension.size },
-                },
+                dimension: deepCopy(object.dimension),
             };
         }
     },
     deserialize(serialized) {
         if (serializedHasMixin(serialized, DimensionMixinConfig)) {
             return {
-                dimension: {
-                    anchor: { ...serialized.dimension.anchor },
-                    size: { ...serialized.dimension.size },
-                },
+                dimension: deepCopy(serialized.dimension),
             };
         }
     },

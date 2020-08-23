@@ -1,3 +1,4 @@
+import deepCopy from 'deepcopy';
 import { ChanceInput } from '../../types';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
@@ -17,14 +18,14 @@ export const ChancePoolMixinConfig: MixinConfig<
     serialize(object) {
         if (hasMixin(object, ChancePoolMixinConfig)) {
             return {
-                chancePool: object.chancePool.slice(),
+                chancePool: deepCopy(object.chancePool),
             };
         }
     },
     deserialize(serialized) {
         if (serializedHasMixin(serialized, ChancePoolMixinConfig)) {
             return {
-                chancePool: serialized.chancePool.slice(),
+                chancePool: deepCopy(serialized.chancePool),
             };
         }
     },

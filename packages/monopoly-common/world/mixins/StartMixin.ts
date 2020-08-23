@@ -1,3 +1,4 @@
+import deepCopy from 'deepcopy';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
 
@@ -15,14 +16,14 @@ export const StartMixinConfig: MixinConfig<StartMixin, SerializedStartMixin, 'st
     serialize(object) {
         if (hasMixin(object, StartMixinConfig)) {
             return {
-                start: { ...object.start },
+                start: deepCopy(object.start),
             };
         }
     },
     deserialize(serialized) {
         if (serializedHasMixin(serialized, StartMixinConfig)) {
             return {
-                start: { ...serialized.start },
+                start: deepCopy(serialized.start),
             };
         }
     },

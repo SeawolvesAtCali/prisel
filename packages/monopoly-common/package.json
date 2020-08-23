@@ -21,7 +21,8 @@
     "dependencies": {
         "@prisel/common": "^0.1.3",
         "debug": "^4.1.0",
-        "shortid": "^2.2.15"
+        "shortid": "^2.2.15",
+        "deepcopy": "^2.1.0"
     },
     "devDependencies": {
         "@prisel/gen-tsconfig": "0.0.0",

@@ -1,0 +1,6 @@
+.container {
+    width: 100%;
+    border: 1px dotted grey;
+    box-sizing: border-box;
+    padding: 5px 0;
+}

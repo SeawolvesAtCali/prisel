@@ -1,5 +1,6 @@
 import { GameObject, PropertyClass, TileClass } from '@prisel/monopoly-common';
 import * as React from 'react';
+import styles from './App.module.css';
 import { AppContext } from './AppContext';
 import { Canvas } from './Canvas';
 import { download } from './common';
@@ -105,8 +106,10 @@ export const Container: React.FC = () => {
                 <section>
                     <Canvas />
                 </section>
-                <section>
-                    {selectedObject instanceof TileClass && <TileEditor tile={selectedObject} />}
+                <section className={styles.propertyPanel}>
+                    {selectedObject instanceof TileClass && (
+                        <TileEditor tile={selectedObject} key={selectedObject.id} />
+                    )}
                     {selectedObject instanceof PropertyClass && (
                         <PropertyEditor property={selectedObject} />
                     )}

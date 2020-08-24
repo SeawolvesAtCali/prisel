@@ -1,4 +1,5 @@
 // re-export all mixins, these will be packaged in index.ts under Mixins module
+export * from './ChancePoolMixin';
 export * from './DimensionMixin';
 export * from './hasMixin';
 export * from './HasPropertiesMixin';

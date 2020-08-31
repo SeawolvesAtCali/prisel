@@ -1,4 +1,4 @@
-import { animEmitter, createAnimationEvent } from './animations';
+import { createAnimationEvent } from './animations';
 import { EVENT_BUS } from './consts';
 import { nullCheck } from './utils';
 
@@ -21,7 +21,7 @@ export default class CaptionAnimation extends cc.Component {
         this.anim = nullCheck(this.label.getComponent(cc.Animation));
         this.node.active = false;
         this.eventBus = nullCheck(cc.find(EVENT_BUS));
-        createAnimationEvent('game_start').sub(animEmitter, (anim) => {
+        createAnimationEvent('game_start').sub((anim) => {
             this.node.active = true;
             this.animate('START!', anim.length);
         });

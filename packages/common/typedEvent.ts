@@ -5,8 +5,10 @@ export interface TypedEvent {
     sub: (callback: () => unknown) => () => void;
 }
 
-export function createEvent(event: string | number): TypedEvent {
-    const emitter = new events.EventEmitter();
+export function createEvent(
+    event: string | number,
+    emitter: events.EventEmitter = new events.EventEmitter(),
+): TypedEvent {
     return {
         pub: () => {
             emitter.emit(event);
@@ -22,8 +24,10 @@ export interface TypedEventWithArg<Arg> {
     sub: (callback: (arg: Arg) => unknown) => () => void;
 }
 
-export function createArgEvent<Arg = never>(event: any): TypedEventWithArg<Arg> {
-    const emitter = new events.EventEmitter();
+export function createArgEvent<Arg = never>(
+    event: string | number,
+    emitter: events.EventEmitter = new events.EventEmitter(),
+): TypedEventWithArg<Arg> {
     return {
         pub: (arg: Arg) => {
             emitter.emit(event, arg);

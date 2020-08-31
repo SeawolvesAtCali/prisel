@@ -1,5 +1,5 @@
 import { Anim, Coordinate } from '@prisel/monopoly-common';
-import { animEmitter, createAnimationEvent } from './animations';
+import { createAnimationEvent } from './animations';
 import { AUTO_PANNING_PX_PER_SECOND, CAMERA_FOLLOW_OFFSET, LANDING_POS_OFFSET } from './consts';
 import Game from './Game';
 import MapLoader from './MapLoader';
@@ -16,10 +16,10 @@ export default class GameCameraControl extends cc.Component {
 
     @lifecycle
     protected start() {
-        createAnimationEvent('pan').sub(animEmitter, (anim) => {
+        createAnimationEvent('pan').sub((anim) => {
             this.moveToTileAtPos(anim.args.target, anim.length);
         });
-        createAnimationEvent('move').sub(animEmitter, async (anim) => {
+        createAnimationEvent('move').sub(async (anim) => {
             const currentGamePlayerNode = Game.get().getPlayerNode(anim.args.player.player.id);
             if (currentGamePlayerNode) {
                 this.startFollowing(currentGamePlayerNode);

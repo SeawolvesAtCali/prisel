@@ -1,6 +1,6 @@
 import { PlayerInfo } from '@prisel/client';
 import { Coordinate } from '@prisel/monopoly-common';
-import { animEmitter, createAnimationEvent } from './animations';
+import { createAnimationEvent } from './animations';
 import { EVENT_BUS, FLIP_THRESHHOLD } from './consts';
 import MapLoader from './MapLoader';
 import { SpriteFrameEntry } from './SpriteFrameEntry';
@@ -66,14 +66,14 @@ export default class Player extends cc.Component {
         this.walk = this.walk.bind(this);
         this.stop = this.stop.bind(this);
 
-        createAnimationEvent('turn_start').sub(animEmitter, (anim) => {
+        createAnimationEvent('turn_start').sub((anim) => {
             if (this.getId() === anim.args.player.player.id) {
                 const animState = this.getComponent(cc.Animation).playAdditive('turn_start');
                 animState.speed = (animState.duration * 1000) / anim.length;
             }
         });
 
-        createAnimationEvent('dice_down').sub(animEmitter, (anim) => {
+        createAnimationEvent('dice_down').sub((anim) => {
             if (this.getId() === anim.args.player.player.id) {
                 this.statusLabel.string = '' + anim.args.steps;
                 const animState = this.getComponent(cc.Animation).playAdditive('status_popup');
@@ -81,7 +81,7 @@ export default class Player extends cc.Component {
             }
         });
 
-        createAnimationEvent('move').sub(animEmitter, async (anim) => {
+        createAnimationEvent('move').sub(async (anim) => {
             if (this.getId() === anim.args.player.player.id) {
                 this.walk();
                 await nullCheck(MapLoader.get()).moveAlongPath(

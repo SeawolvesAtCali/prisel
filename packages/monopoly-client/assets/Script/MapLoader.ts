@@ -8,7 +8,7 @@ import {
     TileClass,
     World,
 } from '@prisel/monopoly-common';
-import { animEmitter, createAnimationEvent } from './animations';
+import { createAnimationEvent } from './animations';
 import { TILE_SIZE } from './consts';
 import PropertyTile from './PropertyTile';
 import TileWrapper from './Tile';
@@ -89,7 +89,7 @@ export default class MapLoader extends cc.Component {
         for (const property of world.getAll(PropertyClass)) {
             this.renderProperty(property);
         }
-        createAnimationEvent('invested').sub(animEmitter, (anim) => {
+        createAnimationEvent('invested').sub((anim) => {
             const property = this.getPropertyTileAt(anim.args.property.pos);
             if (property) {
                 property.playInvestedEffect(anim.length);

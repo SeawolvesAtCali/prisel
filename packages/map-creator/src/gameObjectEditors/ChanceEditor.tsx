@@ -8,6 +8,7 @@ import React from 'react';
 import { EnumInput } from './EnumInput';
 import { NumberInput } from './NumberInput';
 import { StringInput } from './StringInput';
+import { TileSelectInput } from './TileSelectInput';
 
 interface ChanceEditorProps<T extends keyof ChanceInputArgs> {
     autoFocus?: boolean;
@@ -19,13 +20,16 @@ const MoveToTileChanceEditor: React.FC<ChanceEditorProps<'move_to_tile'>> = ({
     autoFocus = false,
 }) => {
     return (
-        <StringInput
+        <TileSelectInput
             label="tile ID"
-            autoSelect={autoFocus}
-            initialValue={input.inputArgs.tileId}
-            onCommit={(tileId) => {
-                input.inputArgs.tileId = tileId;
-            }}
+            autoFocus={autoFocus}
+            tileId={input.inputArgs.tileId}
+            onCommit={React.useCallback(
+                (tileId) => {
+                    input.inputArgs.tileId = tileId;
+                },
+                [input],
+            )}
         />
     );
 };

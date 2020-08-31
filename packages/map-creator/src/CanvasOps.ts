@@ -1,5 +1,5 @@
-import { GameObject } from '@prisel/monopoly-common';
+import { TempSelectingConfig } from './AppContext';
 
 export interface CanvasOps {
-    selectObject: (object: GameObject | undefined) => void;
+    tempSelectingConfig: TempSelectingConfig | undefined;
 }

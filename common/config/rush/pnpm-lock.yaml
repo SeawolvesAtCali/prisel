@@ -19,6 +19,7 @@ dependencies:
   '@testing-library/react': 9.5.0_react-dom@16.13.1+react@16.13.1
   '@testing-library/user-event': 7.2.1
   '@types/debug': 0.0.30
+  '@types/events': 1.2.0
   '@types/jest': 24.9.1
   '@types/koa': 2.11.3
   '@types/lodash': 4.14.155
@@ -30,7 +31,6 @@ dependencies:
   '@types/ws': 6.0.4
   debug: 4.1.1
   deepcopy: 2.1.0
-  events: 3.1.0
   jest: 26.0.1
   jest-dev-server: 4.4.0
   jest-environment-jsdom: 23.4.0
@@ -2795,6 +2795,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-iaIVzr+w2ZJ5HkidlZ3EJM8VTZb2MJLCjw3V+505yVts0gRC4UMvjw0d1HPtGqI/HQC/KdsYtayfzl+AXY2R8g==
+  /@types/events/1.2.0:
+    dev: false
+    resolution:
+      integrity: sha512-KEIlhXnIutzKwRbQkGWb/I4HFqBuUykAdHgDED6xqwXJfONCjF5VoE0cXEiurh3XauygxzeDzgtXUqvLkxFzzA==
   /@types/express-serve-static-core/4.17.7:
     dependencies:
       '@types/node': 14.0.11
@@ -6459,6 +6463,12 @@ packages:
       node: '>=0.8.x'
     resolution:
       integrity: sha512-Rv+u8MLHNOdMjTAFeT3nCjHn2aGlx435FP/sDHNaRhDEMwyI/aB22Kj2qIN8R0cw3z28psEQLYwxVKLsKrMgWg==
+  /events/3.2.0:
+    dev: false
+    engines:
+      node: '>=0.8.x'
+    resolution:
+      integrity: sha512-/46HWwbfCX2xTawVfkKLGxMifJYQBWMwY1mjywRtb4c9x8l5NP3KoJtnIOiL1hfdRkIuYhETxQlo62IF8tcnlg==
   /eventsource/1.0.7:
     dependencies:
       original: 1.0.2
@@ -16524,7 +16534,9 @@ packages:
     version: 0.0.0
   'file:projects/common.tgz':
     dependencies:
+      '@types/events': 1.2.0
       '@types/jest': 24.9.1
+      events: 3.2.0
       jest: 26.0.1
       nps: 5.9.12
       rollup: 2.12.0
@@ -16535,7 +16547,7 @@ packages:
     dev: false
     name: '@rush-temp/common'
     resolution:
-      integrity: sha512-GPlLxQ5IlczWMdpdT+r9Qm8N9wjP0M0ipEfXkk+Ftgj6+Qc6BVHTo/jmbhwvAZNYiyOS17lRY4JCoBsuRn+8kQ==
+      integrity: sha512-MR5NHgsVez51v82P347hK+qBB8eEQGoeL+Nhq5Xwh8SSAak+WOxkKhX8US8FIvLjFePkrgd0oF7n/jro8FCERg==
       tarball: 'file:projects/common.tgz'
     version: 0.0.0
   'file:projects/configs.tgz':
@@ -16616,7 +16628,7 @@ packages:
     dev: false
     name: '@rush-temp/map-creator'
     resolution:
-      integrity: sha512-sJd39vIuofKpPMFMWJcWO8xHRIL07Ue9JtxYoHBwJhZRdRRnKrmr4NvmqzpOFs8aBb5osy7xqTeYAL4Mw5wEdA==
+      integrity: sha512-4JgfVq3Brqr35fAEtN62Mfvqq8H+0Xl58PFPPjaaukklLCKvcbvuwczZnhUFE/ngkgLYTqPBsHntg2Xq9GcSBg==
       tarball: 'file:projects/map-creator.tgz'
     version: 0.0.0
   'file:projects/monopoly-client.tgz':
@@ -16791,6 +16803,7 @@ specifiers:
   '@testing-library/react': ^9.5.0
   '@testing-library/user-event': ^7.2.1
   '@types/debug': ^0.0.30
+  '@types/events': ^1.2.0
   '@types/jest': ^24.9.1
   '@types/koa': ^2.0.47
   '@types/lodash': ^4.14.108
@@ -16802,7 +16815,6 @@ specifiers:
   '@types/ws': ^6.0.1
   debug: ^4.1.0
   deepcopy: ^2.1.0
-  events: 3.1.0
   jest: ^26.0.1
   jest-dev-server: ^4.4.0
   jest-environment-jsdom: ^23.4.0

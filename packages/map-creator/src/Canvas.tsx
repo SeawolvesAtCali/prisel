@@ -1,8 +1,10 @@
 import {
+    ChanceInput,
     Coordinate,
     exist,
     GameObject,
     log,
+    Mixins,
     Property2,
     PropertyClass,
     Tile2,
@@ -29,6 +31,7 @@ import { LayerType } from './Layer';
 import { range } from './range';
 import { toolCreatorMap } from './tools';
 import { Tool } from './tools/Tool';
+import { useMutable } from './useMutable';
 import { arrowBetweenTiles } from './utils/arrow';
 
 const Palette = {
@@ -47,8 +50,6 @@ function px(n: number): string {
 export const Canvas: React.FC = () => {
     const context = React.useContext(AppContext);
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
-    const selectedObjectRef = React.useRef(context?.selectedObject);
-    selectedObjectRef.current = context?.selectedObject;
     const [space, setSpace] = React.useState<CanvasSpace>();
     const [form, setForm] = React.useState<CanvasForm>();
 
@@ -56,17 +57,20 @@ export const Canvas: React.FC = () => {
     const world = context?.world;
     const toolType = context?.tool;
     const layerType = context?.layer;
-    const setSelectedObject = context?.setSelectedObject;
+    const selectedObjectRef = useMutable(context?.selectedObject);
+    const tempSelectingConfig = context?.tempSelectingConfig;
     const boardWidth = context?.width || 0;
     const boardHeight = context?.height || 0;
+
     const tool = React.useMemo(() => {
-        if (form && world && toolType && setSelectedObject) {
+        if (form && world && toolType) {
             const ops: CanvasOps = {
-                selectObject: setSelectedObject,
+                tempSelectingConfig,
             };
             return new toolCreatorMap[toolType](world, form, ops);
         }
-    }, [form, toolType, world, setSelectedObject]);
+    }, [form, toolType, world, tempSelectingConfig]);
+
     React.useEffect(() => {
         if (!canvasRef.current) {
             return;
@@ -153,10 +157,30 @@ function getDrawWorldFn(
                 drawProperty(property, form);
             }
         }
+        // draw arrows representing move to tile for currently selected tile
+        if (
+            selectedObjectRef.current instanceof TileClass &&
+            Mixins.hasMixin(selectedObjectRef.current, Mixins.ChancePoolMixinConfig)
+        ) {
+            const selectedTile = selectedObjectRef.current;
+            const conncetedTileIds = selectedTile.chancePool
+                .filter((chance) => chance.type === 'move_to_tile')
+                .map((chance: ChanceInput<'move_to_tile'>) => chance.inputArgs.tileId);
+            const connectedTiles = world
+                .getAll(TileClass)
+                .filter((tile) => conncetedTileIds.includes(tile.id));
+            connectedTiles.forEach((connectedTile) =>
+                arrowBetweenTiles(selectedTile, connectedTile, form),
+            );
+        }
+
         // draw start flag
         for (const tile of tiles) {
-            if (tile.start) {
+            if (Mixins.hasMixin(tile, Mixins.StartMixinConfig)) {
                 drawStartFlag(tile, form);
+            }
+            if (Mixins.hasMixin(tile, Mixins.ChancePoolMixinConfig)) {
+                drawChanceFlag(tile, form);
             }
         }
         // draw arrows
@@ -185,8 +209,14 @@ function alpha(color: Color, alpha: number) {
 function drawStartFlag(tile: Tile2, form: CanvasForm) {
     form.fillOnly(Palette.START.hex)
         .font(24)
-        .alignText('center', 'middle')
+        .alignText('start', 'middle')
         .textBox(getTileRect(tile), 'S', 'center');
+}
+function drawChanceFlag(tile: Tile2, form: CanvasForm) {
+    form.fillOnly(Palette.START.hex)
+        .font(24)
+        .alignText('end', 'middle')
+        .textBox(getTileRect(tile), 'C', 'center');
 }
 
 function getTileRect(tile: Tile2): Group {

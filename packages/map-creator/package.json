@@ -14,6 +14,7 @@
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
     "dependencies": {
         "@prisel/monopoly-common": "^0.0.0",
+        "@prisel/common": "^0.1.3",
         "@testing-library/jest-dom": "^4.2.4",
         "@testing-library/react": "^9.5.0",
         "@testing-library/user-event": "^7.2.1",

@@ -1,36 +1,36 @@
-export interface SubscriberNode<Arg = any> {
-    on(eventKey: any, handler: (arg: Arg) => any): any;
+import events from 'events';
+
+export interface TypedEvent {
+    pub: () => void;
+    sub: (callback: () => unknown) => () => void;
 }
 
-export interface PublisherNode<Arg = any> {
-    emit(eventKey: any, arg?: Arg): void;
-}
-
-export function createEvent(
-    event: any,
-): {
-    pub: (publisherNode: PublisherNode) => void;
-    sub: (subscriberNode: SubscriberNode, callback: () => void) => any;
-};
-
-export function createEvent<Arg = any>(
-    event: any,
-): {
-    pub: (publisherNode: PublisherNode, arg: Arg) => void;
-    sub: (subscriberNode: SubscriberNode, callback: (arg: Arg) => void) => any;
-};
-
-export function createEvent(event: any) {
+export function createEvent(event: string | number): TypedEvent {
+    const emitter = new events.EventEmitter();
     return {
-        pub: (publisherNode: PublisherNode, arg: any) => {
-            if (arg !== undefined) {
-                publisherNode.emit(event);
-            } else {
-                publisherNode.emit(event, arg);
-            }
+        pub: () => {
+            emitter.emit(event);
         },
-        sub: (subscriberNode: SubscriberNode, callback: () => void) => {
-            return subscriberNode.on(event, callback);
+        sub: (callback: () => unknown) => {
+            emitter.on(event, callback);
+            return () => emitter.removeListener(event, callback);
+        },
+    };
+}
+export interface TypedEventWithArg<Arg> {
+    pub: (arg: Arg) => void;
+    sub: (callback: (arg: Arg) => unknown) => () => void;
+}
+
+export function createArgEvent<Arg = never>(event: any): TypedEventWithArg<Arg> {
+    const emitter = new events.EventEmitter();
+    return {
+        pub: (arg: Arg) => {
+            emitter.emit(event, arg);
+        },
+        sub: (callback: (arg: Arg) => void) => {
+            emitter.on(event, callback);
+            return () => emitter.removeListener(event, callback);
         },
     };
 }

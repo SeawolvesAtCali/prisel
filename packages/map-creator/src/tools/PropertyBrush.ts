@@ -2,6 +2,7 @@ import { Coordinate, PropertyClass, World } from '@prisel/monopoly-common';
 import { CanvasForm } from 'pts';
 import { CanvasOps } from '../CanvasOps';
 import { equal } from '../common';
+import { selectObject } from '../events';
 import { Tool } from './Tool';
 
 export class PropertyBrush implements Tool {
@@ -12,7 +13,7 @@ export class PropertyBrush implements Tool {
             .getAll(PropertyClass)
             .find((property) => equal(property.dimension.anchor, coor));
         if (existingProperty) {
-            this.ops.selectObject(existingProperty);
+            selectObject.pub(existingProperty);
         } else {
             const property = this.world.create(PropertyClass);
             property.dimension = {
@@ -43,7 +44,7 @@ export class PropertyBrush implements Tool {
             if (!property.check()) {
                 throw new Error('property creation missing fields');
             }
-            this.ops.selectObject(property);
+            selectObject.pub(property);
         }
     }
 }

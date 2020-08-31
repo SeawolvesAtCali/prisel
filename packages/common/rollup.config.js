@@ -1,5 +1,10 @@
 import typescript from 'rollup-plugin-typescript2';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+
 import pkg from './package.json';
+
+const externalDependencyList = [...Object.keys(pkg.dependencies)];
 
 export default [
     // browser-friendly UMD build
@@ -11,6 +16,11 @@ export default [
             format: 'umd',
         },
         plugins: [
+            resolve({
+                // This is a browser module, should not use any node internal.
+                preferBuiltins: false,
+            }), // so Rollup can find dependencies
+            commonjs(), // so Rollup can convert dependencies to an ES module
             typescript({
                 tsconfigOverride: {
                     compilerOptions: {
@@ -32,6 +42,8 @@ export default [
     // `file` and `format` for each target)
     {
         input: 'index.ts',
+        external: (id) =>
+            externalDependencyList.some((dep) => id === dep || id.startsWith(`${dep}/`)),
         plugins: [
             typescript({
                 tsconfigOverride: {

@@ -1,11 +1,13 @@
 import { GameObject, PropertyClass, TileClass } from '@prisel/monopoly-common';
 import * as React from 'react';
 import styles from './App.module.css';
-import { AppContext } from './AppContext';
+import { AppContext, TempSelectingConfig } from './AppContext';
 import { Canvas } from './Canvas';
 import { download } from './common';
+import { deselectObject, selectObject } from './events';
 import { PropertyEditor } from './gameObjectEditors/PropertyEditor';
 import { TileEditor } from './gameObjectEditors/TileEditor';
+import { useTypedEvent } from './gameObjectEditors/useTypedEvent';
 import { LayerType } from './Layer';
 import { toBoardSetup } from './mapExporter';
 import { toolSupportedLayer, ToolType } from './tools/Tool';
@@ -17,11 +19,29 @@ export const Container: React.FC = () => {
     const [layer, setLayer] = React.useState(LayerType.TILE);
     const [width, setWidth] = React.useState(10);
     const [height, setHeight] = React.useState(10);
+    const [tempSelectingConfig, setTempSelecting] = React.useState<TempSelectingConfig | undefined>(
+        undefined,
+    );
     const [selectedObject, setSelectedObject] = React.useState<GameObject | undefined>(undefined);
+    useTypedEvent(selectObject, setSelectedObject);
+    useTypedEvent(
+        deselectObject,
+        React.useCallback(() => setSelectedObject(undefined), [setSelectedObject]),
+    );
     return (
         <div>
             <AppContext.Provider
-                value={{ tool, layer, width, height, world, selectedObject, setSelectedObject }}
+                value={{
+                    tool,
+                    layer,
+                    width,
+                    height,
+                    world,
+                    selectedObject,
+                    tempSelectingConfig,
+                    setTempSelecting,
+                    setSelectedObject,
+                }}
             >
                 <section>
                     <label htmlFor="width-input">width</label>

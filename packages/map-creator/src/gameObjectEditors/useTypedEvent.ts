@@ -5,10 +5,11 @@ export function useTypedEvent<T extends TypedEvent | TypedEventWithArg<any>>(
     event: T,
     callback: Parameters<T['sub']>[0],
 ) {
-    const unsubRef = React.useRef(() => {});
-    React.useMemo(() => {
-        const newRemoveListener = event.sub(callback as any);
-        unsubRef.current();
-        unsubRef.current = newRemoveListener;
-    }, [callback, event]);
+    React.useDebugValue(event.event);
+    React.useLayoutEffect(() => {
+        if (callback) {
+            const removeListener = event.sub(callback as any);
+            return removeListener;
+        }
+    }, [event, callback]);
 }

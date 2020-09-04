@@ -3,6 +3,8 @@ import events from 'events';
 export interface TypedEvent {
     pub: () => void;
     sub: (callback: () => unknown) => () => void;
+    event: string | number;
+    emitter: events.EventEmitter;
 }
 
 export function createEvent(
@@ -17,11 +19,15 @@ export function createEvent(
             emitter.on(event, callback);
             return () => emitter.removeListener(event, callback);
         },
+        event,
+        emitter,
     };
 }
 export interface TypedEventWithArg<Arg> {
     pub: (arg: Arg) => void;
     sub: (callback: (arg: Arg) => unknown) => () => void;
+    event: string | number;
+    emitter: events.EventEmitter;
 }
 
 export function createArgEvent<Arg = never>(
@@ -36,5 +42,7 @@ export function createArgEvent<Arg = never>(
             emitter.on(event, callback);
             return () => emitter.removeListener(event, callback);
         },
+        event,
+        emitter,
     };
 }

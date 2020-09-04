@@ -1,5 +1,5 @@
-import { genId } from '@prisel/monopoly-common';
 import React from 'react';
+import { useUniqueId } from '../useUniqueId';
 
 interface EnumInputProps {
     initialValue: number | string;
@@ -16,7 +16,7 @@ export const EnumInput: React.FC<EnumInputProps> = ({
     onCommit,
     label,
 }) => {
-    const uniqueName = React.useMemo(genId, []);
+    const uniqueName = useUniqueId();
 
     const [descriptionState, setDescription] = React.useState(initialValue);
 

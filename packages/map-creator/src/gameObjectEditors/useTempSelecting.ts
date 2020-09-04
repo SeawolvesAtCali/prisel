@@ -1,9 +1,10 @@
-import { GameObject, genId } from '@prisel/monopoly-common';
+import { GameObject } from '@prisel/monopoly-common';
 import React from 'react';
 import { AppContext } from '../AppContext';
 import { tempSelectObject } from '../events';
 import { LayerType } from '../Layer';
 import { useMutable } from '../useMutable';
+import { useUniqueId } from '../useUniqueId';
 import { useTypedEvent } from './useTypedEvent';
 
 export function useTempSelecting(
@@ -12,7 +13,7 @@ export function useTempSelecting(
     stopSelectingWhenSelected = true,
 ) {
     const context = React.useContext(AppContext);
-    const uniqueId = React.useMemo(genId, []);
+    const uniqueId = useUniqueId();
     const isSelecting = context?.tempSelectingConfig?.fieldId === uniqueId;
     const setTempSelectingRef = useMutable(context?.setTempSelecting);
 

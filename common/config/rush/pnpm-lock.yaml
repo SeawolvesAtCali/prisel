@@ -17,6 +17,7 @@ dependencies:
   '@rush-temp/tic-tac-toe-client': 'file:projects/tic-tac-toe-client.tgz_typescript@3.9.3'
   '@testing-library/jest-dom': 4.2.4
   '@testing-library/react': 9.5.0_react-dom@16.13.1+react@16.13.1
+  '@testing-library/react-hooks': 3.4.1_1fb72ba09e79ce5bfd91e4d67e1015b7
   '@testing-library/user-event': 7.2.1
   '@types/debug': 0.0.30
   '@types/events': 1.2.0
@@ -28,6 +29,7 @@ dependencies:
   '@types/react': 16.9.38
   '@types/react-dom': 16.9.8
   '@types/shortid': 0.0.29
+  '@types/testing-library__react-hooks': 3.4.0
   '@types/ws': 6.0.4
   debug: 4.1.1
   deepcopy: 2.1.0
@@ -47,6 +49,7 @@ dependencies:
   react-dom: 16.13.1_react@16.13.1
   react-scripts: 3.4.1_typescript@3.9.3
   react-simple-code-editor: 0.9.15_react-dom@16.13.1+react@16.13.1
+  react-test-renderer: 16.13.1_react@16.13.1
   rollup: 2.12.0
   rollup-plugin-copy: 3.3.0
   rollup-plugin-dts: 1.4.7_rollup@2.12.0+typescript@3.9.3
@@ -2693,6 +2696,18 @@ packages:
       npm: '>=6'
     resolution:
       integrity: sha512-j31Bn0rQo12fhCWOUWy9fl7wtqkp7In/YP2p5ZFyRuiiB9Qs3g+hS4gAmDWONbAHcRmVooNJ5eOHQDCOmUFXHg==
+  /@testing-library/react-hooks/3.4.1_1fb72ba09e79ce5bfd91e4d67e1015b7:
+    dependencies:
+      '@babel/runtime': 7.10.2
+      '@types/testing-library__react-hooks': 3.4.0
+      react: 16.13.1
+      react-test-renderer: 16.13.1_react@16.13.1
+    dev: false
+    peerDependencies:
+      react: '>=16.9.0'
+      react-test-renderer: '>=16.9.0'
+    resolution:
+      integrity: sha512-LbzvE7oKsVzuW1cxA/aOeNgeVvmHWG2p/WSzalIGyWuqZT3jVcNDT5KPEwy36sUYWde0Qsh32xqIUFXukeywXg==
   /@testing-library/react/9.5.0_react-dom@16.13.1+react@16.13.1:
     dependencies:
       '@babel/runtime': 7.10.2
@@ -2977,6 +2992,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-vXoIy4GUfB7/YgqubR4H7RALo+pRdMYCeLgWwV3MPwl5pggTlEkFBTF19R7u+LJc85uMqC7RfsbkqPLMQ4ab+A==
+  /@types/react-test-renderer/16.9.3:
+    dependencies:
+      '@types/react': 16.9.38
+    dev: false
+    resolution:
+      integrity: sha512-wJ7IlN5NI82XMLOyHSa+cNN4Z0I+8/YaLl04uDgcZ+W+ExWCmCiVTLT/7fRNqzy4OhStZcUwIqLNF7q+AdW43Q==
   /@types/react/16.9.35:
     dependencies:
       '@types/prop-types': 15.7.3
@@ -3031,6 +3052,29 @@ packages:
     dev: false
     resolution:
       integrity: sha512-8yu1gSwUEAwzg2OlPNbGq+ixhmSviGurBu1+ivxRKq1eRcwdjkmlwtPvr9VhuxTq2fNHBWN2po6Iem3Xt5A6rg==
+  /@types/testing-library__dom/7.5.0:
+    dependencies:
+      '@testing-library/dom': 6.16.0
+    deprecated: 'This is a stub types definition. testing-library__dom provides its own type definitions, so you do not need this installed.'
+    dev: false
+    resolution:
+      integrity: sha512-mj1aH4cj3XUpMEgVpognma5kHVtbm6U6cHZmEFzCRiXPvKkuHrFr3+yXdGLXvfFRBaQIVshPGHI+hGTOJlhS/g==
+  /@types/testing-library__react-hooks/3.4.0:
+    dependencies:
+      '@types/react-test-renderer': 16.9.3
+    dev: false
+    resolution:
+      integrity: sha512-QYLZipqt1hpwYsBU63Ssa557v5wWbncqL36No59LI7W3nCMYKrLWTnYGn2griZ6v/3n5nKXNYkTeYpqPHY7Ukg==
+  /@types/testing-library__react/10.2.0_react-dom@16.13.1+react@16.13.1:
+    dependencies:
+      '@testing-library/react': 9.5.0_react-dom@16.13.1+react@16.13.1
+    deprecated: 'This is a stub types definition. testing-library__react provides its own type definitions, so you do not need this installed.'
+    dev: false
+    peerDependencies:
+      react: '*'
+      react-dom: '*'
+    resolution:
+      integrity: sha512-KbU7qVfEwml8G5KFxM+xEfentAAVj/SOQSjW0+HqzjPE0cXpt0IpSamfX4jGYCImznDHgQcfXBPajS7HjLZduw==
   /@types/testing-library__react/9.1.3:
     dependencies:
       '@types/react-dom': 16.9.8
@@ -3039,6 +3083,13 @@ packages:
     dev: false
     resolution:
       integrity: sha512-iCdNPKU3IsYwRK9JieSYAiX0+aYDXOGAmrC/3/M7AqqSDKnWWVv07X+Zk1uFSL7cMTUYzv4lQRfohucEocn5/w==
+  /@types/testing-library__user-event/4.2.0:
+    dependencies:
+      '@testing-library/user-event': 7.2.1
+    deprecated: 'This is a stub types definition. testing-library__user-event provides its own type definitions, so you do not need this installed.'
+    dev: false
+    resolution:
+      integrity: sha512-vHuDMJY+UooghUtgFX+OucrhQWLLNUwgSOyvVkHNr+5gYag3a7xVkWNF0hyZID/+qHNw87wFqM/5uagFZ5eQIg==
   /@types/ws/6.0.4:
     dependencies:
       '@types/node': 14.0.11
@@ -13388,6 +13439,18 @@ packages:
       react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0
     resolution:
       integrity: sha512-8MNH/NFX/R7zF6W/w+FS5VXNyDusF+XDW1OU0SzODEU7wqYB+ZTGAiNJ++zVNAVqCAHdyCybScaUB+FCZOmBBw==
+  /react-test-renderer/16.13.1_react@16.13.1:
+    dependencies:
+      object-assign: 4.1.1
+      prop-types: 15.7.2
+      react: 16.13.1
+      react-is: 16.13.1
+      scheduler: 0.19.1
+    dev: false
+    peerDependencies:
+      react: ^16.13.1
+    resolution:
+      integrity: sha512-Sn2VRyOK2YJJldOqoh8Tn/lWQ+ZiKhyZTPtaO0Q6yNj+QDbmRkVFap6pZPy3YQk8DScRDfyqm/KxKYP9gCMRiQ==
   /react/16.13.1:
     dependencies:
       loose-envify: 1.4.0
@@ -16534,6 +16597,8 @@ packages:
     version: 0.0.0
   'file:projects/common.tgz':
     dependencies:
+      '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
+      '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
       '@types/events': 1.2.0
       '@types/jest': 24.9.1
       events: 3.2.0
@@ -16547,7 +16612,7 @@ packages:
     dev: false
     name: '@rush-temp/common'
     resolution:
-      integrity: sha512-MR5NHgsVez51v82P347hK+qBB8eEQGoeL+Nhq5Xwh8SSAak+WOxkKhX8US8FIvLjFePkrgd0oF7n/jro8FCERg==
+      integrity: sha512-fxbB3X7wswe11NZh8B72qhsmIvjPK/Y7CZTVsy0BIIvc6cdUL4qzSHSvFaMFQ5ZLxQmPGNqUTfyWBSnuTX884g==
       tarball: 'file:projects/common.tgz'
     version: 0.0.0
   'file:projects/configs.tgz':
@@ -16600,11 +16665,16 @@ packages:
     dependencies:
       '@testing-library/jest-dom': 4.2.4
       '@testing-library/react': 9.5.0_react-dom@16.13.1+react@16.13.1
+      '@testing-library/react-hooks': 3.4.1_1fb72ba09e79ce5bfd91e4d67e1015b7
       '@testing-library/user-event': 7.2.1
       '@types/jest': 24.9.1
       '@types/node': 12.12.47
       '@types/react': 16.9.38
       '@types/react-dom': 16.9.8
+      '@types/testing-library__dom': 7.5.0
+      '@types/testing-library__react': 10.2.0_react-dom@16.13.1+react@16.13.1
+      '@types/testing-library__react-hooks': 3.4.0
+      '@types/testing-library__user-event': 4.2.0
       autoprefixer: 9.8.0
       cssnano: 4.1.10
       jest: 26.0.1
@@ -16617,6 +16687,7 @@ packages:
       react: 16.13.1
       react-dom: 16.13.1_react@16.13.1
       react-scripts: 3.4.1_typescript@3.9.3
+      react-test-renderer: 16.13.1_react@16.13.1
       rollup: 2.12.0
       rollup-plugin-commonjs: 9.3.4_rollup@2.12.0
       rollup-plugin-node-resolve: 4.2.4
@@ -16628,16 +16699,17 @@ packages:
     dev: false
     name: '@rush-temp/map-creator'
     resolution:
-      integrity: sha512-4JgfVq3Brqr35fAEtN62Mfvqq8H+0Xl58PFPPjaaukklLCKvcbvuwczZnhUFE/ngkgLYTqPBsHntg2Xq9GcSBg==
+      integrity: sha512-b/Fts555H9hQQ587pK8kSD8YqfySEUnndm2C2rhoDUaSGDuG9CoI1DY6IoM5/DCbNprSXZOsrMM10aR0izdS3w==
       tarball: 'file:projects/map-creator.tgz'
     version: 0.0.0
   'file:projects/monopoly-client.tgz':
     dependencies:
+      '@types/events': 1.2.0
       events: 3.1.0
     dev: false
     name: '@rush-temp/monopoly-client'
     resolution:
-      integrity: sha512-GSnA6BRpkotf9G/Sd25Wp1TnTq9AAyjnZkqA4heo+LkW2TmciKbqJbiNQDj2hacqMszTsZ0zSPfnZndE9wVPdg==
+      integrity: sha512-ijaA4KoOCpHV/cvd3az9Y4nmrntsgk+lDJPO5zV1PBdESAtLCuM87GB2e1MropE5T89jbeDSyvvgVvHV/5HbIg==
       tarball: 'file:projects/monopoly-client.tgz'
     version: 0.0.0
   'file:projects/monopoly-common.tgz':
@@ -16801,6 +16873,7 @@ specifiers:
   '@rush-temp/tic-tac-toe-client': 'file:./projects/tic-tac-toe-client.tgz'
   '@testing-library/jest-dom': ^4.2.4
   '@testing-library/react': ^9.5.0
+  '@testing-library/react-hooks': ^3.4.1
   '@testing-library/user-event': ^7.2.1
   '@types/debug': ^0.0.30
   '@types/events': ^1.2.0
@@ -16812,6 +16885,7 @@ specifiers:
   '@types/react': ^16.9.38
   '@types/react-dom': ^16.9.8
   '@types/shortid': ^0.0.29
+  '@types/testing-library__react-hooks': ^3.3.0
   '@types/ws': ^6.0.1
   debug: ^4.1.0
   deepcopy: ^2.1.0
@@ -16831,6 +16905,7 @@ specifiers:
   react-dom: ^16.13.1
   react-scripts: 3.4.1
   react-simple-code-editor: ^0.9.15
+  react-test-renderer: ^16.13.1
   rollup: ^2.7.6
   rollup-plugin-copy: ^3.3.0
   rollup-plugin-dts: ^1.4.0

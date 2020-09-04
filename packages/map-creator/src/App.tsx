@@ -2,6 +2,7 @@ import { GameObject, PropertyClass, TileClass } from '@prisel/monopoly-common';
 import * as React from 'react';
 import styles from './App.module.css';
 import { AppContext, TempSelectingConfig } from './AppContext';
+import { clearSaved, saveToStorage } from './browserStorage';
 import { Canvas } from './Canvas';
 import { download } from './common';
 import { deselectObject, selectObject } from './events';
@@ -76,6 +77,14 @@ export const Container: React.FC = () => {
                     >
                         Export
                     </button>
+                    <button
+                        onClick={() => {
+                            saveToStorage(world);
+                        }}
+                    >
+                        Save
+                    </button>
+                    <button onClick={clearSaved}>Clear Saved</button>
                     <div>
                         {Object.values(ToolType).map((toolType) => (
                             <React.Fragment key={toolType}>

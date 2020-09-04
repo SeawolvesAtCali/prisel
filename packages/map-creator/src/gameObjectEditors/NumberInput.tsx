@@ -8,7 +8,7 @@ interface NumberInputProps {
 }
 
 export const NumberInput: React.FC<NumberInputProps> = (props) => {
-    const [state, setState] = React.useState(props.initialValue || 0);
+    const [state, setState] = React.useState(`${props.initialValue || 0}`);
     const { autoFocus = false } = props;
     const inputRef = React.useRef<HTMLInputElement | null>(null);
     React.useEffect(() => {
@@ -16,6 +16,7 @@ export const NumberInput: React.FC<NumberInputProps> = (props) => {
             inputRef.current?.select();
         }
     }, [inputRef, autoFocus]);
+
     return (
         <div>
             {props.label}
@@ -23,8 +24,8 @@ export const NumberInput: React.FC<NumberInputProps> = (props) => {
                 ref={inputRef}
                 value={state}
                 onChange={(e) => {
-                    const value = Number.parseInt(e.target.value, 10) || 0;
-                    setState(value);
+                    const { written, value } = getValidPrefix(e.target.value);
+                    setState(written);
                     if (props.onCommit) {
                         props.onCommit(value);
                     }
@@ -33,3 +34,22 @@ export const NumberInput: React.FC<NumberInputProps> = (props) => {
         </div>
     );
 };
+
+function getValidPrefix(
+    numString: String,
+): {
+    written: string;
+    value: number;
+} {
+    const trimmed = numString.trim();
+    switch (trimmed) {
+        case '':
+        case '-':
+            return { written: trimmed, value: 0 };
+        default:
+            return {
+                written: `${Number.parseInt(trimmed)}` || '',
+                value: Number.parseInt(trimmed) || 0,
+            };
+    }
+}

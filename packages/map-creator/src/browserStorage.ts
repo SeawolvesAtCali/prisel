@@ -1,11 +1,23 @@
 import { World } from '@prisel/monopoly-common';
 
+const WORLD_STORAGE_KEY = 'world';
 export function saveToStorage(world: World) {
-    window.localStorage.setItem('world', JSON.stringify(world.serialize()));
+    saveValueToStorage(WORLD_STORAGE_KEY, JSON.stringify(world.serialize()));
+}
+
+export function readValueFromStorage(key: string): string | null {
+    return window.localStorage.getItem(key);
+}
+
+export function saveValueToStorage(key: string, value: string) {
+    window.localStorage.setItem(key, value);
+}
+export function clearValue(key: string) {
+    window.localStorage.removeItem(key);
 }
 
 export function readFromStorage(bootstrappedWorld: World): World {
-    const worldString = window.localStorage.getItem('world');
+    const worldString = readValueFromStorage(WORLD_STORAGE_KEY);
     if (worldString) {
         return bootstrappedWorld.deserialize(JSON.parse(worldString));
     }
@@ -13,5 +25,5 @@ export function readFromStorage(bootstrappedWorld: World): World {
 }
 
 export function clearSaved() {
-    window.localStorage.removeItem('world');
+    clearValue(WORLD_STORAGE_KEY);
 }

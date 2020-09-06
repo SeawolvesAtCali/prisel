@@ -12,14 +12,15 @@ import { useTypedEvent } from './gameObjectEditors/useTypedEvent';
 import { LayerType } from './Layer';
 import { toBoardSetup } from './mapExporter';
 import { toolSupportedLayer, ToolType } from './tools/Tool';
+import { useLocalStorage } from './useLocalStorage';
 import { useWorld } from './useWorld';
 
 export const Container: React.FC = () => {
     const [tool, setTool] = React.useState(ToolType.EMPTY_TILE_BRUSH);
     const world = useWorld();
     const [layer, setLayer] = React.useState(LayerType.TILE);
-    const [width, setWidth] = React.useState(10);
-    const [height, setHeight] = React.useState(10);
+    const [width, setWidth] = useLocalStorage('map_width', 10);
+    const [height, setHeight] = useLocalStorage('map_height', 10);
     const [tempSelectingConfig, setTempSelecting] = React.useState<TempSelectingConfig | undefined>(
         undefined,
     );

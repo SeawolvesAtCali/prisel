@@ -27,7 +27,6 @@ export function toBoardSetup(world: World, width: number, height: number): Board
 
 export function connectPathAndProperties(world: World) {
     const pathTileIdMap: Map<CoordinateKey, Ref<Tile2>> = new Map();
-    const propertyIdMap: Map<CoordinateKey, Ref<Property2>> = new Map();
 
     // store all pathTiles and properties in copiedWorld for easy referencing
     for (const tile of world.getAll(TileClass)) {
@@ -39,30 +38,29 @@ export function connectPathAndProperties(world: World) {
     for (const property of world.getAll(PropertyClass)) {
         if (existOrThrow(property.dimension, 'property.dimension not set')) {
             // up
-            addNeighborWalkable(property.dimension.anchor, -1, 0);
+            addNeighborWalkable(property, -1, 0);
             // down
-            addNeighborWalkable(property.dimension.anchor, 1, 0);
+            addNeighborWalkable(property, 1, 0);
             // left
-            addNeighborWalkable(property.dimension.anchor, 0, -1);
+            addNeighborWalkable(property, 0, -1);
             // right
-            addNeighborWalkable(property.dimension.anchor, 0, 1);
+            addNeighborWalkable(property, 0, 1);
         }
     }
 
     // Populate road property mapping.
     // Run through all properties, see if there are road next to it, if there
     // is, create a mapping
-    function addNeighborWalkable(pos: Coordinate, dRow: number, dCol: number): void {
+    function addNeighborWalkable(property: Property2, dRow: number, dCol: number): void {
+        const pos = property.dimension.anchor;
         const walkablePosKey = toKey({ row: pos.row + dRow, col: pos.col + dCol });
-        const propertyPosKey = toKey(pos);
         const tileObjectRef = pathTileIdMap.get(walkablePosKey);
-        const propertyObjectRef = propertyIdMap.get(propertyPosKey);
-        if (tileObjectRef && propertyObjectRef) {
+        if (tileObjectRef) {
             const tileObject = tileObjectRef();
             if (tileObject) {
                 const hasProperties = tileObject.hasProperties ?? [];
                 tileObject.hasProperties = hasProperties;
-                tileObject.hasProperties.push(propertyObjectRef);
+                tileObject.hasProperties.push(world.getRef(property));
             } else {
                 throw new Error(
                     'Constructing property & tile association failed. No tileObject from ref',

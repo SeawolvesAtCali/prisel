@@ -1,10 +1,12 @@
 import {
     CashExchangeDirection,
+    CashExchangeType,
     ChanceInput,
     ChanceInputArgs,
     CollectableType,
 } from '@prisel/monopoly-common';
 import React from 'react';
+import { BooleanInput } from './BooleanInput';
 import { EnumInput } from './EnumInput';
 import { NumberInput } from './NumberInput';
 import { StringInput } from './StringInput';
@@ -20,17 +22,28 @@ const MoveToTileChanceEditor: React.FC<ChanceEditorProps<'move_to_tile'>> = ({
     autoFocus = false,
 }) => {
     return (
-        <TileSelectInput
-            label="tile ID"
-            autoFocus={autoFocus}
-            tileId={input.inputArgs.tileId}
-            onCommit={React.useCallback(
-                (tileId) => {
-                    input.inputArgs.tileId = tileId;
-                },
-                [input],
-            )}
-        />
+        <React.Fragment>
+            <TileSelectInput
+                label="tile ID"
+                autoFocus={autoFocus}
+                tileId={input.inputArgs.tileId}
+                onCommit={React.useCallback(
+                    (tileId) => {
+                        input.inputArgs.tileId = tileId;
+                    },
+                    [input],
+                )}
+            />
+            <BooleanInput
+                autoFocus={autoFocus}
+                initialValue={input.inputArgs.isTeleport}
+                onCommit={(value) => {
+                    input.inputArgs.isTeleport = value;
+                }}
+            >
+                isTeleport
+            </BooleanInput>
+        </React.Fragment>
     );
 };
 
@@ -52,6 +65,18 @@ export const CashExchangeChanceEditor: React.FC<ChanceEditorProps<'cash_exchange
                 }}
                 onCommit={(direction: CashExchangeDirection) => {
                     input.inputArgs.direction = direction;
+                }}
+            />
+            <EnumInput
+                label="cash exchange type"
+                initialValue={input.inputArgs.type}
+                autoFocus={false}
+                enumMap={{
+                    default: CashExchangeType.UNSPECIFIED,
+                    'property tax': CashExchangeType.OWN_PROPERTY_PER_HUNDRED,
+                }}
+                onCommit={(exchangeType: CashExchangeType) => {
+                    input.inputArgs.type = exchangeType;
                 }}
             />
             <NumberInput

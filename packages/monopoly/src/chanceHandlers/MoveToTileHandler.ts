@@ -40,6 +40,7 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
                 type: 'move_to_tile',
                 args: checkType<ChanceArgs['move_to_tile']>({
                     tile: { position: path[path.length - 1].position },
+                    isTeleport: input.inputArgs.isTeleport,
                 }),
             },
         },

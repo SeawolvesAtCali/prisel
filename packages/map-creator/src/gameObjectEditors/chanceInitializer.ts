@@ -1,5 +1,6 @@
 import {
     CashExchangeDirection,
+    CashExchangeType,
     ChanceInput,
     ChanceInputArgs,
     CollectableType,
@@ -18,6 +19,7 @@ export function chanceInitializer<T extends keyof ChanceInputArgs>(
                 type: 'move_to_tile',
                 inputArgs: {
                     tileId: '',
+                    isTeleport: false,
                 },
             };
             return moveToTile;
@@ -42,6 +44,7 @@ export function chanceInitializer<T extends keyof ChanceInputArgs>(
                 type: 'cash_exchange',
                 inputArgs: {
                     direction: CashExchangeDirection.FROM_BANK,
+                    type: CashExchangeType.UNSPECIFIED,
                     amount: 0,
                 },
             };

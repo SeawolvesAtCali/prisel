@@ -4,9 +4,9 @@ import { BooleanInput } from './BooleanInput';
 import { ChanceEditor } from './ChanceEditor';
 import { chanceInitializer } from './chanceInitializer';
 import { Divider } from './Divider';
+import styles from './Editor.module.css';
 import { EnumInput } from './EnumInput';
 import { ListEditor } from './ListEditor';
-import styles from './TileEditor.module.css';
 
 const chanceTypeSelectorMap: { [description: string]: keyof ChanceInputArgs } = {
     'please select': 'unspecified',

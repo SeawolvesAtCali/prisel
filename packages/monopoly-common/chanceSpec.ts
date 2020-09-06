@@ -8,6 +8,7 @@ export interface ChanceArgs {
     // tiles. Normally, player would only go to one tile.
     move_to_tile: {
         tile: PositionMixin;
+        isTeleport: boolean;
     };
     // pay x some money; get some money from all players; pay bank; get from bank
     cash_exchange: {
@@ -33,13 +34,21 @@ export enum CashExchangeDirection {
     FROM_BANK,
     TO_BANK,
 }
+
+export enum CashExchangeType {
+    UNSPECIFIED, // the default, plain fixed amount exchange
+    OWN_PROPERTY_PER_HUNDRED, // based on total worth of owned properties. For every hundred of worth, pay the amount.
+}
+
 export interface ChanceInputArgs {
     unspecified: {};
     move_to_tile: {
         tileId: string;
+        isTeleport: boolean;
     };
     cash_exchange: {
         direction: CashExchangeDirection;
+        type: CashExchangeType;
         amount: number;
     };
     move_steps: {

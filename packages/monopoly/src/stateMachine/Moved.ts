@@ -15,10 +15,7 @@ import {
     Property2,
 } from '@prisel/monopoly-common';
 import { broadcast, debug, PacketType, ResponseWrapper } from '@prisel/server';
-import { chanceHandlers } from '../chanceHandlers';
-import { chanceList } from '../changeList';
 import { GamePlayer } from '../gameObjects/GamePlayer';
-import { getRand } from '../utils';
 import { GameOver } from './GameOver';
 import { PreRoll } from './PreRoll';
 import { StateMachineState } from './StateMachineState';
@@ -128,23 +125,23 @@ export class Moved extends StateMachineState {
     }
 
     // return true if should continue current state
-    private async handleChance(): Promise<boolean> {
-        // randomly select a chance
-        const chanceInput = getRand(chanceList);
-        const maybeState = await chanceHandlers[chanceInput.type](this.game, chanceInput);
-        if (!this.isCurrentState()) {
-            return false;
-        }
-        // check game over
-        if (this.checkGameOver()) {
-            return false;
-        }
-        if (maybeState) {
-            this.transition(maybeState);
-            return false;
-        }
-        return true;
-    }
+    // private async handleChance(): Promise<boolean> {
+    //     // randomly select a chance
+    //     const chanceInput = getRand(chanceList);
+    //     const maybeState = await chanceHandlers[chanceInput.type](this.game, chanceInput);
+    //     if (!this.isCurrentState()) {
+    //         return false;
+    //     }
+    //     // check game over
+    //     if (this.checkGameOver()) {
+    //         return false;
+    //     }
+    //     if (maybeState) {
+    //         this.transition(maybeState);
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
     private handlePayRents(
         properties: Property2[],

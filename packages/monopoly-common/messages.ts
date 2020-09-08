@@ -1,11 +1,11 @@
 import {
-    Coordinate,
-    PropertyInfo,
-    GamePlayerInfo,
-    Payment,
-    Rank,
     Animation,
     Chance,
+    Coordinate,
+    GamePlayerInfo,
+    Payment,
+    PropertyInfo,
+    Rank,
 } from './types';
 
 export enum Action {
@@ -73,6 +73,10 @@ export enum Action {
     ANNOUNCE_BANKRUPT = 'announce_bankrupt',
     ANNOUNCE_GAME_OVER = 'announce_game_over',
     ANNOUNCE_PLAYER_LEFT = 'announce_player_left',
+    // request/response
+    // initiate from server
+    // prompt current player for acknowledging the received chance card.
+    PROMPT_CHANCE_CONFIRMATION = 'prompt_chance_confirmation',
     ANNOUNCE_CHANCE = 'announce_chance',
     ANIMATION = 'animation', // server request client play an animation
 }

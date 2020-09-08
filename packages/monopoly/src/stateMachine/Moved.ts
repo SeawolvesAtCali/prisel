@@ -2,7 +2,9 @@ import {
     Action,
     Anim,
     animationMap,
+    ChanceInputArgs,
     exist,
+    Mixins,
     Payment,
     PlayerBankruptPayload,
     PlayerEndTurnPayload,
@@ -15,10 +17,12 @@ import {
     Property2,
 } from '@prisel/monopoly-common';
 import { broadcast, debug, PacketType, ResponseWrapper } from '@prisel/server';
+import { chanceHandlers } from '../chanceHandlers';
 import { GamePlayer } from '../gameObjects/GamePlayer';
+import { getRand } from '../utils';
 import { GameOver } from './GameOver';
 import { PreRoll } from './PreRoll';
-import { StateMachineState } from './StateMachineState';
+import { StateMachineConstructor, StateMachineState } from './StateMachineState';
 
 /**
  * This state starts after the current player moves to the destination after
@@ -42,42 +46,19 @@ import { StateMachineState } from './StateMachineState';
  * Animation: pay_rent, invested, pan
  */
 export class Moved extends StateMachineState {
+    private shouldTransition: StateMachineConstructor = null;
     public async onEnter() {
         const currentPlayer = this.game.getCurrentPlayer();
-        const currentPathTile = currentPlayer.pathTile;
 
-        const { hasProperties } = currentPathTile;
-
-        if (exist(hasProperties)) {
-            const properties = hasProperties.map((propertyRef) => propertyRef());
-            const handlePayRentPromise = this.handlePayRents(properties, currentPlayer);
-            if (handlePayRentPromise) {
-                await handlePayRentPromise;
-                if (!this.isCurrentState()) {
-                    return;
-                }
-            }
-
-            const investPromise = this.handleInvest(properties, currentPlayer);
-            if (investPromise) {
-                await investPromise;
-                if (!this.isCurrentState()) {
-                    return;
-                }
-            }
-        }
-        if (this.checkGameOver()) {
+        await this.processPropertyManagement();
+        if (this.isTransitioned()) {
             return;
         }
 
-        // TODO remove these lines after testing chance.
-        // const shouldContinue = await this.handleChance();
-        // if (!this.isCurrentState()) {
-        //     return;
-        // }
-        // if (!shouldContinue) {
-        //     return;
-        // }
+        await this.processChance();
+        if (this.isTransitioned()) {
+            return;
+        }
 
         broadcast<PlayerEndTurnPayload>(this.game.room.getPlayers(), {
             type: PacketType.DEFAULT,
@@ -105,11 +86,38 @@ export class Moved extends StateMachineState {
                 )
                 .build(),
         ).promise;
-        if (!this.isCurrentState()) {
+        if (!this.isCurrent()) {
             return;
         }
         this.game.giveTurnToNext();
         this.transition(PreRoll);
+    }
+
+    private async processPropertyManagement() {
+        const currentPlayer = this.game.getCurrentPlayer();
+        const currentPathTile = currentPlayer.pathTile;
+
+        const { hasProperties } = currentPathTile;
+
+        if (exist(hasProperties)) {
+            const properties = hasProperties.map((propertyRef) => propertyRef());
+            const handlePayRentPromise = this.handlePayRents(properties, currentPlayer);
+            if (handlePayRentPromise) {
+                await handlePayRentPromise;
+                if (this.isTransitioned()) {
+                    return;
+                }
+            }
+
+            const investPromise = this.handleInvest(properties, currentPlayer);
+            if (investPromise) {
+                await investPromise;
+                if (this.isTransitioned()) {
+                    return;
+                }
+            }
+        }
+        this.checkGameOver();
     }
 
     private checkGameOver() {
@@ -125,23 +133,67 @@ export class Moved extends StateMachineState {
     }
 
     // return true if should continue current state
-    // private async handleChance(): Promise<boolean> {
-    //     // randomly select a chance
-    //     const chanceInput = getRand(chanceList);
-    //     const maybeState = await chanceHandlers[chanceInput.type](this.game, chanceInput);
-    //     if (!this.isCurrentState()) {
-    //         return false;
-    //     }
-    //     // check game over
-    //     if (this.checkGameOver()) {
-    //         return false;
-    //     }
-    //     if (maybeState) {
-    //         this.transition(maybeState);
-    //         return false;
-    //     }
-    //     return true;
-    // }
+    private async processChance() {
+        const currentPlayer = this.game.getCurrentPlayer();
+        const currentTile = currentPlayer.pathTile;
+
+        if (!Mixins.hasMixin(currentTile, Mixins.ChancePoolMixinConfig)) {
+            return;
+        }
+
+        // randomly select a chance
+        const chanceInput = getRand(currentTile.chancePool);
+
+        await Anim.processAndWait(
+            this.broadcastAnimation,
+            Anim.create('open_chance_chest', {
+                chance_chest_tile: currentTile.position,
+                chance: chanceInput.display,
+            })
+                .setLength(animationMap.open_chance_chest)
+                .build(),
+        ).promise;
+
+        if (this.isTransitioned()) {
+            return;
+        }
+
+        // wait for current player to dismiss the chance card
+        const responseWrapper = await this.game.getCurrentPlayer().player.request(
+            {
+                type: PacketType.REQUEST,
+                action: Action.PROMPT_CHANCE_CONFIRMATION,
+                payload: {},
+            },
+            10000,
+        );
+        if (this.isTransitioned()) {
+            return;
+        }
+
+        await Anim.processAndWait(
+            this.broadcastAnimation,
+            Anim.create('dismiss_chance_card').setLength(animationMap.dismiss_chance_card).build(),
+        ).promise;
+        if (this.isTransitioned()) {
+            return;
+        }
+
+        const chanceType = chanceInput.type as keyof ChanceInputArgs;
+        const maybeState = await chanceHandlers[chanceType](this.game, chanceInput);
+        if (this.isTransitioned()) {
+            return;
+        }
+        // check game over
+        if (this.checkGameOver()) {
+            return;
+        }
+        if (maybeState) {
+            this.transition(maybeState);
+            return;
+        }
+        return;
+    }
 
     private handlePayRents(
         properties: Property2[],
@@ -242,7 +294,7 @@ export class Moved extends StateMachineState {
                 0, // 0 timeout means no timeout
             );
 
-            if (!this.isCurrentState()) {
+            if (!this.isCurrent()) {
                 return;
             }
             debug('receive response for purchase' + JSON.stringify(response.get()));
@@ -273,7 +325,7 @@ export class Moved extends StateMachineState {
                         .setLength(animationMap.invested)
                         .build(),
                 ).promise;
-                if (!this.isCurrentState()) {
+                if (!this.isCurrent()) {
                     return;
                 }
             }

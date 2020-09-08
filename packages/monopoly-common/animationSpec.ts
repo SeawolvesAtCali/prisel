@@ -1,4 +1,4 @@
-import { Coordinate, PropertyInfo, GamePlayerInfo } from './types';
+import { ChanceDisplay, Coordinate, GamePlayerInfo, PropertyInfo } from './types';
 
 export enum EmotionType {
     UNSPECIFIED,
@@ -52,6 +52,18 @@ export interface AnimationArgs {
         player: GamePlayerInfo;
         emotion: EmotionType;
     };
+    // When player arrive at the tile with chance chest, a card flyout from the
+    // chance chest to the center of the screen. The current player would need
+    // to click on anywhere to dismiss it after reading card. Other clients will
+    // play the same animation except they won't be able to dismiss the card.
+    // The card will be automatically dismissed when the current player dismiss it.
+    open_chance_chest: {
+        chance_chest_tile: Coordinate;
+        chance: ChanceDisplay;
+    };
+    // Dismiss the chance card. When current player click on anywhere to dismiss
+    // the card, this animation is broadcasted.
+    dismiss_chance_card: void;
 }
 
 export type AnimationName = keyof AnimationArgs;
@@ -69,4 +81,7 @@ export const animationMap: Record<AnimationName, number> = {
     turn_start: 200,
     pay_rent: 1000,
     player_emotion: 1000,
+    // the time it takes for the card to fly out of the chest to the center of screen
+    open_chance_chest: 1000,
+    dismiss_chance_card: 0,
 };

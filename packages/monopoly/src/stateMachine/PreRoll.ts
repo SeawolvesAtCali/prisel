@@ -103,7 +103,7 @@ export class PreRoll extends StateMachineState {
                             }).setLength(animationMap.move * pathCoordinates.length),
                         ),
                     ).promise.then(() => {
-                        if (this.isCurrentState()) {
+                        if (this.isCurrent()) {
                             this.transition(Moved);
                         }
                     });

@@ -19,6 +19,10 @@ export default class TileWrapper extends cc.Component {
         this.tile = tile;
     }
 
+    public getTile() {
+        return this.tile;
+    }
+
     public getLandingPos() {
         return this.node.position.add(LANDING_POS_OFFSET);
     }

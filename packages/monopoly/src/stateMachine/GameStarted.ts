@@ -65,7 +65,7 @@ export class GameStarted extends StateMachineState {
                         this.sync.add(gamePlayer.id);
                         if (this.sync.isSynced()) {
                             await Anim.wait(startAndPan).promise;
-                            if (!this.isCurrentState()) {
+                            if (this.isTransitioned()) {
                                 return;
                             }
                             this.transition(PreRoll);

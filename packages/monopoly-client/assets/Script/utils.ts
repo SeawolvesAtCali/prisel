@@ -27,7 +27,7 @@ export function getRand<T>(list: T[]): T {
     return null;
 }
 
-export function playAnimation(node: cc.Node, animationName: string): Promise<never> {
+export function legacyPlayAnimation(node: cc.Node, animationName: string): Promise<never> {
     return new Promise((resolve, reject) => {
         const animationComp = node.getComponent(cc.Animation);
         if (!animationComp) {
@@ -83,4 +83,34 @@ export function assertNever(x: never): never {
 
 export function getTileAnchorPos(coor: Coordinate) {
     return new cc.Vec2(coor.col * TILE_SIZE, -(coor.row + 1) * TILE_SIZE);
+}
+
+export function play(comp: cc.Component, clip: string, durationInMs: number) {
+    const anim = nullCheck(comp.getComponent(cc.Animation));
+    const animState = anim.play(clip);
+    const originalDuration = animState.duration;
+    animState.speed = (originalDuration * 1000) / durationInMs;
+    return anim;
+}
+
+export function playPromise(
+    comp: cc.Component,
+    clip: string,
+    durationInMs: number,
+): Promise<unknown> {
+    const animationComp = play(comp, clip, durationInMs);
+    return new Promise((resolve) => {
+        const offListeners = () => {
+            animationComp.off('stop', offListeners);
+            animationComp.off('finished', offListeners);
+        };
+        animationComp.on('stop', () => {
+            offListeners();
+            resolve();
+        });
+        animationComp.on('finished', () => {
+            offListeners();
+            resolve();
+        });
+    });
 }

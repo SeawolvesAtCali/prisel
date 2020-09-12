@@ -3,6 +3,7 @@ import {
     deserialize,
     GameObject,
     GamePlayerInfo,
+    log,
     Payment,
     Properties,
     Property2,
@@ -13,7 +14,7 @@ import {
     Tiles,
     World,
 } from '@prisel/monopoly-common';
-import { debug, Player, PlayerId } from '@prisel/server';
+import { Player, PlayerId } from '@prisel/server';
 
 interface Props {
     id: PlayerId;
@@ -26,8 +27,9 @@ interface Props {
 }
 
 function roll(startingNode: Tile2): Tile2[] {
-    const steps = Math.trunc(Math.random() * 6) + 1;
-    debug(`player will move ${steps}`);
+    const steps = 3;
+    // const steps = Math.trunc(Math.random() * 6) + 1;
+    log.info(`player will move ${steps}`);
     return Tiles.genPath(startingNode, steps);
 }
 

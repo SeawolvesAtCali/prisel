@@ -40,7 +40,7 @@ export async function createIntialState(room: Room): Promise<Game> {
     const playerMap = new Map(
         players.map((player, index) => [
             player.getId(),
-            world.create(GamePlayer).init({
+            world.create(GamePlayer, player.getId()).init({
                 cash: CASH,
                 id: player.getId(),
                 player,

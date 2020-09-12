@@ -1,5 +1,7 @@
 scripts:
-    default: env DEBUG=debug PORT=3000 ts-node --project demo.tsconfig.json server.ts
+    default:
+        env DEBUG=debug,psl:* PORT=3000 ts-node --project demo.tsconfig.json server.ts
+        --unhandled-rejections=strict
     clean: rm -rf ./lib ./dist
     ts-check: tsc
     build: rollup --config --silent

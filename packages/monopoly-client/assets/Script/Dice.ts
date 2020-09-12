@@ -1,5 +1,5 @@
 import { EVENT, EVENT_BUS } from './consts';
-import { playAnimation } from './utils';
+import { legacyPlayAnimation } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
@@ -34,7 +34,7 @@ export default class Dice extends cc.Component {
     }
 
     public playRollAnimation() {
-        return playAnimation(this.node, 'dice_roll');
+        return legacyPlayAnimation(this.node, 'dice_roll');
     }
 
     // update (dt) {}

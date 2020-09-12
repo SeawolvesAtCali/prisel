@@ -1,0 +1,95 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "chance_card_flyout",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 1,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "paths": {
+      "DropShadow": {
+        "props": {
+          "opacity": [
+            {
+              "frame": 0,
+              "value": 130
+            },
+            {
+              "frame": 0.4166666666666667,
+              "value": 255
+            }
+          ]
+        }
+      },
+      "Card": {
+        "props": {
+          "scale": [
+            {
+              "frame": 0,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 0.2,
+                "y": 0.2
+              }
+            },
+            {
+              "frame": 0.75,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 0.2,
+                "y": 0.2
+              }
+            },
+            {
+              "frame": 0.8333333333333334,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 1,
+                "y": 1
+              }
+            }
+          ],
+          "y": [
+            {
+              "frame": 0.08333333333333333,
+              "value": 0,
+              "curve": [
+                0.4,
+                0,
+                0.7306273062730627,
+                0.18173431734317347
+              ]
+            },
+            {
+              "frame": 0.3,
+              "value": 680.467
+            },
+            {
+              "frame": 0.8333333333333334,
+              "value": 680.467,
+              "curve": [
+                0.1929113924050633,
+                0.5440506329113924,
+                0.58,
+                1
+              ]
+            },
+            {
+              "frame": 1,
+              "value": 0
+            }
+          ],
+          "x": [
+            {
+              "frame": 0.8333333333333334,
+              "value": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  "events": []
+}

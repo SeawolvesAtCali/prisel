@@ -108,6 +108,12 @@ export default class Game extends cc.Component {
         this.offPacketListeners.push(
             this.client.on(Action.ANNOUNCE_PLAYER_LEFT, this.handleAnnounceLeft.bind(this)),
         );
+        this.offPacketListeners.push(
+            this.client.on(
+                Action.PROMPT_CHANCE_CONFIRMATION,
+                this.handleChanceConfirmationPrompt.bind(this),
+            ),
+        );
 
         const response: ResponseWrapper<InitialStatePayload> = await this.client.request({
             type: PacketType.REQUEST,
@@ -171,6 +177,15 @@ export default class Game extends cc.Component {
         if (purchase) {
             this.eventBus.emit(EVENT.UPDATE_MY_MONEY, packet.payload.moneyAfterPurchase);
         }
+    }
+
+    private async handleChanceConfirmationPrompt(packet: Request) {
+        await new Promise((resolve) => this.eventBus.once(EVENT.CONFIRM_CHANCE, resolve));
+        // TODO if user doesn't click on the chance to dismiss it. It will be
+        // dismissed after 10 seconds. We will still have this promise, which
+        // is a memory leak
+
+        this.client.respond(packet, {});
     }
 
     private handleAnnouncePurchase(packet: Packet<PlayerPurchasePayload>) {

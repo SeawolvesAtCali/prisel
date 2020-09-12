@@ -5,9 +5,10 @@ import {
     CashExchangeDirection,
     ChanceArgs,
     EmotionType,
+    log,
     PlayerReceiveChancePayload,
 } from '@prisel/monopoly-common';
-import { broadcast, debug, PacketType, Player } from '@prisel/server';
+import { broadcast, PacketType, Player } from '@prisel/server';
 import { ChanceHandler } from './ChanceHander';
 
 function checkType<T>(a: T): T {
@@ -56,7 +57,7 @@ export const cashExchangeHandler: ChanceHandler<'cash_exchange'> = async (game, 
             break;
         default:
             // should not be here. game data is corrupted.
-            debug('CashExchangeHandler cannot handle cash_exchange Chance with no direction');
+            log.severe('CashExchangeHandler cannot handle cash_exchange Chance with no direction');
             return;
     }
     broadcast<PlayerReceiveChancePayload>(game.room.getPlayers(), (player: Player) => ({

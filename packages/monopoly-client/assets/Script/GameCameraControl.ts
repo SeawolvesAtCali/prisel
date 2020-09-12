@@ -1,6 +1,11 @@
 import { Anim, Coordinate } from '@prisel/monopoly-common';
 import { createAnimationEvent } from './animations';
-import { AUTO_PANNING_PX_PER_SECOND, CAMERA_FOLLOW_OFFSET, LANDING_POS_OFFSET } from './consts';
+import {
+    AUTO_PANNING_PX_PER_SECOND,
+    CAMERA_FOLLOW_OFFSET,
+    LANDING_POS_OFFSET,
+    TILE_CENTER_OFFSET,
+} from './consts';
 import Game from './Game';
 import MapLoader from './MapLoader';
 import { lifecycle, toVec2 } from './utils';
@@ -13,6 +18,22 @@ export default class GameCameraControl extends cc.Component {
     private resolveMoveToNode: (value?: void | PromiseLike<void>) => void = null;
     private moveToNodeTween: cc.Tween = null;
     private offset: cc.Vec2 = null;
+
+    private static instance: GameCameraControl;
+
+    public static get() {
+        return GameCameraControl.instance;
+    }
+
+    @lifecycle
+    protected onLoad() {
+        GameCameraControl.instance = this;
+    }
+
+    @lifecycle
+    protected onDestroy() {
+        GameCameraControl.instance = undefined;
+    }
 
     @lifecycle
     protected start() {
@@ -38,6 +59,22 @@ export default class GameCameraControl extends cc.Component {
                 durationInMs,
             );
         }
+    }
+
+    /**
+     * Convert tile coordinate to canvas position
+     * @param tile Coordinate of the tile
+     */
+    public tileToScreenPos(tile: Coordinate): cc.Vec2 | null {
+        const tileComp = MapLoader.get().getTile(tile);
+        if (tileComp) {
+            return toVec2(
+                this.getComponent(cc.Camera).getWorldToScreenPoint(
+                    tileComp.node.position.add(TILE_CENTER_OFFSET),
+                ),
+            );
+        }
+        return null;
     }
 
     public startFollowing(node: cc.Node, offset: cc.Vec2 = CAMERA_FOLLOW_OFFSET) {

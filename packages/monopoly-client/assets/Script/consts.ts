@@ -4,6 +4,7 @@ export const TILE_SIZE = 100;
 // the landing is at the bottom center of the tile.
 export const LANDING_POS_OFFSET = cc.v2(TILE_SIZE / 2, 0);
 export const MOVING_DURATION_PER_TILE = 0.5;
+export const TILE_CENTER_OFFSET = cc.v2(TILE_SIZE / 2, TILE_SIZE / 2);
 
 export const CAMERA_FOLLOW_OFFSET = cc.v2(0, TILE_SIZE);
 
@@ -71,4 +72,9 @@ export enum EVENT {
     // player click on the leave room button while in game
     LEAVE_ROOM = 'leave_room',
     ANIMATION = 'animation',
+    // receive server request, asking current player to confirm after reading
+    // the chance card.
+    PROMPT_CHANCE_CONFIRMATION = 'prompt_chance_confirmation',
+    // current player click on the screen to dismiss the chance card
+    CONFIRM_CHANCE = 'confirm_chance',
 }

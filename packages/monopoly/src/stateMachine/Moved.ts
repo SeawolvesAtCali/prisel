@@ -4,6 +4,7 @@ import {
     animationMap,
     ChanceInputArgs,
     exist,
+    log,
     Mixins,
     Payment,
     PlayerBankruptPayload,
@@ -16,7 +17,7 @@ import {
     Properties,
     Property2,
 } from '@prisel/monopoly-common';
-import { broadcast, debug, PacketType, ResponseWrapper } from '@prisel/server';
+import { broadcast, PacketType, ResponseWrapper } from '@prisel/server';
 import { chanceHandlers } from '../chanceHandlers';
 import { GamePlayer } from '../gameObjects/GamePlayer';
 import { getRand } from '../utils';
@@ -297,7 +298,7 @@ export class Moved extends StateMachineState {
             if (!this.isCurrent()) {
                 return;
             }
-            debug('receive response for purchase' + JSON.stringify(response.get()));
+            log.info('receive response for purchase' + JSON.stringify(response.get()));
             // although client shouldn't send a error response, let's just
             // check the status as well
             if (!response.ok()) {

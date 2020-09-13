@@ -15,6 +15,8 @@ import {
     World,
 } from '@prisel/monopoly-common';
 import { Player, PlayerId } from '@prisel/server';
+import { FIXED_STEPS, USE_FIXED_STEPS } from '../defaultFlags';
+import { flags } from '../flags';
 
 interface Props {
     id: PlayerId;
@@ -27,8 +29,12 @@ interface Props {
 }
 
 function roll(startingNode: Tile2): Tile2[] {
-    const steps = 3;
-    // const steps = Math.trunc(Math.random() * 6) + 1;
+    if (flags.get(USE_FIXED_STEPS)) {
+        const steps = flags.get(FIXED_STEPS);
+        log.info(`player will move a fixed ${steps} step`);
+        return Tiles.genPath(startingNode, steps);
+    }
+    const steps = Math.trunc(Math.random() * 6) + 1;
     log.info(`player will move ${steps}`);
     return Tiles.genPath(startingNode, steps);
 }

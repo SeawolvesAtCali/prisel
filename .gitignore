@@ -67,3 +67,6 @@ dist
 lib
 .DS_Store
 build
+
+# prisel local feature flag db 
+.flags

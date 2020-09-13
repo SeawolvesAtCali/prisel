@@ -24,6 +24,7 @@ dependencies:
   '@types/jest': 24.9.1
   '@types/koa': 2.11.3
   '@types/lodash': 4.14.155
+  '@types/lowdb': 1.0.1
   '@types/node': 12.12.47
   '@types/prismjs': 1.16.1
   '@types/react': 16.9.38
@@ -39,6 +40,7 @@ dependencies:
   jest-standard-reporter: 1.0.4
   koa: 2.12.0
   lodash: 4.17.15
+  lowdb: 1.0.0
   mock-socket: 9.0.3
   normalize.css: 8.0.1
   nps: 5.9.12
@@ -2928,6 +2930,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-vEcX7S7aPhsBCivxMwAANQburHBtfN9RdyXFk84IJmu2Z4Hkg1tOFgaslRiEqqvoLtbCBi6ika1EMspE+NZ9Lg==
+  /@types/lowdb/1.0.1:
+    dependencies:
+      '@types/lodash': 4.14.155
+    dev: false
+    resolution:
+      integrity: sha512-tvpzG1N62KKdmCXdGgl3cC4wOJ2LJffQCQN3UHUznHFfLYx3U8ojsb2bRdflxoZiYwAgAlF7ROC6BIxfd1NVCg==
   /@types/marked/0.4.2:
     dev: false
     resolution:
@@ -8459,6 +8467,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-IHurkWOEmcB7Kt8kCkGochADRXU=
+  /is-promise/2.2.2:
+    dev: false
+    resolution:
+      integrity: sha512-+lP4/6lKUBfQjZ2pdxThZvLUAafmZb8OAxFb8XXtiQmS35INgr85hdOGoEs124ez1FCnZJt6jau/T+alh58QFQ==
   /is-reference/1.2.0:
     dependencies:
       '@types/estree': 0.0.44
@@ -10108,6 +10120,18 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
+  /lowdb/1.0.0:
+    dependencies:
+      graceful-fs: 4.2.4
+      is-promise: 2.2.2
+      lodash: 4.17.15
+      pify: 3.0.0
+      steno: 0.4.4
+    dev: false
+    engines:
+      node: '>=4'
+    resolution:
+      integrity: sha512-2+x8esE/Wb9SQ1F9IHaYWfsC9FIecLOPrK4g17FGEayjUWH172H6nwicRovGvSE2CPZouc2MCIqCI7h9d+GftQ==
   /lower-case/2.0.1:
     dependencies:
       tslib: 1.11.2
@@ -14753,6 +14777,12 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=
+  /steno/0.4.4:
+    dependencies:
+      graceful-fs: 4.2.4
+    dev: false
+    resolution:
+      integrity: sha1-BxEFvfwobmYVwEA8J+nXtdy4Vcs=
   /stream-browserify/2.0.2:
     dependencies:
       inherits: 2.0.4
@@ -16738,7 +16768,9 @@ packages:
       '@rollup/plugin-json': 4.1.0_rollup@2.12.0
       '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
       '@types/jest': 24.9.1
+      '@types/lowdb': 1.0.1
       jest: 26.0.1
+      lowdb: 1.0.0
       nps: 5.9.12
       rollup: 2.12.0
       rollup-plugin-copy: 3.3.0
@@ -16751,7 +16783,7 @@ packages:
     dev: false
     name: '@rush-temp/monopoly'
     resolution:
-      integrity: sha512-f+2rVQicq9TNQgJOBvHV0/4Fm4uoJBffuy1+yNMcRgZaXDKKVEM/WiY1fn6ObYEVUdVnG5iNuOWwo4SJVZ/E1Q==
+      integrity: sha512-DiAmLRAvP5ByJQ4QaEArftn+ZKSqAfykcAV5PIudzk9C6R0FN1emE95XnV9ADpc5sNATcqZaiArGJHdy+4b+SQ==
       tarball: 'file:projects/monopoly.tgz'
     version: 0.0.0
   'file:projects/react.tgz':
@@ -16880,6 +16912,7 @@ specifiers:
   '@types/jest': ^24.9.1
   '@types/koa': ^2.0.47
   '@types/lodash': ^4.14.108
+  '@types/lowdb': 1.0.1
   '@types/node': ^12.12.47
   '@types/prismjs': ^1.9.0
   '@types/react': ^16.9.38
@@ -16895,6 +16928,7 @@ specifiers:
   jest-standard-reporter: ^1.0.4
   koa: ^2.6.2
   lodash: ^4.17.11
+  lowdb: 1.0.0
   mock-socket: ^9.0.3
   normalize.css: ^8.0.1
   nps: ^5.9.12

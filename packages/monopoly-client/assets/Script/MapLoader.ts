@@ -1,24 +1,26 @@
 import {
-    isRoadTile,
-    isStartTile,
-    isPropertyTile,
     BoardSetup,
-    Tile,
-    StartTile,
     Coordinate,
+    Mixins,
+    Property2,
+    PropertyClass,
+    Tile2,
+    TileClass,
+    World,
 } from '@prisel/monopoly-common';
-
-import { default as TileComponent } from './Tile';
-import {
-    getTileKey,
-    getTileKeyFromCoordinate,
-    setZIndexAction,
-    callOnMoveAction,
-    lifecycle,
-} from './utils';
-import { TILE_SIZE, EVENT_BUS } from './consts';
+import { createAnimationEvent } from './animations';
+import { TILE_SIZE } from './consts';
 import PropertyTile from './PropertyTile';
-import { createAnimationEvent, animEmitter } from './animations';
+import TileWrapper from './Tile';
+import {
+    callOnMoveAction,
+    getTileAnchorPos,
+    getTileKeyFromCoordinate,
+    lifecycle,
+    nullCheck,
+    setZIndexAction,
+} from './utils';
+
 const { ccclass, property } = cc._decorator;
 
 // TODO: reposition this to be Map component, that handles only rendering map
@@ -37,9 +39,8 @@ export default class MapLoader extends cc.Component {
     @property(cc.Prefab)
     private startTile = null;
 
-    private startTiles: StartTile[] = null;
-
-    private tileMap: Map<string, TileComponent> = null;
+    private tileMap: Map<string, TileWrapper> = new Map();
+    private propertyMap: Map<string, PropertyTile> = new Map();
 
     public selectedPropertyTile: cc.Node = null;
 
@@ -63,34 +64,32 @@ export default class MapLoader extends cc.Component {
         MapLoader.instance = undefined;
     }
 
-    public renderMap(boardSetup: BoardSetup) {
+    public renderMap(world: World, boardSetup: BoardSetup) {
         if (!this.emptyTile || !this.roadTile || !this.propertyTile || !this.startTile) {
             cc.log('Tile prefabs not set');
             return;
         }
-        const { tiles, height, width, roadPropertyMapping } = boardSetup;
+        const { height, width } = boardSetup;
         this.mapHeightInPx = height * TILE_SIZE;
         this.mapWidthInPx = width * TILE_SIZE;
         this.tilePositionOffset = cc.v2(-this.mapWidthInPx / 2, this.mapHeightInPx / 2);
         this.node.setContentSize(this.mapWidthInPx, this.mapHeightInPx);
 
-        this.startTiles = [];
-        this.tileMap = new Map();
-
-        for (const tile of tiles) {
-            if (isRoadTile(tile)) {
-                this.renderTile(this.roadTile, tile);
-            } else if (isStartTile(tile)) {
-                this.startTiles.push(tile);
-                this.renderTile(this.startTile, tile);
-            } else if (isPropertyTile(tile)) {
-                this.renderTile(this.propertyTile, tile);
+        for (const tile of world.getAll(TileClass)) {
+            if (Mixins.hasMixin(tile as any, Mixins.StartMixinConfig)) {
+                this.renderTile(this.startTile, tile, world);
+            } else if (Mixins.hasMixin(tile, Mixins.PathMixinConfig)) {
+                this.renderTile(this.roadTile, tile, world);
             } else {
                 // assume it is unspecified tile
-                this.renderTile(this.emptyTile, tile);
+                this.renderTile(this.emptyTile, tile, world);
             }
         }
-        createAnimationEvent('invested').sub(animEmitter, (anim) => {
+
+        for (const property of world.getAll(PropertyClass)) {
+            this.renderProperty(property);
+        }
+        createAnimationEvent('invested').sub((anim) => {
             const property = this.getPropertyTileAt(anim.args.property.pos);
             if (property) {
                 property.playInvestedEffect(anim.length);
@@ -98,32 +97,42 @@ export default class MapLoader extends cc.Component {
         });
     }
 
-    private renderTile(tilePrefab: cc.Prefab, tile: Tile) {
+    private renderTile(tilePrefab: cc.Prefab, tile: Tile2, world: World) {
         const tileNode = cc.instantiate(tilePrefab);
-        const tileComp = tileNode.getComponent(TileComponent);
+        const tileComp = tileNode.getComponent(TileWrapper);
         if (!tileComp) {
             throw new Error("current tile doesn't have Tile script attached");
         }
-        tileComp.init(tile);
+        tileComp.init(nullCheck(tile));
         this.node.addChild(tileNode, tileComp.getZIndex());
-        tileNode.setPosition(this.tilePositionOffset.add(tileComp.getInitialAnchorPos()));
-        this.tileMap.set(getTileKey(tile), tileComp);
+        tileNode.setPosition(this.tilePositionOffset.add(getTileAnchorPos(tile.position)));
+        this.tileMap.set(getTileKeyFromCoordinate(tile.position), tileComp);
 
         return tileNode;
     }
 
-    public getStartTiles(): StartTile[] {
-        return this.startTiles;
+    private renderProperty(property: Property2) {
+        const propertyNode = cc.instantiate(this.propertyTile);
+        const propertyComp = propertyNode.getComponent(PropertyTile);
+        if (!propertyComp) {
+            throw new Error("current property doesn't have PropertyTile script attached");
+        }
+        propertyComp.init(property.dimension.anchor);
+        this.node.addChild(propertyNode, propertyComp.getZIndex());
+        propertyNode.setPosition(
+            this.tilePositionOffset.add(getTileAnchorPos(property.dimension.anchor)),
+        );
+        this.propertyMap.set(getTileKeyFromCoordinate(property.dimension.anchor), propertyComp);
     }
 
     public getPropertyTileAt(pos: Coordinate): PropertyTile {
-        const node = this.tileMap.get(getTileKeyFromCoordinate(pos));
+        const node = this.propertyMap.get(getTileKeyFromCoordinate(pos));
         if (node) {
             return node.getComponent(PropertyTile);
         }
     }
 
-    public getTile(pos: Coordinate): TileComponent {
+    public getTile(pos: Coordinate): TileWrapper {
         return this.tileMap.get(getTileKeyFromCoordinate(pos));
     }
     // position node at the tile. Node needs to be a child of map

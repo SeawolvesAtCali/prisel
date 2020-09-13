@@ -1,19 +1,17 @@
 import {
     Action,
-    PlayerRollPayload,
-    RollResponsePayload,
-    PlayerStartTurnPayload,
-    PlayerLeftPayload,
     Anim,
-    toAnimationPacket,
     animationMap,
-    AnimationPayload,
+    PlayerLeftPayload,
+    PlayerRollPayload,
+    PlayerStartTurnPayload,
+    RollResponsePayload,
 } from '@prisel/monopoly-common';
-import { Packet, isRequest, broadcast, PacketType } from '@prisel/server';
-import { GamePlayer } from '../GamePlayer';
-import { StateMachineState } from './StateMachineState';
-import { Moved } from './Moved';
+import { broadcast, isRequest, Packet, PacketType } from '@prisel/server';
+import { GamePlayer } from '../gameObjects/GamePlayer';
 import { GameOver } from './GameOver';
+import { Moved } from './Moved';
+import { StateMachineState } from './StateMachineState';
 
 /**
  * This state is the start of a turn. On client side, camera is focused on the
@@ -66,7 +64,7 @@ export class PreRoll extends StateMachineState {
         switch (action) {
             case Action.ROLL:
                 if (!this.rolled && isRequest(packet) && this.game.isCurrentPlayer(gamePlayer)) {
-                    const initialPos = gamePlayer.pathNode.tile.pos;
+                    const initialPos = gamePlayer.pathTile.position;
                     const pathCoordinates = gamePlayer.rollAndMove();
                     this.rolled = true;
                     const steps = pathCoordinates.length;
@@ -105,7 +103,7 @@ export class PreRoll extends StateMachineState {
                             }).setLength(animationMap.move * pathCoordinates.length),
                         ),
                     ).promise.then(() => {
-                        if (this.isCurrentState()) {
+                        if (this.isCurrent()) {
                             this.transition(Moved);
                         }
                     });

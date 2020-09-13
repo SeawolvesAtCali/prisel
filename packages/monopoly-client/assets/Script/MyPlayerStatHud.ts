@@ -1,5 +1,5 @@
-import { EVENT_BUS, EVENT, getCharacterAvatarSpriteName } from './consts';
 import { GamePlayerInfo } from '@prisel/monopoly-common';
+import { EVENT, EVENT_BUS, getCharacterAvatarSpriteName } from './consts';
 
 const { ccclass, property } = cc._decorator;
 

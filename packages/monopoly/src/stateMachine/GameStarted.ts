@@ -1,16 +1,16 @@
-import { StateMachineState } from './StateMachineState';
-import { Packet, isRequest, broadcast, PacketType } from '@prisel/server';
 import {
     Action,
+    Anim,
+    animationMap,
     InitialStatePayload,
     PlayerLeftPayload,
-    Anim,
     toAnimationPacket,
-    animationMap,
 } from '@prisel/monopoly-common';
-import { GamePlayer } from '../GamePlayer';
-import { PreRoll } from './PreRoll';
+import { broadcast, isRequest, Packet, PacketType } from '@prisel/server';
+import { GamePlayer } from '../gameObjects/GamePlayer';
 import { GameOver } from './GameOver';
+import { PreRoll } from './PreRoll';
+import { StateMachineState } from './StateMachineState';
 import { Sync, syncGamePlayer } from './utils';
 
 /**
@@ -58,14 +58,14 @@ export class GameStarted extends StateMachineState {
                         const startAndPan = Anim.sequence(
                             Anim.create('game_start').setLength(animationMap.game_start),
                             Anim.create('pan', {
-                                target: this.game.getCurrentPlayer().pathNode.tile.pos,
+                                target: this.game.getCurrentPlayer().pathTile.position,
                             }).setLength(300),
                         );
                         gamePlayer.player.emit(toAnimationPacket(startAndPan));
                         this.sync.add(gamePlayer.id);
                         if (this.sync.isSynced()) {
                             await Anim.wait(startAndPan).promise;
-                            if (!this.isCurrentState()) {
+                            if (this.isTransitioned()) {
                                 return;
                             }
                             this.transition(PreRoll);

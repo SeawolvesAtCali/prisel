@@ -2,10 +2,8 @@
     "extends": "../../tsconfig",
     "compilerOptions": {
         "rootDir": "./",
-        "noEmit": true
+        "noEmit": true,
+        "strictNullChecks": true
     },
-    "exclude": [
-        "node_modules",
-        "**/lib"
-    ]
+    "exclude": ["node_modules", "**/lib"]
 }

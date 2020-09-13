@@ -1,11 +1,14 @@
-import { toVec2, lifecycle } from './utils';
-import { AUTO_PANNING_PX_PER_SECOND, CAMERA_FOLLOW_OFFSET, LANDING_POS_OFFSET } from './consts';
-import { Anim, samePos, Coordinate } from '@prisel/monopoly-common';
-import { createAnimationEvent, animEmitter } from './animations';
-
+import { Anim, Coordinate } from '@prisel/monopoly-common';
+import { createAnimationEvent } from './animations';
+import {
+    AUTO_PANNING_PX_PER_SECOND,
+    CAMERA_FOLLOW_OFFSET,
+    LANDING_POS_OFFSET,
+    TILE_CENTER_OFFSET,
+} from './consts';
 import Game from './Game';
-import Player from './Player';
 import MapLoader from './MapLoader';
+import { lifecycle, toVec2 } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
@@ -16,12 +19,28 @@ export default class GameCameraControl extends cc.Component {
     private moveToNodeTween: cc.Tween = null;
     private offset: cc.Vec2 = null;
 
+    private static instance: GameCameraControl;
+
+    public static get() {
+        return GameCameraControl.instance;
+    }
+
+    @lifecycle
+    protected onLoad() {
+        GameCameraControl.instance = this;
+    }
+
+    @lifecycle
+    protected onDestroy() {
+        GameCameraControl.instance = undefined;
+    }
+
     @lifecycle
     protected start() {
-        createAnimationEvent('pan').sub(animEmitter, (anim) => {
+        createAnimationEvent('pan').sub((anim) => {
             this.moveToTileAtPos(anim.args.target, anim.length);
         });
-        createAnimationEvent('move').sub(animEmitter, async (anim) => {
+        createAnimationEvent('move').sub(async (anim) => {
             const currentGamePlayerNode = Game.get().getPlayerNode(anim.args.player.player.id);
             if (currentGamePlayerNode) {
                 this.startFollowing(currentGamePlayerNode);
@@ -40,6 +59,22 @@ export default class GameCameraControl extends cc.Component {
                 durationInMs,
             );
         }
+    }
+
+    /**
+     * Convert tile coordinate to canvas position
+     * @param tile Coordinate of the tile
+     */
+    public tileToScreenPos(tile: Coordinate): cc.Vec2 | null {
+        const tileComp = MapLoader.get().getTile(tile);
+        if (tileComp) {
+            return toVec2(
+                this.getComponent(cc.Camera).getWorldToScreenPoint(
+                    tileComp.node.position.add(TILE_CENTER_OFFSET),
+                ),
+            );
+        }
+        return null;
     }
 
     public startFollowing(node: cc.Node, offset: cc.Vec2 = CAMERA_FOLLOW_OFFSET) {

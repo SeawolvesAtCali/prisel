@@ -16,9 +16,8 @@ export default [
         },
         plugins: [
             resolve({
-                // need to specify preferBuiltins
-                // https://github.com/rollup/rollup-plugin-node-resolve/issues/196
-                preferBuiltins: true,
+                // do not use node builtin, because this is a browser build
+                preferBuiltins: false,
             }), // so Rollup can find dependencies
             commonjs(), // so Rollup can convert dependencies to an ES module
             typescript({

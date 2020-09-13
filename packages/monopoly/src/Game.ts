@@ -1,8 +1,6 @@
-import { GamePlayer } from './GamePlayer';
-import GameObject, { FlatGameObject, Ref } from './GameObject';
-import { log } from './logGameObject';
-import { PlayerId, Player, Room } from '@prisel/server';
-import Property from './Property';
+import { World } from '@prisel/monopoly-common';
+import { Player, PlayerId, Room } from '@prisel/server';
+import { GamePlayer } from './gameObjects/GamePlayer';
 import { StateMachine } from './stateMachine/StateMachine';
 
 interface Props {
@@ -10,32 +8,26 @@ interface Props {
     players: Map<PlayerId, GamePlayer>;
     turnOrder: GamePlayer[];
     room: Room;
-    properties: Property[];
+    world: World;
 }
 
-interface FlatGame extends FlatGameObject {
-    players: { [playerId: string]: Ref<GamePlayer> };
-    turnOrder: Array<Ref<GamePlayer>>;
-}
-
-export default class Game extends GameObject {
+export default class Game {
     public id: string;
     public players: Map<string, GamePlayer>;
     public turnOrder: GamePlayer[];
     public room: Room;
-    public properties: Property[];
     public stateMachine: StateMachine;
+    public world: World;
 
-    constructor(props: Props) {
-        super();
+    public init(props: Props) {
         this.id = props.id;
         this.players = props.players;
         this.turnOrder = props.turnOrder;
         this.room = props.room;
-        this.properties = props.properties;
+        this.world = props.world;
+        return this;
     }
 
-    @log
     public giveTurnToNext(): void {
         this.turnOrder = [...this.turnOrder.slice(1), this.turnOrder[0]];
     }
@@ -52,18 +44,6 @@ export default class Game extends GameObject {
         return this.turnOrder[0];
     }
 
-    public flat(): FlatGame {
-        const players: { [playerId: string]: Ref<GamePlayer> } = {};
-        this.players.forEach((player, key) => {
-            players[key] = this.ref(player);
-        });
-        return {
-            id: this.id,
-            players,
-            turnOrder: this.turnOrder.map(this.ref),
-        };
-    }
-
     public getPlayerId(player: Player): string {
         return this.players.get(player.getId()).id;
     }
@@ -77,5 +57,5 @@ export default class Game extends GameObject {
 }
 
 export function create(props: Props) {
-    return new Game(props);
+    return new Game().init(props);
 }

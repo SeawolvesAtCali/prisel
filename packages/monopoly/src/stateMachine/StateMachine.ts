@@ -1,6 +1,6 @@
+import { log } from '@prisel/monopoly-common';
 import Game from '../Game';
 import { StateMachineState } from './StateMachineState';
-import { debug } from '@prisel/server';
 
 export class StateMachine {
     private currentState: StateMachineState;
@@ -34,7 +34,7 @@ export class StateMachine {
             const previousState = this.currentState;
             previousState.onExit();
             this.currentState = new stateClass(this.game, this);
-            debug(
+            log.info(
                 `transition from ${previousState[Symbol.toStringTag]} to ${
                     this.currentState[Symbol.toStringTag]
                 }`,

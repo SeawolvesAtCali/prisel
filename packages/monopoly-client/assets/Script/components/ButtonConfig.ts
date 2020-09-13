@@ -1,6 +1,6 @@
-import { ComponentConfig } from './ComponentConfig';
 import SharedAssets from '../SharedAssets';
 import { nullCheck } from '../utils';
+import { ComponentConfig } from './ComponentConfig';
 
 export class ButtonConfig extends ComponentConfig {
     public interactable: boolean = true;

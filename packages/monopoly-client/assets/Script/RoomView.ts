@@ -1,13 +1,13 @@
-import { nullCheck } from './utils';
-import { client, ClientState } from './Client';
 import {
     Client,
-    ResponseWrapper,
-    JoinResponsePayload,
-    Messages,
-    LobbyRoomViewInfo,
     JoinPayload,
+    JoinResponsePayload,
+    LobbyRoomViewInfo,
+    Messages,
+    ResponseWrapper,
 } from '@prisel/client';
+import { client, ClientState } from './Client';
+import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 

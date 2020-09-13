@@ -466,6 +466,11 @@
             "packageName": "@prisel/gen-tsconfig",
             "projectFolder": "tools/gen-tsconfig",
             "reviewCategory": "tools"
+        },
+        {
+            "packageName": "@prisel/configs",
+            "projectFolder": "tools/configs",
+            "reviewCategory": "tools"
         }
         //
         // {

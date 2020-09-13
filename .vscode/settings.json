@@ -13,5 +13,19 @@
         "**/.cache/**": true,
         "**/dist/**": true
     },
-    "eslint.enable": true
+    "eslint.enable": true,
+    "prettier.prettierPath": "./tools/configs/node_modules/prettier",
+    "[typescript]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "[typescriptreact]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "search.exclude": {
+        "**/.cache": true
+    }
 }

@@ -1,9 +1,9 @@
-import { ClientState, client } from './Client';
 import { Client, Packet } from '@prisel/client';
-import { nullCheck, lifecycle, assertNever } from './utils';
-import { Action, AnimationPayload, Animation, AnimationType, Anim } from '@prisel/monopoly-common';
-import { EVENT_BUS, EVENT } from './consts';
+import { Action, Anim, Animation, AnimationPayload, AnimationType } from '@prisel/monopoly-common';
 import { animEmitter } from './animations';
+import { client, ClientState } from './Client';
+import { EVENT, EVENT_BUS } from './consts';
+import { assertNever, lifecycle, nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 

@@ -1,7 +1,7 @@
+import { Action, log } from '@prisel/monopoly-common';
+import { RemoveListenerFunc, Request, ResponseWrapper } from '@prisel/server';
 import Game from './Game';
-import { GamePlayer } from './GamePlayer';
-import { Action } from '@prisel/monopoly-common';
-import { ResponseWrapper, RemoveListenerFunc, Request, debug } from '@prisel/server';
+import { GamePlayer } from './gameObjects/GamePlayer';
 
 /**
  * Will be clear when done or when player's turn ends
@@ -55,13 +55,11 @@ export class Turn {
                         requestListener.isDone &&
                         requestListener.isDone(this.game, responseWrapper)
                     ) {
-                        debug('off listener for ' + packet.action);
                         offListener();
                         resolve();
                     }
                 },
             );
-            debug('adding offlistner for ' + requestListener.action);
             this.offListeners.add(offListener);
         });
     }
@@ -71,7 +69,7 @@ export class Turn {
             return;
         }
         this.isActive = false;
-        debug('Ending turn for %0', this.player.id, this.offListeners);
+        log.info('Ending turn for %0', this.player.id, this.offListeners);
         for (const off of this.offListeners) {
             off();
         }

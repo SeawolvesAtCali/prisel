@@ -1,7 +1,7 @@
-import { NodeConfig } from './NodeConfig';
 import SharedAssets from '../SharedAssets';
-import { WidgetConfig } from './WidgetConfig';
 import { nullCheck } from '../utils';
+import { NodeConfig } from './NodeConfig';
+import { WidgetConfig } from './WidgetConfig';
 
 interface InputProps {
     name?: string;

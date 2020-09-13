@@ -1,12 +1,15 @@
-import Game from '../Game';
-import { Packet, broadcast } from '@prisel/server';
-import { GamePlayer } from '../GamePlayer';
-import { StateMachine } from './StateMachine';
 import { AnimationPayload } from '@prisel/monopoly-common';
+import { broadcast, Packet } from '@prisel/server';
+import Game from '../Game';
+import { GamePlayer } from '../gameObjects/GamePlayer';
+import { StateMachine } from './StateMachine';
 
+export type StateMachineConstructor = new (game: Game, machine: StateMachine) => StateMachineState;
 export abstract class StateMachineState {
     protected game: Game;
     private machine: StateMachine;
+    private pendingTransition: StateMachineConstructor = null;
+
     constructor(game: Game, machine: StateMachine) {
         this.game = game;
         this.machine = machine;
@@ -16,9 +19,22 @@ export abstract class StateMachineState {
      * state can still be running even if it is not a current state if we have
      * some async operation that is not terminated when transition.
      */
-    protected isCurrentState(): boolean {
-        return this.machine.state === this;
+    protected isCurrent(): boolean {
+        return !this.pendingTransition;
     }
+
+    /**
+     * Return true if there is already a pending State to transition to in the
+     * next tick. The caller should not perform more logic because we are ready
+     * to transition.
+     * This function will return true even after the transition, so it can be
+     * used as a catchall condition to determine if caller should perform
+     * further logic.
+     */
+    protected isTransitioned(): boolean {
+        return !!this.pendingTransition;
+    }
+
     public onEnter(): Promise<void> | void {}
     public onExit() {}
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
@@ -28,8 +44,9 @@ export abstract class StateMachineState {
     // implement this for state name
     public abstract get [Symbol.toStringTag](): string;
 
-    protected transition(state: new (game: Game, machine: StateMachine) => StateMachineState) {
-        if (this.isCurrentState()) {
+    protected transition(state: StateMachineConstructor) {
+        if (this.isCurrent()) {
+            this.pendingTransition = state;
             this.machine.transition(state);
         }
     }

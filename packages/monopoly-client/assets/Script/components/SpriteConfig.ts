@@ -1,6 +1,6 @@
-import { ComponentConfig } from './ComponentConfig';
 import SharedAssets from '../SharedAssets';
 import { nullCheck } from '../utils';
+import { ComponentConfig } from './ComponentConfig';
 
 export class SpriteConfig extends ComponentConfig {
     public spriteFrame: cc.SpriteFrame;

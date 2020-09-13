@@ -1,9 +1,9 @@
-import { GameConfig, debug, Request, Packet, Player } from '@prisel/server';
-import { createIntialState, flattenState } from './state';
+import { Action, log } from '@prisel/monopoly-common';
+import { GameConfig, Packet, Player } from '@prisel/server';
 import Game from './Game';
-import { Action } from '@prisel/monopoly-common';
-import { StateMachine } from './stateMachine/StateMachine';
+import { createIntialState } from './state';
 import { GameStarted } from './stateMachine/GameStarted';
+import { StateMachine } from './stateMachine/StateMachine';
 
 const MonopolyGameConfig: GameConfig = {
     type: 'monopoly',
@@ -17,16 +17,11 @@ const MonopolyGameConfig: GameConfig = {
         (async () => {
             const game = await createIntialState(room);
             room.setGame(game);
-            room.listenGamePacket<Request>(Action.DEBUG, (player, packet) => {
-                const flatState = flattenState(game);
-                player.respond(packet, flatState);
-                debug('current game state is: \n%O', flatState);
-            });
             const stateMachine = new StateMachine(game);
 
             const handleGamePacket = (player: Player, packet: Packet) => {
                 if (!stateMachine.state.onPacket(packet, game.getGamePlayer(player))) {
-                    debug(
+                    log.verbose(
                         `packet ${packet.action} is not processed by state ${
                             stateMachine.state[Symbol.toStringTag]
                         }`,

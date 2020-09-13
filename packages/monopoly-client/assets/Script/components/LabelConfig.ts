@@ -1,5 +1,5 @@
-import { ComponentConfig } from './ComponentConfig';
 import SharedAssets from '../SharedAssets';
+import { ComponentConfig } from './ComponentConfig';
 export enum LabelTheme {
     ON_LIGHT,
     ON_DARK,

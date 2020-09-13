@@ -1,1 +1,0 @@
-export { welcome } from './welcome';

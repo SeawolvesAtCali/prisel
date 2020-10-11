@@ -1,6 +1,7 @@
 // run server in production using node
+import { Server } from '@prisel/server';
 import { readFileSync } from 'fs';
-import { Server, debug } from '@prisel/server';
+import './src/flags';
 import Monopoly from './src/gameConfig';
 import RoomConfig from './src/roomConfig';
 

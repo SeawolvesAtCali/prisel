@@ -9,13 +9,16 @@ const db = low(
 
 console.log('environemtn is development', process.env.NODE_ENV === 'development');
 
-db.defaults(defaultFlags).write();
+(db as any).defaults(defaultFlags).write();
 
 export const flags = {
     // if the key doesn't exist, return undefined
-    get<T = any>(key: string) {
+    get<T>(key: string) {
         db.read();
-        return (db.get(key) as any).value();
+        return (db as any).get(key).value();
     },
-    set: (key: string, value: unknown) => db.update(key, () => value),
+    set: (key: string, value: unknown) => {
+        (db as any).update(key, () => value);
+        return flags;
+    },
 };

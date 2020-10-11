@@ -29,8 +29,8 @@ interface Props {
 }
 
 function roll(startingNode: Tile2): Tile2[] {
-    if (flags.get(USE_FIXED_STEPS)) {
-        const steps = flags.get(FIXED_STEPS);
+    if (flags.get<boolean>(USE_FIXED_STEPS)) {
+        const steps = flags.get<number>(FIXED_STEPS);
         log.info(`player will move a fixed ${steps} step`);
         return Tiles.genPath(startingNode, steps);
     }

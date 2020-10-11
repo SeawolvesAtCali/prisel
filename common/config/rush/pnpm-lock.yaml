@@ -24,7 +24,7 @@ dependencies:
   '@types/jest': 24.9.1
   '@types/koa': 2.11.3
   '@types/lodash': 4.14.155
-  '@types/lowdb': 1.0.1
+  '@types/lowdb': 1.0.9
   '@types/node': 12.12.47
   '@types/prismjs': 1.16.1
   '@types/react': 16.9.38
@@ -2930,12 +2930,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-vEcX7S7aPhsBCivxMwAANQburHBtfN9RdyXFk84IJmu2Z4Hkg1tOFgaslRiEqqvoLtbCBi6ika1EMspE+NZ9Lg==
-  /@types/lowdb/1.0.1:
+  /@types/lowdb/1.0.9:
     dependencies:
       '@types/lodash': 4.14.155
     dev: false
     resolution:
-      integrity: sha512-tvpzG1N62KKdmCXdGgl3cC4wOJ2LJffQCQN3UHUznHFfLYx3U8ojsb2bRdflxoZiYwAgAlF7ROC6BIxfd1NVCg==
+      integrity: sha512-LBRG5EPXFOJDoJc9jACstMhtMP+u+UkPYllBeGQXXKiaHc+uzJs9+/Aynb/5KkX33DtrIiKyzNVTPQc/4RcD6A==
   /@types/marked/0.4.2:
     dev: false
     resolution:
@@ -16768,7 +16768,7 @@ packages:
       '@rollup/plugin-json': 4.1.0_rollup@2.12.0
       '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
       '@types/jest': 24.9.1
-      '@types/lowdb': 1.0.1
+      '@types/lowdb': 1.0.9
       jest: 26.0.1
       lowdb: 1.0.0
       nps: 5.9.12
@@ -16783,7 +16783,7 @@ packages:
     dev: false
     name: '@rush-temp/monopoly'
     resolution:
-      integrity: sha512-DiAmLRAvP5ByJQ4QaEArftn+ZKSqAfykcAV5PIudzk9C6R0FN1emE95XnV9ADpc5sNATcqZaiArGJHdy+4b+SQ==
+      integrity: sha512-WPdBGagcb1HD/Z4h2Yzymi0X93zWIMJ/HGoGQDqRoVhRsat6WRp5sHi2BbUmG7LRcrSqq1/hf4T/nJwXOcTuNQ==
       tarball: 'file:projects/monopoly.tgz'
     version: 0.0.0
   'file:projects/react.tgz':
@@ -16912,7 +16912,7 @@ specifiers:
   '@types/jest': ^24.9.1
   '@types/koa': ^2.0.47
   '@types/lodash': ^4.14.108
-  '@types/lowdb': 1.0.1
+  '@types/lowdb': ^1.0.9
   '@types/node': ^12.12.47
   '@types/prismjs': ^1.9.0
   '@types/react': ^16.9.38

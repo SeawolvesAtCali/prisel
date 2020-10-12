@@ -27,5 +27,9 @@
     },
     "search.exclude": {
         "**/.cache": true
+    },
+    "protoc": {
+        "compile_on_save": false,
+        "options": ["--proto_path=${workspaceRoot}/protos"]
     }
 }

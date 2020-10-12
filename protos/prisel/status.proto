@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package prisel;
+
+message Status {
+  Code code = 1;
+  string message = 2;
+
+  enum Code {
+    UNSPECIFIED = 0;
+    OK = 1;
+    FAILED = 2;
+  }
+}

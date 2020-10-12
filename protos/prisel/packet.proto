@@ -1,23 +1,19 @@
 syntax = "proto3";
 
 import "google/protobuf/any.proto";
-import "prisel/message_types.proto";
+import "prisel/system_action_type.proto";
 import "prisel/status.proto";
+import "prisel/packet_type.proto";
 
 package prisel;
 
 message Packet {
-  Type type = 1;
+  PacketType type = 1;
   oneof message {
-    MessageType system_action = 2;
+    SystemActionType system_action = 2;
     google.protobuf.Any action = 3;
   }
   optional string request_id = 4;
   optional Status status = 5;
-
-  enum Type {
-    DEFAULT = 0;
-    REQUEST = 1;
-    RESPONSE = 2;
-  }
+  google.protobuf.Any payload = 6;
 }

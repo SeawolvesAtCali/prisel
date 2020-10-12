@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package prisel;
+
+message RoomInfo {
+  string name = 1;
+  string id = 2;
+}

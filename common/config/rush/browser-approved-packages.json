@@ -23,6 +23,10 @@
       "allowedCategories": [ "prototype", "tools" ]
     },
     {
+      "name": "@prisel/protos",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@prisel/server",
       "allowedCategories": [ "prototype", "tools" ]
     },

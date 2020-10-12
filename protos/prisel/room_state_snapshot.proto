@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package prisel;
+
+import "prisel/player_info.proto";
+
+message RoomStateSnapshot {
+  repeated PlayerInfo players = 1;
+  string host_id = 2;
+  string token = 3;
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package prisel;
+
+import "prisel/annotations.proto";
+import "prisel/player_info.proto";
+
+message GetRoomStateResponse {
+  option (for_system_action) = {
+    type : GET_ROOM_STATE,
+    packet_type : RESPONSE
+  };
+
+  repeated PlayerInfo players = 1;
+  string host_id = 2;
+  string token = 3;
+}

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package prisel;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.EnumValueOptions { string payload_spec = 50001; }
+
+enum SystemActionType {
+  UNSPECIFIED = 0;
+  WELCOME = 1;
+  LOGIN = 2 [ (payload_spec) = "prisel/login_spec" ];
+  JOIN = 3 [ (payload_spec) = "prisel/join_spec" ];
+  CREATE_ROOM = 4 [ (payload_spec) = "prisel/create_room_spec" ];
+  LEAVE = 5;
+  EXIT = 6;
+  GAME_START = 7;
+  CHAT = 8 [ (payload_spec) = "prisel/chat_spec" ];
+  BROADCAST = 9 [ (payload_spec) = "prisel/broadcast_spec" ];
+  ROOM_STATE_CHANGE = 10 [ (payload_spec) = "prisel/room_state_change_spec" ];
+  ANNOUNCE_GAME_START = 11;
+  ERROR = 12;
+  GET_ROOM_STATE = 13 [ (payload_spec) = "prisel/get_room_state_spec" ];
+  GET_LOBBY_STATE = 14 [ (payload_spec) = "prisel/get_lobby_state_spec" ];
+}

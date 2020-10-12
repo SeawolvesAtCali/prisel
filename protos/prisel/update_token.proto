@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package prisel;
+
+// Token is used to prevent lost packets. When client receives a new
+// UpdateToken, they should compare if the previousToken matches the current
+// token saved in the client, if so, no packet was dropped, and they should
+// update the saved token to be the new token.
+message UpdateToken {
+  string priviousToken = 1;
+  string token = 2;
+}

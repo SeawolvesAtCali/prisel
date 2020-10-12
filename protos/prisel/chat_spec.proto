@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package prisel;
+
+import "prisel/annotations.proto";
+
+message ChatPayload {
+  option (for_system_action) = {
+    type : CHAT,
+    packet_type : DEFAULT
+  };
+  string message = 1;
+}

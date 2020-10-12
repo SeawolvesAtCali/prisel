@@ -25,6 +25,7 @@ dependencies:
   '@types/jest': 24.9.1
   '@types/koa': 2.11.3
   '@types/lodash': 4.14.155
+  '@types/long': 4.0.1
   '@types/lowdb': 1.0.9
   '@types/prismjs': 1.16.1
   '@types/react': 16.9.38
@@ -32,6 +33,7 @@ dependencies:
   '@types/shortid': 0.0.29
   '@types/testing-library__react-hooks': 3.4.0
   '@types/ws': 6.0.4
+  barrelsby: 2.2.0
   debug: 4.1.1
   deepcopy: 2.1.0
   jest: 26.0.1
@@ -40,6 +42,7 @@ dependencies:
   jest-standard-reporter: 1.0.4
   koa: 2.12.0
   lodash: 4.17.15
+  long: 4.0.0
   lowdb: 1.0.0
   mock-socket: 9.0.3
   normalize.css: 8.0.1
@@ -4220,6 +4223,16 @@ packages:
     dev: false
     resolution:
       integrity: sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
+  /barrelsby/2.2.0:
+    dependencies:
+      '@types/yargs': 13.0.9
+      yargs: 14.2.3
+    dev: false
+    engines:
+      node: '>=6.0.0'
+    hasBin: true
+    resolution:
+      integrity: sha512-tv8q7cPd7eu5C0nv9ibqjyypYReMHTIZCJz7wWNiwmLzsSOSJgwhafJKhQmampK/IjpuQSbcDdPTXM2zceskfw==
   /base/0.11.2:
     dependencies:
       cache-base: 1.0.1
@@ -17009,7 +17022,7 @@ packages:
     dev: false
     name: '@rush-temp/common'
     resolution:
-      integrity: sha512-fxbB3X7wswe11NZh8B72qhsmIvjPK/Y7CZTVsy0BIIvc6cdUL4qzSHSvFaMFQ5ZLxQmPGNqUTfyWBSnuTX884g==
+      integrity: sha512-HeKVOPvBJump+eWAm+p2ZS78Fxsm6ZrvJKHy1Pgvz6jk4dnXCUNOdwJ0qyFkvAyJvr07Q43z5qkj7cRvP5X/+g==
       tarball: 'file:projects/common.tgz'
     version: 0.0.0
   'file:projects/configs.tgz':
@@ -17157,12 +17170,15 @@ packages:
     version: 0.0.0
   'file:projects/protos.tgz':
     dependencies:
+      '@types/long': 4.0.1
+      barrelsby: 2.2.0
+      long: 4.0.0
       protobufjs: 6.10.1
       ts-proto: 1.36.0
     dev: false
     name: '@rush-temp/protos'
     resolution:
-      integrity: sha512-U3+y79M5ow7gChxBQtmKuXeJ6L0CidX3uS7JJa6Jj533PD1S8nERCCRKKSzDr8TDY4s84bMkC7MTFhPrk9xtnw==
+      integrity: sha512-T+PllN3H6mDjpetf0XTGsJXrP8TYH9RlpjKC7B5AMjo4nX0/KbsP03g/zzU9LYwPoBri+U4qXzxzaDAO/1f94g==
       tarball: 'file:projects/protos.tgz'
     version: 0.0.0
   'file:projects/react.tgz':
@@ -17292,6 +17308,7 @@ specifiers:
   '@types/jest': ^24.9.1
   '@types/koa': ^2.0.47
   '@types/lodash': ^4.14.108
+  '@types/long': ^4.0.0
   '@types/lowdb': ^1.0.9
   '@types/prismjs': ^1.9.0
   '@types/react': ^16.9.38
@@ -17299,6 +17316,7 @@ specifiers:
   '@types/shortid': ^0.0.29
   '@types/testing-library__react-hooks': ^3.3.0
   '@types/ws': ^6.0.1
+  barrelsby: ^2.2.0
   debug: ^4.1.0
   deepcopy: ^2.1.0
   jest: ^26.0.1
@@ -17307,6 +17325,7 @@ specifiers:
   jest-standard-reporter: ^1.0.4
   koa: ^2.6.2
   lodash: ^4.17.11
+  long: ^4.0.0
   lowdb: 1.0.0
   mock-socket: ^9.0.3
   normalize.css: ^8.0.1

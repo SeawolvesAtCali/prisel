@@ -18,9 +18,8 @@ const baseLoginResponse: object = {
   userId: "",
 };
 
-export const protobufPackage = 'prisel'
-
 export const LoginRequest = {
+  typeUrl: 'type.googleapis.com/prisel.LoginRequest',
   encode(message: LoginRequest, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.username);
     return writer;
@@ -64,6 +63,7 @@ export const LoginRequest = {
 };
 
 export const LoginResponse = {
+  typeUrl: 'type.googleapis.com/prisel.LoginResponse',
   encode(message: LoginResponse, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.userId);
     return writer;

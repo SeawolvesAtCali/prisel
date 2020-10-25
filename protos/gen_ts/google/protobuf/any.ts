@@ -126,9 +126,8 @@ const baseAny: object = {
   typeUrl: "",
 };
 
-export const protobufPackage = 'google.protobuf'
-
 export const Any = {
+  typeUrl: 'type.googleapis.com/google.protobuf.Any',
   encode(message: Any, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.typeUrl);
     writer.uint32(18).bytes(message.value);

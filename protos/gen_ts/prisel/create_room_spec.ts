@@ -20,9 +20,8 @@ const baseCreateRoomRequest: object = {
 const baseCreateRoomResponse: object = {
 };
 
-export const protobufPackage = 'prisel'
-
 export const CreateRoomRequest = {
+  typeUrl: 'type.googleapis.com/prisel.CreateRoomRequest',
   encode(message: CreateRoomRequest, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.roomName);
     return writer;
@@ -66,6 +65,7 @@ export const CreateRoomRequest = {
 };
 
 export const CreateRoomResponse = {
+  typeUrl: 'type.googleapis.com/prisel.CreateRoomResponse',
   encode(message: CreateRoomResponse, writer: Writer = Writer.create()): Writer {
     if (message.room !== undefined && message.room !== undefined) {
       RoomInfo.encode(message.room, writer.uint32(10).fork()).ldelim();

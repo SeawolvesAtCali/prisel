@@ -18,9 +18,8 @@ const basePacket: object = {
   type: 0,
 };
 
-export const protobufPackage = 'prisel'
-
 export const Packet = {
+  typeUrl: 'type.googleapis.com/prisel.Packet',
   encode(message: Packet, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.type);
     if (message.message?.$case === 'systemAction') {

@@ -1,12 +1,9 @@
 /* eslint-disable */
 
-export const protobufPackage = 'prisel'
-
 export enum PacketType {
   DEFAULT = 0,
   REQUEST = 1,
   RESPONSE = 2,
-  UNRECOGNIZED = -1,
 }
 
 export function packetTypeFromJSON(object: any): PacketType {
@@ -20,10 +17,8 @@ export function packetTypeFromJSON(object: any): PacketType {
     case 2:
     case "RESPONSE":
       return PacketType.RESPONSE;
-    case -1:
-    case "UNRECOGNIZED":
     default:
-      return PacketType.UNRECOGNIZED;
+      throw new Error("Unrecognized enum value " + object + " for enum PacketType");
   }
 }
 

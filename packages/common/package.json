@@ -33,7 +33,8 @@
     "dependencies": {
         "events": "^3.2.0",
         "@types/events": "^1.2.0",
-        "@prisel/protos": "^0.1.3"
+        "@prisel/protos": "^0.1.3",
+        "protobufjs": "~6.10.1"
     },
     "devDependencies": {
         "rollup": "^2.7.6",

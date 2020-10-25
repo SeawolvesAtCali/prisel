@@ -18,9 +18,8 @@ const baseUpdateToken: object = {
   token: "",
 };
 
-export const protobufPackage = 'prisel'
-
 export const UpdateToken = {
+  typeUrl: 'type.googleapis.com/prisel.UpdateToken',
   encode(message: UpdateToken, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.priviousToken);
     writer.uint32(18).string(message.token);

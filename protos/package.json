@@ -11,12 +11,11 @@
     "author": "",
     "license": "MIT",
     "dependencies": {
-        "protobufjs": "^6.10.1",
+        "protobufjs": "~6.10.1",
         "long": "^4.0.0",
         "@types/long": "^4.0.0"
     },
     "devDependencies": {
-        "ts-proto": "^1.35.1",
         "barrelsby": "^2.2.0"
     }
 }

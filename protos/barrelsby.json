@@ -1,4 +1,5 @@
 {
     "directory": "./gen_ts/prisel",
-    "structure": "filesystem"
+    "structure": "filesystem",
+    "location": "all"
 }

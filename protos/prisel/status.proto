@@ -5,6 +5,7 @@ package prisel;
 message Status {
   Code code = 1;
   string message = 2;
+  string detail = 3;
 
   enum Code {
     UNSPECIFIED = 0;

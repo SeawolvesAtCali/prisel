@@ -1,8 +1,10 @@
-import { Response } from './packet';
-import { Code } from './code';
+import { status } from '@prisel/protos';
+import { unpack } from './anyUtils';
+import { Response } from './response';
 
-export interface ResponseWrapper<Payload = any> extends Response<Payload> {
-    get(): Response<Payload>;
+export interface ResponseWrapper<Payload = any> extends Response {
+    get(): Response;
+    unpackPayload(): Payload;
     ok(): boolean;
     failed(): boolean;
     getMessage(): string;
@@ -10,9 +12,20 @@ export interface ResponseWrapper<Payload = any> extends Response<Payload> {
 }
 
 class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
-    private raw: Response<Payload>;
-    constructor(response: Response<Payload>) {
+    private raw: Response;
+    private payloadClass: { decode: (message: Uint8Array) => Payload };
+    constructor(response: Response, payloadClass?: { decode: (message: Uint8Array) => Payload }) {
         this.raw = response;
+        this.payloadClass = payloadClass;
+    }
+    unpackPayload(): Payload | undefined {
+        if (this.payloadClass && this.raw.payload) {
+            return unpack(this.raw.payload.value, this.payloadClass);
+        }
+    }
+
+    public get message() {
+        return this.raw.message;
     }
     public get status() {
         return this.raw.status;
@@ -26,8 +39,8 @@ class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
         return this.raw.payload;
     }
 
-    public get request_id() {
-        return this.raw.request_id;
+    public get requestId() {
+        return this.raw.requestId;
     }
 
     public get() {
@@ -35,11 +48,11 @@ class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
     }
 
     public ok() {
-        return this.status.code === Code.OK;
+        return this.status.code === status.Status_Code.OK;
     }
 
     public failed() {
-        return this.status.code === Code.FAILED;
+        return this.status.code === status.Status_Code.FAILED;
     }
 
     public getMessage() {
@@ -51,6 +64,9 @@ class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
     }
 }
 
-export function wrapResponse<Payload = any>(response: Response<Payload>): ResponseWrapper<Payload> {
-    return new ResponseWrapperImpl(response);
+export function wrapResponse<Payload = any>(
+    response: Response,
+    payloadClass?: { decode: (input: Uint8Array) => Payload },
+): ResponseWrapper<Payload> {
+    return new ResponseWrapperImpl(response, payloadClass);
 }

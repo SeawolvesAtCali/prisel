@@ -10,9 +10,8 @@ const baseChatPayload: object = {
   message: "",
 };
 
-export const protobufPackage = 'prisel'
-
 export const ChatPayload = {
+  typeUrl: 'type.googleapis.com/prisel.ChatPayload',
   encode(message: ChatPayload, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.message);
     return writer;

@@ -1,3 +1,4 @@
+import type { Packet } from '@prisel/protos';
 import { Request, Response } from './packet';
 import { ResponseWrapper, wrapResponse } from './responseWrapper';
 
@@ -5,8 +6,8 @@ type ResolveFunc = (value?: Response<any> | PromiseLike<Response<any>>) => void;
 
 export interface RequestManager {
     newId(): string;
-    addRequest(request: Request, timeout: number): Promise<ResponseWrapper>;
-    onResponse(response: Response): void;
+    addRequest(request: Packet, timeout: number): Promise<ResponseWrapper>;
+    onResponse(response: Packet): void;
     isWaitingFor(requestId: string): boolean;
 }
 

@@ -21,9 +21,8 @@ const baseGetLobbyStateResponse_LobbyRoomViewInfo: object = {
   maxPlayers: 0,
 };
 
-export const protobufPackage = 'prisel'
-
 export const GetLobbyStateResponse = {
+  typeUrl: 'type.googleapis.com/prisel.GetLobbyStateResponse',
   encode(message: GetLobbyStateResponse, writer: Writer = Writer.create()): Writer {
     for (const v of message.rooms) {
       GetLobbyStateResponse_LobbyRoomViewInfo.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -80,6 +79,7 @@ export const GetLobbyStateResponse = {
 };
 
 export const GetLobbyStateResponse_LobbyRoomViewInfo = {
+  typeUrl: 'type.googleapis.com/prisel.GetLobbyStateResponse_LobbyRoomViewInfo',
   encode(message: GetLobbyStateResponse_LobbyRoomViewInfo, writer: Writer = Writer.create()): Writer {
     if (message.room !== undefined && message.room !== undefined) {
       RoomInfo.encode(message.room, writer.uint32(10).fork()).ldelim();

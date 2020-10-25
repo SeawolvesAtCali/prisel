@@ -14,9 +14,8 @@ const baseRoomStateSnapshot: object = {
   token: "",
 };
 
-export const protobufPackage = 'prisel'
-
 export const RoomStateSnapshot = {
+  typeUrl: 'type.googleapis.com/prisel.RoomStateSnapshot',
   encode(message: RoomStateSnapshot, writer: Writer = Writer.create()): Writer {
     for (const v of message.players) {
       PlayerInfo.encode(v!, writer.uint32(10).fork()).ldelim();

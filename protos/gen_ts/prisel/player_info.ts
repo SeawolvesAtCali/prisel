@@ -12,9 +12,8 @@ const basePlayerInfo: object = {
   id: "",
 };
 
-export const protobufPackage = 'prisel'
-
 export const PlayerInfo = {
+  typeUrl: 'type.googleapis.com/prisel.PlayerInfo',
   encode(message: PlayerInfo, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     writer.uint32(18).string(message.id);

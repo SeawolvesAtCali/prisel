@@ -5,20 +5,19 @@ import { Writer, Reader } from 'protobufjs/minimal';
 export interface Status {
   code: Status_Code;
   message: string;
+  detail: string;
 }
 
 const baseStatus: object = {
   code: 0,
   message: "",
+  detail: "",
 };
-
-export const protobufPackage = 'prisel'
 
 export enum Status_Code {
   UNSPECIFIED = 0,
   OK = 1,
   FAILED = 2,
-  UNRECOGNIZED = -1,
 }
 
 export function status_CodeFromJSON(object: any): Status_Code {
@@ -32,10 +31,8 @@ export function status_CodeFromJSON(object: any): Status_Code {
     case 2:
     case "FAILED":
       return Status_Code.FAILED;
-    case -1:
-    case "UNRECOGNIZED":
     default:
-      return Status_Code.UNRECOGNIZED;
+      throw new Error("Unrecognized enum value " + object + " for enum Status_Code");
   }
 }
 
@@ -53,9 +50,11 @@ export function status_CodeToJSON(object: Status_Code): string {
 }
 
 export const Status = {
+  typeUrl: 'type.googleapis.com/prisel.Status',
   encode(message: Status, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.code);
     writer.uint32(18).string(message.message);
+    writer.uint32(26).string(message.detail);
     return writer;
   },
   decode(input: Uint8Array | Reader, length?: number): Status {
@@ -70,6 +69,9 @@ export const Status = {
           break;
         case 2:
           message.message = reader.string();
+          break;
+        case 3:
+          message.detail = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -86,6 +88,9 @@ export const Status = {
     if (object.message !== undefined && object.message !== null) {
       message.message = String(object.message);
     }
+    if (object.detail !== undefined && object.detail !== null) {
+      message.detail = String(object.detail);
+    }
     return message;
   },
   fromPartial(object: DeepPartial<Status>): Status {
@@ -96,12 +101,16 @@ export const Status = {
     if (object.message !== undefined && object.message !== null) {
       message.message = object.message;
     }
+    if (object.detail !== undefined && object.detail !== null) {
+      message.detail = object.detail;
+    }
     return message;
   },
   toJSON(message: Status): unknown {
     const obj: any = {};
     message.code !== undefined && (obj.code = status_CodeToJSON(message.code));
     message.message !== undefined && (obj.message = message.message);
+    message.detail !== undefined && (obj.detail = message.detail);
     return obj;
   },
 };

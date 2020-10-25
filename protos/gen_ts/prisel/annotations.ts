@@ -14,9 +14,8 @@ const baseSystemActionSpec: object = {
   packetType: 0,
 };
 
-export const protobufPackage = 'prisel'
-
 export const SystemActionSpec = {
+  typeUrl: 'type.googleapis.com/prisel.SystemActionSpec',
   encode(message: SystemActionSpec, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.type);
     writer.uint32(16).int32(message.packetType);

@@ -12,9 +12,8 @@ const baseRoomInfo: object = {
   id: "",
 };
 
-export const protobufPackage = 'prisel'
-
 export const RoomInfo = {
+  typeUrl: 'type.googleapis.com/prisel.RoomInfo',
   encode(message: RoomInfo, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     writer.uint32(18).string(message.id);

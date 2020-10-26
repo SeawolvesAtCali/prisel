@@ -16,6 +16,7 @@
         "@types/long": "^4.0.0"
     },
     "devDependencies": {
+        "ts-proto": "yiochen/ts-proto",
         "barrelsby": "^2.2.0"
     }
 }

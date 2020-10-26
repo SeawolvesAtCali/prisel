@@ -1,6 +1,6 @@
-import { RequestManager, newRequestManager } from '../requestManager';
-import { PacketType, Response } from '../packet';
-import { Code } from '../code';
+import { packet_type, status } from '@prisel/protos';
+import { newRequestManager, RequestManager } from '../requestManager';
+import { Response } from '../response';
 
 describe('requestManager', () => {
     let manager: RequestManager;
@@ -13,18 +13,21 @@ describe('requestManager', () => {
     });
 
     test('addRequest', async () => {
-        const promise = manager.addRequest({ type: PacketType.REQUEST, request_id: '123' }, 10);
+        const promise = manager.addRequest(
+            { type: packet_type.PacketType.REQUEST, requestId: '123' },
+            10,
+        );
         const response: Response = {
-            type: PacketType.RESPONSE,
+            type: packet_type.PacketType.RESPONSE,
             status: {
-                code: Code.OK,
+                code: status.Status_Code.OK,
             },
-            request_id: '123',
+            requestId: '123',
         };
         manager.onResponse(response);
         const receivedResponse = await promise;
         expect(receivedResponse.ok()).toBe(true);
-        expect(receivedResponse.type).toBe(PacketType.RESPONSE);
-        expect(receivedResponse.request_id).toBe('123');
+        expect(receivedResponse.type).toBe(packet_type.PacketType.RESPONSE);
+        expect(receivedResponse.requestId).toBe('123');
     });
 });

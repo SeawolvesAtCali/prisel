@@ -4,14 +4,12 @@ import { Writer, Reader } from 'protobufjs/minimal';
 
 export interface Status {
   code: Status_Code;
-  message: string;
-  detail: string;
+  message?: string | undefined;
+  detail?: string | undefined;
 }
 
 const baseStatus: object = {
   code: 0,
-  message: "",
-  detail: "",
 };
 
 export enum Status_Code {
@@ -53,8 +51,12 @@ export const Status = {
   typeUrl: 'type.googleapis.com/prisel.Status',
   encode(message: Status, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.code);
-    writer.uint32(18).string(message.message);
-    writer.uint32(26).string(message.detail);
+    if (message.message !== undefined) {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.detail !== undefined) {
+      writer.uint32(26).string(message.detail);
+    }
     return writer;
   },
   decode(input: Uint8Array | Reader, length?: number): Status {

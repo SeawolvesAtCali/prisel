@@ -19,7 +19,7 @@ enum SystemActionType {
   BROADCAST = 9 [ (payload_spec) = "prisel/broadcast_spec" ];
   ROOM_STATE_CHANGE = 10 [ (payload_spec) = "prisel/room_state_change_spec" ];
   ANNOUNCE_GAME_START = 11;
-  ERROR = 12;
+  ERROR = 12 [(payload_spec) = "prisel/error_spec"];
   GET_ROOM_STATE = 13 [ (payload_spec) = "prisel/get_room_state_spec" ];
   GET_LOBBY_STATE = 14 [ (payload_spec) = "prisel/get_lobby_state_spec" ];
 }

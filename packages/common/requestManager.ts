@@ -1,13 +1,13 @@
-import type { Packet } from '@prisel/protos';
-import { Request, Response } from './packet';
+import { Request } from './request';
+import { Response } from './response';
 import { ResponseWrapper, wrapResponse } from './responseWrapper';
 
-type ResolveFunc = (value?: Response<any> | PromiseLike<Response<any>>) => void;
+type ResolveFunc = (value?: Response | PromiseLike<Response>) => void;
 
 export interface RequestManager {
     newId(): string;
-    addRequest(request: Packet, timeout: number): Promise<ResponseWrapper>;
-    onResponse(response: Packet): void;
+    addRequest(request: Request, timeout: number): Promise<ResponseWrapper>;
+    onResponse(response: Response): void;
     isWaitingFor(requestId: string): boolean;
 }
 
@@ -15,7 +15,7 @@ export function newRequestManager(): RequestManager {
     const requestIdMap = new Map<string, ResolveFunc>();
     let requestId = 1;
     function addRequest(request: Request, timeout: number) {
-        const id = request.request_id;
+        const id = request.requestId;
         const promise = new Promise<ResponseWrapper>((resolve, reject) => {
             requestIdMap.set(id, resolve);
             if (timeout > 0) {
@@ -31,7 +31,7 @@ export function newRequestManager(): RequestManager {
     }
 
     function onResponse(response: Response) {
-        const id = `${response.request_id}`;
+        const id = `${response.requestId}`;
         if (requestIdMap.has(id)) {
             const resolve = requestIdMap.get(id);
             requestIdMap.delete(id);

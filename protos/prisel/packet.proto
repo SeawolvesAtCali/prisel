@@ -15,5 +15,5 @@ message Packet {
   }
   optional string request_id = 4;
   optional Status status = 5;
-  google.protobuf.Any payload = 6;
+  optional google.protobuf.Any payload = 6;
 }

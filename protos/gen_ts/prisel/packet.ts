@@ -11,7 +11,7 @@ export interface Packet {
   message?: { $case: 'systemAction', systemAction: SystemActionType } | { $case: 'action', action: Any };
   requestId?: string | undefined;
   status?: Status | undefined;
-  payload: Any | undefined;
+  payload?: Any | undefined;
 }
 
 const basePacket: object = {
@@ -34,7 +34,7 @@ export const Packet = {
     if (message.status !== undefined) {
       Status.encode(message.status, writer.uint32(42).fork()).ldelim();
     }
-    if (message.payload !== undefined && message.payload !== undefined) {
+    if (message.payload !== undefined) {
       Any.encode(message.payload, writer.uint32(50).fork()).ldelim();
     }
     return writer;

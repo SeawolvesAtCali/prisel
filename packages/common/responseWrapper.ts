@@ -12,15 +12,18 @@ export interface ResponseWrapper<Payload = any> extends Response {
 }
 
 class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
-    private raw: Response;
-    private payloadClass: { decode: (message: Uint8Array) => Payload };
-    constructor(response: Response, payloadClass?: { decode: (message: Uint8Array) => Payload }) {
+    private raw;
+    private payloadClass;
+    constructor(
+        response: Response,
+        payloadClass?: { typeUrl: string; decode: (message: Uint8Array) => Payload },
+    ) {
         this.raw = response;
         this.payloadClass = payloadClass;
     }
     unpackPayload(): Payload | undefined {
         if (this.payloadClass && this.raw.payload) {
-            return unpack(this.raw.payload.value, this.payloadClass);
+            return unpack(this.raw.payload, this.payloadClass);
         }
     }
 
@@ -66,7 +69,7 @@ class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
 
 export function wrapResponse<Payload = any>(
     response: Response,
-    payloadClass?: { decode: (input: Uint8Array) => Payload },
+    payloadClass?: { typeUrl: string; decode: (input: Uint8Array) => Payload },
 ): ResponseWrapper<Payload> {
     return new ResponseWrapperImpl(response, payloadClass);
 }

@@ -5,8 +5,7 @@
     "main": "index.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\"",
-        "build": "./gen.sh",
-        "postbuild": "barrelsby -c barrelsby.json --delete"
+        "build": "./gen.sh"
     },
     "author": "",
     "license": "MIT",

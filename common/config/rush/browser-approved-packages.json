@@ -39,6 +39,10 @@
       "allowedCategories": [ "production", "prototype" ]
     },
     {
+      "name": "@rollup/plugin-typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@testing-library/jest-dom",
       "allowedCategories": [ "prototype", "tools" ]
     },
@@ -112,6 +116,10 @@
     },
     {
       "name": "barrelsby",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "buffer",
       "allowedCategories": [ "production" ]
     },
     {

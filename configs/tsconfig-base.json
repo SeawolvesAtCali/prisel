@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "module": "esnext", // Output js using es6 import export
+        "declaration": true, // emit declaration
+        "declarationMap": true,
+        /**
+        * when importing commonjs
+        * exports = something
+        * treat something as default so that we can
+        * import something from 'commonjspkg';
+        * instead of
+        * import * as something from 'commonjspkg';
+        * which doesn't complie with es6 modules spec.
+        */
+        "esModuleInterop": true,
+        "isolatedModules": true, // disallow typescript features that relies on cross-file compilation
+        "target": "es5", // generated js target
+        "noImplicitAny": true, // explicitly mark any type
+        "moduleResolution": "node",
+        "downlevelIteration": true, // certain strings such has emoji has length of 2, so iterating using for of should take two steps
+        "preserveConstEnums": true, // const enums are not removed in generated code.
+        "sourceMap": true, // enable generation of .js.map source map
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": ["es2015", "es2016", "es2017", "esnext.array", "es2017.object"]
+    }
+}

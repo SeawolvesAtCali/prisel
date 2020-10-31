@@ -181,6 +181,7 @@ export const Any = {
   },
 };
 
+import { Buffer } from "buffer";
 interface WindowBase64 {
   atob(b64: string): string;
   btoa(bin: string): string;

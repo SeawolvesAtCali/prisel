@@ -4144,6 +4144,7 @@ if (util.Long !== Long as any) {
   configure();
 }
 
+import { Buffer } from "buffer";
 interface WindowBase64 {
   atob(b64: string): string;
   btoa(bin: string): string;

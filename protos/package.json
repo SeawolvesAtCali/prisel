@@ -5,7 +5,7 @@
     "main": "./lib/index.cjs.js",
     "browser": "./lib/index.umd.js",
     "module": "./lib/index.esm.js",
-    "types": "./lib/index.d.ts",
+    "types": "./dist/index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\"",
         "build": "./gen.sh && tsc && rollup --config --silent"

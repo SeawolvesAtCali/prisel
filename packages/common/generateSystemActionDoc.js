@@ -1,4 +1,4 @@
-const { ACTION_CONFIG } = require('./lib/actionConfigs.cjs');
+const { ACTION_CONFIG } = require('./lib/actionConfigs.cjs.js');
 const fs = require('fs');
 
 // print table header

@@ -23,6 +23,9 @@
         "sourceMap": true, // enable generation of .js.map source map
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true,
-        "lib": ["es2015", "es2016", "es2017", "esnext.array", "es2017.object"]
+        // lib includes dom, this allows platform agnostic module to use
+        // features shared by both node and browser. But code should be very
+        // careful not to use features only exist in one platform.
+        "lib": ["dom", "es2015", "es2016", "es2017", "esnext.array", "es2017.object"]
     }
 }

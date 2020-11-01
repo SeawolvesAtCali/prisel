@@ -1,7 +1,6 @@
 dependencies:
   '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
   '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
-  '@rollup/plugin-typescript': 6.1.0_b1363846780893b6a97745147a81336e
   '@rush-temp/client': 'file:projects/client.tgz'
   '@rush-temp/common': 'file:projects/common.tgz'
   '@rush-temp/configs': 'file:projects/configs.tgz'
@@ -15794,14 +15793,12 @@ packages:
       bs-logger: 0.2.6
       buffer-from: 1.1.1
       fast-json-stable-stringify: 2.1.0
-      jest: 26.0.1
       json5: 2.1.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       micromatch: 4.0.2
       mkdirp: 1.0.4
       semver: 7.3.2
-      typescript: 3.9.3
       yargs-parser: 18.1.3
     dev: false
     engines:
@@ -16028,13 +16025,6 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-0RNDbSdEokBeEAkgNbxJ+BLwSManFy9TeXz8uW+48j/xhEXv1ePME60olyzw2XzUqUBNAYFeJadIqAgNqIACwg==
-  /typescript/3.9.3:
-    dev: false
-    engines:
-      node: '>=4.2.0'
-    hasBin: true
-    resolution:
-      integrity: sha512-D/wqnB2xzNFIcoBG9FG8cXRDjiqSTbG2wd8DMZeQyJlP1vfTkIxH4GKveWaEBYySKIg+USu+E+EDIR47SqnaMQ==
   /typescript/4.0.5:
     dev: false
     engines:
@@ -17066,7 +17056,7 @@ packages:
       nps: 5.9.12
       rollup: 2.12.0
       rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@4.0.5
-      ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+      ts-jest: 26.1.0_jest@26.0.1+typescript@4.0.5
       tslib: 2.0.0
       typescript: 4.0.5
     dev: false
@@ -17081,6 +17071,7 @@ packages:
       '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
       '@types/events': 1.2.0
       '@types/jest': 24.9.1
+      '@types/node': 12.12.47
       events: 3.2.0
       jest: 26.0.1
       nps: 5.9.12
@@ -17093,7 +17084,7 @@ packages:
     dev: false
     name: '@rush-temp/common'
     resolution:
-      integrity: sha512-f37aitIeHcs7t2U/OKkBT2neDw74QjQmPsinUBeVO3YeGNWYggF6ldH2lKzxsiABZhHnbsiFRyBe7YOa2SGWbg==
+      integrity: sha512-6h94AExVLGpDS80Zqb1fTwyxePVd34lIRcymeFKYbm2h6JYAMt/yD3C3RGyjL2SafbGyTS6/6Lea/6apWAb16w==
       tarball: 'file:projects/common.tgz'
     version: 0.0.0
   'file:projects/configs.tgz':
@@ -17149,7 +17140,7 @@ packages:
       '@testing-library/react-hooks': 3.4.1_1fb72ba09e79ce5bfd91e4d67e1015b7
       '@testing-library/user-event': 7.2.1
       '@types/jest': 24.9.1
-      '@types/node': 12.12.47
+      '@types/node': 14.11.8
       '@types/react': 16.9.38
       '@types/react-dom': 16.9.8
       '@types/testing-library__dom': 7.5.0
@@ -17180,7 +17171,7 @@ packages:
     dev: false
     name: '@rush-temp/map-creator'
     resolution:
-      integrity: sha512-722vAb6J8+OfFVX4WlD4p/QGBWbroD10MJ8vK0ehRl23G6kF6cs5D2+n5tiwNmG4eDbLeN2Vw2u+vbk6O87M1A==
+      integrity: sha512-irRkrM+0i/84k5LZe381aAJ2LSyyMF+oP+dx25Q2Kqth9HbXAYX2dLQn5BoKGjYkWRout6Ltp/mG4lsMDCTbgw==
       tarball: 'file:projects/map-creator.tgz'
     version: 0.0.0
   'file:projects/monopoly-client.tgz':
@@ -17229,7 +17220,7 @@ packages:
       rollup-plugin-dts: 1.4.7_rollup@2.12.0+typescript@4.0.5
       rollup-plugin-node-builtins: 2.1.2
       rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@4.0.5
-      ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+      ts-jest: 26.1.0_jest@26.0.1+typescript@4.0.5
       ts-node: 8.10.2_typescript@4.0.5
       tslib: 2.0.0
       typescript: 4.0.5
@@ -17258,7 +17249,7 @@ packages:
     dev: false
     name: '@rush-temp/protos'
     resolution:
-      integrity: sha512-JS+f2vS2ommdzUPnqxMXA7mXibBlqI6DczfREp5pm2Cp3MexRrgftjw4OAsMiB/tWzLxKZsBH61os78v0++UHg==
+      integrity: sha512-7yz++UjolkS9MIBFlFVOSDyzJQ7qAhV4U/0ojchBqW5ui6BSshIgQQKMwH9GbXQwNLQe6YB74eBZxVAkOMS44w==
       tarball: 'file:projects/protos.tgz'
     version: 0.0.0
   'file:projects/react.tgz':
@@ -17268,7 +17259,7 @@ packages:
       '@testing-library/user-event': 7.2.1
       '@types/jest': 24.9.1
       '@types/lodash': 4.14.155
-      '@types/node': 12.12.47
+      '@types/node': 14.11.8
       '@types/prismjs': 1.16.1
       '@types/react': 16.9.38
       '@types/react-dom': 16.9.8
@@ -17295,7 +17286,7 @@ packages:
     dev: false
     name: '@rush-temp/react'
     resolution:
-      integrity: sha512-5Y27U/ASjFhY85THLaLfD2qCT5a51hJG55PGvHy5LD/3sqr+D4TIbtYx+uc9VNkpubDUkp3gpf6hP0aWwX4i6w==
+      integrity: sha512-dxiu5LdmWAYf0Wb+ymzJPNdF9zjrpFRcef0Jhh2MGIlfvttkJtVipWEqdt4cf/GE9NUYf/XGi2aF4IYnvO/u8g==
       tarball: 'file:projects/react.tgz'
     version: 0.0.0
   'file:projects/server.tgz':
@@ -17304,7 +17295,7 @@ packages:
       '@types/jest': 24.9.1
       '@types/koa': 2.11.3
       '@types/lodash': 4.14.155
-      '@types/node': 12.12.47
+      '@types/node': 14.11.8
       '@types/ws': 6.0.4
       debug: 4.1.1
       jest: 26.0.1
@@ -17323,7 +17314,7 @@ packages:
     dev: false
     name: '@rush-temp/server'
     resolution:
-      integrity: sha512-TtzuYcAYSu6ZKfEeZx9LSm9OT5nmaUwdwkS/Q1mKEobTZ3xkvygVBVaIvOLCA782yniqPrXWdjPMBnIcqPypBA==
+      integrity: sha512-olySmOtWnUw67N7erYIGjkE8wiKAYGDpxqKjNO5RzaUbiVtCtikhiA/qstRzDo45MdHj7raSphdhW2LNxQJtRg==
       tarball: 'file:projects/server.tgz'
     version: 0.0.0
   'file:projects/tic-tac-toe-client.tgz_typescript@4.0.5':
@@ -17350,7 +17341,7 @@ packages:
       '@types/jest': 24.9.1
       jest: 26.0.1
       nps: 5.9.12
-      ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+      ts-jest: 26.1.0_jest@26.0.1+typescript@4.0.5
       ts-node: 8.10.2_typescript@4.0.5
       tslib: 2.0.0
       typescript: 4.0.5
@@ -17379,7 +17370,6 @@ registry: ''
 specifiers:
   '@rollup/plugin-commonjs': ^11.1.0
   '@rollup/plugin-node-resolve': ^7.1.3
-  '@rollup/plugin-typescript': ^6.0.0
   '@rush-temp/client': 'file:./projects/client.tgz'
   '@rush-temp/common': 'file:./projects/common.tgz'
   '@rush-temp/configs': 'file:./projects/configs.tgz'

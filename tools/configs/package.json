@@ -2,13 +2,15 @@
     "name": "@prisel/configs",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "files": ["rollupHelper.js"],
     "scripts": {
         "build": ""
     },
     "author": "",
     "license": "MIT",
     "dependencies": {
-        "prettier": "2.0.5"
+        "prettier": "2.0.5",
+        "@rollup/plugin-commonjs": "^11.1.0",
+        "@rollup/plugin-node-resolve": "^7.1.3"
     }
 }

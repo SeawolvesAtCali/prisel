@@ -1,14 +1,14 @@
 /* eslint-disable */
 import { PacketType, packetTypeFromJSON, packetTypeToJSON } from '../prisel/packet_type';
 import { SystemActionType, systemActionTypeFromJSON, systemActionTypeToJSON } from '../prisel/system_action_type';
-import { Any } from '../google/protobuf/any';
 import { Status } from '../prisel/status';
+import { Any } from '../google/protobuf/any';
 import { Writer, Reader } from 'protobufjs/minimal';
 
 
 export interface Packet {
   type: PacketType;
-  message?: { $case: 'systemAction', systemAction: SystemActionType } | { $case: 'action', action: Any };
+  message?: { $case: 'systemAction', systemAction: SystemActionType } | { $case: 'action', action: string };
   requestId?: string | undefined;
   status?: Status | undefined;
   payload?: Any | undefined;
@@ -26,7 +26,7 @@ export const Packet = {
       writer.uint32(16).int32(message.message.systemAction);
     }
     if (message.message?.$case === 'action') {
-      Any.encode(message.message.action, writer.uint32(26).fork()).ldelim();
+      writer.uint32(26).string(message.message.action);
     }
     if (message.requestId !== undefined) {
       writer.uint32(34).string(message.requestId);
@@ -53,7 +53,7 @@ export const Packet = {
           message.message = {$case: 'systemAction', systemAction: reader.int32() as any};
           break;
         case 3:
-          message.message = {$case: 'action', action: Any.decode(reader, reader.uint32())};
+          message.message = {$case: 'action', action: reader.string()};
           break;
         case 4:
           message.requestId = reader.string();
@@ -80,7 +80,7 @@ export const Packet = {
       message.message = {$case: 'systemAction', systemAction: systemActionTypeFromJSON(object.systemAction)};
     }
     if (object.action !== undefined && object.action !== null) {
-      message.message = {$case: 'action', action: Any.fromJSON(object.action)};
+      message.message = {$case: 'action', action: String(object.action)};
     }
     if (object.requestId !== undefined && object.requestId !== null) {
       message.requestId = String(object.requestId);
@@ -102,7 +102,7 @@ export const Packet = {
       message.message = {$case: 'systemAction', systemAction: object.message.systemAction};
     }
     if (object.message?.$case === 'action' && object.message?.action !== undefined && object.message?.action !== null) {
-      message.message = {$case: 'action', action: Any.fromPartial(object.message.action)};
+      message.message = {$case: 'action', action: object.message.action};
     }
     if (object.requestId !== undefined && object.requestId !== null) {
       message.requestId = object.requestId;
@@ -119,7 +119,7 @@ export const Packet = {
     const obj: any = {};
     message.type !== undefined && (obj.type = packetTypeToJSON(message.type));
     message.message?.$case === 'systemAction' && (obj.systemAction = message.message?.systemAction !== undefined ? systemActionTypeToJSON(message.message?.systemAction) : undefined);
-    message.message?.$case === 'action' && (obj.action = message.message?.action ? Any.toJSON(message.message?.action) : undefined);
+    message.message?.$case === 'action' && (obj.action = message.message?.action);
     message.requestId !== undefined && (obj.requestId = message.requestId);
     message.status !== undefined && (obj.status = message.status ? Status.toJSON(message.status) : undefined);
     message.payload !== undefined && (obj.payload = message.payload ? Any.toJSON(message.payload) : undefined);

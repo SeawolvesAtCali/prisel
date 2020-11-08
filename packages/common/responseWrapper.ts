@@ -1,10 +1,10 @@
 import { status } from '@prisel/protos';
-import { unpack } from './anyUtils';
+import { AnyUtils } from './anyUtils';
 import { Response } from './response';
 
 export interface ResponseWrapper<Payload = any> extends Response {
     get(): Response;
-    unpackPayload(): Payload;
+    unpackedPayload: Payload;
     ok(): boolean;
     failed(): boolean;
     getMessage(): string;
@@ -14,16 +14,15 @@ export interface ResponseWrapper<Payload = any> extends Response {
 class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
     private raw;
     private payloadClass;
+    private _unpackedPayload: Payload;
     constructor(
         response: Response,
         payloadClass?: { typeUrl: string; decode: (message: Uint8Array) => Payload },
     ) {
         this.raw = response;
         this.payloadClass = payloadClass;
-    }
-    unpackPayload(): Payload | undefined {
-        if (this.payloadClass && this.raw.payload) {
-            return unpack(this.raw.payload, this.payloadClass);
+        if (payloadClass && response.payload) {
+            this._unpackedPayload = AnyUtils.unpack(this.raw.payload, this.payloadClass);
         }
     }
 
@@ -40,6 +39,10 @@ class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
 
     public get payload() {
         return this.raw.payload;
+    }
+
+    public get unpackedPayload() {
+        return this._unpackedPayload;
     }
 
     public get requestId() {

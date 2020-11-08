@@ -11,7 +11,7 @@ message Packet {
   PacketType type = 1;
   oneof message {
     SystemActionType system_action = 2;
-    google.protobuf.Any action = 3;
+    string action = 3;
   }
   optional string request_id = 4;
   optional Status status = 5;

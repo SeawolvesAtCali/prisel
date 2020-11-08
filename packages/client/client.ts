@@ -1,21 +1,19 @@
-import once from 'lodash/once';
-import { getExit } from './message';
 import {
-    SERVER,
+    AnyUtils,
     newRequestManager,
     Packet,
-    RequestManager,
     Request,
+    RequestManager,
     Response,
-    PacketType,
-    isResponse,
-    MessageType,
-    RoomChangePayload,
-    Code,
+    SERVER,
 } from '@prisel/common';
+import { ProtoGenInstance } from '@prisel/common/dist/ProtoGenInstance';
+import { packet, room_state_change_spec, system_action_type } from '@prisel/protos';
+import once from 'lodash/once';
+import { assert } from './assert';
+import { getExit } from './message';
 import { PubSub } from './pubSub';
 import withTimer from './withTimer';
-import { assert } from './assert';
 
 type RemoveListenerFunc = () => void;
 
@@ -26,17 +24,12 @@ export interface State {
     [property: string]: unknown;
 }
 
-export function serialize(packet: Packet): string {
-    return JSON.stringify(packet);
+export function serialize(pkt: Packet) {
+    return packet.Packet.encode(pkt).finish();
 }
 
-export function deserialize(buffer: string): Packet | void {
-    try {
-        return JSON.parse(buffer) as Packet;
-    } catch {
-        // tslint:disable-next-line:no-console
-        console.log('Error parsing packet: ' + buffer);
-    }
+export function deserialize(buffer: any): Packet | undefined {
+    return packet.Packet.decode(new Uint8Array(buffer));
 }
 
 const NOT_CONNECTED = 'not connected';
@@ -55,7 +48,7 @@ const NOT_CONNECTED = 'not connected';
  *
  * After a client is connected, we can attach message handler using `client.on`
  */
-class Client<T = State> {
+export class Client<T = State> {
     public get connection(): WebSocket {
         return this.conn;
     }
@@ -93,6 +86,7 @@ class Client<T = State> {
         }
         // TODO if it is already connecting, we should also exit
         const connection = new WebSocket(this.serverUri);
+        connection.binaryType = 'arraybuffer';
 
         connection.onclose = () => {
             this.disconnect();
@@ -106,7 +100,7 @@ class Client<T = State> {
             this.handleMessage(message.data);
         };
         await withTimer(
-            new Promise((resolve, reject) => {
+            new Promise((resolve) => {
                 const onOpen = () => {
                     this.conn = connection;
                     resolve();
@@ -128,10 +122,17 @@ class Client<T = State> {
     }
 
     private listenForSystemAction<Payload = never>(
-        systemAction: MessageType,
-        listener: (payload: Payload) => void,
+        systemAction: system_action_type.SystemActionType,
+        // never in conditional type conditional behaves like an empty union. If we
+        // use `Payload extends never ? A : B` it behaves like
+        // `Payload extends empty_union ? A: B`
+        // https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379094672
+        payloadClass: [Payload] extends [never] ? undefined : ProtoGenInstance<Payload>,
+        listener: (payload?: Payload) => void,
     ): RemoveListenerFunc {
-        return this.systemActionListener.on(systemAction, (packet) => listener(packet.payload));
+        return this.systemActionListener.on(systemAction, (packet) =>
+            payloadClass ? listener(AnyUtils.unpack(packet.payload, payloadClass)) : listener(),
+        );
     }
 
     /**
@@ -147,43 +148,12 @@ class Client<T = State> {
         }
     }
 
-    public async request<Payload = any>(request: Request<Payload>) {
+    public async request(request: Request) {
         this.emit(request);
         return this.requestManager.addRequest(request, DEFAULT_TIMEOUT);
     }
 
-    public respond<Payload>(request: Request, payload: Payload) {
-        const response: Response<Payload> = {
-            type: PacketType.RESPONSE,
-            request_id: request.request_id,
-            status: {
-                code: Code.OK,
-            },
-            payload,
-        };
-        if (request.system_action !== undefined) {
-            response.system_action = request.system_action;
-        }
-        if (request.action !== undefined) {
-            response.action = request.action;
-        }
-        this.emit(response);
-    }
-
-    public respondFailure(request: Request, message?: string, detail?: any) {
-        const response: Response<never> = {
-            type: PacketType.RESPONSE,
-            request_id: request.request_id,
-            status: {
-                code: Code.FAILED,
-            },
-        };
-        if (message) {
-            response.status.message = message;
-        }
-        if (detail !== undefined) {
-            response.status.detail = detail;
-        }
+    public respond(response: Response) {
         this.emit(response);
     }
 
@@ -197,16 +167,21 @@ class Client<T = State> {
     }
 
     public onRoomStateChange(
-        listener: (roomStateChange: RoomChangePayload) => void,
+        listener: (roomStateChange: room_state_change_spec.RoomStateChangePayload) => void,
     ): RemoveListenerFunc {
-        return this.listenForSystemAction<RoomChangePayload>(
-            MessageType.ROOM_STATE_CHANGE,
+        return this.listenForSystemAction(
+            system_action_type.SystemActionType.ROOM_STATE_CHANGE,
+            room_state_change_spec.RoomStateChangePayload,
             listener,
         );
     }
 
     public onGameStart(listener: () => void): RemoveListenerFunc {
-        return this.listenForSystemAction(MessageType.ANNOUNCE_GAME_START, listener);
+        return this.listenForSystemAction<never>(
+            system_action_type.SystemActionType.GAME_START,
+            undefined,
+            listener,
+        );
     }
 
     /**
@@ -222,22 +197,22 @@ class Client<T = State> {
     }
 
     protected processPacket(packet: Packet) {
-        if (isResponse(packet)) {
+        if (Response.isResponse(packet)) {
             // handle response using requestManager
             this.requestManager.onResponse(packet);
             return;
         }
 
-        if (packet.action !== undefined) {
-            this.listeners.dispatch(packet.action, packet);
-        } else if (packet.system_action !== undefined) {
-            this.systemActionListener.dispatch(packet.system_action, packet);
+        if (Packet.isSystemAction(packet)) {
+            this.systemActionListener.dispatch(packet.message.systemAction, packet);
+        } else if (Packet.isCustomAction(packet)) {
+            this.listeners.dispatch(packet.message.action, packet);
         } else {
             this.log('Packet without action is not supported', packet);
         }
     }
 
-    private handleMessage(rawMessage: string) {
+    private handleMessage(rawMessage: any) {
         if (this.isConnected) {
             const message = deserialize(rawMessage);
             if (!message) {
@@ -257,5 +232,3 @@ class Client<T = State> {
         this.listeners = undefined;
     }
 }
-
-export default Client;

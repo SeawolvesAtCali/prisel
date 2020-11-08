@@ -1,86 +1,66 @@
+import { Packet, Request } from '@prisel/common';
 import {
-    MessageType,
-    Request,
-    LoginPayload,
-    PacketType,
-    Packet,
-    JoinPayload,
-    CreateRoomPayload,
-    ChatPayload,
-} from '@prisel/common';
+    chat_spec,
+    create_room_spec,
+    join_spec,
+    login_spec,
+    system_action_type,
+} from '@prisel/protos';
 
+const { SystemActionType } = system_action_type;
 /**
  * Login
  * @param {String} username
  */
-export function getLogin(requestId: string, username: string): Request<LoginPayload> {
-    return {
-        type: PacketType.REQUEST,
-        system_action: MessageType.LOGIN,
-        request_id: requestId,
-        payload: {
-            username,
-        },
-    };
+export function getLogin(requestId: string, username: string) {
+    return Request.forSystemAction<login_spec.LoginRequest>(SystemActionType.LOGIN)
+        .setId(requestId)
+        .setPayload(login_spec.LoginRequest, { username })
+        .build();
 }
 
 /**
  * Exit server
  */
-export function getExit(): Packet {
-    return {
-        type: PacketType.DEFAULT,
-        system_action: MessageType.EXIT,
-    };
+export function getExit() {
+    return Packet.forSystemAction(SystemActionType.EXIT).build();
 }
 
 /**
  * Join room
  * @param {String} roomId
  */
-export function getJoin(requestId: string, roomId: string): Request<JoinPayload> {
-    return {
-        type: PacketType.REQUEST,
-        system_action: MessageType.JOIN,
-        request_id: requestId,
-        payload: {
+export function getJoin(requestId: string, roomId: string) {
+    return Request.forSystemAction<join_spec.JoinRequest>(SystemActionType.JOIN)
+        .setId(requestId)
+        .setPayload(join_spec.JoinRequest, {
             roomId,
-        },
-    };
+        })
+        .build();
 }
 
 /**
  * Leave current room
  */
-export function getLeave(requestId: string): Request<never> {
-    return {
-        type: PacketType.REQUEST,
-        system_action: MessageType.LEAVE,
-        request_id: requestId,
-    };
+export function getLeave(requestId: string) {
+    return Request.forSystemAction(SystemActionType.LEAVE).setId(requestId).build();
 }
 
 /**
  * Create a room
  * @param {String} roomName
  */
-export function getCreateRoom(requestId: string, roomName: string): Request<CreateRoomPayload> {
-    return {
-        type: PacketType.REQUEST,
-        system_action: MessageType.CREATE_ROOM,
-        request_id: requestId,
-        payload: {
+export function getCreateRoom(requestId: string, roomName: string) {
+    return Request.forSystemAction<create_room_spec.CreateRoomRequest>(SystemActionType.CREATE_ROOM)
+        .setId(requestId)
+        .setPayload(create_room_spec.CreateRoomRequest, {
             roomName,
-        },
-    };
+        })
+        .build();
 }
 
-export function getGameStart(requestId: string): Request<never> {
-    return {
-        type: PacketType.REQUEST,
-        system_action: MessageType.GAME_START,
-        request_id: requestId,
-    };
+export function getGameStart(requestId: string) {
+    return Request.forSystemAction(SystemActionType.GAME_START).setId(requestId).build();
 }
 
 /**
@@ -88,28 +68,18 @@ export function getGameStart(requestId: string): Request<never> {
  * @param {String} userId
  * @param {String} message
  */
-export function getChat(message: string): Packet<ChatPayload> {
-    return {
-        type: PacketType.DEFAULT,
-        system_action: MessageType.CHAT,
-        payload: {
+export function getChat(message: string) {
+    return Packet.forSystemAction<chat_spec.ChatPayload>(SystemActionType.CHAT)
+        .setPayload(chat_spec.ChatPayload, {
             message,
-        },
-    };
+        })
+        .build();
 }
 
-export function getGetRoomState(requestId: string): Request {
-    return {
-        type: PacketType.REQUEST,
-        system_action: MessageType.GET_ROOM_STATE,
-        request_id: requestId,
-    };
+export function getGetRoomState(requestId: string) {
+    return Request.forSystemAction(SystemActionType.GET_ROOM_STATE).setId(requestId).build();
 }
 
 export function getGetLobbyState(requestId: string): Request {
-    return {
-        type: PacketType.REQUEST,
-        system_action: MessageType.GET_LOBBY_STATE,
-        request_id: requestId,
-    };
+    return Request.forSystemAction(SystemActionType.GET_ROOM_STATE).setId(requestId).build();
 }

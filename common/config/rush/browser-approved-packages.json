@@ -11,6 +11,10 @@
       "allowedCategories": [ "production", "prototype", "tools" ]
     },
     {
+      "name": "@prisel/configs",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@prisel/gen-tsconfig",
       "allowedCategories": [ "production", "prototype", "tools" ]
     },
@@ -32,11 +36,11 @@
     },
     {
       "name": "@rollup/plugin-commonjs",
-      "allowedCategories": [ "production", "prototype" ]
+      "allowedCategories": [ "production", "prototype", "tools" ]
     },
     {
       "name": "@rollup/plugin-node-resolve",
-      "allowedCategories": [ "production", "prototype" ]
+      "allowedCategories": [ "production", "prototype", "tools" ]
     },
     {
       "name": "@rollup/plugin-typescript",

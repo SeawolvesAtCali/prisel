@@ -1,7 +1,12 @@
 import { Any } from '@prisel/protos';
 import { Reader, Writer } from 'protobufjs/minimal';
 
-export function pack<T>(
+export const AnyUtils = {
+    pack,
+    unpack,
+};
+
+function pack<T>(
     message: T,
     protoClass: { typeUrl: string; encode: (message: T, writer?: Writer) => Writer },
 ): Any {
@@ -11,7 +16,7 @@ export function pack<T>(
     };
 }
 
-export function unpack<T>(
+function unpack<T>(
     any: Any,
     protoClass: { typeUrl: string; decode: (input: Uint8Array | Reader) => T },
 ): T | undefined {

@@ -1,5 +1,4 @@
 import { packet, packet_type, status } from '@prisel/protos';
-import { AnyUtils } from './anyUtils';
 import { PacketBuilder } from './packet';
 import { Request } from './request';
 
@@ -12,22 +11,23 @@ export interface Response extends packet.Packet {
 function isResponse(p: packet.Packet): p is Response {
     return (
         p.type === packet_type.PacketType.RESPONSE &&
-        typeof p.requestId === 'number' &&
-        p.status != undefined
+        p.requestId !== undefined &&
+        p.status !== undefined
     );
 }
 
-class ResponseBuilder<Payload = never> extends PacketBuilder<Payload> {
+class ResponseBuilder extends PacketBuilder {
     id: Response['requestId'];
     status: status.Status;
-    static forRequest<Payload = never>(request: Request) {
-        const builder = new ResponseBuilder<Payload>();
+    static forRequest(request: Request) {
+        const builder = new ResponseBuilder();
         builder.message = request.message.$case;
         if (request.message.$case === 'systemAction') {
             builder.systemAction = request.message.systemAction;
         } else {
             builder.action = request.message.action;
         }
+        builder.id = request.requestId;
         return builder;
     }
 
@@ -41,7 +41,9 @@ class ResponseBuilder<Payload = never> extends PacketBuilder<Payload> {
     }
 
     public build(): Response {
-        const result: Response = {
+        const packet = super.build();
+        return {
+            ...packet,
             type: packet_type.PacketType.RESPONSE,
             requestId: this.id,
             status: this.status
@@ -60,16 +62,12 @@ class ResponseBuilder<Payload = never> extends PacketBuilder<Payload> {
                           action: this.action,
                       },
         };
-        if (this.payloadClass && this.payload) {
-            result.payload = AnyUtils.pack(this.payload, this.payloadClass);
-        }
-        return result;
     }
 }
 
 export const Response = {
     isResponse,
-    forRequest<Payload = any>(request: Request) {
-        return ResponseBuilder.forRequest<Payload>(request);
+    forRequest(request: Request) {
+        return ResponseBuilder.forRequest(request);
     },
 };

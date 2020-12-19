@@ -2,7 +2,7 @@
 import { PacketType, packetTypeFromJSON, packetTypeToJSON } from '../prisel/packet_type';
 import { SystemActionType, systemActionTypeFromJSON, systemActionTypeToJSON } from '../prisel/system_action_type';
 import { Status } from '../prisel/status';
-import { Any } from '../google/protobuf/any';
+import { Payload } from '../prisel/payload';
 import { Writer, Reader } from 'protobufjs/minimal';
 
 
@@ -11,7 +11,7 @@ export interface Packet {
   message?: { $case: 'systemAction', systemAction: SystemActionType } | { $case: 'action', action: string };
   requestId?: string | undefined;
   status?: Status | undefined;
-  payload?: Any | undefined;
+  payload?: Payload | undefined;
 }
 
 const basePacket: object = {
@@ -35,7 +35,7 @@ export const Packet = {
       Status.encode(message.status, writer.uint32(42).fork()).ldelim();
     }
     if (message.payload !== undefined) {
-      Any.encode(message.payload, writer.uint32(50).fork()).ldelim();
+      Payload.encode(message.payload, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -62,7 +62,7 @@ export const Packet = {
           message.status = Status.decode(reader, reader.uint32());
           break;
         case 6:
-          message.payload = Any.decode(reader, reader.uint32());
+          message.payload = Payload.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -89,7 +89,7 @@ export const Packet = {
       message.status = Status.fromJSON(object.status);
     }
     if (object.payload !== undefined && object.payload !== null) {
-      message.payload = Any.fromJSON(object.payload);
+      message.payload = Payload.fromJSON(object.payload);
     }
     return message;
   },
@@ -111,7 +111,7 @@ export const Packet = {
       message.status = Status.fromPartial(object.status);
     }
     if (object.payload !== undefined && object.payload !== null) {
-      message.payload = Any.fromPartial(object.payload);
+      message.payload = Payload.fromPartial(object.payload);
     }
     return message;
   },
@@ -122,7 +122,7 @@ export const Packet = {
     message.message?.$case === 'action' && (obj.action = message.message?.action);
     message.requestId !== undefined && (obj.requestId = message.requestId);
     message.status !== undefined && (obj.status = message.status ? Status.toJSON(message.status) : undefined);
-    message.payload !== undefined && (obj.payload = message.payload ? Any.toJSON(message.payload) : undefined);
+    message.payload !== undefined && (obj.payload = message.payload ? Payload.toJSON(message.payload) : undefined);
     return obj;
   },
 };

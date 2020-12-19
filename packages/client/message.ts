@@ -1,11 +1,5 @@
 import { Packet, Request } from '@prisel/common';
-import {
-    chat_spec,
-    create_room_spec,
-    join_spec,
-    login_spec,
-    system_action_type,
-} from '@prisel/protos';
+import { system_action_type } from '@prisel/protos';
 
 const { SystemActionType } = system_action_type;
 /**
@@ -13,9 +7,11 @@ const { SystemActionType } = system_action_type;
  * @param {String} username
  */
 export function getLogin(requestId: string, username: string) {
-    return Request.forSystemAction<login_spec.LoginRequest>(SystemActionType.LOGIN)
+    return Request.forSystemAction(SystemActionType.LOGIN)
         .setId(requestId)
-        .setPayload(login_spec.LoginRequest, { username })
+        .setPayload('loginRequest', {
+            username,
+        })
         .build();
 }
 
@@ -31,11 +27,9 @@ export function getExit() {
  * @param {String} roomId
  */
 export function getJoin(requestId: string, roomId: string) {
-    return Request.forSystemAction<join_spec.JoinRequest>(SystemActionType.JOIN)
+    return Request.forSystemAction(SystemActionType.JOIN)
         .setId(requestId)
-        .setPayload(join_spec.JoinRequest, {
-            roomId,
-        })
+        .setPayload('joinRequest', { roomId })
         .build();
 }
 
@@ -51,9 +45,9 @@ export function getLeave(requestId: string) {
  * @param {String} roomName
  */
 export function getCreateRoom(requestId: string, roomName: string) {
-    return Request.forSystemAction<create_room_spec.CreateRoomRequest>(SystemActionType.CREATE_ROOM)
+    return Request.forSystemAction(SystemActionType.CREATE_ROOM)
         .setId(requestId)
-        .setPayload(create_room_spec.CreateRoomRequest, {
+        .setPayload('createRoomRequest', {
             roomName,
         })
         .build();
@@ -69,8 +63,8 @@ export function getGameStart(requestId: string) {
  * @param {String} message
  */
 export function getChat(message: string) {
-    return Packet.forSystemAction<chat_spec.ChatPayload>(SystemActionType.CHAT)
-        .setPayload(chat_spec.ChatPayload, {
+    return Packet.forSystemAction(SystemActionType.CHAT)
+        .setPayload('chatPayload', {
             message,
         })
         .build();

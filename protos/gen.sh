@@ -5,6 +5,8 @@ then
     echo "Not generating ts definitions for protos, if you made change to proto files, make sure you install protoc and rerun build locally."
 else
     echo "Generating ts definitions for protos"
+    rm -rf gen_ts
+    mkdir gen_ts
     # generate typescript definition of the proto using a fork of 
     # https://github.com/stephenh/ts-proto
     # at https://github.com/yiochen/ts-proto

@@ -38,7 +38,7 @@
     "devDependencies": {
         "@prisel/configs": "1.0.0",
         "@types/lodash": "^4.14.108",
-        "mock-socket": "^9.0.3",
+        "mock-socket": "yiochen/mock-socket",
         "nps": "^5.9.12",
         "rollup": "^2.7.6",
         "tslib": "^2.0.0",

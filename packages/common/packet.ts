@@ -1,50 +1,43 @@
-import { packet, packet_type, system_action_type } from '@prisel/protos';
-import { AnyUtils } from './anyUtils';
-import { ProtoGenInstance } from './ProtoGenInstance';
+import { packet, packet_type, payload, system_action_type } from '@prisel/protos';
 
 export type Packet = packet.Packet;
 
-type T = never;
-type C = T extends never ? number : string;
+type SelectOneOf<
+    Key extends string,
+    OneofCase extends { $case: string; [key: string]: any }
+> = OneofCase extends { $case: Key } ? OneofCase[Key] : never;
 
-export class PacketBuilder<Payload = never> {
+type OneofPayload<Key extends string> = SelectOneOf<Key, payload.Payload['payload']>;
+
+type PayloadKey = payload.Payload['payload']['$case'];
+
+export class PacketBuilder {
     message: 'systemAction' | 'action';
     systemAction: system_action_type.SystemActionType;
     action: string;
-    payloadClass: Payload extends never ? undefined : ProtoGenInstance<Payload>;
-    payload: Payload extends never ? undefined : Payload;
+    payload?: payload.Payload;
 
-    public static forSystemAction<Payload = never>(action: system_action_type.SystemActionType) {
-        const builder = new PacketBuilder<Payload>();
+    public static forSystemAction(action: system_action_type.SystemActionType) {
+        const builder = new PacketBuilder();
         builder.message = 'systemAction';
         builder.systemAction = action;
         return builder;
     }
 
-    public static forAction<Payload = never>(action: string) {
-        const builder = new PacketBuilder<Payload>();
+    public static forAction(action: string) {
+        const builder = new PacketBuilder();
         builder.message = 'action';
         builder.action = action;
         return builder;
     }
 
-    public setPayloadClass(payloadClass: this['payloadClass']): this {
-        this.payloadClass = payloadClass;
-        return this;
-    }
-
-    public setPayload(payload: this['payload']): this;
-    setPayload(payloadClass: this['payloadClass'], payload: this['payload']): this;
-    public setPayload(
-        payloadClassOrPayload: this['payload'] | this['payloadClass'],
-        payload?: this['payload'],
-    ): this {
-        if ('typeUrl' in payloadClassOrPayload) {
-            this.payloadClass = payloadClassOrPayload;
-            this.payload = payload;
-        } else {
-            this.payload = payloadClassOrPayload;
-        }
+    public setPayload<T extends PayloadKey>(payloadType: T, payload: OneofPayload<T>): this {
+        this.payload = ({
+            payload: {
+                $case: payloadType,
+                [payloadType]: payload,
+            },
+        } as unknown) as payload.Payload;
         return this;
     }
 
@@ -62,20 +55,19 @@ export class PacketBuilder<Payload = never> {
                           action: this.action,
                       },
         };
-        if (this.payloadClass && this.payload) {
-            result.payload = AnyUtils.pack(this.payload, this.payloadClass);
+        if (this.payload) {
+            result.payload = this.payload;
         }
         return result;
     }
 }
 
 export const Packet = {
-    forSystemAction<Payload = never>(action: system_action_type.SystemActionType) {
-        // PacketBuilder.forSystemAction<never>(action).payload = 'sd';
-        return PacketBuilder.forSystemAction<Payload>(action);
+    forSystemAction(action: system_action_type.SystemActionType) {
+        return PacketBuilder.forSystemAction(action);
     },
-    forAction<Payload = never>(action: string) {
-        return PacketBuilder.forAction<Payload>(action);
+    forAction(action: string) {
+        return PacketBuilder.forAction(action);
     },
     isSystemAction(
         packet: Packet,

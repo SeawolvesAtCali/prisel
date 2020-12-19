@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+// keep sorted
+import "prisel/chat_spec.proto";
+import "prisel/create_room_spec.proto";
+import "prisel/error_spec.proto";
+import "prisel/get_lobby_state_spec.proto";
+import "prisel/get_room_state_spec.proto";
+import "prisel/join_spec.proto";
+import "prisel/login_spec.proto";
+import "prisel/room_state_change_spec.proto";
+
+package prisel;
+
+message Payload {
+  oneof payload {
+    ChatPayload chat_payload = 1;
+
+    CreateRoomRequest create_room_request = 2;
+    CreateRoomResponse create_room_response = 3;
+
+    ErrorPayload error_payload = 4;
+
+    GetLobbyStateResponse get_lobby_state_response = 5;
+
+    GetRoomStateResponse get_room_state_response = 6;
+
+    JoinRequest join_request = 7;
+    JoinResponse join_response = 8;
+
+    LoginRequest login_request = 9;
+    LoginResponse login_response = 10;
+
+    RoomStateChangePayload room_state_change_payload = 11;
+  }
+}

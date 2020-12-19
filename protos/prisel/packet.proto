@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-import "google/protobuf/any.proto";
 import "prisel/system_action_type.proto";
 import "prisel/status.proto";
 import "prisel/packet_type.proto";
+import "prisel/payload.proto";
 
 package prisel;
 
@@ -15,5 +15,5 @@ message Packet {
   }
   optional string request_id = 4;
   optional Status status = 5;
-  optional google.protobuf.Any payload = 6;
+  optional Payload payload = 6;
 }

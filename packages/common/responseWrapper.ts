@@ -1,29 +1,19 @@
 import { status } from '@prisel/protos';
-import { AnyUtils } from './anyUtils';
 import { Response } from './response';
 
-export interface ResponseWrapper<Payload = any> extends Response {
+export interface ResponseWrapper extends Response {
     get(): Response;
-    unpackedPayload: Payload;
     ok(): boolean;
     failed(): boolean;
     getMessage(): string;
     getDetail(): any;
 }
 
-class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
+class ResponseWrapperImpl implements ResponseWrapper {
     private raw;
-    private payloadClass;
-    private _unpackedPayload: Payload;
-    constructor(
-        response: Response,
-        payloadClass?: { typeUrl: string; decode: (message: Uint8Array) => Payload },
-    ) {
+
+    constructor(response: Response) {
         this.raw = response;
-        this.payloadClass = payloadClass;
-        if (payloadClass && response.payload) {
-            this._unpackedPayload = AnyUtils.unpack(this.raw.payload, this.payloadClass);
-        }
     }
 
     public get message() {
@@ -39,10 +29,6 @@ class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
 
     public get payload() {
         return this.raw.payload;
-    }
-
-    public get unpackedPayload() {
-        return this._unpackedPayload;
     }
 
     public get requestId() {
@@ -70,9 +56,9 @@ class ResponseWrapperImpl<Payload = any> implements ResponseWrapper<Payload> {
     }
 }
 
-export function wrapResponse<Payload = any>(
+export function wrapResponse(
     response: Response,
-    payloadClass?: { typeUrl: string; decode: (input: Uint8Array) => Payload },
-): ResponseWrapper<Payload> {
-    return new ResponseWrapperImpl(response, payloadClass);
+    payloadClass?: { typeUrl: string },
+): ResponseWrapper {
+    return new ResponseWrapperImpl(response);
 }

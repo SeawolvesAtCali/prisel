@@ -1,4 +1,3 @@
-export * from './anyUtils';
 export * from './constants';
 export { Packet } from './packet';
 export { Request } from './request';

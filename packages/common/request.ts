@@ -1,5 +1,4 @@
 import { packet, packet_type, system_action_type } from '@prisel/protos';
-import { AnyUtils } from './anyUtils';
 import { PacketBuilder } from './packet';
 
 export interface Request extends packet.Packet {
@@ -11,56 +10,40 @@ function isRequest(p: packet.Packet): p is Request {
     return p.type === packet_type.PacketType.REQUEST && p.requestId !== undefined;
 }
 
-class RequestBuilder<Payload = never> extends PacketBuilder<Payload> {
+class RequestBuilder extends PacketBuilder {
     id: Request['requestId'];
 
-    public static forSystemAction<Payload = never>(action: system_action_type.SystemActionType) {
-        const builder = new RequestBuilder<Payload>();
+    public static forSystemAction(action: system_action_type.SystemActionType) {
+        const builder = new RequestBuilder();
         builder.message = 'systemAction';
         builder.systemAction = action;
         return builder;
     }
 
-    public static forAction<Payload = never>(action: string) {
-        const builder = new RequestBuilder<Payload>();
+    public static forAction(action: string) {
+        const builder = new RequestBuilder();
         builder.message = 'action';
         builder.action = action;
         return builder;
     }
 
-    public setId(id: Request['requestId']): RequestBuilder<Payload> {
+    public setId(id: Request['requestId']): RequestBuilder {
         this.id = id;
         return this;
     }
 
     public build(): Request {
-        const result: Request = {
-            type: packet_type.PacketType.REQUEST,
-            requestId: this.id,
-            message:
-                this.message === 'systemAction'
-                    ? {
-                          $case: 'systemAction',
-                          systemAction: this.systemAction,
-                      }
-                    : {
-                          $case: 'action',
-                          action: this.action,
-                      },
-        };
-        if (this.payloadClass && this.payload) {
-            result.payload = AnyUtils.pack(this.payload, this.payloadClass);
-        }
-        return result;
+        const packet = super.build();
+        return { ...packet, type: packet_type.PacketType.REQUEST, requestId: this.id };
     }
 }
 
 export const Request = {
     isRequest,
-    forSystemAction<Payload = never>(action: system_action_type.SystemActionType) {
-        return RequestBuilder.forSystemAction<Payload>(action);
+    forSystemAction(action: system_action_type.SystemActionType) {
+        return RequestBuilder.forSystemAction(action);
     },
-    forAction<Payload = never>(action: string) {
-        return RequestBuilder.forAction<Payload>(action);
+    forAction(action: string) {
+        return RequestBuilder.forAction(action);
     },
 };

@@ -1,4 +1,7 @@
-export default function withTimer<T>(promise: Promise<T>, timeInMilliseconds: number): Promise<T> {
+export default function withTimer<T = never>(
+    promise: Promise<T>,
+    timeInMilliseconds: number,
+): Promise<T> {
     let timerId: any;
 
     return Promise.race([

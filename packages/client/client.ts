@@ -1,5 +1,4 @@
 import {
-    AnyUtils,
     newRequestManager,
     Packet,
     Request,
@@ -7,8 +6,7 @@ import {
     Response,
     SERVER,
 } from '@prisel/common';
-import { ProtoGenInstance } from '@prisel/common/dist/ProtoGenInstance';
-import { packet, room_state_change_spec, system_action_type } from '@prisel/protos';
+import { packet, payload, room_state_change_spec, system_action_type } from '@prisel/protos';
 import once from 'lodash/once';
 import { assert } from './assert';
 import { getExit } from './message';
@@ -29,7 +27,11 @@ export function serialize(pkt: Packet) {
 }
 
 export function deserialize(buffer: any): Packet | undefined {
-    return packet.Packet.decode(new Uint8Array(buffer));
+    if (buffer instanceof ArrayBuffer) {
+        return packet.Packet.decode(new Uint8Array(buffer));
+    } else if (buffer instanceof Uint8Array) {
+        return packet.Packet.decode(buffer);
+    }
 }
 
 const NOT_CONNECTED = 'not connected';
@@ -103,7 +105,7 @@ export class Client<T = State> {
             new Promise((resolve) => {
                 const onOpen = () => {
                     this.conn = connection;
-                    resolve();
+                    resolve(undefined);
                     connection.onopen = null;
                 };
                 connection.onopen = onOpen;
@@ -121,18 +123,11 @@ export class Client<T = State> {
         }
     }
 
-    private listenForSystemAction<Payload = never>(
+    private listenForSystemAction(
         systemAction: system_action_type.SystemActionType,
-        // never in conditional type conditional behaves like an empty union. If we
-        // use `Payload extends never ? A : B` it behaves like
-        // `Payload extends empty_union ? A: B`
-        // https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379094672
-        payloadClass: [Payload] extends [never] ? undefined : ProtoGenInstance<Payload>,
-        listener: (payload?: Payload) => void,
+        listener: (payload?: payload.Payload) => void,
     ): RemoveListenerFunc {
-        return this.systemActionListener.on(systemAction, (packet) =>
-            payloadClass ? listener(AnyUtils.unpack(packet.payload, payloadClass)) : listener(),
-        );
+        return this.systemActionListener.on(systemAction, (packet) => listener(packet.payload));
     }
 
     /**
@@ -171,17 +166,16 @@ export class Client<T = State> {
     ): RemoveListenerFunc {
         return this.listenForSystemAction(
             system_action_type.SystemActionType.ROOM_STATE_CHANGE,
-            room_state_change_spec.RoomStateChangePayload,
-            listener,
+            (payload) => {
+                if (payload.payload.$case === 'roomStateChangePayload') {
+                    listener(payload.payload.roomStateChangePayload);
+                }
+            },
         );
     }
 
     public onGameStart(listener: () => void): RemoveListenerFunc {
-        return this.listenForSystemAction<never>(
-            system_action_type.SystemActionType.GAME_START,
-            undefined,
-            listener,
-        );
+        return this.listenForSystemAction(system_action_type.SystemActionType.GAME_START, listener);
     }
 
     /**

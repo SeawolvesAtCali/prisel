@@ -3,4 +3,3 @@ scripts:
     ts-check: tsc
     clean: rm -rf ./lib
     build: rollup --config --silent
-    gendef: tsc --project build.tsconfig.json

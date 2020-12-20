@@ -1,10 +1,9 @@
-import { Context, Socket } from '../objects';
+import { system_action_type } from '@prisel/protos';
+import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { closeSocket } from '../utils/networkUtils';
-import { MessageType, Packet } from '@prisel/common';
-import clientHandlerRegister from '../clientHandlerRegister';
-import { getRoom, getPlayer } from '../utils/stateUtils';
+import { getPlayer, getRoom } from '../utils/stateUtils';
 
-export const handleExit = (context: Context, socket: Socket) => (packet: Packet) => {
+export const handleExit: Handler = (context, socket) => (_packet) => {
     const { SocketManager } = context;
     closeSocket(socket);
     if (!SocketManager.hasSocket(socket)) {
@@ -21,4 +20,4 @@ export const handleExit = (context: Context, socket: Socket) => (packet: Packet)
     SocketManager.removeBySocket(socket);
 };
 
-clientHandlerRegister.push(MessageType.EXIT, handleExit);
+clientHandlerRegister.push(system_action_type.SystemActionType.EXIT, handleExit);

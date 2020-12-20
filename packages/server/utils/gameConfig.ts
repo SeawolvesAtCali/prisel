@@ -1,9 +1,8 @@
 // import { Handle } from './handle';
 import { Player } from '../player';
 import { Room } from '../room';
-import { Packet } from '@prisel/common';
 
-interface FullGameConfig {
+export interface FullGameConfig {
     /**
      * A unique identifier for this game in the server.
      */

@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { ChatPayload } from '../prisel/chat_spec';
+import { BroadcastPayload } from '../prisel/broadcast_spec';
 import { CreateRoomRequest, CreateRoomResponse } from '../prisel/create_room_spec';
 import { ErrorPayload } from '../prisel/error_spec';
 import { GetLobbyStateResponse } from '../prisel/get_lobby_state_spec';
@@ -11,7 +12,7 @@ import { Writer, Reader } from 'protobufjs/minimal';
 
 
 export interface Payload {
-  payload?: { $case: 'chatPayload', chatPayload: ChatPayload } | { $case: 'createRoomRequest', createRoomRequest: CreateRoomRequest } | { $case: 'createRoomResponse', createRoomResponse: CreateRoomResponse } | { $case: 'errorPayload', errorPayload: ErrorPayload } | { $case: 'getLobbyStateResponse', getLobbyStateResponse: GetLobbyStateResponse } | { $case: 'getRoomStateResponse', getRoomStateResponse: GetRoomStateResponse } | { $case: 'joinRequest', joinRequest: JoinRequest } | { $case: 'joinResponse', joinResponse: JoinResponse } | { $case: 'loginRequest', loginRequest: LoginRequest } | { $case: 'loginResponse', loginResponse: LoginResponse } | { $case: 'roomStateChangePayload', roomStateChangePayload: RoomStateChangePayload };
+  payload?: { $case: 'chatPayload', chatPayload: ChatPayload } | { $case: 'broadcastPayload', broadcastPayload: BroadcastPayload } | { $case: 'createRoomRequest', createRoomRequest: CreateRoomRequest } | { $case: 'createRoomResponse', createRoomResponse: CreateRoomResponse } | { $case: 'errorPayload', errorPayload: ErrorPayload } | { $case: 'getLobbyStateResponse', getLobbyStateResponse: GetLobbyStateResponse } | { $case: 'getRoomStateResponse', getRoomStateResponse: GetRoomStateResponse } | { $case: 'joinRequest', joinRequest: JoinRequest } | { $case: 'joinResponse', joinResponse: JoinResponse } | { $case: 'loginRequest', loginRequest: LoginRequest } | { $case: 'loginResponse', loginResponse: LoginResponse } | { $case: 'roomStateChangePayload', roomStateChangePayload: RoomStateChangePayload };
 }
 
 const basePayload: object = {
@@ -23,35 +24,38 @@ export const Payload = {
     if (message.payload?.$case === 'chatPayload') {
       ChatPayload.encode(message.payload.chatPayload, writer.uint32(10).fork()).ldelim();
     }
+    if (message.payload?.$case === 'broadcastPayload') {
+      BroadcastPayload.encode(message.payload.broadcastPayload, writer.uint32(18).fork()).ldelim();
+    }
     if (message.payload?.$case === 'createRoomRequest') {
-      CreateRoomRequest.encode(message.payload.createRoomRequest, writer.uint32(18).fork()).ldelim();
+      CreateRoomRequest.encode(message.payload.createRoomRequest, writer.uint32(26).fork()).ldelim();
     }
     if (message.payload?.$case === 'createRoomResponse') {
-      CreateRoomResponse.encode(message.payload.createRoomResponse, writer.uint32(26).fork()).ldelim();
+      CreateRoomResponse.encode(message.payload.createRoomResponse, writer.uint32(34).fork()).ldelim();
     }
     if (message.payload?.$case === 'errorPayload') {
-      ErrorPayload.encode(message.payload.errorPayload, writer.uint32(34).fork()).ldelim();
+      ErrorPayload.encode(message.payload.errorPayload, writer.uint32(42).fork()).ldelim();
     }
     if (message.payload?.$case === 'getLobbyStateResponse') {
-      GetLobbyStateResponse.encode(message.payload.getLobbyStateResponse, writer.uint32(42).fork()).ldelim();
+      GetLobbyStateResponse.encode(message.payload.getLobbyStateResponse, writer.uint32(50).fork()).ldelim();
     }
     if (message.payload?.$case === 'getRoomStateResponse') {
-      GetRoomStateResponse.encode(message.payload.getRoomStateResponse, writer.uint32(50).fork()).ldelim();
+      GetRoomStateResponse.encode(message.payload.getRoomStateResponse, writer.uint32(58).fork()).ldelim();
     }
     if (message.payload?.$case === 'joinRequest') {
-      JoinRequest.encode(message.payload.joinRequest, writer.uint32(58).fork()).ldelim();
+      JoinRequest.encode(message.payload.joinRequest, writer.uint32(66).fork()).ldelim();
     }
     if (message.payload?.$case === 'joinResponse') {
-      JoinResponse.encode(message.payload.joinResponse, writer.uint32(66).fork()).ldelim();
+      JoinResponse.encode(message.payload.joinResponse, writer.uint32(74).fork()).ldelim();
     }
     if (message.payload?.$case === 'loginRequest') {
-      LoginRequest.encode(message.payload.loginRequest, writer.uint32(74).fork()).ldelim();
+      LoginRequest.encode(message.payload.loginRequest, writer.uint32(82).fork()).ldelim();
     }
     if (message.payload?.$case === 'loginResponse') {
-      LoginResponse.encode(message.payload.loginResponse, writer.uint32(82).fork()).ldelim();
+      LoginResponse.encode(message.payload.loginResponse, writer.uint32(90).fork()).ldelim();
     }
     if (message.payload?.$case === 'roomStateChangePayload') {
-      RoomStateChangePayload.encode(message.payload.roomStateChangePayload, writer.uint32(90).fork()).ldelim();
+      RoomStateChangePayload.encode(message.payload.roomStateChangePayload, writer.uint32(98).fork()).ldelim();
     }
     return writer;
   },
@@ -66,33 +70,36 @@ export const Payload = {
           message.payload = {$case: 'chatPayload', chatPayload: ChatPayload.decode(reader, reader.uint32())};
           break;
         case 2:
-          message.payload = {$case: 'createRoomRequest', createRoomRequest: CreateRoomRequest.decode(reader, reader.uint32())};
+          message.payload = {$case: 'broadcastPayload', broadcastPayload: BroadcastPayload.decode(reader, reader.uint32())};
           break;
         case 3:
-          message.payload = {$case: 'createRoomResponse', createRoomResponse: CreateRoomResponse.decode(reader, reader.uint32())};
+          message.payload = {$case: 'createRoomRequest', createRoomRequest: CreateRoomRequest.decode(reader, reader.uint32())};
           break;
         case 4:
-          message.payload = {$case: 'errorPayload', errorPayload: ErrorPayload.decode(reader, reader.uint32())};
+          message.payload = {$case: 'createRoomResponse', createRoomResponse: CreateRoomResponse.decode(reader, reader.uint32())};
           break;
         case 5:
-          message.payload = {$case: 'getLobbyStateResponse', getLobbyStateResponse: GetLobbyStateResponse.decode(reader, reader.uint32())};
+          message.payload = {$case: 'errorPayload', errorPayload: ErrorPayload.decode(reader, reader.uint32())};
           break;
         case 6:
-          message.payload = {$case: 'getRoomStateResponse', getRoomStateResponse: GetRoomStateResponse.decode(reader, reader.uint32())};
+          message.payload = {$case: 'getLobbyStateResponse', getLobbyStateResponse: GetLobbyStateResponse.decode(reader, reader.uint32())};
           break;
         case 7:
-          message.payload = {$case: 'joinRequest', joinRequest: JoinRequest.decode(reader, reader.uint32())};
+          message.payload = {$case: 'getRoomStateResponse', getRoomStateResponse: GetRoomStateResponse.decode(reader, reader.uint32())};
           break;
         case 8:
-          message.payload = {$case: 'joinResponse', joinResponse: JoinResponse.decode(reader, reader.uint32())};
+          message.payload = {$case: 'joinRequest', joinRequest: JoinRequest.decode(reader, reader.uint32())};
           break;
         case 9:
-          message.payload = {$case: 'loginRequest', loginRequest: LoginRequest.decode(reader, reader.uint32())};
+          message.payload = {$case: 'joinResponse', joinResponse: JoinResponse.decode(reader, reader.uint32())};
           break;
         case 10:
-          message.payload = {$case: 'loginResponse', loginResponse: LoginResponse.decode(reader, reader.uint32())};
+          message.payload = {$case: 'loginRequest', loginRequest: LoginRequest.decode(reader, reader.uint32())};
           break;
         case 11:
+          message.payload = {$case: 'loginResponse', loginResponse: LoginResponse.decode(reader, reader.uint32())};
+          break;
+        case 12:
           message.payload = {$case: 'roomStateChangePayload', roomStateChangePayload: RoomStateChangePayload.decode(reader, reader.uint32())};
           break;
         default:
@@ -106,6 +113,9 @@ export const Payload = {
     const message = { ...basePayload } as Payload;
     if (object.chatPayload !== undefined && object.chatPayload !== null) {
       message.payload = {$case: 'chatPayload', chatPayload: ChatPayload.fromJSON(object.chatPayload)};
+    }
+    if (object.broadcastPayload !== undefined && object.broadcastPayload !== null) {
+      message.payload = {$case: 'broadcastPayload', broadcastPayload: BroadcastPayload.fromJSON(object.broadcastPayload)};
     }
     if (object.createRoomRequest !== undefined && object.createRoomRequest !== null) {
       message.payload = {$case: 'createRoomRequest', createRoomRequest: CreateRoomRequest.fromJSON(object.createRoomRequest)};
@@ -144,6 +154,9 @@ export const Payload = {
     if (object.payload?.$case === 'chatPayload' && object.payload?.chatPayload !== undefined && object.payload?.chatPayload !== null) {
       message.payload = {$case: 'chatPayload', chatPayload: ChatPayload.fromPartial(object.payload.chatPayload)};
     }
+    if (object.payload?.$case === 'broadcastPayload' && object.payload?.broadcastPayload !== undefined && object.payload?.broadcastPayload !== null) {
+      message.payload = {$case: 'broadcastPayload', broadcastPayload: BroadcastPayload.fromPartial(object.payload.broadcastPayload)};
+    }
     if (object.payload?.$case === 'createRoomRequest' && object.payload?.createRoomRequest !== undefined && object.payload?.createRoomRequest !== null) {
       message.payload = {$case: 'createRoomRequest', createRoomRequest: CreateRoomRequest.fromPartial(object.payload.createRoomRequest)};
     }
@@ -179,6 +192,7 @@ export const Payload = {
   toJSON(message: Payload): unknown {
     const obj: any = {};
     message.payload?.$case === 'chatPayload' && (obj.chatPayload = message.payload?.chatPayload ? ChatPayload.toJSON(message.payload?.chatPayload) : undefined);
+    message.payload?.$case === 'broadcastPayload' && (obj.broadcastPayload = message.payload?.broadcastPayload ? BroadcastPayload.toJSON(message.payload?.broadcastPayload) : undefined);
     message.payload?.$case === 'createRoomRequest' && (obj.createRoomRequest = message.payload?.createRoomRequest ? CreateRoomRequest.toJSON(message.payload?.createRoomRequest) : undefined);
     message.payload?.$case === 'createRoomResponse' && (obj.createRoomResponse = message.payload?.createRoomResponse ? CreateRoomResponse.toJSON(message.payload?.createRoomResponse) : undefined);
     message.payload?.$case === 'errorPayload' && (obj.errorPayload = message.payload?.errorPayload ? ErrorPayload.toJSON(message.payload?.errorPayload) : undefined);

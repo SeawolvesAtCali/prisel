@@ -1,20 +1,27 @@
-import { Context, Socket } from '../objects';
-import clientHandlerRegister from '../clientHandlerRegister';
-import { getPlayerOrRespondError } from './utils';
-import { Request, MessageType, RoomStateResponsePayload } from '@prisel/common';
+import { Response } from '@prisel/common';
+import { system_action_type } from '@prisel/protos';
+import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { getRoom, getRoomStateSnapshot } from '../utils/stateUtils';
+import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
-export const handleGetRoomState = (context: Context, socket: Socket) => (request: Request) => {
+export const handleGetRoomState: Handler = (context, socket) => (request) => {
+    if (!verifyIsRequest(request)) {
+        return;
+    }
     const player = getPlayerOrRespondError(context, socket, request);
     if (!player) {
         return;
     }
     const room = getRoom(context, socket);
     if (!room) {
-        player.respondFailure(request, 'not in a room');
+        player.respond(Response.forRequest(request).setFailure('not in a room').build());
         return;
     }
-    player.respond<RoomStateResponsePayload>(request, getRoomStateSnapshot(room));
+    player.respond(
+        Response.forRequest(request)
+            .setPayload('getRoomStateResponse', getRoomStateSnapshot(room))
+            .build(),
+    );
 };
 
-clientHandlerRegister.push(MessageType.GET_ROOM_STATE, handleGetRoomState);
+clientHandlerRegister.push(system_action_type.SystemActionType.GET_ROOM_STATE, handleGetRoomState);

@@ -6,7 +6,7 @@ import {
     Response,
     SERVER,
 } from '@prisel/common';
-import { packet, payload, room_state_change_spec, system_action_type } from '@prisel/protos';
+import { payload, room_state_change_spec, system_action_type } from '@prisel/protos';
 import once from 'lodash/once';
 import { assert } from './assert';
 import { getExit } from './message';
@@ -20,18 +20,6 @@ const CONNECTION_TIMEOUT = DEFAULT_TIMEOUT;
 
 export interface State {
     [property: string]: unknown;
-}
-
-export function serialize(pkt: Packet) {
-    return packet.Packet.encode(pkt).finish();
-}
-
-export function deserialize(buffer: any): Packet | undefined {
-    if (buffer instanceof ArrayBuffer) {
-        return packet.Packet.decode(new Uint8Array(buffer));
-    } else if (buffer instanceof Uint8Array) {
-        return packet.Packet.decode(buffer);
-    }
 }
 
 const NOT_CONNECTED = 'not connected';
@@ -102,10 +90,10 @@ export class Client<T = State> {
             this.handleMessage(message.data);
         };
         await withTimer(
-            new Promise((resolve) => {
+            new Promise<void>((resolve) => {
                 const onOpen = () => {
                     this.conn = connection;
-                    resolve(undefined);
+                    resolve();
                     connection.onopen = null;
                 };
                 connection.onopen = onOpen;
@@ -137,7 +125,7 @@ export class Client<T = State> {
      */
     public emit<P extends Packet = any>(packet: P) {
         assert(this.isConnected, NOT_CONNECTED);
-        this.connection.send(serialize(packet));
+        this.connection.send(Packet.serialize(packet));
         if (this.onEmitCallback) {
             this.onEmitCallback(packet);
         }
@@ -153,7 +141,7 @@ export class Client<T = State> {
     }
 
     /**
-     * Attach handler for messages from server
+     * Attach handler for messages frorushm server
      * @param messageTypeOrFilter
      * @param callback
      */
@@ -197,9 +185,9 @@ export class Client<T = State> {
             return;
         }
 
-        if (Packet.isSystemAction(packet)) {
+        if (Packet.isAnySystemAction(packet)) {
             this.systemActionListener.dispatch(packet.message.systemAction, packet);
-        } else if (Packet.isCustomAction(packet)) {
+        } else if (Packet.isAnyCustomAction(packet)) {
             this.listeners.dispatch(packet.message.action, packet);
         } else {
             this.log('Packet without action is not supported', packet);
@@ -208,7 +196,7 @@ export class Client<T = State> {
 
     private handleMessage(rawMessage: any) {
         if (this.isConnected) {
-            const message = deserialize(rawMessage);
+            const message = Packet.deserialize(rawMessage);
             if (!message) {
                 return;
             }

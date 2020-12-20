@@ -1,4 +1,4 @@
-export { Context } from './context';
+export type { AnyObject } from './anyObject';
+export type { Context } from './context';
+export type { wsServer } from './server';
 export { Socket } from './socket';
-export { wsServer } from './server';
-export * from './anyObject';

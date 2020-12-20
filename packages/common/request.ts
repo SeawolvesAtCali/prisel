@@ -1,5 +1,5 @@
 import { packet, packet_type, system_action_type } from '@prisel/protos';
-import { PacketBuilder } from './packet';
+import { isValidRequest, PacketBuilder } from './packet';
 
 export interface Request extends packet.Packet {
     type: packet_type.PacketType.REQUEST;
@@ -7,10 +7,10 @@ export interface Request extends packet.Packet {
 }
 
 function isRequest(p: packet.Packet): p is Request {
-    return p.type === packet_type.PacketType.REQUEST && p.requestId !== undefined;
+    return isValidRequest(p);
 }
 
-class RequestBuilder extends PacketBuilder {
+export class RequestBuilder extends PacketBuilder {
     id: Request['requestId'];
 
     public static forSystemAction(action: system_action_type.SystemActionType) {

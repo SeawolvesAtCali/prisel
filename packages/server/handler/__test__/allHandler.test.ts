@@ -1,21 +1,27 @@
-import '../index';
+import { system_action_type } from '@prisel/protos';
 import clientHandlerRegister from '../../clientHandlerRegister';
-import { MessageType, serverInitiatedMessages } from '@prisel/common/messageTypes';
-import { messageTypeMap } from '@prisel/common';
+import '../index';
 
+const systemActionsWithoutHandler = new Set([
+    system_action_type.SystemActionType.UNSPECIFIED,
+    system_action_type.SystemActionType.WELCOME,
+    system_action_type.SystemActionType.BROADCAST,
+    system_action_type.SystemActionType.ROOM_STATE_CHANGE,
+    system_action_type.SystemActionType.ANNOUNCE_GAME_START,
+    system_action_type.SystemActionType.ERROR,
+]);
 test('all client intiated messages have handler', () => {
-    const allHandlerKeys = Array.from(clientHandlerRegister.messageList).map((key) =>
-        messageTypeMap.get(key),
-    );
-    for (const messageType of Object.values(MessageType)) {
+    const allHandlerKeys = Array.from(clientHandlerRegister.messageList);
+    for (const systemActionType of Object.values(system_action_type.SystemActionType)) {
         if (
-            messageType === MessageType.UNSPECIFIED ||
-            // number enum has mapping from key to value and value to key https://github.com/Microsoft/TypeScript/issues/17198#issuecomment-315400819
-            typeof messageType === 'string' ||
-            serverInitiatedMessages.includes(messageType)
+            systemActionsWithoutHandler.has(
+                system_action_type.systemActionTypeFromJSON(systemActionType),
+            )
         ) {
             continue;
         }
-        expect(allHandlerKeys).toContain(messageTypeMap.get(messageType));
+        expect(allHandlerKeys).toContain(
+            system_action_type.systemActionTypeFromJSON(systemActionType),
+        );
     }
 });

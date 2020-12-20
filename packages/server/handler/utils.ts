@@ -1,25 +1,40 @@
-import { getPlayer } from '../utils/stateUtils';
-import { Context } from '../objects';
-import WebSocket from 'ws';
-import { Packet, isRequest, PacketType, MessageType, ErrorPayload } from '@prisel/common';
-import { getFailureFor } from '../message';
+import { Packet, Request, Response } from '@prisel/common';
+import { system_action_type } from '@prisel/protos';
+import { debug } from '../debug';
+import { getError } from '../message';
+import { Context, Socket } from '../objects';
+import { Player } from '../player';
 import { emit } from '../utils/networkUtils';
+import { safeStringify } from '../utils/safeStringify';
+import { getPlayer } from '../utils/stateUtils';
 
-export function getPlayerOrRespondError(context: Context, socket: WebSocket, packet: Packet) {
+export function getPlayerOrRespondError(
+    context: Context,
+    socket: Socket,
+    packet: Packet,
+): Player | undefined {
     const player = getPlayer(context, socket);
     if (!player) {
-        if (isRequest(packet)) {
-            emit(socket, getFailureFor(packet, 'Please login first'));
+        if (Request.isRequest(packet)) {
+            emit(socket, Response.forRequest(packet).setFailure('Please login first').build());
         } else {
-            emit<Packet<ErrorPayload>>(socket, {
-                type: PacketType.DEFAULT,
-                system_action: MessageType.ERROR,
-                payload: {
-                    message: 'Unauthenticated',
-                },
-            });
+            emit(socket, getError('Unauthenticated'));
         }
         return;
     }
     return player;
+}
+
+export function verifyIsRequest(p: Packet): p is Request {
+    if (!Request.isRequest(p)) {
+        debug(
+            `Received ${
+                Packet.isAnySystemAction(p)
+                    ? system_action_type.systemActionTypeToJSON(Packet.getSystemAction(p))
+                    : Packet.getAction(p)
+            } but packet is not a request: ${safeStringify(p)}`,
+        );
+        return false;
+    }
+    return true;
 }

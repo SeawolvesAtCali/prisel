@@ -1,25 +1,25 @@
-import { Context } from './objects';
+import { Packet, Response } from '@prisel/common';
+import http from 'http';
+import clientHandlerRegister from './clientHandlerRegister';
 import createContext from './createContext';
 import debug from './debug';
-import './handler';
-import {
-    createServerWithInternalHTTPServer,
-    watchForDisconnection,
-    getConnectionToken,
-    emit,
-    createServerFromHTTPServer,
-    deserialize,
-} from './utils/networkUtils';
-import clientHandlerRegister from './clientHandlerRegister';
-import { handleDisconnect } from './handler/handleDisconnect';
-import { getWelcome } from './message';
-import { GameConfig, BaseGameConfig } from './utils/gameConfig';
-import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
-import http from 'http';
-import { getPlayer, getRoom } from './utils/stateUtils';
-import { isResponse, isSupportedPacket, ErrorPayload, Packet, PacketType } from '@prisel/common';
-import { GAME_PHASE } from './objects/gamePhase';
 import { DEBUG_MODE } from './flags';
+import { handleDisconnect } from './handler/handleDisconnect';
+import './handler/index';
+import { getError, getWelcome } from './message';
+import { Context } from './objects';
+import { GAME_PHASE } from './objects/gamePhase';
+import { BaseGameConfig, GameConfig } from './utils/gameConfig';
+import {
+    createServerFromHTTPServer,
+    createServerWithInternalHTTPServer,
+    emit,
+    getConnectionToken,
+    watchForDisconnection,
+} from './utils/networkUtils';
+import { BaseRoomConfig, RoomConfig } from './utils/roomConfig';
+import { safeStringify } from './utils/safeStringify';
+import { getPlayer, getRoom } from './utils/stateUtils';
 
 interface ServerConfig {
     host?: string;
@@ -110,27 +110,27 @@ export class Server {
                 if (!data) {
                     return;
                 }
-                const packet = deserialize(data);
-                if (DEBUG_MODE && !isSupportedPacket(packet)) {
+                const packet = Packet.deserialize(data);
+                if (!Packet.verify(packet)) {
                     debug(`packet structure is invalid`);
-                    const player = getPlayer(context, socket);
-                    if (player) {
-                        player.emit<Packet<ErrorPayload>>({
-                            type: PacketType.DEFAULT,
-                            payload: {
-                                message: 'packet structure is invalid',
-                                detail: packet,
-                            },
-                        });
-                    } else {
-                        debug(`player is not logged in, cannot send error report`);
+                    if (DEBUG_MODE) {
+                        const player = getPlayer(context, socket);
+                        if (player) {
+                            player.emit(
+                                getError('packet structure is invalid', safeStringify(packet)),
+                            );
+                        } else {
+                            debug(`player is not logged in, cannot send error report`);
+                        }
+                        // TODO send info back to client
+                        return;
                     }
-                    // TODO send info back to client
                     return;
                 }
+
                 // handle response
-                if (isResponse(packet)) {
-                    const { request_id: id } = packet;
+                if (Response.isResponse(packet)) {
+                    const { requestId: id } = packet;
                     if (context.requests.isWaitingFor(id)) {
                         context.requests.onResponse(packet);
                     } else {
@@ -140,15 +140,14 @@ export class Server {
                 }
                 // handle packet or request
                 // systemAction are handled by pre-registered handlers.
-                const { system_action: systemAction, action } = packet;
-
-                if (action) {
+                if (Packet.isAnyCustomAction(packet)) {
                     const player = getPlayer(context, socket);
                     const room = getRoom(context, socket);
                     if (player && room && room.getGamePhase() === GAME_PHASE.GAME) {
                         room.dispatchGamePacket(packet, player);
                     }
-                } else if (systemAction !== undefined) {
+                } else if (Packet.isAnySystemAction(packet)) {
+                    const systemAction = Packet.getSystemAction(packet);
                     const handler = clientHandlerRegister.get(systemAction);
                     if (!handler) {
                         debug(

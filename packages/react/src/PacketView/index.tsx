@@ -1,8 +1,8 @@
+import { isResponse, messageTypeMap, Packet, PacketType } from '@prisel/client';
 import * as React from 'react';
-import { Packet, PacketType, isResponse, wrapResponse, messageTypeMap } from '@prisel/client';
 import { Pill, Preset } from '../Pill';
-import styles from './index.module.css';
 import cn from '../utils/classname';
+import styles from './index.module.css';
 
 interface PacketTypeLabelProps {
     type: PacketType;
@@ -117,7 +117,7 @@ interface PacketViewProps {
 }
 function getResponseStatus(packet: Packet) {
     if (isResponse(packet)) {
-        const response = wrapResponse(packet);
+        const response = packet;
         return response.ok() ? (
             <Pill preset={Preset.GREEN}>SUCCESS</Pill>
         ) : (
@@ -129,7 +129,7 @@ function getResponseStatus(packet: Packet) {
 
 function renderStatus(packet: Packet) {
     if (isResponse(packet)) {
-        const response = wrapResponse(packet);
+        const response = packet;
         return (
             <div className={styles.status}>
                 <JsonView value={response.status} />

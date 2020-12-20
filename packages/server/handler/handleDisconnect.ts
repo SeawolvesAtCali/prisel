@@ -8,6 +8,5 @@ import { handleExit } from './handleExit';
  * @param socket
  */
 export const handleDisconnect = (context: Context, socket: Socket) => {
-    const { SocketManager } = context;
     handleExit(context, socket)(null);
 };

@@ -1,7 +1,11 @@
 export * from './constants';
 export { Packet } from './packet';
+export type { PacketBuilder } from './packet';
 export { Request } from './request';
-export * from './requestManager';
+export type { RequestBuilder } from './request';
+export { newRequestManager } from './requestManager';
+export type { RequestManager } from './requestManager';
 export { Response } from './response';
-export * from './responseWrapper';
-export * from './typedEvent';
+export type { ResponseBuilder } from './response';
+export { createArgEvent, createEvent } from './typedEvent';
+export type { TypedEvent, TypedEventWithArg } from './typedEvent';

@@ -1,11 +1,8 @@
-import { emit } from './networkUtils';
-import { Player } from '../player';
 import { Packet } from '@prisel/common';
+import { Player } from '../player';
+import { emit } from './networkUtils';
 
-export function broadcast<Payload = any>(
-    players: Player[],
-    packetBuilder: ((player: Player) => Packet<Payload>) | Packet<Payload>,
-) {
+export function broadcast(players: Player[], packetBuilder: ((player: Player) => Packet) | Packet) {
     if (typeof packetBuilder === 'function') {
         const packets = players.map(packetBuilder);
         setImmediate(() => {

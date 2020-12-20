@@ -7,6 +7,6 @@ package prisel;
 // token saved in the client, if so, no packet was dropped, and they should
 // update the saved token to be the new token.
 message UpdateToken {
-  string priviousToken = 1;
+  string previousToken = 1;
   string token = 2;
 }

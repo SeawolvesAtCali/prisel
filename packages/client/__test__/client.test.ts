@@ -1,7 +1,7 @@
-import { Packet, Request, Response, ResponseWrapper } from '@prisel/common';
+import { Packet, Request, Response } from '@prisel/common';
 import { packet, packet_type, system_action_type } from '@prisel/protos';
 import { Server } from 'mock-socket';
-import { Client, deserialize, serialize } from '../client';
+import { Client } from '../client';
 import { getLogin } from '../message';
 
 describe('Client', () => {
@@ -42,7 +42,7 @@ describe('Client', () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
                 socket.on('message', (data) => {
-                    const pkt = deserialize(data);
+                    const pkt = Packet.deserialize(data);
                     expect(Request.isRequest(pkt)).toBe(true);
 
                     // pkt.payload.value = new Uint8Array(2); //new Uint8Array(pkt.payload.value);
@@ -69,18 +69,17 @@ describe('Client', () => {
                             userId: '123',
                         })
                         .build();
-                    socket.send(serialize(loginResponse));
+                    socket.send(Packet.serialize(loginResponse));
                 });
             });
             await client.connect();
-            const loginResult: ResponseWrapper = await client.request(
-                getLogin(client.newId(), 'batman'),
-            );
-            const payload = loginResult.payload.payload;
-            expect(payload.$case).toBe('loginResponse');
-            if (payload.$case === 'loginResponse') {
-                expect(payload.loginResponse.userId).toBe('123');
-            }
+            const loginResult = await client.request(getLogin(client.newId(), 'batman'));
+            expect(
+                Packet.isSystemAction(loginResult, system_action_type.SystemActionType.LOGIN),
+            ).toBe(true);
+            const payload = Packet.getPayload(loginResult, 'loginResponse');
+            expect(payload).toBeDefined();
+            expect(payload.userId).toBe('123');
         });
         it('should reject if timeout', async () => {
             const client = new Client(fakeURL);
@@ -95,11 +94,8 @@ describe('Client', () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
                 socket.on('message', (data) => {
-                    const packet = deserialize(data);
-                    if (
-                        Packet.isSystemAction(packet) &&
-                        packet.message.systemAction === system_action_type.SystemActionType.EXIT
-                    ) {
+                    const packet = Packet.deserialize(data);
+                    if (Packet.isSystemAction(packet, system_action_type.SystemActionType.EXIT)) {
                         // do nothing on EXIT
                         return;
                     }
@@ -109,7 +105,7 @@ describe('Client', () => {
                             userId: '123',
                         })
                         .build();
-                    socket.send(serialize(loginResponse));
+                    socket.send(Packet.serialize(loginResponse));
                 });
             });
             await client.connect();
@@ -121,11 +117,8 @@ describe('Client', () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
                 socket.on('message', (data) => {
-                    const packet = deserialize(data);
-                    if (
-                        Packet.isSystemAction(packet) &&
-                        packet.message.systemAction === system_action_type.SystemActionType.EXIT
-                    ) {
+                    const packet = Packet.deserialize(data);
+                    if (Packet.isSystemAction(packet, system_action_type.SystemActionType.EXIT)) {
                         // do nothing on EXIT
                         return;
                     }
@@ -135,7 +128,7 @@ describe('Client', () => {
                             userId: '123',
                         })
                         .build();
-                    socket.send(serialize(loginResponse));
+                    socket.send(Packet.serialize(loginResponse));
                 });
             });
             await client.connect();
@@ -150,9 +143,9 @@ describe('Client', () => {
             const client = new Client(fakeURL);
             mockServer.on('connection', (socket) => {
                 const pkt = Packet.forAction('MESSAGE').build();
-                socket.send(serialize(pkt));
+                socket.send(Packet.serialize(pkt));
             });
-            const waitForMessage = new Promise((resolve) => {
+            const waitForMessage = new Promise<void>((resolve) => {
                 const mockCallback = (packet: Packet, action: string) => {
                     expect(packet).toMatchObject<Packet>({
                         type: packet_type.PacketType.DEFAULT,
@@ -161,7 +154,7 @@ describe('Client', () => {
                             action: 'MESSAGE',
                         },
                     });
-                    resolve(undefined);
+                    resolve();
                 };
                 client.on('MESSAGE', mockCallback);
             });
@@ -178,7 +171,7 @@ describe('Client', () => {
                 client.on('YES', resolve);
             });
             const packet = Packet.forAction('YES').build();
-            connection.send(serialize(packet));
+            connection.send(Packet.serialize(packet));
             await waitForGameStart;
         });
     });

@@ -1,5 +1,5 @@
 import { packet, packet_type, status } from '@prisel/protos';
-import { PacketBuilder } from './packet';
+import { isValidResponse, PacketBuilder } from './packet';
 import { Request } from './request';
 
 export interface Response extends packet.Packet {
@@ -9,14 +9,10 @@ export interface Response extends packet.Packet {
 }
 
 function isResponse(p: packet.Packet): p is Response {
-    return (
-        p.type === packet_type.PacketType.RESPONSE &&
-        p.requestId !== undefined &&
-        p.status !== undefined
-    );
+    return isValidResponse(p);
 }
 
-class ResponseBuilder extends PacketBuilder {
+export class ResponseBuilder extends PacketBuilder {
     id: Response['requestId'];
     status: status.Status;
     static forRequest(request: Request) {
@@ -28,15 +24,22 @@ class ResponseBuilder extends PacketBuilder {
             builder.action = request.message.action;
         }
         builder.id = request.requestId;
+        builder.status = {
+            code: status.Status_Code.OK,
+        };
         return builder;
     }
 
     setFailure(message?: string, detail?: string): this {
         this.status = {
             code: status.Status_Code.FAILED,
-            message,
-            detail,
         };
+        if (message != undefined) {
+            this.status.message = message;
+        }
+        if (detail != undefined) {
+            this.status.detail = detail;
+        }
         return this;
     }
 
@@ -46,11 +49,7 @@ class ResponseBuilder extends PacketBuilder {
             ...packet,
             type: packet_type.PacketType.RESPONSE,
             requestId: this.id,
-            status: this.status
-                ? this.status
-                : {
-                      code: status.Status_Code.OK,
-                  },
+            status: this.status,
             message:
                 this.message === 'systemAction'
                     ? {

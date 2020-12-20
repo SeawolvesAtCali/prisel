@@ -9,19 +9,19 @@ import { Writer, Reader } from 'protobufjs/minimal';
  *  update the saved token to be the new token.
  */
 export interface UpdateToken {
-  priviousToken: string;
+  previousToken: string;
   token: string;
 }
 
 const baseUpdateToken: object = {
-  priviousToken: "",
+  previousToken: "",
   token: "",
 };
 
 export const UpdateToken = {
   typeUrl: 'type.googleapis.com/prisel.UpdateToken',
   encode(message: UpdateToken, writer: Writer = Writer.create()): Writer {
-    writer.uint32(10).string(message.priviousToken);
+    writer.uint32(10).string(message.previousToken);
     writer.uint32(18).string(message.token);
     return writer;
   },
@@ -33,7 +33,7 @@ export const UpdateToken = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.priviousToken = reader.string();
+          message.previousToken = reader.string();
           break;
         case 2:
           message.token = reader.string();
@@ -47,8 +47,8 @@ export const UpdateToken = {
   },
   fromJSON(object: any): UpdateToken {
     const message = { ...baseUpdateToken } as UpdateToken;
-    if (object.priviousToken !== undefined && object.priviousToken !== null) {
-      message.priviousToken = String(object.priviousToken);
+    if (object.previousToken !== undefined && object.previousToken !== null) {
+      message.previousToken = String(object.previousToken);
     }
     if (object.token !== undefined && object.token !== null) {
       message.token = String(object.token);
@@ -57,8 +57,8 @@ export const UpdateToken = {
   },
   fromPartial(object: DeepPartial<UpdateToken>): UpdateToken {
     const message = { ...baseUpdateToken } as UpdateToken;
-    if (object.priviousToken !== undefined && object.priviousToken !== null) {
-      message.priviousToken = object.priviousToken;
+    if (object.previousToken !== undefined && object.previousToken !== null) {
+      message.previousToken = object.previousToken;
     }
     if (object.token !== undefined && object.token !== null) {
       message.token = object.token;
@@ -67,7 +67,7 @@ export const UpdateToken = {
   },
   toJSON(message: UpdateToken): unknown {
     const obj: any = {};
-    message.priviousToken !== undefined && (obj.priviousToken = message.priviousToken);
+    message.previousToken !== undefined && (obj.previousToken = message.previousToken);
     message.token !== undefined && (obj.token = message.token);
     return obj;
   },

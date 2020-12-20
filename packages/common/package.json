@@ -24,7 +24,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "nps ts-check clean build gendef gendoc",
+    "build": "nps ts-check clean build gendoc",
     "fix": "tslint --project tsconfig.json --fix",
     "lint": "tslint --project tsconfig.json",
     "test": "jest"

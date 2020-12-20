@@ -4,19 +4,20 @@ import { Writer, Reader } from 'protobufjs/minimal';
 
 export interface ErrorPayload {
   message: string;
-  detail: string;
+  detail?: string | undefined;
 }
 
 const baseErrorPayload: object = {
   message: "",
-  detail: "",
 };
 
 export const ErrorPayload = {
   typeUrl: 'type.googleapis.com/prisel.ErrorPayload',
   encode(message: ErrorPayload, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.message);
-    writer.uint32(18).string(message.detail);
+    if (message.detail !== undefined) {
+      writer.uint32(18).string(message.detail);
+    }
     return writer;
   },
   decode(input: Uint8Array | Reader, length?: number): ErrorPayload {

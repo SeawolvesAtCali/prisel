@@ -1,10 +1,7 @@
+import { player_info, room_info, room_state_snapshot } from '@prisel/protos';
 import { Context, Socket } from '../objects';
-
 import { Player } from '../player';
 import { Room } from '../room';
-import { RoomStateSnapshot } from '@prisel/common';
-import { PlayerInfo } from '@prisel/common';
-import { RoomInfo } from '@prisel/common';
 
 // Some utility functions for working with state
 
@@ -46,7 +43,7 @@ export function getRoom(context: Context, client: Socket): Room {
     }
 }
 
-export function getRoomStateSnapshot(room: Room): RoomStateSnapshot {
+export function getRoomStateSnapshot(room: Room): room_state_snapshot.RoomStateSnapshot {
     const host = room.getHost();
 
     return {
@@ -56,14 +53,14 @@ export function getRoomStateSnapshot(room: Room): RoomStateSnapshot {
     };
 }
 
-export function getPlayerInfo(player: Player): PlayerInfo {
+export function getPlayerInfo(player: Player): player_info.PlayerInfo {
     return {
         name: player.getName(),
         id: player.getId(),
     };
 }
 
-export function getRoomInfo(room: Room): RoomInfo {
+export function getRoomInfo(room: Room): room_info.RoomInfo {
     return {
         name: room.getName(),
         id: room.getId(),

@@ -1,78 +1,68 @@
+import { Packet, Request, Response } from '@prisel/common';
+import { update_token } from '@prisel/protos';
 import { EventEmitter } from 'events';
-
-import { Player } from './player';
-import { Context } from './objects';
-import { GAME_PHASE } from './objects/gamePhase';
-import { newId } from './utils/idUtils';
-import { Packet, PacketType, isRequest, ErrorPayload, UpdateToken } from '@prisel/common';
 import debug from './debug';
 import { DEBUG_MODE } from './flags';
+import { getError } from './message';
+import { Context } from './objects';
+import { GAME_PHASE } from './objects/gamePhase';
+import { Player } from './player';
+import { newId } from './utils/idUtils';
+import { safeStringify } from './utils/safeStringify';
 
 export type RoomId = string;
 
 export type RemoveListenerFunc = () => void;
-type PacketListener<T extends Packet<any>> = (player: Player, packet: T, action: any) => void;
+type PacketListener = (player: Player, packet: Packet, action: any) => void;
 
 // replace handle to control room related info
-export abstract class Room {
-    public abstract removePlayer(player: Player): void;
-    public abstract startGame(): void;
-    public abstract endGame(): void;
-    public abstract getGamePhase(): GAME_PHASE;
-    public abstract getGameCapacity(): number;
-    public abstract getPlayers(): Player[];
-    public hasPlayer(player: Player): boolean {
-        return this.getPlayers().some((playerInRoom) => playerInRoom.equals(player));
-    }
-    public abstract getHost(): Player;
-    public abstract setHost(player: Player): void;
-    public abstract addPlayer(player: Player): void;
-    public abstract getId(): string;
-    public abstract getName(): string;
+export interface Room {
+    removePlayer(player: Player): void;
+    startGame(): void;
+    endGame(): void;
+    getGamePhase(): GAME_PHASE;
+    getGameCapacity(): number;
+    getPlayers(): Player[];
+    hasPlayer(player: Player): boolean;
+    getHost(): Player;
+    setHost(player: Player): void;
+    addPlayer(player: Player): void;
+    getId(): string;
+    getName(): string;
     /**
      * Called when everybody left room and the room is ready to be clean up.
      */
-    public abstract close(): void;
-    public abstract get isClosed(): boolean;
-    public abstract setGame<Game = any>(game: Game): void;
-    public abstract getGame<Game = any>(): Game;
-    public abstract listenGamePacket<T extends Packet<any> = Packet<any>>(
-        action: any,
-        onPacket: PacketListener<T>,
-    ): RemoveListenerFunc;
-    public abstract removeAllGamePacketListener(): void;
-    public abstract dispatchGamePacket(packet: Packet, player: Player): void;
-    public equals(room: Room): boolean {
-        if (!room) {
-            return false;
-        }
-        return this.getId() === room.getId();
-    }
-
-    public abstract updateStateToken(): UpdateToken;
-    public abstract getStateToken(): string;
+    close(): void;
+    isClosed: boolean;
+    setGame<Game = any>(game: Game): void;
+    getGame<Game = any>(): Game;
+    listenGamePacket(action: any, onPacket: PacketListener): RemoveListenerFunc;
+    removeAllGamePacketListener(): void;
+    dispatchGamePacket(packet: Packet, player: Player): void;
+    equals(room: Room): boolean;
+    updateStateToken(): update_token.UpdateToken;
+    getStateToken(): string;
 }
 
-export interface RoomConfig {
+export interface RoomOption {
     name: string;
     id: RoomId;
 }
 
 /* tslint:disable: max-classes-per-file*/
-class RoomImpl extends Room {
-    private context: Context;
+class RoomImpl implements Room {
+    private context;
     private players: Player[] = [];
     private host: Player;
-    private name: string;
-    private id: string;
+    private name;
+    private id;
     private gamePhase: GAME_PHASE = GAME_PHASE.WAITING;
     private game: any;
     private actionListeners: EventEmitter = new EventEmitter();
     private currentToken = 0;
     private closed = false;
 
-    constructor(context: Context, config: RoomConfig) {
-        super();
+    constructor(context: Context, config: RoomOption) {
         this.context = context;
         this.name = config.name;
         this.id = config.id;
@@ -94,6 +84,9 @@ class RoomImpl extends Room {
 
     public getPlayers() {
         return this.players;
+    }
+    public hasPlayer(player: Player) {
+        return this.getPlayers().some((playerInRoom) => playerInRoom.equals(player));
     }
     public addPlayer(player: Player) {
         if (!this.players.includes(player)) {
@@ -144,10 +137,7 @@ class RoomImpl extends Room {
         return this.closed;
     }
 
-    public listenGamePacket<T extends Packet<any> = Packet<any>>(
-        action: any,
-        onPacket: PacketListener<T>,
-    ) {
+    public listenGamePacket(action: any, onPacket: PacketListener) {
         this.actionListeners.on(action, onPacket);
         return this.actionListeners.off.bind(this.actionListeners, action, onPacket);
     }
@@ -156,7 +146,7 @@ class RoomImpl extends Room {
         this.actionListeners.removeAllListeners();
     }
 
-    public updateStateToken(): UpdateToken {
+    public updateStateToken(): update_token.UpdateToken {
         const previousToken = this.getStateToken();
         this.currentToken = this.currentToken + 1;
         return {
@@ -164,13 +154,18 @@ class RoomImpl extends Room {
             token: this.getStateToken(),
         };
     }
-
+    public equals(room: Room): boolean {
+        if (!room) {
+            return false;
+        }
+        return this.getId() === room.getId();
+    }
     public getStateToken(): string {
         return `${this.currentToken}`;
     }
 
     public dispatchGamePacket(packet: Packet, player: Player) {
-        const { action } = packet;
+        const action = Packet.getAction(packet);
         if (action === undefined) {
             return;
         }
@@ -180,34 +175,30 @@ class RoomImpl extends Room {
         // TODO(minor) there is no detection for where a response is proccessed.
         // But this might not be an issue if we don't require all response to be
         // processed.
-        if (packet.type === PacketType.RESPONSE) {
+        if (Response.isResponse(packet)) {
             return;
         }
         setImmediate(() => {
             if (this.actionListeners.listenerCount(action) === 0) {
                 // no listener currently subscribe to this action
                 debug(`no game action listener is listening for ${action}`);
-                if (isRequest(packet)) {
-                    if (DEBUG_MODE) {
-                        player.respondFailure(
-                            packet,
-                            'no game action listener is listening for this request',
-                            packet,
-                        );
-                    } else {
-                        player.respondFailure(packet);
-                    }
+                if (Request.isRequest(packet)) {
+                    player.respond(
+                        Response.forRequest(packet)
+                            .setFailure(
+                                'no game action listener is listening for this request',
+                                DEBUG_MODE ? safeStringify(packet) : undefined,
+                            )
+                            .build(),
+                    );
                 } else {
                     // type === Packet
-                    if (DEBUG_MODE) {
-                        player.emit<Packet<ErrorPayload>>({
-                            type: PacketType.DEFAULT,
-                            payload: {
-                                message: 'no game action listener is listening for this packet',
-                                detail: packet,
-                            },
-                        });
-                    }
+                    player.emit(
+                        getError(
+                            'no game action listener is listening for this packet',
+                            DEBUG_MODE ? safeStringify(packet) : undefined,
+                        ),
+                    );
                 }
             } else {
                 this.actionListeners.emit(action, player, packet, action);
@@ -216,8 +207,8 @@ class RoomImpl extends Room {
     }
 }
 
-export function newRoom(context: Context, config: Omit<RoomConfig, 'id'>): Room {
-    const { name } = config;
+export function newRoom(context: Context, option: Omit<RoomOption, 'id'>): Room {
+    const { name } = option;
     const id = newId<RoomId>('ROOM');
     const room = new RoomImpl(context, {
         name,

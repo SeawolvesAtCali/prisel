@@ -28,7 +28,7 @@
     },
     {
       "name": "@prisel/protos",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "tools" ]
     },
     {
       "name": "@prisel/server",

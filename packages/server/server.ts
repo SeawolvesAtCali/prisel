@@ -98,6 +98,7 @@ export class Server {
         const context: Context = createContext({
             gameConfig,
             roomConfig,
+            server,
         });
 
         this.context = context;

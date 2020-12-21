@@ -1,20 +1,21 @@
-import { isResponse, messageTypeMap, Packet, PacketType } from '@prisel/client';
+import { Packet, Response } from '@prisel/client';
+import { packet_type, system_action_type } from '@prisel/protos';
 import * as React from 'react';
 import { Pill, Preset } from '../Pill';
 import cn from '../utils/classname';
 import styles from './index.module.css';
 
 interface PacketTypeLabelProps {
-    type: PacketType;
+    type: packet_type.PacketType;
 }
 
 const PacketTypeLabel: React.FC<PacketTypeLabelProps> = (props) => {
     switch (props.type) {
-        case PacketType.REQUEST:
+        case packet_type.PacketType.REQUEST:
             return <Pill preset={Preset.GREEN}>REQUEST</Pill>;
-        case PacketType.RESPONSE:
+        case packet_type.PacketType.RESPONSE:
             return <Pill preset={Preset.GREEN}>RESPONSE</Pill>;
-        case PacketType.DEFAULT:
+        case packet_type.PacketType.DEFAULT:
             return <Pill preset={Preset.GREEN}>PACKET</Pill>;
         default:
             return <Pill preset={Preset.GREEN}>UNKNOWN</Pill>;
@@ -116,9 +117,9 @@ interface PacketViewProps {
     actionToString?: (action: any) => string;
 }
 function getResponseStatus(packet: Packet) {
-    if (isResponse(packet)) {
+    if (Response.isResponse(packet)) {
         const response = packet;
-        return response.ok() ? (
+        return Packet.isStatusOk(response) ? (
             <Pill preset={Preset.GREEN}>SUCCESS</Pill>
         ) : (
             <Pill preset={Preset.PINK}>FAILURE</Pill>
@@ -128,7 +129,7 @@ function getResponseStatus(packet: Packet) {
 }
 
 function renderStatus(packet: Packet) {
-    if (isResponse(packet)) {
+    if (Response.isResponse(packet)) {
         const response = packet;
         return (
             <div className={styles.status}>
@@ -140,7 +141,7 @@ function renderStatus(packet: Packet) {
 }
 
 export const PacketView: React.FC<PacketViewProps> = (props) => {
-    const { packet, actionToString = (action: any) => `${action}`, fromServer } = props;
+    const { packet: p, actionToString = (action: any) => `${action}`, fromServer } = props;
 
     return (
         <div>
@@ -150,17 +151,19 @@ export const PacketView: React.FC<PacketViewProps> = (props) => {
                 ) : (
                     <span className={styles.upload}>⬆</span>
                 )}
-                <PacketTypeLabel type={packet.type} />
-                {getResponseStatus(packet)}
-                {packet.system_action && (
-                    <Pill preset={Preset.DEFAULT}>{messageTypeMap.get(packet.system_action)}</Pill>
+                <PacketTypeLabel type={p.type} />
+                {getResponseStatus(p)}
+                {Packet.isAnySystemAction(p) && (
+                    <Pill preset={Preset.DEFAULT}>
+                        {system_action_type.systemActionTypeToJSON(Packet.getSystemAction(p))}
+                    </Pill>
                 )}
-                {packet.action !== undefined && (
-                    <Pill preset={Preset.DEFAULT}>{actionToString(packet.action)}</Pill>
+                {Packet.isAnyCustomAction(p) && (
+                    <Pill preset={Preset.DEFAULT}>{actionToString(Packet.getAction(p))}</Pill>
                 )}
             </div>
-            {renderStatus(packet)}
-            {packet.payload !== undefined && <JsonView value={packet.payload} />}
+            {renderStatus(p)}
+            {p.payload !== undefined && <JsonView value={p.payload} />}
         </div>
     );
 };

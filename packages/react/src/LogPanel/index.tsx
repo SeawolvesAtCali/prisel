@@ -1,11 +1,11 @@
-import * as React from 'react';
-import Suggestion from '../Suggestion';
 import { Packet } from '@prisel/client';
-import styles from './index.module.css';
-import cn from '../utils/classname';
-import Chip from '../Chip';
 import debounce from 'lodash/debounce';
+import * as React from 'react';
+import Chip from '../Chip';
 import { PacketView } from '../PacketView';
+import Suggestion from '../Suggestion';
+import cn from '../utils/classname';
+import styles from './index.module.css';
 
 export interface Message {
     packet: Packet;
@@ -66,10 +66,6 @@ export function createMessage(message: Message): MessageWithMetaData {
 
 interface LogPanelProps {
     messages: MessageWithMetaData[];
-}
-
-interface LogPanelControl {
-    scrollToBottom: () => void;
 }
 
 const AUTO_SCROLL_THRESHHOLD = 50;

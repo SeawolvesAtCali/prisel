@@ -1,8 +1,8 @@
 import * as React from 'react';
-import styles from './index.module.css';
-import cn from '../utils/classname';
-import Suggestion from '../Suggestion';
 import { Pill, Preset } from '../Pill';
+import Suggestion from '../Suggestion';
+import cn from '../utils/classname';
+import styles from './index.module.css';
 
 const classNameForType: { [key in Suggestion['type']]: Preset } = {
     command: Preset.PINK,
@@ -63,7 +63,9 @@ function Edit(props: EditProps) {
     );
 }
 
-export default {
+const Chip = {
     Edit,
     Display,
 };
+
+export default Chip;

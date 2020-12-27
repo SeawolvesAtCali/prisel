@@ -20,8 +20,9 @@ const baseJoinRequest: object = {
 const baseJoinResponse: object = {
 };
 
+export const protobufPackage = 'prisel'
+
 export const JoinRequest = {
-  typeUrl: 'type.googleapis.com/prisel.JoinRequest',
   encode(message: JoinRequest, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.roomId);
     return writer;
@@ -65,7 +66,6 @@ export const JoinRequest = {
 };
 
 export const JoinResponse = {
-  typeUrl: 'type.googleapis.com/prisel.JoinResponse',
   encode(message: JoinResponse, writer: Writer = Writer.create()): Writer {
     if (message.room !== undefined && message.room !== undefined) {
       RoomInfo.encode(message.room, writer.uint32(10).fork()).ldelim();
@@ -124,7 +124,7 @@ export const JoinResponse = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

@@ -2,14 +2,14 @@ import { packet, packet_type, payload, status, system_action_type } from '@prise
 
 export type Packet = packet.Packet;
 
-type SelectOneOf<
+export type SelectOneOf<
     Key extends string,
     OneofCase extends { $case: string; [key: string]: any }
 > = OneofCase extends { $case: Key } ? OneofCase[Key] : never;
 
-type OneofPayload<Key extends string> = SelectOneOf<Key, payload.Payload['payload']>;
+export type OneofPayload<Key extends string> = SelectOneOf<Key, payload.Payload['payload']>;
 
-type PayloadKey = payload.Payload['payload']['$case'];
+export type PayloadKey = payload.Payload['payload']['$case'];
 
 function isPacketType(t: any): t is packet_type.PacketType {
     return (

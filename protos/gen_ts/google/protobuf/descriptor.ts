@@ -992,6 +992,8 @@ function longToNumber(long: Long) {
   return long.toNumber();
 }
 
+export const protobufPackage = 'google.protobuf'
+
 export enum FieldDescriptorProto_Type {
   /** TYPE_DOUBLE -  0 is reserved for errors.
    Order is weird for historical reasons.
@@ -1092,7 +1094,7 @@ export function fieldDescriptorProto_TypeFromJSON(object: any): FieldDescriptorP
     case "TYPE_SINT64":
       return FieldDescriptorProto_Type.TYPE_SINT64;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum FieldDescriptorProto_Type");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum FieldDescriptorProto_Type");
   }
 }
 
@@ -1159,7 +1161,7 @@ export function fieldDescriptorProto_LabelFromJSON(object: any): FieldDescriptor
     case "LABEL_REPEATED":
       return FieldDescriptorProto_Label.LABEL_REPEATED;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum FieldDescriptorProto_Label");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum FieldDescriptorProto_Label");
   }
 }
 
@@ -1202,7 +1204,7 @@ export function fileOptions_OptimizeModeFromJSON(object: any): FileOptions_Optim
     case "LITE_RUNTIME":
       return FileOptions_OptimizeMode.LITE_RUNTIME;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum FileOptions_OptimizeMode");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum FileOptions_OptimizeMode");
   }
 }
 
@@ -1239,7 +1241,7 @@ export function fieldOptions_CTypeFromJSON(object: any): FieldOptions_CType {
     case "STRING_PIECE":
       return FieldOptions_CType.STRING_PIECE;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum FieldOptions_CType");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum FieldOptions_CType");
   }
 }
 
@@ -1280,7 +1282,7 @@ export function fieldOptions_JSTypeFromJSON(object: any): FieldOptions_JSType {
     case "JS_NUMBER":
       return FieldOptions_JSType.JS_NUMBER;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum FieldOptions_JSType");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum FieldOptions_JSType");
   }
 }
 
@@ -1323,7 +1325,7 @@ export function methodOptions_IdempotencyLevelFromJSON(object: any): MethodOptio
     case "IDEMPOTENT":
       return MethodOptions_IdempotencyLevel.IDEMPOTENT;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum MethodOptions_IdempotencyLevel");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum MethodOptions_IdempotencyLevel");
   }
 }
 
@@ -1341,7 +1343,6 @@ export function methodOptions_IdempotencyLevelToJSON(object: MethodOptions_Idemp
 }
 
 export const FileDescriptorSet = {
-  typeUrl: 'type.googleapis.com/google.protobuf.FileDescriptorSet',
   encode(message: FileDescriptorSet, writer: Writer = Writer.create()): Writer {
     for (const v of message.file) {
       FileDescriptorProto.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1398,7 +1399,6 @@ export const FileDescriptorSet = {
 };
 
 export const FileDescriptorProto = {
-  typeUrl: 'type.googleapis.com/google.protobuf.FileDescriptorProto',
   encode(message: FileDescriptorProto, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     writer.uint32(18).string(message.package);
@@ -1676,7 +1676,6 @@ export const FileDescriptorProto = {
 };
 
 export const DescriptorProto = {
-  typeUrl: 'type.googleapis.com/google.protobuf.DescriptorProto',
   encode(message: DescriptorProto, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     for (const v of message.field) {
@@ -1925,7 +1924,6 @@ export const DescriptorProto = {
 };
 
 export const DescriptorProto_ExtensionRange = {
-  typeUrl: 'type.googleapis.com/google.protobuf.DescriptorProto_ExtensionRange',
   encode(message: DescriptorProto_ExtensionRange, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.start);
     writer.uint32(16).int32(message.end);
@@ -1993,7 +1991,6 @@ export const DescriptorProto_ExtensionRange = {
 };
 
 export const DescriptorProto_ReservedRange = {
-  typeUrl: 'type.googleapis.com/google.protobuf.DescriptorProto_ReservedRange',
   encode(message: DescriptorProto_ReservedRange, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.start);
     writer.uint32(16).int32(message.end);
@@ -2048,7 +2045,6 @@ export const DescriptorProto_ReservedRange = {
 };
 
 export const ExtensionRangeOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.ExtensionRangeOptions',
   encode(message: ExtensionRangeOptions, writer: Writer = Writer.create()): Writer {
     for (const v of message.uninterpretedOption) {
       UninterpretedOption.encode(v!, writer.uint32(7994).fork()).ldelim();
@@ -2105,7 +2101,6 @@ export const ExtensionRangeOptions = {
 };
 
 export const FieldDescriptorProto = {
-  typeUrl: 'type.googleapis.com/google.protobuf.FieldDescriptorProto',
   encode(message: FieldDescriptorProto, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     writer.uint32(24).int32(message.number);
@@ -2261,7 +2256,6 @@ export const FieldDescriptorProto = {
 };
 
 export const OneofDescriptorProto = {
-  typeUrl: 'type.googleapis.com/google.protobuf.OneofDescriptorProto',
   encode(message: OneofDescriptorProto, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     if (message.options !== undefined && message.options !== undefined) {
@@ -2318,7 +2312,6 @@ export const OneofDescriptorProto = {
 };
 
 export const EnumDescriptorProto = {
-  typeUrl: 'type.googleapis.com/google.protobuf.EnumDescriptorProto',
   encode(message: EnumDescriptorProto, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     for (const v of message.value) {
@@ -2447,7 +2440,6 @@ export const EnumDescriptorProto = {
 };
 
 export const EnumDescriptorProto_EnumReservedRange = {
-  typeUrl: 'type.googleapis.com/google.protobuf.EnumDescriptorProto_EnumReservedRange',
   encode(message: EnumDescriptorProto_EnumReservedRange, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.start);
     writer.uint32(16).int32(message.end);
@@ -2502,7 +2494,6 @@ export const EnumDescriptorProto_EnumReservedRange = {
 };
 
 export const EnumValueDescriptorProto = {
-  typeUrl: 'type.googleapis.com/google.protobuf.EnumValueDescriptorProto',
   encode(message: EnumValueDescriptorProto, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     writer.uint32(16).int32(message.number);
@@ -2570,7 +2561,6 @@ export const EnumValueDescriptorProto = {
 };
 
 export const ServiceDescriptorProto = {
-  typeUrl: 'type.googleapis.com/google.protobuf.ServiceDescriptorProto',
   encode(message: ServiceDescriptorProto, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     for (const v of message.method) {
@@ -2651,7 +2641,6 @@ export const ServiceDescriptorProto = {
 };
 
 export const MethodDescriptorProto = {
-  typeUrl: 'type.googleapis.com/google.protobuf.MethodDescriptorProto',
   encode(message: MethodDescriptorProto, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     writer.uint32(18).string(message.inputType);
@@ -2752,7 +2741,6 @@ export const MethodDescriptorProto = {
 };
 
 export const FileOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.FileOptions',
   encode(message: FileOptions, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.javaPackage);
     writer.uint32(66).string(message.javaOuterClassname);
@@ -3029,7 +3017,6 @@ export const FileOptions = {
 };
 
 export const MessageOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.MessageOptions',
   encode(message: MessageOptions, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).bool(message.messageSetWireFormat);
     writer.uint32(16).bool(message.noStandardDescriptorAccessor);
@@ -3130,7 +3117,6 @@ export const MessageOptions = {
 };
 
 export const FieldOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.FieldOptions',
   encode(message: FieldOptions, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.ctype);
     writer.uint32(16).bool(message.packed);
@@ -3253,7 +3239,6 @@ export const FieldOptions = {
 };
 
 export const OneofOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.OneofOptions',
   encode(message: OneofOptions, writer: Writer = Writer.create()): Writer {
     for (const v of message.uninterpretedOption) {
       UninterpretedOption.encode(v!, writer.uint32(7994).fork()).ldelim();
@@ -3310,7 +3295,6 @@ export const OneofOptions = {
 };
 
 export const EnumOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.EnumOptions',
   encode(message: EnumOptions, writer: Writer = Writer.create()): Writer {
     writer.uint32(16).bool(message.allowAlias);
     writer.uint32(24).bool(message.deprecated);
@@ -3389,7 +3373,6 @@ export const EnumOptions = {
 };
 
 export const EnumValueOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.EnumValueOptions',
   encode(message: EnumValueOptions, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).bool(message.deprecated);
     for (const v of message.uninterpretedOption) {
@@ -3457,7 +3440,6 @@ export const EnumValueOptions = {
 };
 
 export const ServiceOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.ServiceOptions',
   encode(message: ServiceOptions, writer: Writer = Writer.create()): Writer {
     writer.uint32(264).bool(message.deprecated);
     for (const v of message.uninterpretedOption) {
@@ -3525,7 +3507,6 @@ export const ServiceOptions = {
 };
 
 export const MethodOptions = {
-  typeUrl: 'type.googleapis.com/google.protobuf.MethodOptions',
   encode(message: MethodOptions, writer: Writer = Writer.create()): Writer {
     writer.uint32(264).bool(message.deprecated);
     writer.uint32(272).int32(message.idempotencyLevel);
@@ -3604,7 +3585,6 @@ export const MethodOptions = {
 };
 
 export const UninterpretedOption = {
-  typeUrl: 'type.googleapis.com/google.protobuf.UninterpretedOption',
   encode(message: UninterpretedOption, writer: Writer = Writer.create()): Writer {
     for (const v of message.name) {
       UninterpretedOption_NamePart.encode(v!, writer.uint32(18).fork()).ldelim();
@@ -3727,7 +3707,6 @@ export const UninterpretedOption = {
 };
 
 export const UninterpretedOption_NamePart = {
-  typeUrl: 'type.googleapis.com/google.protobuf.UninterpretedOption_NamePart',
   encode(message: UninterpretedOption_NamePart, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.namePart);
     writer.uint32(16).bool(message.isExtension);
@@ -3782,7 +3761,6 @@ export const UninterpretedOption_NamePart = {
 };
 
 export const SourceCodeInfo = {
-  typeUrl: 'type.googleapis.com/google.protobuf.SourceCodeInfo',
   encode(message: SourceCodeInfo, writer: Writer = Writer.create()): Writer {
     for (const v of message.location) {
       SourceCodeInfo_Location.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -3839,7 +3817,6 @@ export const SourceCodeInfo = {
 };
 
 export const SourceCodeInfo_Location = {
-  typeUrl: 'type.googleapis.com/google.protobuf.SourceCodeInfo_Location',
   encode(message: SourceCodeInfo_Location, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).fork();
     for (const v of message.path) {
@@ -3984,7 +3961,6 @@ export const SourceCodeInfo_Location = {
 };
 
 export const GeneratedCodeInfo = {
-  typeUrl: 'type.googleapis.com/google.protobuf.GeneratedCodeInfo',
   encode(message: GeneratedCodeInfo, writer: Writer = Writer.create()): Writer {
     for (const v of message.annotation) {
       GeneratedCodeInfo_Annotation.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -4041,7 +4017,6 @@ export const GeneratedCodeInfo = {
 };
 
 export const GeneratedCodeInfo_Annotation = {
-  typeUrl: 'type.googleapis.com/google.protobuf.GeneratedCodeInfo_Annotation',
   encode(message: GeneratedCodeInfo_Annotation, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).fork();
     for (const v of message.path) {
@@ -4144,7 +4119,6 @@ if (util.Long !== Long as any) {
   configure();
 }
 
-import { Buffer } from "buffer";
 interface WindowBase64 {
   atob(b64: string): string;
   btoa(bin: string): string;
@@ -4171,7 +4145,7 @@ function base64FromBytes(arr: Uint8Array): string {
   return btoa(bin.join(''));
 }
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

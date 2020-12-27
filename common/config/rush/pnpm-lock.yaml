@@ -65,7 +65,7 @@ dependencies:
   shortid: 2.2.15
   ts-jest: 26.1.0_jest@26.0.1+typescript@4.0.5
   ts-node: 8.10.2_typescript@4.0.5
-  ts-proto: github.com/yiochen/ts-proto/98ba60f1c5b5d5832b35e3e15e3031a5a4a8b5ef
+  ts-proto: 1.41.1
   tslib: 2.0.0
   typedoc: 0.14.2
   typedoc-plugin-markdown: 1.2.1_typedoc@0.14.2
@@ -13907,12 +13907,6 @@ packages:
       node: '>= 0.8.0'
     resolution:
       integrity: sha512-BsVKsiGcQMFwT8UxypobUKyv7irCNRHk1T0G680vk88yf6LBByGcZJOTJCrTP2xVN6yI+XjPJcNuE3V4fT9sAg==
-  /sequency/0.19.2:
-    dev: false
-    engines:
-      node: '>=6.0.0'
-    resolution:
-      integrity: sha512-iP0psxGsDgMTgyA6wfqVJqYsFp1eDO/WFh9ylJa2sWq/TuUxLrwPrpYN2+hgmIpFLFu1agnUu9t/vRzck1YWrw==
   /serialize-javascript/3.1.0:
     dependencies:
       randombytes: 2.1.0
@@ -14955,27 +14949,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-slzrsTGPwoEQFTr8N9A2ZcqRLu0U3+aFpCwFtDOVmjD2b9AGSzYnHJQVDVP54kmoSD1BIM3bLN2VeOkFpu7Ycw==
-  /ts-jest/26.1.0_jest@26.0.1+typescript@3.9.3:
-    dependencies:
-      bs-logger: 0.2.6
-      buffer-from: 1.1.1
-      fast-json-stable-stringify: 2.1.0
-      json5: 2.1.3
-      lodash.memoize: 4.1.2
-      make-error: 1.3.6
-      micromatch: 4.0.2
-      mkdirp: 1.0.4
-      semver: 7.3.2
-      yargs-parser: 18.1.3
-    dev: false
-    engines:
-      node: '>= 10'
-    hasBin: true
-    peerDependencies:
-      jest: '>=26 <27'
-      typescript: '>=3.8 <4.0'
-    resolution:
-      integrity: sha512-JbhQdyDMYN5nfKXaAwCIyaWLGwevcT2/dbqRPsQeh6NZPUuXjZQZEfeLb75tz0ubCIgEELNm6xAzTe5NXs5Y4Q==
   /ts-jest/26.1.0_jest@26.0.1+typescript@4.0.5:
     dependencies:
       bs-logger: 0.2.6
@@ -15030,11 +15003,22 @@ packages:
       integrity: sha512-csd+vJOb/gkzvcCHgTGSChYpy5f1/XKNsmvBGO4JXS+z1v2HobugDz4s1IeFXM3wZB44uczs+eazB5Q/ccdhQw==
   /ts-poet/1.0.1:
     dependencies:
-      lodash: 4.17.15
+      lodash: 4.17.20
       ts-imm: 0.4.0
     dev: false
     resolution:
       integrity: sha512-wGzYjiNKtDZqC5CXCAxwxhR0d/MJYIVvV5H+C2I2ntwK5HcFtoLNTSwfrXo0asO5WtBJ4upULCCAM02NYX7eUg==
+  /ts-proto/1.41.1:
+    dependencies:
+      '@types/object-hash': 1.3.4
+      dataloader: 1.4.0
+      object-hash: 1.3.1
+      protobufjs: 6.10.1
+      ts-poet: 1.0.1
+    dev: false
+    hasBin: true
+    resolution:
+      integrity: sha512-Acf2nKIjBVn2ANAFkHgWdpnfswgwRSWc1iiKtORv7v0vNsWNzPJ6PmOxGDI0WOyKxzqAPwuUYt83K/4sSn0o6A==
   /tsconfig-paths/3.9.0:
     dependencies:
       '@types/json5': 0.0.29
@@ -16254,7 +16238,7 @@ packages:
       protobufjs: 6.10.1
       rollup: 2.12.0
       rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@4.0.5
-      ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+      ts-jest: 26.1.0_jest@26.0.1+typescript@4.0.5
       tslib: 2.0.0
       typescript: 4.0.5
     dev: false
@@ -16410,13 +16394,13 @@ packages:
       protobufjs: 6.10.1
       rollup: 2.12.0
       rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@4.0.5
-      ts-proto: github.com/yiochen/ts-proto/98ba60f1c5b5d5832b35e3e15e3031a5a4a8b5ef
+      ts-proto: 1.41.1
       tslib: 2.0.0
       typescript: 4.0.5
     dev: false
     name: '@rush-temp/protos'
     resolution:
-      integrity: sha512-NUS76fUVpIbm2uWYRl1G0wJpQsCkBcGx/iFXC2yTHRZEtN6M5RPl2enuOaU6MevTUqLZGfSWpBst2V/JD8nJOw==
+      integrity: sha512-JZcFImojbKIUvbnSEfTj6xLUh8/0dw97JVNs+VcGX27wLCQd5476A6Gm20eiUr68Df7DBE6oUJpND0EgO6LWfA==
       tarball: 'file:projects/protos.tgz'
     version: 0.0.0
   'file:projects/react.tgz_ts-node@8.10.2':
@@ -16462,7 +16446,7 @@ packages:
       nps: 5.9.12
       rollup: 2.12.0
       rollup-plugin-typescript2: 0.27.1_rollup@2.12.0+typescript@4.0.5
-      ts-jest: 26.1.0_jest@26.0.1+typescript@3.9.3
+      ts-jest: 26.1.0_jest@26.0.1+typescript@4.0.5
       ts-node: 8.10.2_typescript@4.0.5
       tslib: 2.0.0
       typedoc: 0.14.2
@@ -16518,23 +16502,9 @@ packages:
       node: '>= 8'
     name: mock-socket
     resolution:
+      registry: 'https://registry.npmjs.org/'
       tarball: 'https://codeload.github.com/yiochen/mock-socket/tar.gz/9701273d3789f83002d5a596d005f920a8ba7c27'
     version: 9.0.3
-  github.com/yiochen/ts-proto/98ba60f1c5b5d5832b35e3e15e3031a5a4a8b5ef:
-    dependencies:
-      '@types/object-hash': 1.3.4
-      dataloader: 1.4.0
-      object-hash: 1.3.1
-      protobufjs: 6.10.1
-      sequency: 0.19.2
-      ts-poet: 1.0.1
-    dev: false
-    hasBin: true
-    name: ts-proto
-    resolution:
-      registry: 'https://registry.npmjs.org/'
-      tarball: 'https://codeload.github.com/yiochen/ts-proto/tar.gz/98ba60f1c5b5d5832b35e3e15e3031a5a4a8b5ef'
-    version: 1.38.0
 registry: ''
 specifiers:
   '@rollup/plugin-commonjs': ^11.1.0
@@ -16603,7 +16573,7 @@ specifiers:
   shortid: ^2.2.15
   ts-jest: ^26.1.0
   ts-node: ^8.10.2
-  ts-proto: yiochen/ts-proto
+  ts-proto: ^1.41.1
   tslib: ^2.0.0
   typedoc: ^0.14.2
   typedoc-plugin-markdown: ^1.2.1

@@ -12,6 +12,8 @@ const baseStatus: object = {
   code: 0,
 };
 
+export const protobufPackage = 'prisel'
+
 export enum Status_Code {
   UNSPECIFIED = 0,
   OK = 1,
@@ -30,7 +32,7 @@ export function status_CodeFromJSON(object: any): Status_Code {
     case "FAILED":
       return Status_Code.FAILED;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum Status_Code");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum Status_Code");
   }
 }
 
@@ -48,7 +50,6 @@ export function status_CodeToJSON(object: Status_Code): string {
 }
 
 export const Status = {
-  typeUrl: 'type.googleapis.com/prisel.Status',
   encode(message: Status, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.code);
     if (message.message !== undefined) {
@@ -118,7 +119,7 @@ export const Status = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

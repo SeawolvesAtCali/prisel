@@ -12,8 +12,9 @@ const baseBroadcastPayload: object = {
   message: "",
 };
 
+export const protobufPackage = 'prisel'
+
 export const BroadcastPayload = {
-  typeUrl: 'type.googleapis.com/prisel.BroadcastPayload',
   encode(message: BroadcastPayload, writer: Writer = Writer.create()): Writer {
     if (message.player !== undefined && message.player !== undefined) {
       PlayerInfo.encode(message.player, writer.uint32(10).fork()).ldelim();
@@ -70,7 +71,7 @@ export const BroadcastPayload = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

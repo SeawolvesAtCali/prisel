@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+export const protobufPackage = 'prisel'
+
 export enum SystemActionType {
   UNSPECIFIED = 0,
   WELCOME = 1,
@@ -66,7 +68,7 @@ export function systemActionTypeFromJSON(object: any): SystemActionType {
     case "GET_LOBBY_STATE":
       return SystemActionType.GET_LOBBY_STATE;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum SystemActionType");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum SystemActionType");
   }
 }
 

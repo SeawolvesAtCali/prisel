@@ -1,19 +1,7 @@
-import {
-    broadcast_spec,
-    chat_spec,
-    create_room_spec,
-    error_spec,
-    get_lobby_state_spec,
-    get_room_state_spec,
-    join_spec,
-    login_spec,
-    room_state_change_spec,
-    system_action_type,
-} from '@prisel/protos';
-import { enumToMap } from './enumToMap';
+import { system_action_type } from '@prisel/protos';
+import { PayloadKey } from './packet';
 
 const { SystemActionType } = system_action_type;
-const systemActionTypeMap = enumToMap(SystemActionType);
 
 enum FROM {
     UNSPECIFIED = '',
@@ -28,18 +16,9 @@ interface ActionConfig {
     payload?: Array<[string, string]>;
     related?: system_action_type.SystemActionType[];
 }
-const request = (requestPayload: { typeUrl: string }): [string, string] => [
-    'request',
-    requestPayload.typeUrl,
-];
-const response = (responsePayload: { typeUrl: string }): [string, string] => [
-    'response',
-    responsePayload.typeUrl,
-];
-const packet = (packetPayload: { typeUrl: string }): [string, string] => [
-    'packet',
-    packetPayload.typeUrl,
-];
+const request = (key: PayloadKey): [string, string] => ['request', key];
+const response = (key: PayloadKey): [string, string] => ['response', key];
+const packet = (key: PayloadKey): [string, string] => ['packet', key];
 
 const RAW_ACTION_CONFIG: Record<system_action_type.SystemActionType, ActionConfig> = {
     [SystemActionType.UNSPECIFIED]: {
@@ -56,29 +35,26 @@ const RAW_ACTION_CONFIG: Record<system_action_type.SystemActionType, ActionConfi
         desc: 'Client login with username and retrieve a user ID',
         from: FROM.CLIENT,
         isRest: true,
-        payload: [request(login_spec.LoginRequest), response(login_spec.LoginResponse)],
+        payload: [request('loginRequest'), response('loginResponse')],
     },
     [SystemActionType.JOIN]: {
         desc: 'Client join a room',
         from: FROM.CLIENT,
         isRest: true,
-        payload: [request(join_spec.JoinRequest), response(join_spec.JoinResponse)],
+        payload: [request('joinRequest'), response('joinResponse')],
         related: [SystemActionType.ROOM_STATE_CHANGE],
     },
     [SystemActionType.ROOM_STATE_CHANGE]: {
         desc: 'Room state change due to players joining or leaving',
         from: FROM.SERVER,
         isRest: false,
-        payload: [packet(room_state_change_spec.RoomStateChangePayload)],
+        payload: [packet('roomStateChangePayload')],
     },
     [SystemActionType.CREATE_ROOM]: {
         desc: 'Client create a room',
         from: FROM.CLIENT,
         isRest: true,
-        payload: [
-            request(create_room_spec.CreateRoomRequest),
-            response(create_room_spec.CreateRoomResponse),
-        ],
+        payload: [request('createRoomRequest'), response('createRoomResponse')],
     },
     [SystemActionType.LEAVE]: {
         desc: 'Client leave a room',
@@ -102,14 +78,14 @@ const RAW_ACTION_CONFIG: Record<system_action_type.SystemActionType, ActionConfi
         desc: 'Client send chat message to room',
         from: FROM.CLIENT,
         isRest: false,
-        payload: [packet(chat_spec.ChatPayload)],
+        payload: [packet('chatPayload')],
         related: [SystemActionType.BROADCAST],
     },
     [SystemActionType.BROADCAST]: {
         desc: "Broadcast client's message to the room",
         from: FROM.SERVER,
         isRest: false,
-        payload: [packet(broadcast_spec.BroadcastPayload)],
+        payload: [packet('broadcastPayload')],
         related: [SystemActionType.CHAT],
     },
     [SystemActionType.ANNOUNCE_GAME_START]: {
@@ -123,26 +99,24 @@ const RAW_ACTION_CONFIG: Record<system_action_type.SystemActionType, ActionConfi
             'Report error to client, usually responding to a packet. If an error is related to a request, a response should be used instead.',
         from: FROM.SERVER,
         isRest: false,
-        payload: [packet(error_spec.ErrorPayload)],
+        payload: [packet('errorPayload')],
     },
     [SystemActionType.GET_ROOM_STATE]: {
         desc: 'Client request a snapshot of current room state.',
         from: FROM.CLIENT,
         isRest: true,
-        payload: [response(get_room_state_spec.GetRoomStateResponse)],
+        payload: [response('getRoomStateResponse')],
     },
     [SystemActionType.GET_LOBBY_STATE]: {
         desc: 'Client request a snapshot of current lobby state.',
         from: FROM.CLIENT,
         isRest: true,
-        payload: [response(get_lobby_state_spec.GetLobbyStateResponse)],
+        payload: [response('getLobbyStateResponse')],
     },
 };
 
 export const ACTION_CONFIG = Object.entries(RAW_ACTION_CONFIG).map(([key, value]) => ({
-    type: systemActionTypeMap.get(Number(key)),
+    type: system_action_type.SystemActionType[Number(key)],
     ...value,
-    related: value.related
-        ? value.related.map((actionType) => systemActionTypeMap.get(actionType))
-        : [],
+    related: value.related ? value.related.map((actionType) => SystemActionType[actionType]) : [],
 }));

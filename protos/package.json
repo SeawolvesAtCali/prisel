@@ -19,7 +19,7 @@
         "buffer": "^5.6.0"
     },
     "devDependencies": {
-        "ts-proto": "yiochen/ts-proto",
+        "ts-proto": "^1.41.1",
         "@prisel/configs": "1.0.0",
         "barrelsby": "^2.2.0",
         "rollup": "^2.7.6",

@@ -12,8 +12,9 @@ const baseRoomInfo: object = {
   id: "",
 };
 
+export const protobufPackage = 'prisel'
+
 export const RoomInfo = {
-  typeUrl: 'type.googleapis.com/prisel.RoomInfo',
   encode(message: RoomInfo, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.name);
     writer.uint32(18).string(message.id);
@@ -68,7 +69,7 @@ export const RoomInfo = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

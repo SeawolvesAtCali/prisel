@@ -18,8 +18,9 @@ export interface Payload {
 const basePayload: object = {
 };
 
+export const protobufPackage = 'prisel'
+
 export const Payload = {
-  typeUrl: 'type.googleapis.com/prisel.Payload',
   encode(message: Payload, writer: Writer = Writer.create()): Writer {
     if (message.payload?.$case === 'chatPayload') {
       ChatPayload.encode(message.payload.chatPayload, writer.uint32(10).fork()).ldelim();
@@ -208,7 +209,7 @@ export const Payload = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

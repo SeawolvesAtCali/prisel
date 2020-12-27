@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+export const protobufPackage = 'prisel'
+
 export enum PacketType {
   DEFAULT = 0,
   REQUEST = 1,
@@ -18,7 +20,7 @@ export function packetTypeFromJSON(object: any): PacketType {
     case "RESPONSE":
       return PacketType.RESPONSE;
     default:
-      throw new Error("Unrecognized enum value " + object + " for enum PacketType");
+      throw new globalThis.Error("Unrecognized enum value " + object + " for enum PacketType");
   }
 }
 

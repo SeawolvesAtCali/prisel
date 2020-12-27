@@ -11,8 +11,9 @@ const baseErrorPayload: object = {
   message: "",
 };
 
+export const protobufPackage = 'prisel'
+
 export const ErrorPayload = {
-  typeUrl: 'type.googleapis.com/prisel.ErrorPayload',
   encode(message: ErrorPayload, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.message);
     if (message.detail !== undefined) {
@@ -69,7 +70,7 @@ export const ErrorPayload = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

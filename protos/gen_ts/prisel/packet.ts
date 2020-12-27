@@ -18,8 +18,9 @@ const basePacket: object = {
   type: 0,
 };
 
+export const protobufPackage = 'prisel'
+
 export const Packet = {
-  typeUrl: 'type.googleapis.com/prisel.Packet',
   encode(message: Packet, writer: Writer = Writer.create()): Writer {
     writer.uint32(8).int32(message.type);
     if (message.message?.$case === 'systemAction') {
@@ -128,7 +129,7 @@ export const Packet = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

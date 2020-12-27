@@ -18,8 +18,9 @@ const baseUpdateToken: object = {
   token: "",
 };
 
+export const protobufPackage = 'prisel'
+
 export const UpdateToken = {
-  typeUrl: 'type.googleapis.com/prisel.UpdateToken',
   encode(message: UpdateToken, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.previousToken);
     writer.uint32(18).string(message.token);
@@ -74,7 +75,7 @@ export const UpdateToken = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

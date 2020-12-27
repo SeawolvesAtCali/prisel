@@ -22,8 +22,9 @@ const baseRoomStateChangePayload_HostLeaveData: object = {
   newHostId: "",
 };
 
+export const protobufPackage = 'prisel'
+
 export const RoomStateChangePayload = {
-  typeUrl: 'type.googleapis.com/prisel.RoomStateChangePayload',
   encode(message: RoomStateChangePayload, writer: Writer = Writer.create()): Writer {
     if (message.change?.$case === 'playerJoin') {
       PlayerInfo.encode(message.change.playerJoin, writer.uint32(10).fork()).ldelim();
@@ -108,7 +109,6 @@ export const RoomStateChangePayload = {
 };
 
 export const RoomStateChangePayload_HostLeaveData = {
-  typeUrl: 'type.googleapis.com/prisel.RoomStateChangePayload_HostLeaveData',
   encode(message: RoomStateChangePayload_HostLeaveData, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.hostId);
     writer.uint32(18).string(message.newHostId);
@@ -163,7 +163,7 @@ export const RoomStateChangePayload_HostLeaveData = {
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>

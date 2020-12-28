@@ -24,8 +24,7 @@
         "fix": "tslint --project tsconfig.json --fix",
         "lint": "tslint --project tsconfig.json",
         "start": "nps",
-        "test": "jest",
-        "gen-tsconfig": "gen-tsconfig"
+        "test": "jest"
     },
     "dependencies": {
         "@prisel/server": "^0.1.3"
@@ -36,15 +35,8 @@
         "nps": "^5.9.12",
         "tslib": "^2.0.0",
         "typescript": "^4.0.5",
-        "@prisel/gen-tsconfig": "0.0.0",
         "@prisel/jest-preset": "0.0.0",
         "ts-node": "^8.10.2"
-    },
-    "genTsconfig": {
-        "files": [
-            "index.ts"
-        ],
-        "genDemo": true
     },
     "jest": {
         "preset": "@prisel/jest-preset"

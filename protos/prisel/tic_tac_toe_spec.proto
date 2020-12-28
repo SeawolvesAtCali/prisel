@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package tic_tac_toe;
+
+import "prisel/annotations.proto";
+
+message MovePayload {
+  option (prisel.for_action) = {
+    type : "move"
+    packet_type : REQUEST
+  };
+  uint32 position = 1;
+}
+
+message GameStatePayload {
+  option (prisel.for_action) = {
+    type : "game_state"
+    packet_type : DEFAULT
+  };
+  repeated string player = 1;
+  repeated string map = 2;
+  uint32 current_player = 3;
+  optional string winner = 4;
+}

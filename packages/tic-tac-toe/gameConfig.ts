@@ -1,4 +1,4 @@
-import { GameConfig, debug, broadcast, Packet, PacketType } from '@prisel/server';
+import { broadcast, debug, GameConfig, Packet } from '@prisel/server';
 
 interface GameState {
     player: string[];
@@ -34,9 +34,9 @@ export const TicTacToe: GameConfig = {
             };
             newGameState.currentPlayer = 1 - gameState.currentPlayer;
             newGameState.map = gameState.map.slice();
-            const newMove = packet.payload;
+            const newMove = Packet.getPayload(packet, 'ticTacToeMovePayload').position;
             if (newMove < 9 && newMove >= 0 && gameState.map[newMove] === '') {
-                newGameState.map[packet.payload] = sign;
+                newGameState.map[newMove] = sign;
             }
             let gameOver = false;
             if (checkWin(newGameState)) {
@@ -46,38 +46,32 @@ export const TicTacToe: GameConfig = {
                 newGameState.winner = 'even';
                 gameOver = true;
             }
-            const newGameStateMessage: Packet<GameState> = {
-                type: PacketType.DEFAULT,
-                action: GAME_STATE,
-                payload: newGameState,
-            };
+            const newGameStateMessage = Packet.forAction('game_state')
+                .setPayload('ticTacToeGameStatePayload', newGameState)
+                .build();
             room.setGame(newGameState);
             broadcast(room.getPlayers(), newGameStateMessage);
             if (gameOver) {
                 stopListenForMessage();
                 // end the game 500 ms later to allow clients to paint the last move
                 setTimeout(() => {
-                    const gameOverMessage: Packet = {
-                        type: PacketType.DEFAULT,
-                        action: 'GAME_OVER',
-                    };
+                    const gameOverMessage = Packet.forAction('game_over').build();
                     broadcast(room.getPlayers(), gameOverMessage);
                     room.endGame();
                 }, 500);
             }
         });
 
+        // setting initial state
         room.setGame<GameState>({
             player: room.getPlayers().map((player) => player.getId()),
             map: new Array(9).fill(''),
             currentPlayer: 0,
             winner: null,
         });
-        const gameStateMessage: Packet<GameState> = {
-            type: PacketType.DEFAULT,
-            action: GAME_STATE,
-            payload: room.getGame<GameState>(),
-        };
+        const gameStateMessage = Packet.forAction('game_state')
+            .setPayload('ticTacToeGameStatePayload', room.getGame<GameState>())
+            .build();
         broadcast(room.getPlayers(), gameStateMessage);
     },
 };

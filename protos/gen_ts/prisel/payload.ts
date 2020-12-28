@@ -8,11 +8,12 @@ import { GetRoomStateResponse } from '../prisel/get_room_state_spec';
 import { JoinRequest, JoinResponse } from '../prisel/join_spec';
 import { LoginRequest, LoginResponse } from '../prisel/login_spec';
 import { RoomStateChangePayload } from '../prisel/room_state_change_spec';
+import { MovePayload, GameStatePayload } from '../prisel/tic_tac_toe_spec';
 import { Writer, Reader } from 'protobufjs/minimal';
 
 
 export interface Payload {
-  payload?: { $case: 'chatPayload', chatPayload: ChatPayload } | { $case: 'broadcastPayload', broadcastPayload: BroadcastPayload } | { $case: 'createRoomRequest', createRoomRequest: CreateRoomRequest } | { $case: 'createRoomResponse', createRoomResponse: CreateRoomResponse } | { $case: 'errorPayload', errorPayload: ErrorPayload } | { $case: 'getLobbyStateResponse', getLobbyStateResponse: GetLobbyStateResponse } | { $case: 'getRoomStateResponse', getRoomStateResponse: GetRoomStateResponse } | { $case: 'joinRequest', joinRequest: JoinRequest } | { $case: 'joinResponse', joinResponse: JoinResponse } | { $case: 'loginRequest', loginRequest: LoginRequest } | { $case: 'loginResponse', loginResponse: LoginResponse } | { $case: 'roomStateChangePayload', roomStateChangePayload: RoomStateChangePayload };
+  payload?: { $case: 'chatPayload', chatPayload: ChatPayload } | { $case: 'broadcastPayload', broadcastPayload: BroadcastPayload } | { $case: 'createRoomRequest', createRoomRequest: CreateRoomRequest } | { $case: 'createRoomResponse', createRoomResponse: CreateRoomResponse } | { $case: 'errorPayload', errorPayload: ErrorPayload } | { $case: 'getLobbyStateResponse', getLobbyStateResponse: GetLobbyStateResponse } | { $case: 'getRoomStateResponse', getRoomStateResponse: GetRoomStateResponse } | { $case: 'joinRequest', joinRequest: JoinRequest } | { $case: 'joinResponse', joinResponse: JoinResponse } | { $case: 'loginRequest', loginRequest: LoginRequest } | { $case: 'loginResponse', loginResponse: LoginResponse } | { $case: 'roomStateChangePayload', roomStateChangePayload: RoomStateChangePayload } | { $case: 'ticTacToeMovePayload', ticTacToeMovePayload: MovePayload } | { $case: 'ticTacToeGameStatePayload', ticTacToeGameStatePayload: GameStatePayload };
 }
 
 const basePayload: object = {
@@ -57,6 +58,12 @@ export const Payload = {
     }
     if (message.payload?.$case === 'roomStateChangePayload') {
       RoomStateChangePayload.encode(message.payload.roomStateChangePayload, writer.uint32(98).fork()).ldelim();
+    }
+    if (message.payload?.$case === 'ticTacToeMovePayload') {
+      MovePayload.encode(message.payload.ticTacToeMovePayload, writer.uint32(106).fork()).ldelim();
+    }
+    if (message.payload?.$case === 'ticTacToeGameStatePayload') {
+      GameStatePayload.encode(message.payload.ticTacToeGameStatePayload, writer.uint32(114).fork()).ldelim();
     }
     return writer;
   },
@@ -103,6 +110,12 @@ export const Payload = {
         case 12:
           message.payload = {$case: 'roomStateChangePayload', roomStateChangePayload: RoomStateChangePayload.decode(reader, reader.uint32())};
           break;
+        case 13:
+          message.payload = {$case: 'ticTacToeMovePayload', ticTacToeMovePayload: MovePayload.decode(reader, reader.uint32())};
+          break;
+        case 14:
+          message.payload = {$case: 'ticTacToeGameStatePayload', ticTacToeGameStatePayload: GameStatePayload.decode(reader, reader.uint32())};
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -148,6 +161,12 @@ export const Payload = {
     if (object.roomStateChangePayload !== undefined && object.roomStateChangePayload !== null) {
       message.payload = {$case: 'roomStateChangePayload', roomStateChangePayload: RoomStateChangePayload.fromJSON(object.roomStateChangePayload)};
     }
+    if (object.ticTacToeMovePayload !== undefined && object.ticTacToeMovePayload !== null) {
+      message.payload = {$case: 'ticTacToeMovePayload', ticTacToeMovePayload: MovePayload.fromJSON(object.ticTacToeMovePayload)};
+    }
+    if (object.ticTacToeGameStatePayload !== undefined && object.ticTacToeGameStatePayload !== null) {
+      message.payload = {$case: 'ticTacToeGameStatePayload', ticTacToeGameStatePayload: GameStatePayload.fromJSON(object.ticTacToeGameStatePayload)};
+    }
     return message;
   },
   fromPartial(object: DeepPartial<Payload>): Payload {
@@ -188,6 +207,12 @@ export const Payload = {
     if (object.payload?.$case === 'roomStateChangePayload' && object.payload?.roomStateChangePayload !== undefined && object.payload?.roomStateChangePayload !== null) {
       message.payload = {$case: 'roomStateChangePayload', roomStateChangePayload: RoomStateChangePayload.fromPartial(object.payload.roomStateChangePayload)};
     }
+    if (object.payload?.$case === 'ticTacToeMovePayload' && object.payload?.ticTacToeMovePayload !== undefined && object.payload?.ticTacToeMovePayload !== null) {
+      message.payload = {$case: 'ticTacToeMovePayload', ticTacToeMovePayload: MovePayload.fromPartial(object.payload.ticTacToeMovePayload)};
+    }
+    if (object.payload?.$case === 'ticTacToeGameStatePayload' && object.payload?.ticTacToeGameStatePayload !== undefined && object.payload?.ticTacToeGameStatePayload !== null) {
+      message.payload = {$case: 'ticTacToeGameStatePayload', ticTacToeGameStatePayload: GameStatePayload.fromPartial(object.payload.ticTacToeGameStatePayload)};
+    }
     return message;
   },
   toJSON(message: Payload): unknown {
@@ -204,6 +229,8 @@ export const Payload = {
     message.payload?.$case === 'loginRequest' && (obj.loginRequest = message.payload?.loginRequest ? LoginRequest.toJSON(message.payload?.loginRequest) : undefined);
     message.payload?.$case === 'loginResponse' && (obj.loginResponse = message.payload?.loginResponse ? LoginResponse.toJSON(message.payload?.loginResponse) : undefined);
     message.payload?.$case === 'roomStateChangePayload' && (obj.roomStateChangePayload = message.payload?.roomStateChangePayload ? RoomStateChangePayload.toJSON(message.payload?.roomStateChangePayload) : undefined);
+    message.payload?.$case === 'ticTacToeMovePayload' && (obj.ticTacToeMovePayload = message.payload?.ticTacToeMovePayload ? MovePayload.toJSON(message.payload?.ticTacToeMovePayload) : undefined);
+    message.payload?.$case === 'ticTacToeGameStatePayload' && (obj.ticTacToeGameStatePayload = message.payload?.ticTacToeGameStatePayload ? GameStatePayload.toJSON(message.payload?.ticTacToeGameStatePayload) : undefined);
     return obj;
   },
 };

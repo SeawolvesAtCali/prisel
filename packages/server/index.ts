@@ -1,5 +1,5 @@
 export * from '@prisel/common';
-export { default as debug } from './debug';
+export { debug } from './debug';
 export * as Messages from './message';
 export * from './objects/index';
 export { newPlayer } from './player';

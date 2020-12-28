@@ -10,6 +10,7 @@ import "prisel/get_room_state_spec.proto";
 import "prisel/join_spec.proto";
 import "prisel/login_spec.proto";
 import "prisel/room_state_change_spec.proto";
+import "prisel/tic_tac_toe_spec.proto";
 
 package prisel;
 
@@ -34,5 +35,9 @@ message Payload {
     LoginResponse login_response = 11;
 
     RoomStateChangePayload room_state_change_payload = 12;
+
+    tic_tac_toe.MovePayload tic_tac_toe_move_payload = 13;
+
+    tic_tac_toe.GameStatePayload tic_tac_toe_game_state_payload = 14;
   }
 }

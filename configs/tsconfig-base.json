@@ -1,7 +1,7 @@
 {
     "$schema": "http://json.schemastore.org/tsconfig",
     "compilerOptions": {
-        "module": "esnext", // Output js using es6 import export
+        "module": "esnext", // Output js using es6 import export. Rollup will further convert this to respected formats on different platform
         "declaration": true, // emit declaration
         "declarationMap": true,
         /**

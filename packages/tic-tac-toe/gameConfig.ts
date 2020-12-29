@@ -4,7 +4,7 @@ interface GameState {
     player: string[];
     map: string[];
     currentPlayer: number;
-    winner: string;
+    winner?: string;
 }
 
 const GAME_STATE = 'GAME_STATE';
@@ -18,10 +18,11 @@ export const TicTacToe: GameConfig = {
         room.removeAllGamePacketListener();
     },
     onStart(room) {
-        const stopListenForMessage = room.listenGamePacket('MESSAGE', (player, packet) => {
+        const stopListenForMessage = room.listenGamePacket('move', (player, packet) => {
             debug('tic-tac-toe receive game message ', packet);
             const gameState = room.getGame<GameState>();
-            if (gameState.winner !== null) {
+            if (gameState.winner != null) {
+                debug('game already ended, exit');
                 // game already finished
                 return;
             }
@@ -37,6 +38,9 @@ export const TicTacToe: GameConfig = {
             const newMove = Packet.getPayload(packet, 'ticTacToeMovePayload').position;
             if (newMove < 9 && newMove >= 0 && gameState.map[newMove] === '') {
                 newGameState.map[newMove] = sign;
+            } else {
+                debug('invalid move');
+                return;
             }
             let gameOver = false;
             if (checkWin(newGameState)) {
@@ -67,10 +71,13 @@ export const TicTacToe: GameConfig = {
             player: room.getPlayers().map((player) => player.getId()),
             map: new Array(9).fill(''),
             currentPlayer: 0,
-            winner: null,
         });
         const gameStateMessage = Packet.forAction('game_state')
-            .setPayload('ticTacToeGameStatePayload', room.getGame<GameState>())
+            .setPayload('ticTacToeGameStatePayload', {
+                player: room.getGame<GameState>().player,
+                map: room.getGame<GameState>().map,
+                currentPlayer: room.getGame<GameState>().currentPlayer,
+            })
             .build();
         broadcast(room.getPlayers(), gameStateMessage);
     },

@@ -33,7 +33,7 @@
         "pts": "^0.9.4"
     },
     "scripts": {
-        "start": "react-scripts start",
+        "start": "FAST_REFRESH=false react-scripts start",
         "build": "react-scripts build",
         "test": "env CI=true react-scripts test --passWithNoTests --reporters=jest-standard-reporter",
         "eject": "react-scripts eject"

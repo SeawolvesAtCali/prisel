@@ -1,5 +1,5 @@
 import { Request, Response } from '@prisel/common';
-import { packet_type, status, system_action_type } from '@prisel/protos';
+import { system_action_type } from '@prisel/protos';
 import { getWelcome } from '../message';
 import { newPlayer } from '../player';
 import { emit } from '../utils/networkUtils';
@@ -60,11 +60,12 @@ describe('player', () => {
         jest.useFakeTimers();
         const context = mockContext();
         const player = newPlayer(context, { name: 'player', id: '1' });
-        player.request(Request.forSystemAction(system_action_type.SystemActionType.CHAT));
+        const request = Request.forSystemAction(system_action_type.SystemActionType.CHAT);
+        player.request(request);
         jest.runAllTimers();
         expect(emit).toHaveBeenCalledWith(
             player.getSocket(),
-            expect.objectContaining({ requestId: expect.any(String) }),
+            request.setId(expect.any(String)).build(),
         );
     });
     test('response', () => {
@@ -77,22 +78,9 @@ describe('player', () => {
         const request = Request.forSystemAction(system_action_type.SystemActionType.CREATE_ROOM)
             .setId('123')
             .build();
-        player.respond(Response.forRequest(request).setFailure('failure message').build());
+        const response = Response.forRequest(request).setFailure('failure message').build();
+        player.respond(response);
         jest.runAllTimers();
-        expect(emit).toHaveBeenCalledWith(
-            player.getSocket(),
-            expect.objectContaining<Response>({
-                type: packet_type.PacketType.RESPONSE,
-                requestId: '123',
-                message: {
-                    $case: 'systemAction',
-                    systemAction: system_action_type.SystemActionType.CREATE_ROOM,
-                },
-                status: {
-                    code: status.Status_Code.FAILED,
-                    message: 'failure message',
-                },
-            }),
-        );
+        expect(emit).toHaveBeenCalledWith(player.getSocket(), response);
     });
 });

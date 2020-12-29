@@ -12,7 +12,7 @@
     },
     {
       "name": "@prisel/configs",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototype" ]
     },
     {
       "name": "@prisel/gen-tsconfig",
@@ -28,7 +28,7 @@
     },
     {
       "name": "@prisel/protos",
-      "allowedCategories": [ "production", "tools" ]
+      "allowedCategories": [ "production", "prototype", "tools" ]
     },
     {
       "name": "@prisel/server",

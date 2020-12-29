@@ -20,10 +20,10 @@
         "test": "__test__"
     },
     "scripts": {
-        "build": "nps build",
+        "build": "nps clean ts-check build",
         "fix": "tslint --project tsconfig.json --fix",
         "lint": "tslint --project tsconfig.json",
-        "start": "nps",
+        "start": "nps clean ts-check build default",
         "test": "jest"
     },
     "dependencies": {
@@ -31,6 +31,8 @@
     },
     "devDependencies": {
         "@types/jest": "^24.9.1",
+        "@prisel/configs": "1.0.0",
+        "rollup": "^2.7.6",
         "jest": "^26.0.1",
         "nps": "^5.9.12",
         "tslib": "^2.0.0",

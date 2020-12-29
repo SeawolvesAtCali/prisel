@@ -1,4 +1,5 @@
 import { packet_type, status } from '@prisel/protos';
+import { Packet } from '../packet';
 import { newRequestManager, RequestManager } from '../requestManager';
 import { Response } from '../response';
 
@@ -26,7 +27,7 @@ describe('requestManager', () => {
         };
         manager.onResponse(response);
         const receivedResponse = await promise;
-        expect(receivedResponse.ok()).toBe(true);
+        expect(Packet.isStatusOk(receivedResponse)).toBe(true);
         expect(receivedResponse.type).toBe(packet_type.PacketType.RESPONSE);
         expect(receivedResponse.requestId).toBe('123');
     });

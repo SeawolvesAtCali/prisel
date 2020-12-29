@@ -1,4 +1,5 @@
 scripts:
-    default: env DEBUG=debug ts-node index.ts
-    clean: rm -rf ./lib
-    build: tsc
+    default: env DEBUG=debug node lib/index.js
+    clean: rm -rf ./lib ./dist
+    ts-check: tsc
+    build: rollup --config --silent

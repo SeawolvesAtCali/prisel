@@ -1,5 +1,5 @@
 import { Packet, Request, Response } from '@prisel/common';
-import { packet, packet_type, system_action_type } from '@prisel/protos';
+import { login_spec, packet_type, system_action_type } from '@prisel/protos';
 import { Server } from 'mock-socket';
 import { Client } from '../client';
 import { getLogin } from '../message';
@@ -40,30 +40,19 @@ describe('Client', () => {
     describe('login', () => {
         it('should login with username', async () => {
             const client = new Client(fakeURL);
+            const loginRequest = getLogin(client.newId(), 'batman');
+            expect(Request.isRequest(loginRequest));
             mockServer.on('connection', (socket) => {
                 socket.on('message', (data) => {
                     const pkt = Packet.deserialize(data);
                     expect(Request.isRequest(pkt)).toBe(true);
-
-                    // pkt.payload.value = new Uint8Array(2); //new Uint8Array(pkt.payload.value);
-                    // pkt.payload.value[0] = 1;
-                    // pkt.payload.value[1] = 7;
-                    expect(pkt as Request).toMatchObject<packet.Packet>({
-                        type: packet_type.PacketType.REQUEST,
-                        message: {
-                            $case: 'systemAction',
-                            systemAction: system_action_type.SystemActionType.LOGIN,
-                        },
-                        requestId: expect.any(String),
-                        payload: {
-                            payload: {
-                                $case: 'loginRequest',
-                                loginRequest: {
-                                    username: 'batman',
-                                },
-                            },
-                        },
+                    expect(Packet.isSystemAction(pkt, system_action_type.SystemActionType.LOGIN));
+                    expect(Packet.getPayload(pkt, 'loginRequest')).toMatchObject<
+                        login_spec.LoginRequest
+                    >({
+                        username: 'batman',
                     });
+
                     const loginResponse = Response.forRequest(pkt as Request)
                         .setPayload('loginResponse', {
                             userId: '123',
@@ -73,7 +62,8 @@ describe('Client', () => {
                 });
             });
             await client.connect();
-            const loginResult = await client.request(getLogin(client.newId(), 'batman'));
+            const loginResult = await client.request(loginRequest);
+            expect(Response.isResponse(loginResult));
             expect(
                 Packet.isSystemAction(loginResult, system_action_type.SystemActionType.LOGIN),
             ).toBe(true);
@@ -147,13 +137,9 @@ describe('Client', () => {
             });
             const waitForMessage = new Promise<void>((resolve) => {
                 const mockCallback = (packet: Packet, action: string) => {
-                    expect(packet).toMatchObject<Packet>({
-                        type: packet_type.PacketType.DEFAULT,
-                        message: {
-                            $case: 'action',
-                            action: 'MESSAGE',
-                        },
-                    });
+                    expect(Packet.verify(packet)).toBe(true);
+                    expect(packet.type).toEqual(packet_type.PacketType.DEFAULT);
+                    expect(Packet.isCustomAction(packet, 'MESSAGE'));
                     resolve();
                 };
                 client.on('MESSAGE', mockCallback);

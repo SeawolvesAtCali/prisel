@@ -1,4 +1,4 @@
-import { Client, PacketType, Messages } from '@prisel/client';
+import { Client, Messages, Packet, RoomStateChangePayload } from '@prisel/client';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 export const phases = {
@@ -8,7 +8,7 @@ export const phases = {
     GAME: 3,
 };
 /**
- * @typedef {import('@prisel/client').PlayerInfo} PlayerInfo
+ * @typedef {import('@prisel/protos').player_info.PlayerInfo} PlayerInfo
  */
 
 export function useConnected(initial = false) {
@@ -23,7 +23,7 @@ export function useRoomState() {
     const [host, setHost] = useState(/** @type {string} */ (undefined));
 
     const onJoin = useCallback((
-        /** @type {import('@prisel/client').JoinResponsePayload} */
+        /** @type {import('@prisel/protos').join_spec.JoinResponse} */
         joinResponsePayload,
     ) => {
         const { room, roomState } = joinResponsePayload;
@@ -34,7 +34,7 @@ export function useRoomState() {
     }, []);
 
     const onCreateRoom = useCallback((
-        /** @type {import('@prisel/client').CreateRoomResponsePayload} */
+        /** @type {import('@prisel/protos').create_room_spec.CreateRoomResponse} */
         createRoomResponsePayload,
     ) => {
         const { room, roomState } = createRoomResponsePayload;
@@ -45,22 +45,24 @@ export function useRoomState() {
     }, []);
 
     const onRoomStateChange = useCallback((
-        /** @type {import('@prisel/client').RoomChangePayload} */
+        /** @type {import('@prisel/protos').room_state_change_spec.RoomStateChangePayload} */
         roomChangePayload,
     ) => {
-        if (roomChangePayload.playerJoin) {
-            setPlayers((oldPlayers) => oldPlayers.concat(roomChangePayload.playerJoin));
-        }
-        if (roomChangePayload.playerLeave) {
+        if (RoomStateChangePayload.isPlayerJoin(roomChangePayload)) {
             setPlayers((oldPlayers) =>
-                oldPlayers.filter((player) => player.id !== roomChangePayload.playerLeave.id),
+                oldPlayers.concat(RoomStateChangePayload.getJoinedPlayer(roomChangePayload)),
             );
         }
-        if (roomChangePayload.hostLeave) {
+        if (RoomStateChangePayload.isPlayerLeave(roomChangePayload)) {
+            const leftPlayerId = RoomStateChangePayload.getLeftPlayer(roomChangePayload);
+            setPlayers((oldPlayers) => oldPlayers.filter((player) => player.id !== leftPlayerId));
+        }
+        if (RoomStateChangePayload.isHostLeave(roomChangePayload)) {
+            const hostLeaveData = RoomStateChangePayload.getHostLeaveData(roomChangePayload);
             setPlayers((oldPlayers) =>
-                oldPlayers.filter((player) => player.id !== roomChangePayload.hostLeave.hostId),
+                oldPlayers.filter((player) => player.id !== hostLeaveData.hostId),
             );
-            setHost(roomChangePayload.hostLeave.newHostId);
+            setHost(hostLeaveData.newHostId);
         }
     }, []);
 
@@ -91,19 +93,19 @@ export function useGameState(client, onEnd) {
     endRef.current = onEnd;
     const handleMove = useCallback(
         (index) => {
-            const movePacket = {
-                type: PacketType.DEFAULT,
-                action: 'MESSAGE',
-                payload: index,
-            };
+            const movePacket = Packet.forAction('move')
+                .setPayload('ticTacToeMovePayload', {
+                    position: index,
+                })
+                .build();
             client.emit(movePacket);
         },
         [client],
     );
 
     useEffect(() => {
-        return client.on('GAME_STATE', (packet) => {
-            const newState = packet.payload;
+        return client.on('game_state', (packet) => {
+            const newState = Packet.getPayload(packet, 'ticTacToeGameStatePayload');
             setGameState(newState);
             if (newState.winner) {
                 setWinner(newState.winner);
@@ -112,7 +114,7 @@ export function useGameState(client, onEnd) {
     }, [client]);
 
     useEffect(() => {
-        return client.on('GAME_OVER', (packet) => {
+        return client.on('game_over', (packet) => {
             setGameState(initialGameState);
             endRef.current(winner);
         });
@@ -138,8 +140,8 @@ async function clientSetup(client) {
     return await client.connect();
 }
 
-/** @typedef {import('@prisel/client').ResponseWrapper} ResponseWrapper */
-/** @typedef {import('@prisel/client').LoginResponsePayload} LoginResponsePayload */
+/** @typedef {import('@prisel/client').Response} Response */
+/** @typedef {import('@prisel/protos').login_spec.LoginResponse} LoginResponse */
 
 export function useClient(url, connectedRef) {
     const client = useMemo(() => {
@@ -161,10 +163,13 @@ export function useClient(url, connectedRef) {
         if (!connectedRef.current) {
             return;
         }
-        /** @type {ResponseWrapper<LoginResponsePayload>} */
-        const loginInfo = await client.request(Messages.getLogin(client.newId(), username));
+        /** @type {Response} */
+        const loginInfo = Packet.getPayload(
+            await client.request(Messages.getLogin(client.newId(), username)),
+            'loginResponse',
+        );
         if (connectedRef.current) {
-            return { id: loginInfo.payload.userId, name: username };
+            return { id: loginInfo.userId, name: username };
         }
         throw new Error('disconnected while trying to login');
     }

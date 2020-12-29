@@ -51,7 +51,6 @@
         "@types/ws": "^6.0.1",
         "nps": "^5.9.12",
         "rollup": "^2.7.6",
-        "rollup-plugin-typescript2": "^0.27.0",
         "tslib": "^2.0.0",
         "typedoc": "^0.14.2",
         "typedoc-plugin-markdown": "^1.2.1",

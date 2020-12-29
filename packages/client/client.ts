@@ -6,7 +6,7 @@ import {
     Response,
     SERVER,
 } from '@prisel/common';
-import { payload, room_state_change_spec, system_action_type } from '@prisel/protos';
+import { room_state_change_spec, system_action_type } from '@prisel/protos';
 import once from 'lodash/once';
 import { assert } from './assert';
 import { getExit } from './message';
@@ -113,9 +113,9 @@ export class Client<T = State> {
 
     private listenForSystemAction(
         systemAction: system_action_type.SystemActionType,
-        listener: (payload?: payload.Payload) => void,
+        listener: (packet?: Packet) => void,
     ): RemoveListenerFunc {
-        return this.systemActionListener.on(systemAction, (packet) => listener(packet.payload));
+        return this.systemActionListener.on(systemAction, (packet) => listener(packet));
     }
 
     /**
@@ -141,9 +141,9 @@ export class Client<T = State> {
     }
 
     /**
-     * Attach handler for messages frorushm server
-     * @param messageTypeOrFilter
-     * @param callback
+     * Attach handler for messages from server
+     * @param action
+     * @param listener
      */
     public on(action: any, listener: (packet: Packet, action?: any) => void): RemoveListenerFunc {
         return this.listeners.on(action, listener);
@@ -154,16 +154,19 @@ export class Client<T = State> {
     ): RemoveListenerFunc {
         return this.listenForSystemAction(
             system_action_type.SystemActionType.ROOM_STATE_CHANGE,
-            (payload) => {
-                if (payload.payload.$case === 'roomStateChangePayload') {
-                    listener(payload.payload.roomStateChangePayload);
+            (packet) => {
+                if (Packet.hasPayload(packet, 'roomStateChangePayload')) {
+                    listener(Packet.getPayload(packet, 'roomStateChangePayload'));
                 }
             },
         );
     }
 
     public onGameStart(listener: () => void): RemoveListenerFunc {
-        return this.listenForSystemAction(system_action_type.SystemActionType.GAME_START, listener);
+        return this.listenForSystemAction(
+            system_action_type.SystemActionType.ANNOUNCE_GAME_START,
+            listener,
+        );
     }
 
     /**

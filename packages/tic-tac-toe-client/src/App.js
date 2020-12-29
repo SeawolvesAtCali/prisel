@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Messages } from '@prisel/client';
+import { Messages, Packet } from '@prisel/client';
 import Context from './context';
 import Login from './Login';
 import Lobby from './Lobby';
@@ -35,25 +35,25 @@ function App() {
         });
     const handleCreate = async (roomName) => {
         const response = await client.request(Messages.getCreateRoom(client.newId(), roomName));
-        if (response.ok()) {
-            onJoin(response.payload);
+        if (Packet.isStatusOk(response)) {
+            onJoin(Packet.getPayload(response, 'createRoomResponse'));
             setPhase(phases.ROOM);
         } else {
-            client.log(response.getMessage());
+            client.log(Packet.getStatusMessage(response));
         }
     };
     const handleJoin = async (roomId) => {
         const response = await client.request(Messages.getJoin(client.newId(), roomId));
-        if (response.ok()) {
-            onJoin(response.payload);
+        if (Packet.isStatusOk(response)) {
+            onJoin(Packet.getPayload(response, 'joinResponse'));
             setPhase(phases.ROOM);
         } else {
-            client.log(response.status.message);
+            client.log(Packet.getStatusMessage(response));
         }
     };
     const handleLeave = async () => {
         const response = await client.request(Messages.getLeave(client.newId()));
-        if (response.ok()) {
+        if (Packet.isStatusOk(response)) {
             onLeave();
             setPhase(phases.LOBBY);
         }

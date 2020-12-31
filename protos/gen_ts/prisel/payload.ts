@@ -8,7 +8,7 @@ import { GetRoomStateResponse } from '../prisel/get_room_state_spec';
 import { JoinRequest, JoinResponse } from '../prisel/join_spec';
 import { LoginRequest, LoginResponse } from '../prisel/login_spec';
 import { RoomStateChangePayload } from '../prisel/room_state_change_spec';
-import { MovePayload, GameStatePayload } from '../prisel/tic_tac_toe_spec';
+import { MovePayload, GameStatePayload } from '../tic_tac_toe/tic_tac_toe_spec';
 import { Writer, Reader } from 'protobufjs/minimal';
 
 

@@ -35,8 +35,13 @@ export const TicTacToe: GameConfig = {
             };
             newGameState.currentPlayer = 1 - gameState.currentPlayer;
             newGameState.map = gameState.map.slice();
-            const newMove = Packet.getPayload(packet, 'ticTacToeMovePayload').position;
-            if (newMove < 9 && newMove >= 0 && gameState.map[newMove] === '') {
+            const newMove = Packet.getPayload(packet, 'ticTacToeMovePayload')?.position;
+            if (
+                typeof newMove === 'number' &&
+                newMove < 9 &&
+                newMove >= 0 &&
+                gameState.map[newMove] === ''
+            ) {
                 newGameState.map[newMove] = sign;
             } else {
                 debug('invalid move');

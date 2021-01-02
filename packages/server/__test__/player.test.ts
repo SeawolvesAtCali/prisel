@@ -3,7 +3,7 @@ import { system_action_type } from '@prisel/protos';
 import { getWelcome } from '../message';
 import { newPlayer } from '../player';
 import { emit } from '../utils/networkUtils';
-import { mockContext } from '../utils/testUtils';
+import { mockContext, mockSocket } from '../utils/testUtils';
 jest.mock('../utils/networkUtils');
 
 describe('player', () => {
@@ -52,21 +52,22 @@ describe('player', () => {
         jest.useFakeTimers();
         const player = newPlayer(mockContext(), { name: 'player', id: '1' });
         const packet = getWelcome();
+        const socket = mockSocket();
+        jest.spyOn(player, 'getSocket').mockImplementation(() => socket);
         player.emit(packet);
         jest.runAllTimers();
-        expect(emit).toHaveBeenCalledWith(player.getSocket(), expect.objectContaining(packet));
+        expect(emit).toHaveBeenCalledWith(socket, expect.objectContaining(packet));
     });
     test('request', () => {
         jest.useFakeTimers();
         const context = mockContext();
         const player = newPlayer(context, { name: 'player', id: '1' });
         const request = Request.forSystemAction(system_action_type.SystemActionType.CHAT);
+        const socket = mockSocket();
+        jest.spyOn(player, 'getSocket').mockImplementation(() => socket);
         player.request(request);
         jest.runAllTimers();
-        expect(emit).toHaveBeenCalledWith(
-            player.getSocket(),
-            request.setId(expect.any(String)).build(),
-        );
+        expect(emit).toHaveBeenCalledWith(socket, request.setId(expect.any(String)).build());
     });
     test('response', () => {
         jest.useFakeTimers();
@@ -79,8 +80,10 @@ describe('player', () => {
             .setId('123')
             .build();
         const response = Response.forRequest(request).setFailure('failure message').build();
+        const socket = mockSocket();
+        jest.spyOn(player, 'getSocket').mockImplementation(() => socket);
         player.respond(response);
         jest.runAllTimers();
-        expect(emit).toHaveBeenCalledWith(player.getSocket(), response);
+        expect(emit).toHaveBeenCalledWith(socket, response);
     });
 });

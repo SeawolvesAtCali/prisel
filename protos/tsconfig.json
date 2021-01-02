@@ -1,6 +1,7 @@
 {
     "extends": "../configs/tsconfig-base",
     "compilerOptions": {
+        "noImplicitAny": false,
         "outDir": "./dist",
         "rootDir": "./"
     },

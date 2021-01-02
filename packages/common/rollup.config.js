@@ -6,7 +6,6 @@ export default [
     cjsAndEsBuild(/* entry= */ 'dist/index.js', /* pkgJson= */ pkg),
     {
         input: 'dist/actionConfigs.js',
-
         output: [{ file: './lib/actionConfigs.cjs.js', format: 'cjs' }],
     },
 ];

@@ -12,6 +12,6 @@ message GetRoomStateResponse {
   };
 
   repeated PlayerInfo players = 1;
-  string host_id = 2;
+  optional string host_id = 2;
   string token = 3;
 }

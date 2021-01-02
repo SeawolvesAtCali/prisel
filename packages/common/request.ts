@@ -6,7 +6,7 @@ export interface Request extends packet.Packet {
     requestId: string;
 }
 
-function isRequest(p: packet.Packet): p is Request {
+function isRequest(p: packet.Packet | undefined): p is Request {
     return isValidRequest(p);
 }
 

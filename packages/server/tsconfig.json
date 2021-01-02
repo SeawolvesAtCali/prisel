@@ -1,8 +1,11 @@
 {
-    "extends": "../../configs/tsconfig-node.json",
+    // Although this package will be used in node enviroment only, there are
+    // some definition, such as TextEncoder not available @types/node as global
+    // definitions. https://github.com/microsoft/TypeScript/issues/31535
+    // TextEncoder is used by the generated files from protobuf-ts
+    "extends": "../../configs/tsconfig-base.json",
     "compilerOptions": {
         "outDir": "./dist",
         "rootDir": "./",
-    },
-    "files": ["index.ts"]
+    }
 }

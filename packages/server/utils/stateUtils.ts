@@ -10,7 +10,7 @@ import { Room } from '../room';
  * @param context
  * @param client
  */
-export function getPlayer(context: Context, client: Socket): Player | void {
+export function getPlayer(context: Context | undefined, client: Socket | undefined): Player | void {
     if (!context || !client) {
         return;
     }
@@ -33,22 +33,31 @@ export function getRooms(context: Context): Room[] {
  * @param context
  * @param client
  */
-export function getRoom(context: Context, client: Socket): Room {
+export function getRoom(context: Context, client: Socket): Room | null {
     if (!context || !client) {
-        return;
+        return null;
     }
     const player = getPlayer(context, client);
     if (player) {
         return player.getRoom();
     }
+    return null;
 }
 
 export function getRoomStateSnapshot(room: Room): room_state_snapshot.RoomStateSnapshot {
     const host = room.getHost();
 
+    const players = room.getPlayers().map((player) => getPlayerInfo(player));
+    const token = room.getStateToken();
+    if (host) {
+        return {
+            players,
+            hostId: host.getId(),
+            token,
+        };
+    }
     return {
         players: room.getPlayers().map((player) => getPlayerInfo(player)),
-        hostId: host ? host.getId() : null,
         token: room.getStateToken(),
     };
 }

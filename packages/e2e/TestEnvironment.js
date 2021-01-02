@@ -5,6 +5,10 @@ const { setup: setupDevServer, teardown: teardownDevServer } = require('jest-dev
 class TestEnvironment extends JSDomEnvironment {
     async setup() {
         await super.setup();
+        if (typeof this.global.TextEncoder === 'undefined') {
+            const { TextEncoder } = require('util');
+            this.global.TextEncoder = TextEncoder;
+        }
         await setupDevServer({
             command: `node ${path.resolve(__dirname, './server.js')}`,
             launchTimeout: 5000,

@@ -10,7 +10,7 @@ class Builder {
         const builder = new Builder();
         builder.payload = {
             change: {
-                $case: 'playerJoin',
+                oneofKind: 'playerJoin',
                 playerJoin: playerInfo,
             },
         };
@@ -20,7 +20,7 @@ class Builder {
         const builder = new Builder();
         builder.payload = {
             change: {
-                $case: 'playerLeave',
+                oneofKind: 'playerLeave',
                 playerLeave: playerId,
             },
         };
@@ -30,7 +30,7 @@ class Builder {
         const builder = new Builder();
         builder.payload = {
             change: {
-                $case: 'hostLeave',
+                oneofKind: 'hostLeave',
                 hostLeave: {
                     hostId,
                     newHostId,
@@ -46,6 +46,9 @@ class Builder {
     }
 
     public build(): room_state_change_spec.RoomStateChangePayload {
+        if (this.payload.change === undefined) {
+            throw new Error('RoomStateChangePayload should specifiy change');
+        }
         return {
             change: this.payload.change,
             token: this.token,
@@ -60,23 +63,23 @@ export const RoomStateChangePayload = {
     isPlayerJoin(
         payload: room_state_change_spec.RoomStateChangePayload,
     ): payload is room_state_change_spec.RoomStateChangePayload & {
-        change: { $case: 'playerJoin' };
+        change: { oneofKind: 'playerJoin' };
     } {
-        return payload?.change?.$case === 'playerJoin';
+        return payload?.change?.oneofKind === 'playerJoin';
     },
     isPlayerLeave(
         payload: room_state_change_spec.RoomStateChangePayload,
     ): payload is room_state_change_spec.RoomStateChangePayload & {
-        change: { $case: 'playerLeave' };
+        change: { oneofKind: 'playerLeave' };
     } {
-        return payload?.change?.$case === 'playerLeave';
+        return payload?.change?.oneofKind === 'playerLeave';
     },
     isHostLeave(
         payload: room_state_change_spec.RoomStateChangePayload,
     ): payload is room_state_change_spec.RoomStateChangePayload & {
-        change: { $case: 'hostLeave' };
+        change: { oneofKind: 'hostLeave' };
     } {
-        return payload?.change?.$case === 'hostLeave';
+        return payload?.change?.oneofKind === 'hostLeave';
     },
     getJoinedPlayer(payload: room_state_change_spec.RoomStateChangePayload) {
         if (RoomStateChangePayload.isPlayerJoin(payload)) {

@@ -1,15 +1,11 @@
 import { packet, packet_type, payload, status, system_action_type } from '@prisel/protos';
+import type { NotUndefined, SelectOneOf } from './oneof';
 
 export type Packet = packet.Packet;
 
-export type SelectOneOf<
-    Key extends string,
-    OneofCase extends { $case: string; [key: string]: any }
-> = OneofCase extends { $case: Key } ? OneofCase[Key] : never;
-
 export type OneofPayload<Key extends string> = SelectOneOf<Key, payload.Payload['payload']>;
 
-export type PayloadKey = payload.Payload['payload']['$case'];
+export type PayloadKey = NotUndefined<payload.Payload['payload']['oneofKind']>;
 
 function isPacketType(t: any): t is packet_type.PacketType {
     return (
@@ -50,7 +46,7 @@ export class PacketBuilder {
     public setPayload<T extends PayloadKey>(payloadType: T, payload: OneofPayload<T>): this {
         this.payload = ({
             payload: {
-                $case: payloadType,
+                oneofKind: payloadType,
                 [payloadType]: payload,
             },
         } as unknown) as payload.Payload;
@@ -63,11 +59,11 @@ export class PacketBuilder {
             message:
                 this.message === 'systemAction'
                     ? {
-                          $case: 'systemAction',
+                          oneofKind: 'systemAction',
                           systemAction: this.systemAction,
                       }
                     : {
-                          $case: 'action',
+                          oneofKind: 'action',
                           action: this.action,
                       },
         };
@@ -78,15 +74,15 @@ export class PacketBuilder {
     }
 }
 
-export function isValidRequest(p: Packet) {
-    return p.type === packet_type.PacketType.REQUEST && p.requestId !== undefined;
+export function isValidRequest(p: Packet | undefined) {
+    return p?.type === packet_type.PacketType.REQUEST && p?.requestId !== undefined;
 }
 
-export function isValidResponse(p: Packet) {
+export function isValidResponse(p: Packet | undefined) {
     return (
-        p.type === packet_type.PacketType.RESPONSE &&
-        p.requestId !== undefined &&
-        p.status !== undefined
+        p?.type === packet_type.PacketType.RESPONSE &&
+        p?.requestId !== undefined &&
+        p?.status !== undefined
     );
 }
 
@@ -97,67 +93,71 @@ export const Packet = {
     forAction(action: string) {
         return PacketBuilder.forAction(action);
     },
-    getSystemAction(packet: Packet) {
-        if (packet?.message?.$case === 'systemAction') {
+    getSystemAction(packet: Packet | undefined) {
+        if (packet?.message?.oneofKind === 'systemAction') {
             return packet.message.systemAction;
         }
         return undefined;
     },
-    getAction(packet: Packet) {
-        if (packet?.message?.$case === 'action') {
+    getAction(packet: Packet | undefined) {
+        if (packet?.message?.oneofKind === 'action') {
             return packet.message.action;
         }
         return undefined;
     },
     isAnySystemAction(
-        packet: Packet,
+        packet: Packet | undefined,
     ): packet is Packet & {
-        message: { $case: 'systemAction'; systemAction: system_action_type.SystemActionType };
+        message: { oneofKind: 'systemAction'; systemAction: system_action_type.SystemActionType };
     } {
         return (
-            packet?.message?.$case === 'systemAction' && packet.message.systemAction != undefined
+            packet?.message?.oneofKind === 'systemAction' &&
+            packet.message.systemAction != undefined
         );
     },
     isSystemAction<T extends system_action_type.SystemActionType>(
-        packet: Packet,
+        packet: Packet | undefined,
         systemActionType: T,
     ): packet is Packet & {
-        message: { $case: 'systemAction'; systemAction: T };
+        message: { oneofKind: 'systemAction'; systemAction: T };
     } {
         return (
-            packet?.message?.$case === 'systemAction' &&
+            packet?.message?.oneofKind === 'systemAction' &&
             packet?.message?.systemAction === systemActionType
         );
     },
     isAnyCustomAction(
-        packet: Packet,
+        packet: Packet | undefined,
     ): packet is Packet & {
-        message: { $case: 'action'; action: string };
+        message: { oneofKind: 'action'; action: string };
     } {
-        return packet?.message?.$case === 'action' && packet.message.action != undefined;
+        return packet?.message?.oneofKind === 'action' && packet.message.action != undefined;
     },
     isCustomAction<T extends string>(
-        packet: Packet,
+        packet: Packet | undefined,
         action: T,
     ): packet is Packet & {
-        message: { $case: 'action'; action: T };
+        message: { oneofKind: 'action'; action: T };
     } {
-        return packet?.message?.$case === 'action' && packet?.message?.action === action;
+        return packet?.message?.oneofKind === 'action' && packet?.message?.action === action;
     },
     hasPayload<T extends PayloadKey>(
-        packet: Packet,
+        packet: Packet | undefined,
         payloadKey: T,
-    ): packet is Packet & { payload: { payload: { $case: T } } } {
+    ): packet is Packet & { payload: { payload: { oneofKind: T } } } {
         if (
-            packet?.payload?.payload?.$case === payloadKey &&
+            packet?.payload?.payload?.oneofKind === payloadKey &&
             (packet.payload.payload as any)[payloadKey] !== undefined
         ) {
             return true;
         }
         return false;
     },
-    getPayload<T extends PayloadKey>(packet: Packet, payloadKey: T): OneofPayload<T> | undefined {
-        if (packet?.payload?.payload?.$case === payloadKey) {
+    getPayload<T extends PayloadKey>(
+        packet: Packet | undefined,
+        payloadKey: T,
+    ): OneofPayload<T> | undefined {
+        if (packet?.payload?.payload?.oneofKind === payloadKey) {
             const payload = packet.payload.payload;
             if (payloadKey in payload) {
                 return (payload as any)[payloadKey];
@@ -165,16 +165,16 @@ export const Packet = {
         }
         return undefined;
     },
-    isStatusOk(packet: Packet) {
+    isStatusOk(packet: Packet | undefined) {
         return packet?.status?.code === status.Status_Code.OK;
     },
-    isStatusFailed(packet: Packet) {
+    isStatusFailed(packet: Packet | undefined) {
         return packet?.status?.code === status.Status_Code.FAILED;
     },
-    getStatusMessage(packet: Packet) {
+    getStatusMessage(packet: Packet | undefined) {
         return packet?.status?.message ?? '';
     },
-    getStatusDetail(packet: Packet) {
+    getStatusDetail(packet: Packet | undefined) {
         return packet?.status?.detail ?? '';
     },
     /**
@@ -192,16 +192,16 @@ export const Packet = {
         return packet.type === packet_type.PacketType.DEFAULT;
     },
     toDebugString(p: Packet): string {
-        return JSON.stringify(packet.Packet.toJSON(p));
+        return JSON.stringify(packet.Packet.toJson(p));
     },
     serialize(pkt: Packet): Uint8Array {
-        return packet.Packet.encode(pkt).finish();
+        return packet.Packet.toBinary(pkt);
     },
     deserialize(buffer: any): Packet | undefined {
         if (buffer instanceof ArrayBuffer) {
-            return packet.Packet.decode(new Uint8Array(buffer));
+            return packet.Packet.fromBinary(new Uint8Array(buffer));
         } else if (buffer instanceof Uint8Array) {
-            return packet.Packet.decode(buffer);
+            return packet.Packet.fromBinary(buffer);
         }
     },
 };

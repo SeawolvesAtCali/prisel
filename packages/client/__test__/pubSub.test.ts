@@ -1,10 +1,7 @@
 import { Packet } from '@prisel/common';
-import { packet_type } from '@prisel/protos';
 import { PubSub } from '../pubSub';
 
-const mockPacket: Packet = {
-    type: packet_type.PacketType.DEFAULT,
-};
+const mockPacket = Packet.forAction('TEST').build();
 
 describe('pubSub', () => {
     let pubSub: PubSub;

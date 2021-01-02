@@ -1,4 +1,4 @@
-import { packet, packet_type, status } from '@prisel/protos';
+import { packet, packet_type, status, system_action_type } from '@prisel/protos';
 import { isValidResponse, PacketBuilder } from './packet';
 import { Request } from './request';
 
@@ -8,7 +8,7 @@ export interface Response extends packet.Packet {
     status: status.Status;
 }
 
-function isResponse(p: packet.Packet): p is Response {
+function isResponse(p: packet.Packet | undefined): p is Response {
     return isValidResponse(p);
 }
 
@@ -17,20 +17,39 @@ export class ResponseBuilder extends PacketBuilder {
     status: status.Status;
     static forRequest(request: Request) {
         const builder = new ResponseBuilder();
-        builder.message = request.message.$case;
-        if (request.message.$case === 'systemAction') {
+        if (request.message.oneofKind === undefined) {
+            // Not likely to happen, unless client maliciously sends a request
+            // without message. In this case, we can't really recover. We just
+            // send back an ERROR as a response. The error message will be in
+            // the payload as well as status.
+            builder.message = 'systemAction';
+            builder.id = request.requestId;
+            builder.systemAction = system_action_type.SystemActionType.ERROR;
+            builder.setFailure('Request should either be systemAction or action');
+            builder.setPayload('errorPayload', {
+                message: 'Request should either be systemAction or action',
+            });
+            return builder;
+        }
+        builder.message = request.message.oneofKind;
+        if (request.message.oneofKind === 'systemAction') {
             builder.systemAction = request.message.systemAction;
         } else {
             builder.action = request.message.action;
         }
         builder.id = request.requestId;
-        builder.status = {
-            code: status.Status_Code.OK,
-        };
+        builder.setSuccess();
         return builder;
     }
 
-    setFailure(message?: string, detail?: string): this {
+    public setSuccess(): this {
+        this.status = {
+            code: status.Status_Code.OK,
+        };
+        return this;
+    }
+
+    public setFailure(message?: string, detail?: string): this {
         this.status = {
             code: status.Status_Code.FAILED,
         };
@@ -53,11 +72,11 @@ export class ResponseBuilder extends PacketBuilder {
             message:
                 this.message === 'systemAction'
                     ? {
-                          $case: 'systemAction',
+                          oneofKind: 'systemAction',
                           systemAction: this.systemAction,
                       }
                     : {
-                          $case: 'action',
+                          oneofKind: 'action',
                           action: this.action,
                       },
         };

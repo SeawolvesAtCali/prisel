@@ -1,4 +1,6 @@
 import {
+    assert,
+    assertExist,
     newRequestManager,
     Packet,
     Request,
@@ -8,7 +10,6 @@ import {
 } from '@prisel/common';
 import { room_state_change_spec, system_action_type } from '@prisel/protos';
 import once from 'lodash/once';
-import { assert } from './assert';
 import { getExit } from './message';
 import { PubSub } from './pubSub';
 import withTimer from './withTimer';
@@ -40,7 +41,7 @@ const NOT_CONNECTED = 'not connected';
  */
 export class Client<T = State> {
     public get connection(): WebSocket {
-        return this.conn;
+        return assertExist(this.conn, 'connection');
     }
 
     public get isConnected(): boolean {
@@ -48,10 +49,10 @@ export class Client<T = State> {
     }
 
     public state: Partial<T>;
-    private conn: WebSocket;
+    private conn: WebSocket | undefined;
     private serverUri: string;
     private requestManager: RequestManager;
-    private listeners = new PubSub();
+    private listeners: PubSub | undefined = new PubSub();
     private systemActionListener = new PubSub();
     private onEmitCallback: (packet: Packet) => void;
 
@@ -70,7 +71,7 @@ export class Client<T = State> {
     /**
      * Connect to server
      */
-    public async connect(): Promise<WebSocket> {
+    public async connect(): Promise<WebSocket | undefined> {
         if (this.isConnected) {
             return;
         }
@@ -125,7 +126,7 @@ export class Client<T = State> {
      */
     public emit<P extends Packet = any>(packet: P) {
         assert(this.isConnected, NOT_CONNECTED);
-        this.connection.send(Packet.serialize(packet));
+        assertExist(this.connection).send(Packet.serialize(packet));
         if (this.onEmitCallback) {
             this.onEmitCallback(packet);
         }
@@ -146,7 +147,7 @@ export class Client<T = State> {
      * @param listener
      */
     public on(action: any, listener: (packet: Packet, action?: any) => void): RemoveListenerFunc {
-        return this.listeners.on(action, listener);
+        return assertExist(this.listeners?.on(action, listener), 'pubsub');
     }
 
     public onRoomStateChange(
@@ -155,8 +156,9 @@ export class Client<T = State> {
         return this.listenForSystemAction(
             system_action_type.SystemActionType.ROOM_STATE_CHANGE,
             (packet) => {
-                if (Packet.hasPayload(packet, 'roomStateChangePayload')) {
-                    listener(Packet.getPayload(packet, 'roomStateChangePayload'));
+                const payload = Packet.getPayload(packet, 'roomStateChangePayload');
+                if (payload) {
+                    listener(payload);
                 }
             },
         );
@@ -191,7 +193,7 @@ export class Client<T = State> {
         if (Packet.isAnySystemAction(packet)) {
             this.systemActionListener.dispatch(packet.message.systemAction, packet);
         } else if (Packet.isAnyCustomAction(packet)) {
-            this.listeners.dispatch(packet.message.action, packet);
+            this.listeners?.dispatch(packet.message.action, packet);
         } else {
             this.log('Packet without action is not supported', packet);
         }
@@ -208,12 +210,12 @@ export class Client<T = State> {
     }
 
     private disconnect() {
-        if (this.isConnected) {
-            this.connection.onclose = undefined;
+        if (this.isConnected && this.connection) {
+            this.connection.onclose = null;
             this.connection.close();
             this.conn = undefined;
         }
-        this.listeners.close();
+        this.listeners?.close();
         this.listeners = undefined;
     }
 }

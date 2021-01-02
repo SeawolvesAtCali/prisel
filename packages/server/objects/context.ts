@@ -1,10 +1,10 @@
-import SocketManager from '../socketManager';
-import WebSocket from 'ws';
-import { GameConfig } from '../utils/gameConfig';
-import { RoomConfig } from '../utils/roomConfig';
-import { Room } from '../room';
-import { Player } from '../player';
 import { RequestManager } from '@prisel/common/requestManager';
+import WebSocket from 'ws';
+import { Player } from '../player';
+import { Room } from '../room';
+import SocketManager from '../socketManager';
+import { FullGameConfig, GameConfig } from '../utils/gameConfig';
+import { FullRoomConfig, RoomConfig } from '../utils/roomConfig';
 
 export interface Context {
     SocketManager: SocketManager;
@@ -12,7 +12,12 @@ export interface Context {
     rooms: Map<string, Room>;
     players: Map<string, Player>;
     newRequestId(): any;
+    requests: RequestManager;
+    gameConfig: FullGameConfig;
+    roomConfig: FullRoomConfig;
+}
+
+export interface ContextWithPartialConfig extends Omit<Context, 'gameConfig' | 'roomConfig'> {
     gameConfig: GameConfig;
     roomConfig: RoomConfig;
-    requests: RequestManager;
 }

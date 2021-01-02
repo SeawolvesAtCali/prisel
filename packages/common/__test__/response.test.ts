@@ -8,12 +8,12 @@ describe('response', () => {
             type: packet_type.PacketType.REQUEST,
             requestId: '1',
             message: {
-                $case: 'systemAction',
+                oneofKind: 'systemAction',
                 systemAction: system_action_type.SystemActionType.LOGIN,
             },
             payload: {
                 payload: {
-                    $case: 'loginRequest',
+                    oneofKind: 'loginRequest',
                     loginRequest: {
                         username: 'batman',
                     },

@@ -35,7 +35,9 @@ export function newRequestManager(): RequestManager {
             const resolve = requestIdMap.get(id);
             requestIdMap.delete(id);
             Promise.resolve().then(() => {
-                resolve(response);
+                if (resolve) {
+                    resolve(response);
+                }
             });
         }
     }

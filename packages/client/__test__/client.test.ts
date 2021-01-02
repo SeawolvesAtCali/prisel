@@ -69,7 +69,9 @@ describe('Client', () => {
             ).toBe(true);
             const payload = Packet.getPayload(loginResult, 'loginResponse');
             expect(payload).toBeDefined();
-            expect(payload.userId).toBe('123');
+            if (payload) {
+                expect(payload.userId).toBe('123');
+            }
         });
         it('should reject if timeout', async () => {
             const client = new Client(fakeURL);
@@ -149,9 +151,10 @@ describe('Client', () => {
         });
         it('should listen for the right event', async () => {
             const client = new Client(fakeURL);
-            let connection: WebSocket;
-            mockServer.on('connection', (socket) => (connection = socket));
-            await client.connect();
+            const connectionPromise = new Promise<WebSocket>((resolve) => {
+                mockServer.on('connection', resolve);
+            });
+            const [connection, _] = await Promise.all([connectionPromise, client.connect()]);
             const waitForGameStart = new Promise((resolve, reject) => {
                 client.on('NO', reject);
                 client.on('YES', resolve);

@@ -35,6 +35,14 @@
       "allowedCategories": [ "prototype", "tools" ]
     },
     {
+      "name": "@protobuf-ts/plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@protobuf-ts/runtime",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rollup/plugin-commonjs",
       "allowedCategories": [ "production", "prototype", "tools" ]
     },
@@ -252,6 +260,10 @@
     },
     {
       "name": "ts-proto",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "tsc-files",
       "allowedCategories": [ "production" ]
     },
     {

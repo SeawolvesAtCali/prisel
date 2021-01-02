@@ -1,4 +1,4 @@
-import { Packet, RequestBuilder, Response } from '@prisel/common';
+import { assertExist, Packet, RequestBuilder, Response } from '@prisel/common';
 import WebSocket from 'ws';
 import debug from './debug';
 import { Context } from './objects';
@@ -27,7 +27,7 @@ export interface Player {
     request(requestBuilder: RequestBuilder, timeout?: number): Promise<Response>;
     respond(response: Response): void;
     getSocket(): WebSocket;
-    equals(player: Player): boolean;
+    equals(player: Player | null): boolean;
 }
 
 export interface PlayerOption {
@@ -36,7 +36,7 @@ export interface PlayerOption {
 }
 /* tslint:disable: max-classes-per-file*/
 class PlayerImpl implements Player {
-    private room: Room = null;
+    private room: Room | null = null;
     private context: Context;
     private id: string;
     private name: string;
@@ -46,7 +46,7 @@ class PlayerImpl implements Player {
         this.name = config.name;
     }
     public getSocket(): WebSocket {
-        return this.context.SocketManager.getSocket(this.id);
+        return assertExist(this.context.SocketManager.getSocket(this.id));
     }
 
     public getName() {
@@ -114,8 +114,9 @@ class PlayerImpl implements Player {
 }
 
 export function newPlayer(context: Context, config: PlayerOption): Player {
-    if (context.players.has(config.id)) {
-        return context.players.get(config.id);
+    const existingPlayer = context.players.get(config.id);
+    if (existingPlayer) {
+        return existingPlayer;
     }
     const player = new PlayerImpl(context, config);
     context.players.set(config.id, player);

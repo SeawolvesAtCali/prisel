@@ -24,7 +24,7 @@ export interface Room {
     getGameCapacity(): number;
     getPlayers(): Player[];
     hasPlayer(player: Player): boolean;
-    getHost(): Player;
+    getHost(): Player | null;
     setHost(player: Player): void;
     addPlayer(player: Player): void;
     getId(): string;
@@ -53,7 +53,7 @@ export interface RoomOption {
 class RoomImpl implements Room {
     private context;
     private players: Player[] = [];
-    private host: Player;
+    private host: Player | null;
     private name;
     private id;
     private gamePhase: GAME_PHASE = GAME_PHASE.WAITING;

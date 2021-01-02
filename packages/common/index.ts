@@ -1,4 +1,6 @@
+export { assert, assertExist } from './assert';
 export * from './constants';
+export type { NotUndefined, SelectOneOf } from './oneof';
 export { Packet } from './packet';
 export type { PacketBuilder } from './packet';
 export { Request } from './request';

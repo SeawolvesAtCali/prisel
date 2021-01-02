@@ -16,7 +16,7 @@ export function waitForRoomUpdate(
     });
 }
 
-export async function connectAndLogin(client: Client): Promise<string> {
+export async function connectAndLogin(client: Client): Promise<string | undefined> {
     await client.connect();
     const loginResponse = await client.request(Messages.getLogin(client.newId(), 'username'));
     return Packet.getPayload(loginResponse, 'loginResponse')?.userId;

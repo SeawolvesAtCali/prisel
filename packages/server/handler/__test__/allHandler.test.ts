@@ -13,15 +13,12 @@ const systemActionsWithoutHandler = new Set([
 test('all client intiated messages have handler', () => {
     const allHandlerKeys = Array.from(clientHandlerRegister.messageList);
     for (const systemActionType of Object.values(system_action_type.SystemActionType)) {
-        if (
-            systemActionsWithoutHandler.has(
-                system_action_type.systemActionTypeFromJSON(systemActionType),
-            )
-        ) {
+        if (typeof systemActionType === 'string') {
+            return;
+        }
+        if (systemActionsWithoutHandler.has(systemActionType)) {
             continue;
         }
-        expect(allHandlerKeys).toContain(
-            system_action_type.systemActionTypeFromJSON(systemActionType),
-        );
+        expect(allHandlerKeys).toContain(system_action_type.SystemActionType[systemActionType]);
     }
 });

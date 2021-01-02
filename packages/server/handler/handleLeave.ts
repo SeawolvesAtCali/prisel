@@ -22,7 +22,7 @@ export const handleLeave: Handler = (context, socket) => (request) => {
     const room = getRoom(context, socket);
     roomConfig.onLeave(player, request);
 
-    if (!room.isClosed && room.getGamePhase() === GAME_PHASE.GAME) {
+    if (!room?.isClosed && room?.getGamePhase() === GAME_PHASE.GAME) {
         gameConfig.onRemovePlayer(room, player);
     }
 };

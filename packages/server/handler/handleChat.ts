@@ -11,10 +11,11 @@ export const handleChat: Handler = (context, socket) => (chatPacket) => {
     if (!player) {
         return;
     }
-    if (!Packet.hasPayload(chatPacket, 'chatPayload')) {
+    const payload = Packet.getPayload(chatPacket, 'chatPayload');
+    if (!payload) {
         return;
     }
-    const { message } = Packet.getPayload(chatPacket, 'chatPayload');
+    const { message } = payload;
     const room = getRoom(context, socket);
 
     if (player && room) {

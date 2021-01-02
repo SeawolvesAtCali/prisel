@@ -13,11 +13,9 @@ export const handleLogin: Handler = (context, client) => (request) => {
     }
     const id = newId<PlayerId>(SOCKET);
     const { SocketManager } = context;
-    if (
-        Packet.isSystemAction(request, system_action_type.SystemActionType.LOGIN) &&
-        Packet.hasPayload(request, 'loginRequest')
-    ) {
-        const { username } = Packet.getPayload(request, 'loginRequest');
+    const payload = Packet.getPayload(request, 'loginRequest');
+    if (Packet.isSystemAction(request, system_action_type.SystemActionType.LOGIN) && payload) {
+        const { username } = payload;
         SocketManager.add(id, client);
         context.players.set(
             id,

@@ -45,6 +45,9 @@ export const BaseRoomConfig: FullRoomConfig = {
     },
     onCreate(player, packet) {
         const payload = Packet.getPayload(packet, 'createRoomRequest');
+        if (!payload) {
+            return;
+        }
         const { roomName } = payload;
         const room = player.createRoom({ name: roomName });
         const roomId = room.getId();
@@ -61,6 +64,9 @@ export const BaseRoomConfig: FullRoomConfig = {
     },
     preJoin(player, packet) {
         const payload = Packet.getPayload(packet, 'joinRequest');
+        if (!payload) {
+            return Response.forRequest(packet).setFailure(`No payload`).build();
+        }
         const { roomId } = payload;
         const currentRoom = player.getRoom();
         if (currentRoom) {
@@ -80,8 +86,14 @@ export const BaseRoomConfig: FullRoomConfig = {
     },
     onJoin(player, packet) {
         const payload = Packet.getPayload(packet, 'joinRequest');
+        if (!payload) {
+            return;
+        }
         const { roomId } = payload;
         const room = player.joinRoom(roomId);
+        if (!room) {
+            return;
+        }
         const updateToken = room.updateStateToken();
         player.respond(
             Response.forRequest(packet)
@@ -98,7 +110,7 @@ export const BaseRoomConfig: FullRoomConfig = {
             return Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
                 .setPayload('roomStateChangePayload', {
                     change: {
-                        $case: 'playerJoin',
+                        oneofKind: 'playerJoin',
                         playerJoin: getPlayerInfo(player),
                     },
                     token: updateToken,
@@ -133,7 +145,7 @@ export const BaseRoomConfig: FullRoomConfig = {
                 .setFailure('NOT ENOUGH PRIVILEGE TO START GAME')
                 .build();
         }
-        if (!canStart(currentRoom)) {
+        if (canStart && !canStart(currentRoom)) {
             return Response.forRequest(packet)
                 .setFailure('GAME_CONFIG DISALLOW STARTING GAME')
                 .build();
@@ -175,7 +187,7 @@ function onLeave(player: Player, leaveRequest?: Request) {
                 Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
                     .setPayload('roomStateChangePayload', {
                         change: {
-                            $case: 'playerLeave',
+                            oneofKind: 'playerLeave',
                             playerLeave: player.getId(),
                         },
                         token: currentRoom.updateStateToken(),
@@ -193,7 +205,7 @@ function onLeave(player: Player, leaveRequest?: Request) {
             Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
                 .setPayload('roomStateChangePayload', {
                     change: {
-                        $case: 'hostLeave',
+                        oneofKind: 'hostLeave',
                         hostLeave: {
                             hostId: player.getId(),
                             newHostId: newHost.getId(),

@@ -1,0 +1,8 @@
+scripts:
+    clean: rm -rf gen_ts && mkdir gen_ts
+    protoc:
+        protoc --experimental_allow_proto3_optional --ts_opt disable_service_client --ts_out gen_ts
+        --proto_path . **/*.proto
+    ts-check: tsc
+    barrel: barrelsby -c barrelsby.json --delete
+    rollup: rollup --config --silent

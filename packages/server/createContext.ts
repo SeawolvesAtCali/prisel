@@ -1,10 +1,11 @@
-import SocketManager from './socketManager';
+import { newRequestManager } from '@prisel/common';
 import { Context } from './objects';
+import { ContextWithPartialConfig } from './objects/context';
+import SocketManager from './socketManager';
 import { BaseGameConfig } from './utils/gameConfig';
 import { BaseRoomConfig } from './utils/roomConfig';
-import { newRequestManager } from '@prisel/common';
 
-const createContext = (partial: Partial<Context> = {}): Context => {
+const createContext = (partial: Partial<ContextWithPartialConfig> = {}): Context => {
     const gameConfig = partial.gameConfig
         ? { ...BaseGameConfig, ...partial.gameConfig }
         : BaseGameConfig;
@@ -14,7 +15,7 @@ const createContext = (partial: Partial<Context> = {}): Context => {
     const requestManager = newRequestManager();
     const context: Partial<Context> = {
         SocketManager: new SocketManager(),
-        server: null,
+        server: undefined,
         rooms: new Map(),
         players: new Map(),
 

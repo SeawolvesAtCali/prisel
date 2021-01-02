@@ -11,6 +11,7 @@ export const handleCreateRoom: Handler = (context, socket) => (request) => {
         return;
     }
     const roomConfig = context.roomConfig;
+
     const failureResponse = roomConfig.preCreate(player, request);
     if (failureResponse) {
         player.emit(failureResponse);

@@ -1,5 +1,6 @@
-import { packet_type, status } from '@prisel/protos';
+import { packet_type } from '@prisel/protos';
 import { Packet } from '../packet';
+import { Request } from '../request';
 import { newRequestManager, RequestManager } from '../requestManager';
 import { Response } from '../response';
 
@@ -14,17 +15,9 @@ describe('requestManager', () => {
     });
 
     test('addRequest', async () => {
-        const promise = manager.addRequest(
-            { type: packet_type.PacketType.REQUEST, requestId: '123' },
-            10,
-        );
-        const response: Response = {
-            type: packet_type.PacketType.RESPONSE,
-            status: {
-                code: status.Status_Code.OK,
-            },
-            requestId: '123',
-        };
+        const request = Request.forAction('message').setId('123').build();
+        const promise = manager.addRequest(request, 10);
+        const response = Response.forRequest(request).build();
         manager.onResponse(response);
         const receivedResponse = await promise;
         expect(Packet.isStatusOk(receivedResponse)).toBe(true);

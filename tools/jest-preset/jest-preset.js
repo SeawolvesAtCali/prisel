@@ -20,4 +20,5 @@ module.exports = {
     // TODO(minor) Although this seems to conflict with TestEnvironment in e2e. With
     // TestEnvironment, we still output to stderr.
     reporters: ['jest-standard-reporter'],
+    testEnvironment: "node"
 };

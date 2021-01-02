@@ -58,13 +58,13 @@ function browserBuild(entryFile, pkgJson) {
  * @param {object} pkgJson Imported package.json object. pkgJson.main is the
  * commonjs output path. pkgJson.module is the ES module output path.
  */
-function cjsAndEsBuild(entry, pkgJson, additionalDeps = []) {
+function cjsAndEsBuild(entry, pkgJson, additionalDeps = [], includedDeps = []) {
     return {
         input: entry,
         external: (id) =>
-            [...Object.keys(pkgJson.dependencies), ...additionalDeps].some(
-                (dep) => id === dep || id.startsWith(`${dep}/`),
-            ),
+            [...Object.keys(pkgJson.dependencies), ...additionalDeps]
+                .filter((dep) => !(dep in includedDeps))
+                .some((dep) => id === dep || id.startsWith(`${dep}/`)),
         output: [
             { file: pkgJson.main || './lib/index.cjs.js', format: 'cjs' },
             { file: pkgJson.module || './lib/index.esm.js', format: 'es' },

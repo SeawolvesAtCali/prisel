@@ -139,7 +139,7 @@ describe('Client', () => {
             });
             const waitForMessage = new Promise<void>((resolve) => {
                 const mockCallback = (packet: Packet, action: string) => {
-                    expect(Packet.verify(packet)).toBe(true);
+                    expect(Packet.is(packet)).toBe(true);
                     expect(packet.type).toEqual(packet_type.PacketType.DEFAULT);
                     expect(Packet.isCustomAction(packet, 'MESSAGE'));
                     resolve();

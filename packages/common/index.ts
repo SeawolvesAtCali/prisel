@@ -1,6 +1,6 @@
 export { assert, assertExist } from './assert';
 export * from './constants';
-export type { NotUndefined, SelectOneOf } from './oneof';
+export type { SelectOneOf } from './oneof';
 export { Packet } from './packet';
 export type { PacketBuilder } from './packet';
 export { Request } from './request';
@@ -12,3 +12,4 @@ export type { ResponseBuilder } from './response';
 export { RoomStateChangePayload } from './RoomStateChangePayload';
 export { createArgEvent, createEvent } from './typedEvent';
 export type { TypedEvent, TypedEventWithArg } from './typedEvent';
+export { typeRegistry } from './typeRegistry';

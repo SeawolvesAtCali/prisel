@@ -9,6 +9,7 @@
     "browser": "./lib/index.umd.js",
     "types": "./dist/index.d.ts",
     "scripts": {
+        "protoc": "nps protoc",
         "build": "nps clean protoc barrel ts-check rollup",
         "test": "echo \"Error: no test specified\""
     },

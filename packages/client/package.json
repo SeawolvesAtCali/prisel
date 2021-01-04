@@ -24,7 +24,7 @@
         "lib"
     ],
     "scripts": {
-        "build": "nps ts-check clean build",
+        "build": "nps clean ts-check build",
         "fix": "tslint --project tsconfig.json --fix",
         "lint": "tslint --project tsconfig.json",
         "test": "jest --runInBand --detectOpenHandles"

@@ -3,6 +3,7 @@ import http from 'http';
 import Koa from 'koa';
 import WebSocket from 'ws';
 import debug from '../debug';
+import { DEBUG_MODE } from '../flags';
 
 export function createServerWithInternalHTTPServer({
     host,
@@ -68,12 +69,14 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
  */
 
 export function emit(client: WebSocket, packet: Packet): Packet | void {
-    if (Packet.isAnyCustomAction(packet)) {
-        debug(`SERVER: [custom action] ${Packet.toDebugString(packet)}`);
-    } else if (Packet.isAnySystemAction(packet)) {
-        debug(`SERVER: [system action] ${Packet.toDebugString(packet)}`);
-    } else {
-        debug(`SERVER: emitting packet without action ${JSON.stringify(packet)}`);
+    if (DEBUG_MODE) {
+        if (Packet.isAnyCustomAction(packet)) {
+            debug(`SERVER: [custom action] ${Packet.toDebugString(packet)}`);
+        } else if (Packet.isAnySystemAction(packet)) {
+            debug(`SERVER: [system action] ${Packet.toDebugString(packet)}`);
+        } else {
+            debug(`SERVER: emitting packet without action ${JSON.stringify(packet)}`);
+        }
     }
     if (client && client.readyState === WebSocket.OPEN) {
         client.send(Packet.serialize(packet));

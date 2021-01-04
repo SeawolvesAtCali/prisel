@@ -10,6 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Any } from "../google/protobuf/any";
 import { GameStatePayload } from "../tic_tac_toe/tic_tac_toe_spec";
 import { MovePayload } from "../tic_tac_toe/tic_tac_toe_spec";
 import { RoomStateChangePayload } from "./room_state_change_spec";
@@ -116,6 +117,12 @@ export interface Payload {
          */
         ticTacToeGameStatePayload: GameStatePayload;
     } | {
+        oneofKind: "actionPayload";
+        /**
+         * @generated from protobuf field: google.protobuf.Any action_payload = 15;
+         */
+        actionPayload: Any;
+    } | {
         oneofKind: undefined;
     };
 }
@@ -138,7 +145,8 @@ class Payload$Type extends MessageType<Payload> {
             { no: 11, name: "login_response", kind: "message", oneof: "payload", T: () => LoginResponse },
             { no: 12, name: "room_state_change_payload", kind: "message", oneof: "payload", T: () => RoomStateChangePayload },
             { no: 13, name: "tic_tac_toe_move_payload", kind: "message", oneof: "payload", T: () => MovePayload },
-            { no: 14, name: "tic_tac_toe_game_state_payload", kind: "message", oneof: "payload", T: () => GameStatePayload }
+            { no: 14, name: "tic_tac_toe_game_state_payload", kind: "message", oneof: "payload", T: () => GameStatePayload },
+            { no: 15, name: "action_payload", kind: "message", oneof: "payload", T: () => Any }
         ]);
     }
     create(value?: PartialMessage<Payload>): Payload {
@@ -236,6 +244,12 @@ class Payload$Type extends MessageType<Payload> {
                         ticTacToeGameStatePayload: GameStatePayload.internalBinaryRead(reader, reader.uint32(), options, (message.payload as any).ticTacToeGameStatePayload)
                     };
                     break;
+                case /* google.protobuf.Any action_payload */ 15:
+                    message.payload = {
+                        oneofKind: "actionPayload",
+                        actionPayload: Any.internalBinaryRead(reader, reader.uint32(), options, (message.payload as any).actionPayload)
+                    };
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -290,6 +304,9 @@ class Payload$Type extends MessageType<Payload> {
         /* tic_tac_toe.GameStatePayload tic_tac_toe_game_state_payload = 14; */
         if (message.payload.oneofKind === "ticTacToeGameStatePayload")
             GameStatePayload.internalBinaryWrite(message.payload.ticTacToeGameStatePayload, writer.tag(14, WireType.LengthDelimited).fork(), options).join();
+        /* google.protobuf.Any action_payload = 15; */
+        if (message.payload.oneofKind === "actionPayload")
+            Any.internalBinaryWrite(message.payload.actionPayload, writer.tag(15, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

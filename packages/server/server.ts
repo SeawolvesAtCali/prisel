@@ -110,7 +110,7 @@ export class Server {
             debug('client connected');
             emit(socket, getWelcome());
             socket.on('message', (data: any) => {
-                debug(`received ${data}`);
+                debug(`received socket message`);
                 if (!data) {
                     return;
                 }
@@ -118,8 +118,8 @@ export class Server {
                     return;
                 }
                 const packet = Packet.deserialize(data);
-                if (!Packet.verify(packet)) {
-                    debug(`packet structure is invalid`);
+                if (!Packet.is(packet)) {
+                    debug(`packet structure is invalid ${safeStringify(packet)}`);
                     if (DEBUG_MODE) {
                         const player = getPlayer(this.context, socket);
                         if (player) {

@@ -1,28 +1,16 @@
-import { packet, packet_type, payload, status, system_action_type } from '@prisel/protos';
-import type { NotUndefined, SelectOneOf } from './oneof';
+import { packet, packet_type, payload, protobuf, status, system_action_type } from '@prisel/protos';
+import { IMessageType } from '@protobuf-ts/runtime';
+import type { SelectOneOf } from './oneof';
+import { typeRegistry } from './typeRegistry';
 
 export type Packet = packet.Packet;
 
 export type OneofPayload<Key extends string> = SelectOneOf<Key, payload.Payload['payload']>;
 
-export type PayloadKey = NotUndefined<payload.Payload['payload']['oneofKind']>;
-
-function isPacketType(t: any): t is packet_type.PacketType {
-    return (
-        t === packet_type.PacketType.DEFAULT ||
-        t === packet_type.PacketType.REQUEST ||
-        t === packet_type.PacketType.RESPONSE
-    );
-}
-
-function isPacket(p: any): p is packet.Packet {
-    if (!p) {
-        return false;
-    }
-    const packet: Packet = p;
-    return typeof packet === 'object' && isPacketType(packet.type);
-}
-
+export type PayloadKey = Exclude<
+    payload.Payload['payload']['oneofKind'],
+    undefined | 'actionPayload'
+>;
 export class PacketBuilder {
     message: 'systemAction' | 'action';
     systemAction: system_action_type.SystemActionType;
@@ -43,13 +31,24 @@ export class PacketBuilder {
         return builder;
     }
 
-    public setPayload<T extends PayloadKey>(payloadType: T, payload: OneofPayload<T>): this {
-        this.payload = ({
+    public setPayload<T extends PayloadKey>(payloadType: T, payload: OneofPayload<T>): this;
+    public setPayload<T extends object>(messageType: IMessageType<T>, payload: T): this;
+    setPayload(payloadTypeOrMessageType: PayloadKey | IMessageType<any>, payload: any): this {
+        if (typeof payloadTypeOrMessageType === 'string') {
+            this.payload = ({
+                payload: {
+                    oneofKind: payloadTypeOrMessageType,
+                    [payloadTypeOrMessageType]: payload,
+                },
+            } as unknown) as payload.Payload;
+            return this;
+        }
+        this.payload = {
             payload: {
-                oneofKind: payloadType,
-                [payloadType]: payload,
+                oneofKind: 'actionPayload',
+                actionPayload: protobuf.any.Any.pack(payload, payloadTypeOrMessageType),
             },
-        } as unknown) as payload.Payload;
+        };
         return this;
     }
 
@@ -86,26 +85,26 @@ export function isValidResponse(p: Packet | undefined) {
     );
 }
 
-export const Packet = {
-    forSystemAction(action: system_action_type.SystemActionType) {
+class Packet$Type {
+    public forSystemAction(action: system_action_type.SystemActionType) {
         return PacketBuilder.forSystemAction(action);
-    },
-    forAction(action: string) {
+    }
+    public forAction(action: string) {
         return PacketBuilder.forAction(action);
-    },
-    getSystemAction(packet: Packet | undefined) {
+    }
+    public getSystemAction(packet: Packet | undefined) {
         if (packet?.message?.oneofKind === 'systemAction') {
             return packet.message.systemAction;
         }
         return undefined;
-    },
-    getAction(packet: Packet | undefined) {
+    }
+    public getAction(packet: Packet | undefined) {
         if (packet?.message?.oneofKind === 'action') {
             return packet.message.action;
         }
         return undefined;
-    },
-    isAnySystemAction(
+    }
+    public isAnySystemAction(
         packet: Packet | undefined,
     ): packet is Packet & {
         message: { oneofKind: 'systemAction'; systemAction: system_action_type.SystemActionType };
@@ -114,8 +113,8 @@ export const Packet = {
             packet?.message?.oneofKind === 'systemAction' &&
             packet.message.systemAction != undefined
         );
-    },
-    isSystemAction<T extends system_action_type.SystemActionType>(
+    }
+    public isSystemAction<T extends system_action_type.SystemActionType>(
         packet: Packet | undefined,
         systemActionType: T,
     ): packet is Packet & {
@@ -125,83 +124,122 @@ export const Packet = {
             packet?.message?.oneofKind === 'systemAction' &&
             packet?.message?.systemAction === systemActionType
         );
-    },
-    isAnyCustomAction(
+    }
+    public isAnyCustomAction(
         packet: Packet | undefined,
     ): packet is Packet & {
         message: { oneofKind: 'action'; action: string };
     } {
         return packet?.message?.oneofKind === 'action' && packet.message.action != undefined;
-    },
-    isCustomAction<T extends string>(
+    }
+    public isCustomAction<T extends string>(
         packet: Packet | undefined,
         action: T,
     ): packet is Packet & {
         message: { oneofKind: 'action'; action: T };
     } {
         return packet?.message?.oneofKind === 'action' && packet?.message?.action === action;
-    },
-    hasPayload<T extends PayloadKey>(
+    }
+    public hasPayload<T extends PayloadKey>(packet: Packet | undefined, payloadKey: T): boolean;
+    public hasPayload<T extends object>(
         packet: Packet | undefined,
-        payloadKey: T,
-    ): packet is Packet & { payload: { payload: { oneofKind: T } } } {
-        if (
-            packet?.payload?.payload?.oneofKind === payloadKey &&
-            (packet.payload.payload as any)[payloadKey] !== undefined
-        ) {
-            return true;
-        }
-        return false;
-    },
-    getPayload<T extends PayloadKey>(
+        messageType: IMessageType<T>,
+    ): boolean;
+    hasPayload(
         packet: Packet | undefined,
-        payloadKey: T,
-    ): OneofPayload<T> | undefined {
-        if (packet?.payload?.payload?.oneofKind === payloadKey) {
-            const payload = packet.payload.payload;
-            if (payloadKey in payload) {
-                return (payload as any)[payloadKey];
-            }
-        }
-        return undefined;
-    },
-    isStatusOk(packet: Packet | undefined) {
-        return packet?.status?.code === status.Status_Code.OK;
-    },
-    isStatusFailed(packet: Packet | undefined) {
-        return packet?.status?.code === status.Status_Code.FAILED;
-    },
-    getStatusMessage(packet: Packet | undefined) {
-        return packet?.status?.message ?? '';
-    },
-    getStatusDetail(packet: Packet | undefined) {
-        return packet?.status?.detail ?? '';
-    },
-    /**
-     * Verify that packet is well-formed
-     * @param packet a potential packet
-     */
-    verify(packet: any): packet is Packet {
-        if (!isPacket(packet)) {
+        payloadKeyOrMessageType: PayloadKey | IMessageType<any>,
+    ) {
+        if (!packet) {
             return false;
         }
-        if (isValidRequest(packet) || isValidResponse(packet)) {
-            return true;
+        if (typeof payloadKeyOrMessageType === 'string') {
+            return (
+                packet?.payload?.payload?.oneofKind === payloadKeyOrMessageType &&
+                (packet.payload.payload as any)[payloadKeyOrMessageType] !== undefined
+            );
         }
-
-        return packet.type === packet_type.PacketType.DEFAULT;
-    },
-    toDebugString(p: Packet): string {
-        return JSON.stringify(packet.Packet.toJson(p));
-    },
-    serialize(pkt: Packet): Uint8Array {
+        if (packet.payload?.payload?.oneofKind === 'actionPayload') {
+            return protobuf.any.Any.contains(
+                packet.payload.payload.actionPayload,
+                payloadKeyOrMessageType,
+            );
+        }
+        return false;
+    }
+    public getPayload<T extends PayloadKey>(
+        packet: Packet | undefined,
+        payloadKey: T,
+    ): OneofPayload<T> | undefined;
+    public getPayload<T extends object>(
+        packet: Packet | undefined,
+        messageType: IMessageType<T>,
+    ): T | undefined;
+    getPayload(
+        packet: Packet | undefined,
+        payloadKeyOrMessageType: PayloadKey | IMessageType<any>,
+    ) {
+        if (!packet) {
+            return undefined;
+        }
+        if (typeof payloadKeyOrMessageType === 'string') {
+            if (packet.payload?.payload?.oneofKind === payloadKeyOrMessageType) {
+                const payload = packet.payload.payload;
+                if (payloadKeyOrMessageType in payload) {
+                    return (payload as any)[payloadKeyOrMessageType];
+                }
+            }
+            return undefined;
+        }
+        if (
+            packet.payload?.payload?.oneofKind === 'actionPayload' &&
+            protobuf.any.Any.contains(packet.payload.payload.actionPayload, payloadKeyOrMessageType)
+        ) {
+            return protobuf.any.Any.unpack(
+                packet.payload.payload.actionPayload,
+                payloadKeyOrMessageType,
+            );
+        }
+        return undefined;
+    }
+    public isStatusOk(packet: Packet | undefined) {
+        return packet?.status?.code === status.Status_Code.OK;
+    }
+    public isStatusFailed(packet: Packet | undefined) {
+        return packet?.status?.code === status.Status_Code.FAILED;
+    }
+    public getStatusMessage(packet: Packet | undefined) {
+        return packet?.status?.message ?? '';
+    }
+    public getStatusDetail(packet: Packet | undefined) {
+        return packet?.status?.detail ?? '';
+    }
+    /**
+     * Verify that packet is well-formed
+     * @param p a potential packet
+     */
+    public is(p: any): p is Packet {
+        return (
+            packet.Packet.is(p) &&
+            (isValidRequest(p) || isValidResponse(p) || p.type === packet_type.PacketType.DEFAULT)
+        );
+    }
+    public toDebugString(p: Packet): string {
+        try {
+            return JSON.stringify(packet.Packet.toJson(p, { typeRegistry: typeRegistry }), null, 2);
+        } catch (_) {
+            return `${p}`;
+        }
+    }
+    public serialize(pkt: Packet): Uint8Array {
         return packet.Packet.toBinary(pkt);
-    },
-    deserialize(buffer: any): Packet | undefined {
+    }
+    public deserialize(buffer: any): Packet | undefined {
         if (buffer instanceof ArrayBuffer) {
             return packet.Packet.fromBinary(new Uint8Array(buffer));
         } else if (buffer instanceof Uint8Array) {
             return packet.Packet.fromBinary(buffer);
         }
-    },
-};
+    }
+}
+
+export const Packet = new Packet$Type();

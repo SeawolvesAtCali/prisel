@@ -1,4 +1,5 @@
 import { Client, Messages, Packet, RoomStateChangePayload } from '@prisel/client';
+import { tic_tac_toe_spec } from '@prisel/protos';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 export const phases = {
@@ -94,7 +95,7 @@ export function useGameState(client, onEnd) {
     const handleMove = useCallback(
         (index) => {
             const movePacket = Packet.forAction('move')
-                .setPayload('ticTacToeMovePayload', {
+                .setPayload(tic_tac_toe_spec.MovePayload, {
                     position: index,
                 })
                 .build();
@@ -105,7 +106,7 @@ export function useGameState(client, onEnd) {
 
     useEffect(() => {
         return client.on('game_state', (packet) => {
-            const newState = Packet.getPayload(packet, 'ticTacToeGameStatePayload');
+            const newState = Packet.getPayload(packet, tic_tac_toe_spec.GameStatePayload);
             setGameState(newState);
             if (newState.winner) {
                 setWinner(newState.winner);
@@ -163,11 +164,9 @@ export function useClient(url, connectedRef) {
         if (!connectedRef.current) {
             return;
         }
+        const loginRequest = Messages.getLogin(client.newId(), username);
         /** @type {Response} */
-        const loginInfo = Packet.getPayload(
-            await client.request(Messages.getLogin(client.newId(), username)),
-            'loginResponse',
-        );
+        const loginInfo = Packet.getPayload(await client.request(loginRequest), 'loginResponse');
         if (connectedRef.current) {
             return { id: loginInfo.userId, name: username };
         }

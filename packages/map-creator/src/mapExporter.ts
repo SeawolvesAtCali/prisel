@@ -3,10 +3,10 @@ import {
     Coordinate,
     existOrThrow,
     Mixins,
-    Property2,
+    Property,
     PropertyClass,
     Ref,
-    Tile2,
+    Tile,
     TileClass,
     World,
 } from '@prisel/monopoly-common';
@@ -26,7 +26,7 @@ export function toBoardSetup(world: World, width: number, height: number): Board
 }
 
 export function connectPathAndProperties(world: World) {
-    const pathTileIdMap: Map<CoordinateKey, Ref<Tile2>> = new Map();
+    const pathTileIdMap: Map<CoordinateKey, Ref<Tile>> = new Map();
 
     // store all pathTiles and properties in copiedWorld for easy referencing
     for (const tile of world.getAll(TileClass)) {
@@ -51,7 +51,7 @@ export function connectPathAndProperties(world: World) {
     // Populate road property mapping.
     // Run through all properties, see if there are road next to it, if there
     // is, create a mapping
-    function addNeighborWalkable(property: Property2, dRow: number, dCol: number): void {
+    function addNeighborWalkable(property: Property, dRow: number, dCol: number): void {
         const pos = property.dimension.anchor;
         const walkablePosKey = toKey({ row: pos.row + dRow, col: pos.col + dCol });
         const tileObjectRef = pathTileIdMap.get(walkablePosKey);

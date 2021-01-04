@@ -2,9 +2,9 @@ import {
     BoardSetup,
     Coordinate,
     Mixins,
-    Property2,
+    Property,
     PropertyClass,
-    Tile2,
+    Tile,
     TileClass,
     World,
 } from '@prisel/monopoly-common';
@@ -97,7 +97,7 @@ export default class MapLoader extends cc.Component {
         });
     }
 
-    private renderTile(tilePrefab: cc.Prefab, tile: Tile2, world: World) {
+    private renderTile(tilePrefab: cc.Prefab, tile: Tile, world: World) {
         const tileNode = cc.instantiate(tilePrefab);
         const tileComp = tileNode.getComponent(TileWrapper);
         if (!tileComp) {
@@ -111,7 +111,7 @@ export default class MapLoader extends cc.Component {
         return tileNode;
     }
 
-    private renderProperty(property: Property2) {
+    private renderProperty(property: Property) {
         const propertyNode = cc.instantiate(this.propertyTile);
         const propertyComp = propertyNode.getComponent(PropertyTile);
         if (!propertyComp) {

@@ -1,4 +1,4 @@
-import { TileClass } from '../Tile2';
+import { TileClass } from '../Tile';
 import { World } from '../World';
 
 test('serialize', () => {

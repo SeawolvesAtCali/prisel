@@ -17,33 +17,33 @@ export const PropertyClass = createClass('property', [
     OwnerMixinConfig,
 ]);
 
-export type Property2 = InstanceType<typeof PropertyClass>;
+export type Property = InstanceType<typeof PropertyClass>;
 
 export const Properties = {
-    purchasedBy(property: Property2, owner: GameObject) {
+    purchasedBy(property: Property, owner: GameObject) {
         property.propertyLevel.current = 0;
         property.owner = owner.id;
     },
 
-    upgrade(property: Property2, newLevel: number) {
+    upgrade(property: Property, newLevel: number) {
         property.propertyLevel.current = newLevel;
     },
 
-    purchaseable(property: Property2): boolean {
+    purchaseable(property: Property): boolean {
         return !exist(property.owner);
     },
-    upgradable(property: Property2, requester: GameObject): boolean {
+    upgradable(property: Property, requester: GameObject): boolean {
         return (
             exist(property.owner) &&
             property.owner === requester.id &&
             property.propertyLevel.current < property.propertyLevel.levels.length - 1
         );
     },
-    investable(property: Property2, requester: GameObject): boolean {
+    investable(property: Property, requester: GameObject): boolean {
         return Properties.purchaseable(property) || Properties.upgradable(property, requester);
     },
 
-    getWorth(property: Property2): number {
+    getWorth(property: Property): number {
         // the worth of a property is the sum of the cost taken to
         // purchase/upgrade the property.
         return property.propertyLevel.levels.reduce(
@@ -54,7 +54,7 @@ export const Properties = {
     },
 
     getBasicPropertyInfo(
-        property: Property2,
+        property: Property,
     ): Required<Pick<PropertyInfo, 'name' | 'pos' | 'currentLevel'>> {
         return {
             name: property.name,
@@ -63,7 +63,7 @@ export const Properties = {
         };
     },
 
-    getPropertyInfoForInvesting(property: Property2, requester: GameObject): PropertyInfo | null {
+    getPropertyInfoForInvesting(property: Property, requester: GameObject): PropertyInfo | null {
         const basicPropertyInfo = Properties.getBasicPropertyInfo(property);
 
         if (property.propertyLevel.current >= property.propertyLevel.levels.length) {
@@ -80,7 +80,7 @@ export const Properties = {
         };
     },
 
-    getPropertyInfoForRent(property: Property2): PropertyInfo | null {
+    getPropertyInfoForRent(property: Property): PropertyInfo | null {
         const basicPropertyInfo = Properties.getBasicPropertyInfo(property);
         if (
             basicPropertyInfo.currentLevel < 0 ||

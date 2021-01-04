@@ -6,11 +6,11 @@ import {
     log,
     Payment,
     Properties,
-    Property2,
+    Property,
     PropertyInfo,
     serialize,
     Serialized,
-    Tile2,
+    Tile,
     Tiles,
     World,
 } from '@prisel/monopoly-common';
@@ -21,14 +21,14 @@ import { flags } from '../flags';
 interface Props {
     id: PlayerId;
     player: Player;
-    pathTile: Tile2;
-    owning: Property2[];
+    pathTile: Tile;
+    owning: Property[];
     cash: number;
     character: number;
     rolled: boolean;
 }
 
-function roll(startingNode: Tile2): Tile2[] {
+function roll(startingNode: Tile): Tile[] {
     if (flags.get<boolean>(USE_FIXED_STEPS)) {
         const steps = flags.get<number>(FIXED_STEPS);
         log.info(`player will move a fixed ${steps} step`);
@@ -45,8 +45,8 @@ export class GamePlayer extends GameObject {
     public get type() {
         return 'game_player';
     }
-    public pathTile: Tile2;
-    public owning: Property2[];
+    public pathTile: Tile;
+    public owning: Property[];
     public cash: number;
     public rolled: boolean;
     public player: Player;
@@ -84,7 +84,7 @@ export class GamePlayer extends GameObject {
         return this.move(path);
     }
 
-    public move(path: Tile2[]) {
+    public move(path: Tile[]) {
         if (path.length > 0) {
             this.pathTile = path[path.length - 1];
             return path.map((pathTile) => pathTile.position);
@@ -92,7 +92,7 @@ export class GamePlayer extends GameObject {
         return [];
     }
 
-    public purchaseProperty(property: Property2, nextLevelPropertyInfo: PropertyInfo) {
+    public purchaseProperty(property: Property, nextLevelPropertyInfo: PropertyInfo) {
         this.cash = this.cash - nextLevelPropertyInfo.cost;
         if (property.owner !== this.id) {
             this.owning.push(property);

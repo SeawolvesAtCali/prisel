@@ -1,9 +1,9 @@
-import { RefIdSymbol, Tile2, World } from '@prisel/monopoly-common';
+import { RefIdSymbol, Tile, World } from '@prisel/monopoly-common';
 
-function isEmptyPath(path: Exclude<Tile2['path'], undefined>) {
+function isEmptyPath(path: Exclude<Tile['path'], undefined>) {
     return path.prev.length === 0 && path.next.length === 0;
 }
-export function clearTilePath(tile: Tile2, world: World) {
+export function clearTilePath(tile: Tile, world: World) {
     if (!tile.path) {
         return;
     }

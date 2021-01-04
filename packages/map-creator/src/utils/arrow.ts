@@ -1,4 +1,4 @@
-import { log, Tile2 } from '@prisel/monopoly-common';
+import { log, Tile } from '@prisel/monopoly-common';
 import { CanvasForm, Geom, Group, Pt } from 'pts';
 import { tileCenter } from './tileCenter';
 
@@ -14,7 +14,7 @@ export function arrow(start: Pt, end: Pt, form: CanvasForm) {
     form.strokeOnly('#000', 3).lines([line, new Group(ps[0], end, ps[1])]);
 }
 
-export function arrowBetweenTiles(startTile: Tile2, endTile: Tile2, form: CanvasForm) {
+export function arrowBetweenTiles(startTile: Tile, endTile: Tile, form: CanvasForm) {
     const startCenter = tileCenter(startTile);
     const endCenter = tileCenter(endTile);
     const unit = endCenter.$subtract(startCenter).unit();

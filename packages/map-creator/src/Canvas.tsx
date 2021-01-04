@@ -5,9 +5,9 @@ import {
     GameObject,
     log,
     Mixins,
-    Property2,
+    Property,
     PropertyClass,
-    Tile2,
+    Tile,
     TileClass,
     World,
 } from '@prisel/monopoly-common';
@@ -206,27 +206,27 @@ function alpha(color: Color, alpha: number) {
     newColor.alpha = alpha;
     return newColor;
 }
-function drawStartFlag(tile: Tile2, form: CanvasForm) {
+function drawStartFlag(tile: Tile, form: CanvasForm) {
     form.fillOnly(Palette.START.hex)
         .font(24)
         .alignText('start', 'middle')
         .textBox(getTileRect(tile), 'S', 'center');
 }
-function drawChanceFlag(tile: Tile2, form: CanvasForm) {
+function drawChanceFlag(tile: Tile, form: CanvasForm) {
     form.fillOnly(Palette.START.hex)
         .font(24)
         .alignText('end', 'middle')
         .textBox(getTileRect(tile), 'C', 'center');
 }
 
-function getTileRect(tile: Tile2): Group {
+function getTileRect(tile: Tile): Group {
     return Rectangle.from(
         new Pt(tile.position.col * TILE_SIZE_PX, tile.position.row * TILE_SIZE_PX),
         TILE_SIZE_PX,
         TILE_SIZE_PX,
     );
 }
-function drawTile(tile: Tile2, form: CanvasForm, selectedVaryingOpacity: number = 1) {
+function drawTile(tile: Tile, form: CanvasForm, selectedVaryingOpacity: number = 1) {
     const tileRect = Rectangle.from(
         new Pt(tile.position.col * TILE_SIZE_PX + 1, tile.position.row * TILE_SIZE_PX + 1),
         TILE_SIZE_PX - 2,
@@ -246,7 +246,7 @@ function drawTile(tile: Tile2, form: CanvasForm, selectedVaryingOpacity: number 
         ).rect(tileRect);
     }
 }
-function drawProperty(property: Property2, form: CanvasForm, selectedVaryingOpacity: number = 1) {
+function drawProperty(property: Property, form: CanvasForm, selectedVaryingOpacity: number = 1) {
     const propertyInset = 4;
     const propertyRect = Rectangle.from(
         new Pt(

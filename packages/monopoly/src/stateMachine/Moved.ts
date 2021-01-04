@@ -15,7 +15,7 @@ import {
     PromptPurchasePayload,
     PromptPurchaseResponsePayload,
     Properties,
-    Property2,
+    Property,
 } from '@prisel/monopoly-common';
 import { broadcast, PacketType, ResponseWrapper } from '@prisel/server';
 import { chanceHandlers } from '../chanceHandlers';
@@ -197,7 +197,7 @@ export class Moved extends StateMachineState {
     }
 
     private handlePayRents(
-        properties: Property2[],
+        properties: Property[],
         currentPlayer: GamePlayer,
     ): Promise<void> | void {
         const rentPayments: Payment[] = [];
@@ -231,7 +231,7 @@ export class Moved extends StateMachineState {
     }
 
     private handleInvest(
-        properties: Property2[],
+        properties: Property[],
         currentPlayer: GamePlayer,
     ): Promise<void> | undefined {
         if (!properties.some((property) => Properties.investable(property, currentPlayer))) {
@@ -262,7 +262,7 @@ export class Moved extends StateMachineState {
         }));
     }
 
-    private async promptForPurchases(properties: Property2[]) {
+    private async promptForPurchases(properties: Property[]) {
         const currentPlayer = this.game.getCurrentPlayer();
 
         for (const property of properties) {

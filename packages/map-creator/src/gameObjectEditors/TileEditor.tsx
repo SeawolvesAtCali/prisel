@@ -1,4 +1,4 @@
-import { ChanceInput, ChanceInputArgs, Mixins, Tile2 } from '@prisel/monopoly-common';
+import { ChanceInput, ChanceInputArgs, Mixins, Tile } from '@prisel/monopoly-common';
 import React from 'react';
 import { BooleanInput } from './BooleanInput';
 import { ChanceEditor } from './ChanceEditor';
@@ -16,7 +16,7 @@ const chanceTypeSelectorMap: { [description: string]: keyof ChanceInputArgs } = 
     collectable: 'collectable',
 };
 interface TileEditorProps {
-    tile: Tile2;
+    tile: Tile;
 }
 export const TileEditor: React.FC<TileEditorProps> = ({ tile }) => {
     const [hasChance, setHasChance] = React.useState(

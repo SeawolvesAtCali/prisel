@@ -15,7 +15,7 @@ export const TileClass = createClass('tile', [
     ChancePoolMixinConfig,
 ]);
 
-export type Tile2 = InstanceType<typeof TileClass>;
+export type Tile = InstanceType<typeof TileClass>;
 
 /**
  * generate path not including current node using genNextPathTile funtion.If
@@ -23,11 +23,11 @@ export type Tile2 = InstanceType<typeof TileClass>;
  */
 export const Tiles = {
     genPathWith(
-        tile: Tile2,
-        genNextPathTile: (currentPathTile: Tile2, length: number) => Tile2 | undefined,
-    ): Tile2[] {
-        const path: Tile2[] = [];
-        let current: Tile2 = tile;
+        tile: Tile,
+        genNextPathTile: (currentPathTile: Tile, length: number) => Tile | undefined,
+    ): Tile[] {
+        const path: Tile[] = [];
+        let current: Tile = tile;
         while (true) {
             const next = genNextPathTile(current, path.length);
             if (next) {
@@ -40,7 +40,7 @@ export const Tiles = {
         return path;
     },
 
-    genPath(tile: Tile2, steps: number) {
+    genPath(tile: Tile, steps: number) {
         return Tiles.genPathWith(tile, (current, length) =>
             length === steps
                 ? undefined
@@ -49,7 +49,7 @@ export const Tiles = {
         );
     },
 
-    genPathReverse(tile: Tile2, steps: number) {
+    genPathReverse(tile: Tile, steps: number) {
         return Tiles.genPathWith(tile, (current, length) =>
             length === steps
                 ? undefined

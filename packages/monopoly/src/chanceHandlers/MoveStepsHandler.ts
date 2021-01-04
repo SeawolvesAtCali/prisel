@@ -4,7 +4,7 @@ import {
     animationMap,
     ChanceArgs,
     PlayerReceiveChancePayload,
-    Tile2,
+    Tile,
     Tiles,
 } from '@prisel/monopoly-common';
 import { broadcast, PacketType } from '@prisel/server';
@@ -16,7 +16,7 @@ export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input)
     const inputArgs = input.inputArgs;
     const currentPlayer = game.getCurrentPlayer();
     const startLocation = currentPlayer.pathTile.position;
-    let path: Tile2[] = [];
+    let path: Tile[] = [];
     if (inputArgs.steps > 0) {
         path = Tiles.genPath(currentPlayer.pathTile, inputArgs.steps);
         currentPlayer.move(path);

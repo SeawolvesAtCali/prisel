@@ -1,4 +1,4 @@
-import { Mixins, Tile2 } from '@prisel/monopoly-common';
+import { Mixins, Tile } from '@prisel/monopoly-common';
 import {
     LANDING_POS_OFFSET,
     PLAYER_Z_INDEX_OFFSET,
@@ -11,11 +11,11 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class TileWrapper extends cc.Component {
-    private tile: Tile2 = null;
+    private tile: Tile = null;
     @property(cc.SpriteAtlas)
     private tileAtlas: cc.SpriteAtlas = null;
 
-    public init(tile: Tile2) {
+    public init(tile: Tile) {
         this.tile = tile;
     }
 

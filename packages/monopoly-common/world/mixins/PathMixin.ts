@@ -1,20 +1,20 @@
 import { Id } from '../Id';
 import { Ref, RefIdSymbol } from '../Ref';
-import { Tile2 } from '../Tile2';
+import { Tile } from '../Tile';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
 
 export interface PathMixin {
     path: {
-        prev: Ref<Tile2>[];
-        next: Ref<Tile2>[];
+        prev: Ref<Tile>[];
+        next: Ref<Tile>[];
     };
 }
 
 export interface SerializedPathMixin {
     path: {
-        prev: Id<Tile2>[];
-        next: Id<Tile2>[];
+        prev: Id<Tile>[];
+        next: Id<Tile>[];
     };
 }
 

@@ -1,11 +1,11 @@
-import { Coordinate, Tile2, World } from '@prisel/monopoly-common';
+import { Coordinate, Tile, World } from '@prisel/monopoly-common';
 import { CanvasForm } from 'pts';
 import { getOrCreateCurrentTile } from './getOrCreateCurrentTile';
 import { pathConnect } from './pathConnect';
 import { Tool } from './Tool';
 
 export class PathTileBrush implements Tool {
-    private previousTile: Tile2 | undefined;
+    private previousTile: Tile | undefined;
     constructor(private world: World, private form: CanvasForm) {}
 
     public onDown(coor: Coordinate): void {

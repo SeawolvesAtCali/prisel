@@ -1,6 +1,6 @@
-import { Mixins, Tile2 } from '@prisel/monopoly-common';
+import { Mixins, Tile } from '@prisel/monopoly-common';
 
-export function ensurePath(tile: Tile2): Tile2 & Mixins.PathMixin {
+export function ensurePath(tile: Tile): Tile & Mixins.PathMixin {
     if (!tile.path) {
         tile.path = {
             prev: [],
@@ -8,5 +8,5 @@ export function ensurePath(tile: Tile2): Tile2 & Mixins.PathMixin {
         };
     }
 
-    return tile as Tile2 & Mixins.PathMixin;
+    return tile as Tile & Mixins.PathMixin;
 }

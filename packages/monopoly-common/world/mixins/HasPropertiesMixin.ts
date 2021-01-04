@@ -1,16 +1,16 @@
 import { Id } from '../Id';
-import { Property2 } from '../Property2';
+import { Property } from '../Property';
 import { Ref, RefIdSymbol } from '../Ref';
 import { World } from '../World';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
 
 export interface HasPropertiesMixin {
-    hasProperties: Ref<Property2>[];
+    hasProperties: Ref<Property>[];
 }
 
 export interface SerializedHasPropertiesMixin {
-    hasProperties: Id<Property2>[];
+    hasProperties: Id<Property>[];
 }
 
 export const HasPropertiesMixinConfig: MixinConfig<

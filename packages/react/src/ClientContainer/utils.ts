@@ -74,7 +74,7 @@ export async function login(client: Client<ClientState>): Promise<Client<ClientS
     if (Packet.isStatusOk(loginResponse) && Packet.hasPayload(loginResponse, 'loginResponse')) {
         client.setState({
             loggingIn: false,
-            userId: Packet.getPayload(loginResponse, 'loginResponse').userId,
+            userId: Packet.getPayload(loginResponse, 'loginResponse')?.userId,
         });
         return client;
     }

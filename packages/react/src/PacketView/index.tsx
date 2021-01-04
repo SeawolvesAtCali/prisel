@@ -1,5 +1,5 @@
 import { Packet, Response } from '@prisel/client';
-import { packet_type, system_action_type } from '@prisel/protos';
+import { packet_type, status, system_action_type } from '@prisel/protos';
 import * as React from 'react';
 import { Pill, Preset } from '../Pill';
 import cn from '../utils/classname';
@@ -133,7 +133,7 @@ function renderStatus(packet: Packet) {
         const response = packet;
         return (
             <div className={styles.status}>
-                <JsonView value={response.status} />
+                <JsonView value={status.Status.toJson(response.status)} />
             </div>
         );
     }
@@ -155,7 +155,12 @@ export const PacketView: React.FC<PacketViewProps> = (props) => {
                 {getResponseStatus(p)}
                 {Packet.isAnySystemAction(p) && (
                     <Pill preset={Preset.DEFAULT}>
-                        {system_action_type.systemActionTypeToJSON(Packet.getSystemAction(p))}
+                        {
+                            system_action_type.SystemActionType[
+                                Packet.getSystemAction(p) ||
+                                    system_action_type.SystemActionType.UNSPECIFIED
+                            ]
+                        }
                     </Pill>
                 )}
                 {Packet.isAnyCustomAction(p) && (

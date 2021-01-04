@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "monopoly/game_player.proto";
+message Asset {
+  int32 cash = 1;
+  int32 property_worth = 2;
+  int32 total = 3;
+}
+message Rank {
+  GamePlayer player = 1;
+  Asset asset = 2;
+}

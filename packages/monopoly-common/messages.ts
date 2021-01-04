@@ -31,7 +31,7 @@ export enum Action {
 
     // request/response
     // initiate from server
-    PROMPT_PURCHASE = 'promp_purchase',
+    PROMPT_PURCHASE = 'prompt_purchase',
 
     // request/response
     // initiate from client
@@ -98,10 +98,13 @@ export interface RollResponsePayload {
     path: Coordinate[]; // not including the current position
 }
 
+// Seems not used.
+// PlayerPurchasePayload is used for announcing purchase
 export interface PurchasePayload {
     propertyPos: Coordinate;
 }
 
+// seems not used. Only PromptPurchaseResponsePayload is used
 export interface PurchaseResponsePayload {
     property: PropertyInfo;
     remainingMoney: number;

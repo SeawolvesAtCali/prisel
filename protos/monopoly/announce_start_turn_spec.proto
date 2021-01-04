@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "prisel/annotations.proto";
+
+message AnnounceStartTurnPayload {
+  option (prisel.for_action) = {
+    type : "announce_start_turn"
+    packet_type : DEFAULT
+  };
+  string player = 1;
+}

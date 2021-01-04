@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "monopoly/coordinate.proto";
+
+message PropertyLevel {
+  // The cost to reach this level from previous level
+  // If this is the first level, the cost is land purchase cost
+  int32 cost = 1;
+  int32 rent = 2;
+}
+
+message PropertyInfo {
+  int32 current_level = 1;
+  int32 cost = 2;
+  int32 rent = 3;
+  string name = 4;
+  Coordinate pos = 5;
+}

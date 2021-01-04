@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package monopoly;
+
+// The position of an entity on the board
+message Coordinate {
+  int32 row = 1;
+  int32 col = 2;
+}

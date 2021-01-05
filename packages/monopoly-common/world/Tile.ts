@@ -21,7 +21,7 @@ export type Tile = InstanceType<typeof TileClass>;
  * generate path not including current node using genNextPathTile funtion.If
  * the function return undefined, generation is stopped.
  */
-export const Tiles = {
+export const Tile = {
     genPathWith(
         tile: Tile,
         genNextPathTile: (currentPathTile: Tile, length: number) => Tile | undefined,
@@ -41,7 +41,7 @@ export const Tiles = {
     },
 
     genPath(tile: Tile, steps: number) {
-        return Tiles.genPathWith(tile, (current, length) =>
+        return Tile.genPathWith(tile, (current, length) =>
             length === steps
                 ? undefined
                 : // Choose a random next
@@ -50,7 +50,7 @@ export const Tiles = {
     },
 
     genPathReverse(tile: Tile, steps: number) {
-        return Tiles.genPathWith(tile, (current, length) =>
+        return Tile.genPathWith(tile, (current, length) =>
             length === steps
                 ? undefined
                 : // Choose a random next

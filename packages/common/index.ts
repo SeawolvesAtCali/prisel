@@ -1,4 +1,4 @@
-export { assert, assertExist } from './assert';
+export { assert, assertExist, assertNever } from './assert';
 export * from './constants';
 export type { SelectOneOf } from './oneof';
 export { Packet } from './packet';

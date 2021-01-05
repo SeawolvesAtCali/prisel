@@ -1,5 +1,5 @@
+import { payment, prompt_purchase_spec, property } from '@prisel/protos';
 import { exist } from '../exist';
-import { PropertyInfo } from '../types/propertyInfo';
 import { createClass } from './createClass';
 import { GameObject } from './GameObject';
 import {
@@ -8,7 +8,7 @@ import {
     OwnerMixinConfig,
     PropertyLevelMixinConfig,
     required,
-} from './mixins';
+} from './mixins/index';
 
 export const PropertyClass = createClass('property', [
     required(DimensionMixinConfig),
@@ -19,7 +19,7 @@ export const PropertyClass = createClass('property', [
 
 export type Property = InstanceType<typeof PropertyClass>;
 
-export const Properties = {
+export const Property = {
     purchasedBy(property: Property, owner: GameObject) {
         property.propertyLevel.current = 0;
         property.owner = owner.id;
@@ -40,7 +40,7 @@ export const Properties = {
         );
     },
     investable(property: Property, requester: GameObject): boolean {
-        return Properties.purchaseable(property) || Properties.upgradable(property, requester);
+        return Property.purchaseable(property) || Property.upgradable(property, requester);
     },
 
     getWorth(property: Property): number {
@@ -53,35 +53,43 @@ export const Properties = {
         );
     },
 
-    getBasicPropertyInfo(
-        property: Property,
-    ): Required<Pick<PropertyInfo, 'name' | 'pos' | 'currentLevel'>> {
+    getBasicPropertyInfo(property: Property): property.PropertyInfo {
         return {
             name: property.name,
             pos: property.dimension.anchor,
             currentLevel: property.propertyLevel.current,
+            ...property.propertyLevel.levels[property.propertyLevel.current],
         };
     },
 
-    getPropertyInfoForInvesting(property: Property, requester: GameObject): PropertyInfo | null {
-        const basicPropertyInfo = Properties.getBasicPropertyInfo(property);
+    getNextLevel(property: Property) {
+        return {
+            ...Property.getBasicPropertyInfo(property),
+            currentLevel: property.propertyLevel.current + 1,
+            ...property.propertyLevel.levels[property.propertyLevel.current + 1],
+        };
+    },
 
+    getPromptPurchaseRequest(
+        property: Property,
+        requester: GameObject,
+        existingMoney: number,
+    ): prompt_purchase_spec.PromptPurchaseRequest | null {
         if (property.propertyLevel.current >= property.propertyLevel.levels.length) {
             return null;
         }
 
-        const nextLevel = basicPropertyInfo.currentLevel + 1;
+        const nextLevel = Property.getNextLevel(property);
         return {
-            ...basicPropertyInfo,
-            currentLevel: nextLevel,
+            property: nextLevel,
             levels: property.propertyLevel.levels,
-            ...property.propertyLevel.levels[nextLevel],
-            isUpgrade: Properties.upgradable(property, requester),
+            isUpgrade: Property.upgradable(property, requester),
+            moneyAfterPurchase: existingMoney - nextLevel.cost,
         };
     },
 
-    getPropertyInfoForRent(property: Property): PropertyInfo | null {
-        const basicPropertyInfo = Properties.getBasicPropertyInfo(property);
+    getPaymentForRent(property: Property, payer: string, payee: string): payment.Payment | null {
+        const basicPropertyInfo = Property.getBasicPropertyInfo(property);
         if (
             basicPropertyInfo.currentLevel < 0 ||
             basicPropertyInfo.currentLevel >= property.propertyLevel.levels.length
@@ -89,8 +97,10 @@ export const Properties = {
             return null;
         }
         return {
-            ...basicPropertyInfo,
-            rent: property.propertyLevel.levels[basicPropertyInfo.currentLevel].rent,
+            payer,
+            payee,
+            amount: property.propertyLevel.levels[property.propertyLevel.current].rent,
+            forProperty: Property.getBasicPropertyInfo(property),
         };
     },
 };

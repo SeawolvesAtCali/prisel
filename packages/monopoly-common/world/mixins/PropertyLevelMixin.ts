@@ -1,12 +1,12 @@
+import { property } from '@prisel/protos';
 import deepCopy from 'deepcopy';
-import { PropertyLevel } from '../../types';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
 
 export interface PropertyLevelMixin {
     propertyLevel: {
         current: number;
-        levels: PropertyLevel[];
+        levels: property.PropertyLevel[];
     };
 }
 

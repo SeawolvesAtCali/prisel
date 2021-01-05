@@ -40,7 +40,7 @@
     },
     {
       "name": "@protobuf-ts/runtime",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototype" ]
     },
     {
       "name": "@rollup/plugin-commonjs",
@@ -181,6 +181,10 @@
     {
       "name": "mock-socket",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "nanoid",
+      "allowedCategories": [ "prototype" ]
     },
     {
       "name": "normalize.css",

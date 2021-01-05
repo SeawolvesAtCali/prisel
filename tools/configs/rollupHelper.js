@@ -33,6 +33,7 @@ function browserBuild(entryFile, pkgJson) {
             resolve({
                 // This is a browser module, should not use any node internal.
                 preferBuiltins: false,
+                mainFields: ['module', 'main', 'browser'],
             }), // so Rollup can find dependencies
             commonjs({
                 namedExports: {

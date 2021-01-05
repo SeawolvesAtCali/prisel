@@ -24,9 +24,9 @@ export interface Payment {
      */
     payer: string;
     /**
-     * @generated from protobuf field: string amount = 3;
+     * @generated from protobuf field: int32 amount = 3;
      */
-    amount: string;
+    amount: number;
     /**
      * @generated from protobuf field: monopoly.PropertyInfo for_property = 4;
      */
@@ -40,12 +40,12 @@ class Payment$Type extends MessageType<Payment> {
         super("monopoly.Payment", [
             { no: 1, name: "payee", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "payer", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "amount", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "amount", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "for_property", kind: "message", T: () => PropertyInfo }
         ]);
     }
     create(value?: PartialMessage<Payment>): Payment {
-        const message = { payee: "", payer: "", amount: "" };
+        const message = { payee: "", payer: "", amount: 0 };
         if (value !== undefined)
             reflectionMergePartial<Payment>(this, message, value);
         return message;
@@ -61,8 +61,8 @@ class Payment$Type extends MessageType<Payment> {
                 case /* string payer */ 2:
                     message.payer = reader.string();
                     break;
-                case /* string amount */ 3:
-                    message.amount = reader.string();
+                case /* int32 amount */ 3:
+                    message.amount = reader.int32();
                     break;
                 case /* monopoly.PropertyInfo for_property */ 4:
                     message.forProperty = PropertyInfo.internalBinaryRead(reader, reader.uint32(), options, message.forProperty);
@@ -85,9 +85,9 @@ class Payment$Type extends MessageType<Payment> {
         /* string payer = 2; */
         if (message.payer !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.payer);
-        /* string amount = 3; */
-        if (message.amount !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.amount);
+        /* int32 amount = 3; */
+        if (message.amount !== 0)
+            writer.tag(3, WireType.Varint).int32(message.amount);
         /* monopoly.PropertyInfo for_property = 4; */
         if (message.forProperty)
             PropertyInfo.internalBinaryWrite(message.forProperty, writer.tag(4, WireType.LengthDelimited).fork(), options).join();

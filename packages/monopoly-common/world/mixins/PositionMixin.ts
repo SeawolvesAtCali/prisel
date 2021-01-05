@@ -1,10 +1,10 @@
+import { coordinate } from '@prisel/protos';
 import deepCopy from 'deepcopy';
-import { Coordinate } from '../../types';
 import { hasMixin, serializedHasMixin } from './hasMixin';
 import { MixinConfig } from './MixinConfig';
 
 export interface PositionMixin {
-    position: Coordinate;
+    position: coordinate.Coordinate;
 }
 
 export type SerializedPositionMixin = PositionMixin;

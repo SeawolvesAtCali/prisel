@@ -1,15 +1,18 @@
-import { Packet, PacketType } from '@prisel/common';
-import { AnimationArgs, AnimationName } from './animationSpec';
-import { Action, AnimationPayload } from './messages';
-import { Animation, AnimationType } from './types/index';
+import { assertNever, Packet } from '@prisel/common';
+import { animation_spec, protobuf } from '@prisel/protos';
+import type { IMessageType } from '@protobuf-ts/runtime';
 
+type Animation = animation_spec.Animation;
+type AnimationType = animation_spec.AnimationType;
+const AnimationType = animation_spec.AnimationType;
 // Utilities for working with animations
-export class AnimationBuilder<ArgType = any> implements Animation {
-    private _name: AnimationName = 'unspecified';
+export class AnimationBuilder<ExtraType extends object = {}> implements Animation {
+    private _name: string = 'unspecified';
     private _length: number = 0;
     private _type: AnimationType = AnimationType.DEFAULT;
-    private _children: Animation[];
-    private _args?: ArgType = undefined;
+    private _children: Animation[] = [];
+    private _extra?: ExtraType = undefined;
+    private _extraType?: IMessageType<ExtraType> = undefined;
 
     public get name() {
         return this._name;
@@ -24,12 +27,20 @@ export class AnimationBuilder<ArgType = any> implements Animation {
         return this._children;
     }
 
-    public get args() {
-        return this._args;
+    public get extra() {
+        if (this._extra && this._extraType) {
+            return protobuf.any.Any.pack(this._extra, this._extraType);
+        }
     }
 
-    public constructor(type: AnimationType = AnimationType.DEFAULT) {
+    public constructor(
+        type: AnimationType = AnimationType.DEFAULT,
+        extraMessageType?: IMessageType<ExtraType>,
+    ) {
         this._type = type;
+        if (extraMessageType) {
+            this._extraType = extraMessageType;
+        }
         if (
             this._type === AnimationType.RACE ||
             this._type === AnimationType.ALL ||
@@ -38,7 +49,7 @@ export class AnimationBuilder<ArgType = any> implements Animation {
             this._children = [];
         }
     }
-    public setName(name: AnimationName) {
+    public setName(name: string) {
         if (this._type === AnimationType.DEFAULT) {
             this._name = name;
         }
@@ -55,9 +66,9 @@ export class AnimationBuilder<ArgType = any> implements Animation {
         return this;
     }
 
-    public setArgs(args: ArgType) {
+    public setExtra(extra: ExtraType) {
         if (this._type === AnimationType.DEFAULT) {
-            this._args = args;
+            this._extra = extra;
         }
         return this;
     }
@@ -66,11 +77,13 @@ export class AnimationBuilder<ArgType = any> implements Animation {
             type: this._type,
             name: this._name,
             length: this._length,
+            children: [],
         };
-        if (this._args !== undefined && this._args !== null) {
-            animation.args = this._args;
+        const maybeExtra = this.extra;
+        if (maybeExtra) {
+            animation.extra = maybeExtra;
         }
-        if (this._children) {
+        if (this._children.length > 0) {
             animation.children = this._children.map((child) =>
                 child instanceof AnimationBuilder ? child.build() : child,
             );
@@ -82,64 +95,29 @@ export class AnimationBuilder<ArgType = any> implements Animation {
     }
 }
 
-type NoArgAnimation<_AnimationName extends AnimationName = AnimationName> = _AnimationName extends (
-    AnimationArgs[_AnimationName] extends void ? _AnimationName : never
-)
-    ? _AnimationName
-    : never;
-
-type ArgedAnimation = Exclude<AnimationName, NoArgAnimation>;
-
-interface CreateAnimation {
-    create<_AnimationName extends NoArgAnimation = NoArgAnimation>(
-        animationName: _AnimationName,
-    ): AnimationBuilder<void>;
-    create<_AnimationName extends ArgedAnimation = ArgedAnimation>(
-        animationName: _AnimationName,
-        arg: AnimationArgs[_AnimationName],
-    ): AnimationBuilder<AnimationArgs[_AnimationName]>;
-    [x: string]: any;
-    all(...animations: Animation[]): Animation;
-    race(...animations: Animation[]): Animation;
-    sequence(...animations: Animation[]): Animation;
-    processAndWait(
-        processor: (packet: Packet<AnimationPayload>) => void,
-        animation: Animation,
-    ): {
-        promise: Promise<void>;
-        cancel: () => void;
-    };
-    wait(
-        animation: Animation,
-    ): {
-        promise: Promise<void>;
-        cancel: () => void;
-    };
-}
-
-export const Anim: CreateAnimation = {
-    create(name: AnimationName, args?: any) {
-        const builder = new AnimationBuilder(AnimationType.DEFAULT).setName(name);
-        if (args) {
-            builder.setArgs(args);
-        }
-        return builder;
+export const Anim = {
+    // Create a single DEFAULT type animation
+    create<ExtraType extends object = {}>(
+        name: string,
+        extraType?: IMessageType<ExtraType>,
+    ): AnimationBuilder<ExtraType> {
+        return new AnimationBuilder<ExtraType>(AnimationType.DEFAULT, extraType).setName(name);
     },
-    all(...animations) {
+    all(...animations: Animation[]): Animation {
         return new AnimationBuilder(AnimationType.ALL).addChildren(...animations).build();
     },
-    race(...animations) {
+    race(...animations: Animation[]): Animation {
         return new AnimationBuilder(AnimationType.RACE).addChildren(...animations).build();
     },
-    sequence(...animations) {
+    sequence(...animations: Animation[]): Animation {
         return new AnimationBuilder(AnimationType.SEQUENCE).addChildren(...animations).build();
     },
-    processAndWait(processor, animation) {
+    processAndWait(processor: (packet: Packet) => void, animation: Animation) {
         const packet = toAnimationPacket(animation);
         processor(packet);
         return Anim.wait(animation);
     },
-    wait(animation) {
+    wait(animation: Animation) {
         const waitTime = computeAnimationLength(animation);
         if (waitTime === Infinity) {
             throw new Error('cannot wait for infinite animation');
@@ -163,17 +141,17 @@ function computeAnimationLength(animation: Animation): number {
                     0,
                 ) ?? 0
             );
+        default:
+            assertNever(animation.type);
     }
 }
 
-export function toAnimationPacket(animation: Animation): Packet<AnimationPayload> {
-    return {
-        type: PacketType.DEFAULT,
-        action: Action.ANIMATION,
-        payload: {
+export function toAnimationPacket(animation: Animation): Packet {
+    return Packet.forAction('animation')
+        .setPayload(animation_spec.AnimationPayload, {
             animation: animation instanceof AnimationBuilder ? animation.build() : animation,
-        },
-    };
+        })
+        .build();
 }
 
 function timeoutPromise(ms: number) {

@@ -13,17 +13,7 @@ describe('GamePlayer', () => {
         player.owning = [Ref.forTest<Property>('property1'), Ref.forTest<Property>('property2')];
         player.pathTile = Ref.forTest<Tile>('tile1');
         player.rolled = true;
-        expect(player.serialize()).toMatchObject({
-            id: '123',
-            type: 'game_player',
-            data: {
-                money: 100,
-                owning: [{ id: 'property1' }, { id: 'property2' }],
-                pathTile: { id: 'tile1' },
-                rolled: true,
-                character: 1,
-            },
-        });
+        expect(player.serialize()).toMatchSnapshot();
     });
 
     test('deserialize', () => {

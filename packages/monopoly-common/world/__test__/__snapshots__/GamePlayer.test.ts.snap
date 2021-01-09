@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GamePlayer serialize 1`] = `
+Object {
+  "data": Object {
+    "character": 1,
+    "money": 100,
+    "owning": Array [
+      Object {
+        "id": "property1",
+      },
+      Object {
+        "id": "property2",
+      },
+    ],
+    "pathTile": Object {
+      "id": "tile1",
+    },
+    "rolled": true,
+  },
+  "id": "123",
+  "type": "game_player",
+}
+`;

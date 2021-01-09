@@ -1,33 +1,43 @@
+import { coordinate } from '@prisel/protos';
+import { serializable } from 'serializr';
 import { getRand } from '../getRand';
-import { createClass } from './createClass';
-import { ChancePoolMixinConfig } from './mixins/ChancePoolMixin';
-import { HasPropertiesMixinConfig } from './mixins/HasPropertiesMixin';
-import { required } from './mixins/MixinConfig';
-import { PathMixinConfig } from './mixins/PathMixin';
-import { PositionMixinConfig } from './mixins/PositionMixin';
-import { StartMixinConfig } from './mixins/StartMixin';
+import { ChanceInput } from '../types';
+import { GameObject } from './GameObject';
+import { Property } from './Property';
+import { Ref } from './ref2';
+import { jsonSerializable, listRefSerializable } from './serializeUtil';
 
-export const TileClass = createClass('tile', [
-    required(PositionMixinConfig),
-    PathMixinConfig,
-    HasPropertiesMixinConfig,
-    StartMixinConfig,
-    ChancePoolMixinConfig,
-]);
+export class Tile extends GameObject {
+    static TYPE = 'tile';
+    readonly type = 'tile';
 
-export type Tile = InstanceType<typeof TileClass>;
+    @jsonSerializable
+    position: coordinate.Coordinate;
 
-/**
- * generate path not including current node using genNextPathTile funtion.If
- * the function return undefined, generation is stopped.
- */
-export const Tile = {
+    @listRefSerializable
+    prev: Ref<Tile>[] = [];
+
+    @listRefSerializable
+    next: Ref<Tile>[] = [];
+
+    @listRefSerializable
+    hasProperties: Ref<Property>[] = [];
+
+    @serializable
+    isStart = false;
+
+    @jsonSerializable
+    chancePool?: ChanceInput<any>[];
+
+    /**
+     * generate path not including current node using genNextPathTile funtion.If
+     * the function return undefined, generation is stopped.
+     */
     genPathWith(
-        tile: Tile,
         genNextPathTile: (currentPathTile: Tile, length: number) => Tile | undefined,
     ): Tile[] {
         const path: Tile[] = [];
-        let current: Tile = tile;
+        let current: Tile = this;
         while (true) {
             const next = genNextPathTile(current, path.length);
             if (next) {
@@ -38,23 +48,23 @@ export const Tile = {
             }
         }
         return path;
-    },
+    }
 
-    genPath(tile: Tile, steps: number) {
-        return Tile.genPathWith(tile, (current, length) =>
+    genPath(steps: number) {
+        return this.genPathWith((current, length) =>
             length === steps
                 ? undefined
                 : // Choose a random next
-                  getRand(current.path?.next ?? [])?.() ?? undefined,
+                  getRand(current.next)?.get(),
         );
-    },
+    }
 
     genPathReverse(tile: Tile, steps: number) {
-        return Tile.genPathWith(tile, (current, length) =>
+        return this.genPathWith((current, length) =>
             length === steps
                 ? undefined
                 : // Choose a random next
-                  getRand(current.path?.prev ?? [])?.() ?? undefined,
+                  getRand(current.prev)?.get(),
         );
-    },
-};
+    }
+}

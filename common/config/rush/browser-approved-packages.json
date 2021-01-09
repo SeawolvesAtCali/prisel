@@ -251,6 +251,10 @@
       "allowedCategories": [ "production", "prototype" ]
     },
     {
+      "name": "serializr",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
       "name": "shortid",
       "allowedCategories": [ "prototype" ]
     },

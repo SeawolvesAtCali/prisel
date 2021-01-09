@@ -1,29 +1,29 @@
-import { TileClass } from '../Tile';
+import { Tile } from '../Tile';
 import { World } from '../World';
 
 test('id', () => {
-    const world = new World().registerObject(TileClass);
-    const node = world.create(TileClass);
+    const world = new World().registerObject(Tile);
+    const node = world.create(Tile);
     expect(node.id).toBeTruthy();
 });
 
 test('ref', () => {
-    const world = new World().registerObject(TileClass);
-    const node = world.create(TileClass);
-    const ref = world.getRef(node);
-    expect(ref()).toBe(node);
+    const world = new World().registerObject(Tile);
+    const node = world.create(Tile);
+    const ref = world.makeRef(node);
+    expect(ref.get()).toBe(node);
 });
 
 test('ref with id', () => {
-    const world = new World().registerObject(TileClass);
-    const node = world.create(TileClass, '123');
-    const ref = world.getRef('123');
-    expect(ref()).toBe(node);
+    const world = new World().registerObject(Tile);
+    const node = world.create(Tile, '123');
+    const ref = world.makeRef('123');
+    expect(ref.get()).toBe(node);
 });
 
 test('create and check', () => {
-    const world = new World().registerObject(TileClass);
-    const tile = world.create(TileClass, '123');
+    const world = new World().registerObject(Tile);
+    const tile = world.create(Tile, '123');
     tile.position = {
         row: 1,
         col: 2,

@@ -1,28 +1,18 @@
-import { TileClass } from '../Tile';
+import { Tile } from '../Tile';
 import { World } from '../World';
 
 test('serialize', () => {
-    const world = new World().registerObject(TileClass);
-    const tile = world.create(TileClass);
-    tile.path = {
-        prev: [world.createRef(TileClass)],
-        next: [world.createRef(TileClass)],
-    };
-    expect(tile.serialize()).toMatchObject({
-        id: expect.any(String),
-        type: 'tile',
-        path: {
-            next: [expect.any(String)],
-            prev: [expect.any(String)],
-        },
-    });
-});
+    const world = new World().registerObject(Tile);
+    const tile = world.create(Tile);
+    tile.prev = [world.createRef(Tile)];
+    tile.next = [world.createRef(Tile)];
 
-test('serialize no mixin', () => {
-    const world = new World().registerObject(TileClass);
-    const tile = world.create(TileClass);
     expect(tile.serialize()).toMatchObject({
         id: expect.any(String),
         type: 'tile',
+        data: {
+            next: [{ id: expect.any(String) }],
+            prev: [{ id: expect.any(String) }],
+        },
     });
 });

@@ -1,6 +1,8 @@
-import { Serialized } from './serialize';
+import { deserialize, serialize } from 'serializr';
+import { Serialized } from './serializeUtil';
 import { World } from './World';
 
+export type StaticThis<T> = { new (): T };
 export abstract class GameObject {
     /**
      * type is classname. This is used during (de)serialization to identify the
@@ -12,13 +14,24 @@ export abstract class GameObject {
      */
     public id: string;
 
+    public world: World;
+
     // Child type of GameObject should all provide a no argument constructor, or
     // just don't add constructor. This allows world to create any GameObject
 
-    public abstract serialize(): Serialized<this>;
+    public serialize(): Serialized<this> {
+        return { id: this.id, type: this.type, data: serialize(this) };
+    }
 
-    public static deserialize(serialized: Serialized, world: World): GameObject {
-        throw new Error('cannot deserialize GameObject');
+    public static deserialize<T extends GameObject>(
+        this: StaticThis<T>,
+        serialized: Serialized,
+        world: World,
+    ) {
+        const deserialized = deserialize(this, serialized.data);
+        deserialized.id = serialized.id;
+        deserialized.world = world;
+        return deserialized;
     }
     /**
      * Return true if all required mixins are initialized

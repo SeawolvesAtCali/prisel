@@ -1,106 +1,115 @@
-import { payment, prompt_purchase_spec, property } from '@prisel/protos';
+import { coordinate, payment, prompt_purchase_spec, property } from '@prisel/protos';
+import { serializable } from 'serializr';
 import { exist } from '../exist';
-import { createClass } from './createClass';
+import { Size } from '../types';
 import { GameObject } from './GameObject';
-import {
-    DimensionMixinConfig,
-    NameMixinConfig,
-    OwnerMixinConfig,
-    PropertyLevelMixinConfig,
-    required,
-} from './mixins/index';
+import { GamePlayer } from './GamePlayer';
+import { Ref } from './ref2';
+import { jsonSerializable, refSerializable } from './serializeUtil';
 
-export const PropertyClass = createClass('property', [
-    required(DimensionMixinConfig),
-    required(PropertyLevelMixinConfig),
-    required(NameMixinConfig),
-    OwnerMixinConfig,
-]);
+export class Property extends GameObject {
+    static TYPE = 'property';
+    readonly type = 'property';
 
-export type Property = InstanceType<typeof PropertyClass>;
+    @jsonSerializable
+    anchor: coordinate.Coordinate;
 
-export const Property = {
-    purchasedBy(property: Property, owner: GameObject) {
-        property.propertyLevel.current = 0;
-        property.owner = owner.id;
-    },
+    @jsonSerializable
+    size: Size;
 
-    upgrade(property: Property, newLevel: number) {
-        property.propertyLevel.current = newLevel;
-    },
+    @serializable
+    currentLevel = -1;
 
-    purchaseable(property: Property): boolean {
-        return !exist(property.owner);
-    },
-    upgradable(property: Property, requester: GameObject): boolean {
+    @jsonSerializable
+    levels: property.PropertyLevel[] = [];
+
+    @serializable
+    name = '';
+
+    @refSerializable
+    owner?: Ref<GamePlayer>;
+
+    purchasedBy(owner: GamePlayer) {
+        this.currentLevel = 0;
+        this.owner = Ref.of(owner, this.world);
+    }
+
+    upgrade(newLevel: number) {
+        this.currentLevel = newLevel;
+    }
+
+    purchaseable(): boolean {
+        return !exist(this.owner);
+    }
+
+    upgradable(requester: GamePlayer): boolean {
         return (
-            exist(property.owner) &&
-            property.owner === requester.id &&
-            property.propertyLevel.current < property.propertyLevel.levels.length - 1
+            exist(this.owner) &&
+            this.owner.id === requester.id &&
+            this.currentLevel < this.levels.length - 1
         );
-    },
-    investable(property: Property, requester: GameObject): boolean {
-        return Property.purchaseable(property) || Property.upgradable(property, requester);
-    },
+    }
 
-    getWorth(property: Property): number {
+    investable(requester: GamePlayer): boolean {
+        return this.purchaseable() || this.upgradable(requester);
+    }
+
+    getWorth() {
         // the worth of a property is the sum of the cost taken to
         // purchase/upgrade the property.
-        return property.propertyLevel.levels.reduce(
-            (prev, cur, level) =>
-                level <= property.propertyLevel.current ? prev + cur.cost : prev,
+        return this.levels.reduce(
+            (prev, cur, level) => (level <= this.currentLevel ? prev + cur.cost : prev),
             0,
         );
-    },
+    }
 
-    getBasicPropertyInfo(property: Property): property.PropertyInfo {
+    getBasicPropertyInfo(): property.PropertyInfo {
         return {
-            name: property.name,
-            pos: property.dimension.anchor,
-            currentLevel: property.propertyLevel.current,
-            ...property.propertyLevel.levels[property.propertyLevel.current],
+            name: this.name,
+            pos: this.anchor,
+            currentLevel: this.currentLevel,
+            ...this.levels[this.currentLevel],
         };
-    },
+    }
 
-    getNextLevel(property: Property) {
+    getNextLevel(): property.PropertyInfo {
         return {
-            ...Property.getBasicPropertyInfo(property),
-            currentLevel: property.propertyLevel.current + 1,
-            ...property.propertyLevel.levels[property.propertyLevel.current + 1],
+            ...this.getBasicPropertyInfo(),
+            currentLevel: this.currentLevel + 1,
+            ...this.levels[this.currentLevel + 1],
         };
-    },
+    }
 
     getPromptPurchaseRequest(
-        property: Property,
-        requester: GameObject,
+        requester: GamePlayer,
         existingMoney: number,
     ): prompt_purchase_spec.PromptPurchaseRequest | null {
-        if (property.propertyLevel.current >= property.propertyLevel.levels.length) {
+        if (this.currentLevel >= this.levels.length) {
             return null;
         }
 
-        const nextLevel = Property.getNextLevel(property);
+        const nextLevel = this.getNextLevel();
         return {
             property: nextLevel,
-            levels: property.propertyLevel.levels,
-            isUpgrade: Property.upgradable(property, requester),
+            levels: this.levels,
+            isUpgrade: this.upgradable(requester),
             moneyAfterPurchase: existingMoney - nextLevel.cost,
         };
-    },
+    }
 
     getPaymentForRent(property: Property, payer: string, payee: string): payment.Payment | null {
-        const basicPropertyInfo = Property.getBasicPropertyInfo(property);
+        const basicPropertyInfo = this.getBasicPropertyInfo();
         if (
             basicPropertyInfo.currentLevel < 0 ||
-            basicPropertyInfo.currentLevel >= property.propertyLevel.levels.length
+            basicPropertyInfo.currentLevel >= this.levels.length
         ) {
             return null;
         }
         return {
             payer,
             payee,
-            amount: property.propertyLevel.levels[property.propertyLevel.current].rent,
-            forProperty: Property.getBasicPropertyInfo(property),
+            amount: this.levels[this.currentLevel].rent,
+            forProperty: this.getBasicPropertyInfo(),
         };
-    },
-};
+    }
+}

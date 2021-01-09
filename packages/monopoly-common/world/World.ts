@@ -94,6 +94,17 @@ export class World {
         return this.makeRef(this.create(clazz, id));
     }
 
+    public add<T extends GameObject>(object: T) {
+        if (!this.idMap.has(object.type)) {
+            throw new Error(`object type ${object.type} is not registered`);
+        }
+        if (this.idMap.get(object.type)?.has(object.id)) {
+            throw new Error(`object ${object.type} already has an id ${object.id}`);
+        }
+        this.objectMap.set(object.id, object);
+        this.getIdSetOfSameType(object)?.add(object.id);
+    }
+
     public remove<T extends GameObject>(idOrGameObject: Id | T) {
         let deletedObject;
         if (typeof idOrGameObject === 'string') {

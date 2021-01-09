@@ -8,7 +8,7 @@ export enum MoneyExchangeDirection {
     TO_BANK,
 }
 
-export enum MonyExchangeType {
+export enum MoneyExchangeType {
     UNSPECIFIED, // the default, plain fixed amount exchange
     OWN_PROPERTY_PER_HUNDRED, // based on total worth of owned properties. For every hundred of worth, pay the amount.
 }
@@ -21,13 +21,13 @@ export interface ChanceInputArgs {
     };
     money_exchange: {
         direction: MoneyExchangeDirection;
-        type: MonyExchangeType;
+        type: MoneyExchangeType;
         amount: number;
     };
     move_steps: {
         steps: number;
     };
-    collectable: {
+    collectible: {
         type: chance.CollectibleExtra_CollectibleType;
     };
 }

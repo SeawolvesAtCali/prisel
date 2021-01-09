@@ -1,4 +1,4 @@
-import { log, Tile } from '@prisel/monopoly-common';
+import { Tile } from '@prisel/monopoly-common';
 import { CanvasForm, Geom, Group, Pt } from 'pts';
 import { tileCenter } from './tileCenter';
 
@@ -6,7 +6,7 @@ export function arrow(start: Pt, end: Pt, form: CanvasForm) {
     const line = new Group(start, end);
     const unit = end.$subtract(start);
     if (unit.magnitudeSq() === 0) {
-        log.warning(`cannot draw an arrow of length 0 at (${start.x}, ${start.y})`);
+        console.error(`cannot draw an arrow of length 0 at (${start.x}, ${start.y})`);
         return;
     }
     unit.unit();

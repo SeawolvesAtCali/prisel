@@ -1,4 +1,5 @@
-import { Coordinate, PropertyClass, TileClass, World } from '@prisel/monopoly-common';
+import { Property, Tile, World } from '@prisel/monopoly-common';
+import { coordinate } from '@prisel/protos';
 import { CanvasForm, Pt } from 'pts';
 import { CanvasOps } from '../CanvasOps';
 import { equal } from '../common';
@@ -9,23 +10,21 @@ import { Tool } from './Tool';
 export class Selector implements Tool {
     constructor(private world: World, private form: CanvasForm, private ops: CanvasOps) {}
 
-    onUp(coor: Coordinate, _: Pt, layer: LayerType) {
+    onUp(coor: coordinate.Coordinate, _: Pt, layer: LayerType) {
         if (this.ops.tempSelectingConfig) {
             // temp selecting
             const { tempSelectingConfig } = this.ops;
             switch (tempSelectingConfig.layer) {
                 case LayerType.TILE:
-                    const tile = this.world
-                        .getAll(TileClass)
-                        .find((tile) => equal(tile.position, coor));
+                    const tile = this.world.getAll(Tile).find((tile) => equal(tile.position, coor));
                     if (tile) {
                         tempSelectObject.pub(tile);
                     }
                     break;
                 case LayerType.PROPERTY:
                     const property = this.world
-                        .getAll(PropertyClass)
-                        .find((property) => equal(property.dimension.anchor, coor));
+                        .getAll(Property)
+                        .find((property) => equal(property.anchor, coor));
                     if (property) {
                         tempSelectObject.pub(property);
                     }
@@ -35,9 +34,7 @@ export class Selector implements Tool {
             // regular selecting
             switch (layer) {
                 case LayerType.TILE:
-                    const tile = this.world
-                        .getAll(TileClass)
-                        .find((tile) => equal(tile.position, coor));
+                    const tile = this.world.getAll(Tile).find((tile) => equal(tile.position, coor));
                     if (tile) {
                         selectObject.pub(tile);
                     } else {
@@ -46,8 +43,8 @@ export class Selector implements Tool {
                     break;
                 case LayerType.PROPERTY:
                     const property = this.world
-                        .getAll(PropertyClass)
-                        .find((property) => equal(property.dimension.anchor, coor));
+                        .getAll(Property)
+                        .find((property) => equal(property.anchor, coor));
                     if (property) {
                         selectObject.pub(property);
                     } else {

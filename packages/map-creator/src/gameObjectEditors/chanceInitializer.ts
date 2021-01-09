@@ -1,10 +1,10 @@
 import {
-    CashExchangeDirection,
-    CashExchangeType,
     ChanceInput,
     ChanceInputArgs,
-    CollectableType,
+    MoneyExchangeDirection,
+    MoneyExchangeType,
 } from '@prisel/monopoly-common';
+import { chance } from '@prisel/protos';
 
 export function chanceInitializer<T extends keyof ChanceInputArgs>(
     type: T,
@@ -35,29 +35,29 @@ export function chanceInitializer<T extends keyof ChanceInputArgs>(
                 },
             };
             return moveSteps;
-        case 'cash_exchange':
-            const cashExchange: ChanceInput<'cash_exchange'> = {
+        case 'money_exchange':
+            const cashExchange: ChanceInput<'money_exchange'> = {
                 display: {
                     title: 'cash exchange',
                     description: 'give or take cash',
                 },
-                type: 'cash_exchange',
+                type: 'money_exchange',
                 inputArgs: {
-                    direction: CashExchangeDirection.FROM_BANK,
-                    type: CashExchangeType.UNSPECIFIED,
+                    direction: MoneyExchangeDirection.FROM_BANK,
+                    type: MoneyExchangeType.UNSPECIFIED,
                     amount: 0,
                 },
             };
             return cashExchange;
-        case 'collectable':
-            const collectable: ChanceInput<'collectable'> = {
+        case 'collectible':
+            const collectable: ChanceInput<'collectible'> = {
                 display: {
-                    title: 'collectable',
+                    title: 'collectible',
                     description: "add something to player's possession",
                 },
-                type: 'collectable',
+                type: 'collectible',
                 inputArgs: {
-                    type: CollectableType.GET_OUT_OF_JAIL_FREE,
+                    type: chance.CollectibleExtra_CollectibleType.GET_OUT_OF_JAIL_FREE,
                 },
             };
             return collectable;

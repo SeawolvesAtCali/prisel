@@ -25,6 +25,7 @@ describe('GamePlayer', () => {
         player.pathTile = Ref.forTest<Tile>('tile1');
         player.rolled = true;
         const world = new World();
+        world.registerObject(GamePlayer);
         const deserialized = GamePlayer.deserialize(player.serialize(), world);
         expect(deserialized).toBeInstanceOf(GamePlayer);
         expect(deserialized.id).toBe('123');

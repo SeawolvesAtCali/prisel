@@ -1,10 +1,10 @@
-import { Coordinate, TileClass, World } from '@prisel/monopoly-common';
+import { Tile, World } from '@prisel/monopoly-common';
+import { coordinate } from '@prisel/protos';
 import { equal } from '../common';
 
-export function getOrCreateCurrentTile(coor: Coordinate, world: World) {
+export function getOrCreateCurrentTile(coor: coordinate.Coordinate, world: World) {
     const tile =
-        world.getAll(TileClass).find((tile) => equal(tile.position, coor)) ||
-        world.create(TileClass);
+        world.getAll(Tile).find((tile) => equal(tile.position, coor)) || world.create(Tile);
     tile.position = coor;
     if (!tile.check()) {
         throw new Error('tile incomplete');

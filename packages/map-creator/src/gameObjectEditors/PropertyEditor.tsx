@@ -21,7 +21,7 @@ export const PropertyEditor: React.FC<PropertyEditorProps> = ({ property }) => {
                 }}
             />
             <Divider />
-            <PropertyLevelsEditor propertyLevels={property.propertyLevel.levels} />
+            <PropertyLevelsEditor propertyLevels={property.levels} />
         </div>
     );
 };

@@ -1,13 +1,7 @@
-import {
-    Action,
-    Anim,
-    animationMap,
-    InitialStatePayload,
-    PlayerLeftPayload,
-    toAnimationPacket,
-} from '@prisel/monopoly-common';
-import { broadcast, isRequest, Packet, PacketType } from '@prisel/server';
-import { GamePlayer } from '../gameObjects/GamePlayer';
+import { Action, Anim, animationMap, GamePlayer, toAnimationPacket } from '@prisel/monopoly-common';
+import { animation_spec, announce_player_left_spec, get_initial_state_spec } from '@prisel/protos';
+import { Packet, Request, Response } from '@prisel/server';
+import { getPlayer } from '../utils';
 import { GameOver } from './GameOver';
 import { PreRoll } from './PreRoll';
 import { StateMachineState } from './StateMachineState';
@@ -41,15 +35,23 @@ export class GameStarted extends StateMachineState {
     }
 
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
-        switch (packet.action) {
+        switch (Packet.getAction(packet)) {
             case Action.GET_INITIAL_STATE:
-                if (isRequest(packet)) {
-                    gamePlayer.player.respond<InitialStatePayload>(packet, {
-                        gamePlayers: Array.from(this.game.players.values()).map((player) =>
+                if (Request.isRequest(packet)) {
+                    const initialStateResponse: get_initial_state_spec.GetInitialStateResponse = {
+                        players: Array.from(this.game.players.values()).map((player) =>
                             player.getGamePlayerInfo(),
                         ),
                         firstPlayerId: this.game.getCurrentPlayer().id,
-                    });
+                    };
+                    getPlayer(gamePlayer).respond(
+                        Response.forRequest(packet)
+                            .setPayload(
+                                get_initial_state_spec.GetInitialStateResponse,
+                                initialStateResponse,
+                            )
+                            .build(),
+                    );
                 }
                 return true;
             case Action.READY_TO_START_GAME:
@@ -57,11 +59,13 @@ export class GameStarted extends StateMachineState {
                     if (!this.sync.has(gamePlayer.id)) {
                         const startAndPan = Anim.sequence(
                             Anim.create('game_start').setLength(animationMap.game_start),
-                            Anim.create('pan', {
-                                target: this.game.getCurrentPlayer().pathTile.position,
-                            }).setLength(300),
+                            Anim.create('pan', animation_spec.PanExtra)
+                                .setExtra({
+                                    target: this.game.getCurrentPlayer().pathTile.get().position,
+                                })
+                                .setLength(300),
                         );
-                        gamePlayer.player.emit(toAnimationPacket(startAndPan));
+                        getPlayer(gamePlayer).emit(toAnimationPacket(startAndPan));
                         this.sync.add(gamePlayer.id);
                         if (this.sync.isSynced()) {
                             await Anim.wait(startAndPan).promise;
@@ -79,13 +83,14 @@ export class GameStarted extends StateMachineState {
 
     public onPlayerLeave(gamePlayer: GamePlayer) {
         // player left, let's just end the game
-        broadcast<PlayerLeftPayload>(this.game.room.getPlayers(), {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_PLAYER_LEFT,
-            payload: {
-                player: gamePlayer.getGamePlayerInfo(),
-            },
-        });
+        this.game.broadcast(
+            Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
+                .setPayload(announce_player_left_spec.AnnouncePlayerLeftPayload, {
+                    player: gamePlayer.getGamePlayerInfo(),
+                })
+                .build(),
+        );
+
         this.transition(GameOver);
     }
 

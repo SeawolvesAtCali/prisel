@@ -1,11 +1,11 @@
-import { World } from '@prisel/monopoly-common';
-import { Player, PlayerId, Room } from '@prisel/server';
-import { GamePlayer } from './gameObjects/GamePlayer';
+import { GamePlayer, Id, World } from '@prisel/monopoly-common';
+import { broadcast, Packet, Player, PlayerId, Room } from '@prisel/server';
 import { StateMachine } from './stateMachine/StateMachine';
 
 interface Props {
     id: string;
     players: Map<PlayerId, GamePlayer>;
+    getGamePlayerByPlayer: (player: Player) => GamePlayer | undefined;
     turnOrder: GamePlayer[];
     room: Room;
     world: World;
@@ -13,11 +13,13 @@ interface Props {
 
 export default class Game {
     public id: string;
+    // map of Id<GamePlayer>, GamePlayer
     public players: Map<string, GamePlayer>;
     public turnOrder: GamePlayer[];
     public room: Room;
     public stateMachine: StateMachine;
     public world: World;
+    private getGamePlayerByPlayer: Props['getGamePlayerByPlayer'];
 
     public init(props: Props) {
         this.id = props.id;
@@ -25,6 +27,7 @@ export default class Game {
         this.turnOrder = props.turnOrder;
         this.room = props.room;
         this.world = props.world;
+        this.getGamePlayerByPlayer = props.getGamePlayerByPlayer;
         return this;
     }
 
@@ -44,15 +47,23 @@ export default class Game {
         return this.turnOrder[0];
     }
 
-    public getPlayerId(player: Player): string {
-        return this.players.get(player.getId()).id;
+    public getGamePlayer(player: Player): GamePlayer | undefined {
+        return this.getGamePlayerByPlayer(player);
     }
 
-    public getGamePlayer(player: Player): GamePlayer {
-        return this.players.get(player.getId());
-    }
-    public getGamePlayerById(id: string): GamePlayer {
+    public getGamePlayerById(id: Id<GamePlayer>): GamePlayer | undefined {
         return this.players.get(id);
+    }
+
+    public broadcast(packetBuilder: ((player: GamePlayer) => Packet | undefined) | Packet) {
+        broadcast(this.room.getPlayers(), (player) => {
+            const gamePlayer = this.getGamePlayer(player);
+            if (gamePlayer) {
+                return typeof packetBuilder === 'function'
+                    ? packetBuilder(gamePlayer)
+                    : packetBuilder;
+            }
+        });
     }
 }
 

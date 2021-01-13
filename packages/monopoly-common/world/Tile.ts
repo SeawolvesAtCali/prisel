@@ -59,7 +59,7 @@ export class Tile extends GameObject {
         );
     }
 
-    genPathReverse(tile: Tile, steps: number) {
+    genPathReverse(steps: number) {
         return this.genPathWith((current, length) =>
             length === steps
                 ? undefined

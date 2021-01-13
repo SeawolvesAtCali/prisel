@@ -1,7 +1,8 @@
 scripts:
     default:
-        DEBUG=debug,psl:* PORT=3000 NODE_ENV=development ts-node --project demo.tsconfig.json
+        DEBUG=debug,psl:* PORT=3000 NODE_ENV=development ts-node --project tsconfig-build.json
         server.ts --unhandled-rejections=strict
     clean: rm -rf ./lib ./dist
-    ts-check: tsc
+    copy-data: cp -r ../monopoly-common/data ./dist
+    ts-check: tsc --project tsconfig-build.json
     build: rollup --config --silent

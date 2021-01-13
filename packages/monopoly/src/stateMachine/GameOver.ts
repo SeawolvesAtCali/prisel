@@ -1,13 +1,6 @@
-import {
-    Action,
-    GameOverPayload,
-    Mixins,
-    Properties,
-    PropertyClass,
-    Rank,
-} from '@prisel/monopoly-common';
-import { broadcast, isRequest, Packet, PacketType } from '@prisel/server';
-import { GamePlayer } from '../gameObjects/GamePlayer';
+import { Action, exist, GamePlayer, Property } from '@prisel/monopoly-common';
+import { announce_game_over_spec, rank } from '@prisel/protos';
+import { Packet, Request } from '@prisel/server';
 import { StateMachineState } from './StateMachineState';
 import { Sync, syncGamePlayer } from './utils';
 
@@ -15,13 +8,13 @@ export class GameOver extends StateMachineState {
     private sync: Sync;
     public async onEnter() {
         this.sync = syncGamePlayer(this.game);
-        broadcast<GameOverPayload>(this.game.room.getPlayers(), {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_GAME_OVER,
-            payload: {
-                ranks: this.computeRanks(),
-            },
-        });
+        this.game.broadcast(
+            Packet.forAction(Action.ANNOUNCE_GAME_OVER)
+                .setPayload(announce_game_over_spec.AnnounceGameOverPayload, {
+                    ranks: this.computeRanks(),
+                })
+                .build(),
+        );
     }
 
     private computeProperties() {
@@ -30,44 +23,37 @@ export class GameOver extends StateMachineState {
         for (const player of this.game.players.keys()) {
             playerPropertiesWorth.set(player, 0);
         }
-        for (const property of this.game.world.getAll(PropertyClass)) {
-            if (
-                Mixins.hasMixin(property, Mixins.OwnerMixinConfig) &&
-                playerPropertiesWorth.has(property.owner)
-            ) {
+        for (const property of this.game.world.getAll(Property)) {
+            if (exist(property.owner) && playerPropertiesWorth.has(property.owner.get().id)) {
                 playerPropertiesWorth.set(
-                    property.owner,
-                    playerPropertiesWorth.get(property.owner) + Properties.getWorth(property),
+                    property.owner.get().id,
+                    (playerPropertiesWorth.get(property.owner.get().id) || 0) + property.getWorth(),
                 );
             }
         }
         return playerPropertiesWorth;
     }
-    private computeRanks(): Rank[] {
+    private computeRanks(): rank.Rank[] {
         const propertiesWorthMap = this.computeProperties();
         return Array.from(this.game.players.values())
             .map((player) => ({
-                player: {
-                    name: player.player.getName(),
-                    id: player.player.getId(),
-                },
-                character: player.character,
+                player: player.getGamePlayerInfo(),
                 assets: {
-                    cash: player.cash,
+                    cash: player.money,
                     property: propertiesWorthMap.get(player.id),
-                    total: player.cash + propertiesWorthMap.get(player.id),
+                    total: player.money + (propertiesWorthMap.get(player.id) || 0),
                 },
             }))
             .sort((playerA, playerB) => {
                 if (playerA.assets.cash !== playerB.assets.cash) {
                     return playerA.assets.cash - playerB.assets.cash;
                 }
-                return playerA.assets.property - playerB.assets.property;
+                return (playerA.assets.property || 0) - (playerB.assets.property || 0);
             });
     }
 
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
-        if (isRequest(packet) && packet.action === Action.BACK_TO_ROOM) {
+        if (Request.isRequest(packet) && Packet.getAction(packet) === Action.BACK_TO_ROOM) {
             gamePlayer.player.respond(packet);
             if (this.sync.add(gamePlayer.id)) {
                 this.end();

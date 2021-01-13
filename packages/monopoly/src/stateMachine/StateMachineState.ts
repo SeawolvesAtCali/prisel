@@ -1,14 +1,13 @@
-import { AnimationPayload } from '@prisel/monopoly-common';
-import { broadcast, Packet } from '@prisel/server';
+import { GamePlayer } from '@prisel/monopoly-common';
+import { Packet } from '@prisel/server';
 import Game from '../Game';
-import { GamePlayer } from '../gameObjects/GamePlayer';
 import { StateMachine } from './StateMachine';
 
 export type StateMachineConstructor = new (game: Game, machine: StateMachine) => StateMachineState;
 export abstract class StateMachineState {
     protected game: Game;
     private machine: StateMachine;
-    private pendingTransition: StateMachineConstructor = null;
+    private pendingTransition?: StateMachineConstructor;
 
     constructor(game: Game, machine: StateMachine) {
         this.game = game;
@@ -54,12 +53,12 @@ export abstract class StateMachineState {
         this.machine.end();
     }
 
-    protected get broadcastAnimation(): (packet: Packet<AnimationPayload>) => void {
-        return (packet: Packet<AnimationPayload>) => {
+    protected get broadcastAnimation(): (packet: Packet) => void {
+        return (packet: Packet) => {
             if (packet === null || packet === undefined) {
                 throw new Error('cannot broadcast animation, found ' + packet);
             }
-            broadcast(this.game.room.getPlayers(), packet);
+            this.game.broadcast(packet);
         };
     }
 }

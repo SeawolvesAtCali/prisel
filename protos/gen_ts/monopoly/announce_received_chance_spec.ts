@@ -20,9 +20,9 @@ export interface AnnounceRecievedChancePayload {
      */
     player: string;
     /**
-     * @generated from protobuf field: monopoly.Chance change = 2;
+     * @generated from protobuf field: monopoly.Chance chance = 2;
      */
-    change?: Chance;
+    chance?: Chance;
 }
 /**
  * Type for protobuf message monopoly.AnnounceRecievedChancePayload
@@ -31,7 +31,7 @@ class AnnounceRecievedChancePayload$Type extends MessageType<AnnounceRecievedCha
     constructor() {
         super("monopoly.AnnounceRecievedChancePayload", [
             { no: 1, name: "player", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "change", kind: "message", T: () => Chance }
+            { no: 2, name: "chance", kind: "message", T: () => Chance }
         ]);
     }
     create(value?: PartialMessage<AnnounceRecievedChancePayload>): AnnounceRecievedChancePayload {
@@ -48,8 +48,8 @@ class AnnounceRecievedChancePayload$Type extends MessageType<AnnounceRecievedCha
                 case /* string player */ 1:
                     message.player = reader.string();
                     break;
-                case /* monopoly.Chance change */ 2:
-                    message.change = Chance.internalBinaryRead(reader, reader.uint32(), options, message.change);
+                case /* monopoly.Chance chance */ 2:
+                    message.chance = Chance.internalBinaryRead(reader, reader.uint32(), options, message.chance);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -66,9 +66,9 @@ class AnnounceRecievedChancePayload$Type extends MessageType<AnnounceRecievedCha
         /* string player = 1; */
         if (message.player !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.player);
-        /* monopoly.Chance change = 2; */
-        if (message.change)
-            Chance.internalBinaryWrite(message.change, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* monopoly.Chance chance = 2; */
+        if (message.chance)
+            Chance.internalBinaryWrite(message.chance, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

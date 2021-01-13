@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "prisel/annotations.proto";
+import "monopoly/coordinate.proto";
+
+message AnnounceRollPayload {
+  option (prisel.for_action) = {
+    type : "announce_roll"
+    packet_type : DEFAULT
+  };
+  string player = 1;
+  int32 steps = 2;
+  repeated Coordinate path = 3;
+  int32 my_money = 4;
+}

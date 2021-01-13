@@ -11,5 +11,5 @@ message AnnounceRecievedChancePayload {
     packet_type : DEFAULT
   };
   string player = 1;
-  Chance change = 2;
+  Chance chance = 2;
 }

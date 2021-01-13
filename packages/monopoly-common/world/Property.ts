@@ -85,10 +85,15 @@ export class Property extends GameObject {
         existingMoney: number,
     ): prompt_purchase_spec.PromptPurchaseRequest | null {
         if (this.currentLevel >= this.levels.length) {
+            // max level
+            return null;
+        }
+        const nextLevel = this.getNextLevel();
+        if (existingMoney < nextLevel.cost) {
+            // not enough money
             return null;
         }
 
-        const nextLevel = this.getNextLevel();
         return {
             property: nextLevel,
             levels: this.levels,

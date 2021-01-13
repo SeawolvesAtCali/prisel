@@ -1,7 +1,11 @@
-export * from './GameObject';
-export * from './Id';
-export * from './Property';
-export * from './ref2';
-export * from './serializeUtil';
-export * from './Tile';
-export * from './World';
+export { GameObject } from './GameObject';
+export type { GameObjectClass } from './GameObject';
+export { GamePlayer } from './GamePlayer';
+export type { Id } from './Id';
+export { Property } from './Property';
+export { Ref } from './ref2';
+export { jsonSerializable, listRefSerializable, refSerializable } from './serializeUtil';
+export type { Serialized } from './serializeUtil';
+export { Tile } from './Tile';
+export { World } from './World';
+export type { SerializedWorld } from './World';

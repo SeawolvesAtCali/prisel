@@ -112,6 +112,12 @@ export const Anim = {
     sequence(...animations: Animation[]): Animation {
         return new AnimationBuilder(AnimationType.SEQUENCE).addChildren(...animations).build();
     },
+    /**
+     * Package the animation into a packet and process it (usually emitting to
+     * client) then wait for the duration of the animation.
+     * @param processor A runnable that takes a Animation packet.
+     * @param animation The animation to be packaged and waited
+     */
     processAndWait(processor: (packet: Packet) => void, animation: Animation) {
         const packet = toAnimationPacket(animation);
         processor(packet);

@@ -1,11 +1,9 @@
 import { assertExist } from '@prisel/common';
-import { serializable } from 'serializr';
 import { GameObject } from './GameObject';
 import { Id } from './Id';
 import { World } from './World';
 
 export class Ref<T extends GameObject> {
-    @serializable
     id;
     world: World;
 

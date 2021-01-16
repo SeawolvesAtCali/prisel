@@ -12,7 +12,8 @@
     ],
     "scripts": {
         "build": "nps clean ts-check build",
-        "test": "jest"
+        "test": "jest",
+        "update-snapshot": "jest --updateSnapshot"
     },
     "jest": {
         "preset": "@prisel/jest-preset"

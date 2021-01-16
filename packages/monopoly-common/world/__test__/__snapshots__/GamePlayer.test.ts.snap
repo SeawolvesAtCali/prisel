@@ -6,16 +6,10 @@ Object {
     "character": 1,
     "money": 100,
     "owning": Array [
-      Object {
-        "id": "property1",
-      },
-      Object {
-        "id": "property2",
-      },
+      "property1",
+      "property2",
     ],
-    "pathTile": Object {
-      "id": "tile1",
-    },
+    "pathTile": "tile1",
     "rolled": true,
   },
   "id": "123",

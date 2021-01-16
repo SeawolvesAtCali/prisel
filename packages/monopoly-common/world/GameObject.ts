@@ -28,7 +28,7 @@ export abstract class GameObject {
         serialized: Serialized,
         world: World,
     ) {
-        const deserialized = deserialize(this, serialized.data);
+        const deserialized = deserialize(this, serialized.data, undefined, { world });
         deserialized.id = serialized.id;
         deserialized.world = world;
         world.add(deserialized);

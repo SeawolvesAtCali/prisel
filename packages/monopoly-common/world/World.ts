@@ -149,6 +149,10 @@ export class World {
                     for (const serializedObject of serialized[key]) {
                         clazz.deserialize(serializedObject, this);
                     }
+                } else {
+                    console.error(
+                        `Cannot deserialize object of type ${key}, type might not be registered in this world.`,
+                    );
                 }
             }
         }

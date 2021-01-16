@@ -11,8 +11,8 @@ test('serialize', () => {
         id: expect.any(String),
         type: 'tile',
         data: {
-            next: [{ id: expect.any(String) }],
-            prev: [{ id: expect.any(String) }],
+            next: [expect.any(String)],
+            prev: [expect.any(String)],
         },
     });
 });

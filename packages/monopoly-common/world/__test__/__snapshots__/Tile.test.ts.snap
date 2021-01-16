@@ -5,24 +5,16 @@ Object {
   "data": Object {
     "chancePool": "[{\\"display\\":{\\"title\\":\\"move to tile\\",\\"description\\":\\"description\\"},\\"type\\":\\"move_to_tile\\",\\"inputArgs\\":{\\"tileId\\":\\"1\\",\\"isTeleport\\":false}}]",
     "hasProperties": Array [
-      Object {
-        "id": "property1",
-      },
+      "property1",
     ],
     "isStart": true,
     "next": Array [
-      Object {
-        "id": "3",
-      },
+      "3",
     ],
     "position": "{\\"row\\":1,\\"col\\":2}",
     "prev": Array [
-      Object {
-        "id": "1",
-      },
-      Object {
-        "id": "2",
-      },
+      "1",
+      "2",
     ],
   },
   "id": "123",

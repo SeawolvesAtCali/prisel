@@ -1,17 +1,33 @@
-import { deserialize, serialize } from 'serializr';
+import { GameObject } from '../GameObject';
 import { Ref } from '../ref2';
+import { refSerializable } from '../serializeUtil';
+import { World } from '../World';
+
+class TestObject extends GameObject {
+    static TYPE = 'test';
+    readonly type = 'test';
+    @refSerializable
+    ref?: Ref<TestObject>;
+}
 
 describe('ref', () => {
     test('serialize', () => {
-        const ref = Ref.forTest('123');
-        expect(serialize(ref)).toMatchObject({
-            id: '123',
-        });
+        const world = new World();
+        world.registerObject(TestObject);
+        const object1 = world.create(TestObject, 'object1');
+        const object2Ref = world.createRef(TestObject, 'object2');
+        object1.ref = object2Ref;
+        expect(object1.serialize()).toMatchSnapshot();
     });
-    test('deserialize', () => {
-        const ref = Ref.forTest('123');
-        const deserialized = deserialize(Ref, serialize(ref));
-        expect(deserialized).toBeInstanceOf(Ref);
-        expect(deserialized.equals(ref)).toBe(true);
+    test('deserialize restores ref', () => {
+        const world = new World();
+        world.registerObject(TestObject);
+        const object1 = world.create(TestObject, 'object1');
+        const object2Ref = world.createRef(TestObject, 'object2');
+        object1.ref = object2Ref;
+
+        const serializedWorld = world.serialize();
+        const newWorld = new World().registerObject(TestObject).deserialize(serializedWorld);
+        expect(newWorld.get('object1').ref.get()).toBe(newWorld.get('object2'));
     });
 });

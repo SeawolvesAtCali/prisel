@@ -33,7 +33,7 @@ describe('GamePlayer', () => {
         expect(deserialized.owning).toHaveLength(2);
         expect(deserialized.owning[0].equals(Ref.forTest('property1'))).toBe(true);
         expect(deserialized.owning[1].equals(Ref.forTest('property2'))).toBe(true);
-        expect(deserialized.pathTile.equals(Ref.forTest('tile1'))).toBe(true);
+        expect(deserialized.pathTile?.equals(Ref.forTest('tile1'))).toBe(true);
         expect(deserialized.rolled).toBe(true);
         expect(deserialized.world).toBe(world);
     });

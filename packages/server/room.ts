@@ -24,7 +24,7 @@ export interface Room {
     getGameCapacity(): number;
     getPlayers(): Player[];
     hasPlayer(player: Player): boolean;
-    getHost(): Player | null;
+    getHost(): Player | undefined;
     setHost(player: Player): void;
     addPlayer(player: Player): void;
     getId(): string;
@@ -53,7 +53,7 @@ export interface RoomOption {
 class RoomImpl implements Room {
     private context;
     private players: Player[] = [];
-    private host: Player | null;
+    private host?: Player;
     private name;
     private id;
     private gamePhase: GAME_PHASE = GAME_PHASE.WAITING;
@@ -96,7 +96,7 @@ class RoomImpl implements Room {
     public removePlayer(player: Player) {
         this.players = this.players.filter((playerInRoom) => playerInRoom !== player);
         if (player.equals(this.host)) {
-            this.host = null;
+            this.host = undefined;
         }
     }
     public getHost() {

@@ -4,23 +4,26 @@
         "module": "esnext", // Output js using es6 import export. Rollup will further convert this to respected formats on different platform
         "declaration": true, // emit declaration
         "declarationMap": true,
-        "strictNullChecks": true,
+        // Enable all strict type checking options. Enabling --strict enables
+        // --noImplicitAny, --noImplicitThis, --alwaysStrict,
+        // --strictBindCallApply, --strictNullChecks, --strictFunctionTypes and
+        // --strictPropertyInitialization.
+        "strict": true,
         /**
-        * when importing commonjs
-        * exports = something
-        * treat something as default so that we can
-        * import something from 'commonjspkg';
-        * instead of
-        * import * as something from 'commonjspkg';
-        * which doesn't complie with es6 modules spec.
-        */
+         * when importing commonjs
+         * exports = something
+         * treat something as default so that we can
+         * import something from 'commonjspkg';
+         * instead of
+         * import * as something from 'commonjspkg';
+         * which doesn't complie with es6 modules spec.
+         */
         "esModuleInterop": true,
         "isolatedModules": true, // disallow typescript features that relies on cross-file compilation
         "target": "es6", // Node/commonjs supports es6 which uses es6 class. If we set the target to es5, typescript will use `Parent.call(this, ...) || this` instead of `new Parent(...)`, which violate the rule that es6 class can only be called with `new`.
         // https://stackoverflow.com/a/50203532
         // browser build should have additional rollup build to bundle
         // dependencies to es5
-        "noImplicitAny": true, // explicitly mark any type
         "moduleResolution": "node",
         "downlevelIteration": true, // certain strings such has emoji has length of 2, so iterating using for of should take two steps
         "preserveConstEnums": true, // const enums are not removed in generated code.

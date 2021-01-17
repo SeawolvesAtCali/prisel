@@ -17,7 +17,7 @@ import {
     payment,
     prompt_purchase_spec,
 } from '@prisel/protos';
-import { Packet, Request } from '@prisel/server';
+import { assertExist, Packet, Request } from '@prisel/server';
 import { chanceHandlers } from '../chanceHandlers/index';
 import { log } from '../log';
 import { getPlayer, getRand } from '../utils';
@@ -69,8 +69,14 @@ export class Moved extends StateMachineState {
                 .build(),
         );
 
-        const currentPlayerPos = this.game.getCurrentPlayer().pathTile.get().position;
-        const nextPlayerPos = this.game.getNextPlayer().pathTile.get().position;
+        const currentPlayerPos = assertExist(
+            this.game.getCurrentPlayer().pathTile?.get().position,
+            'currentPlayerPos',
+        );
+        const nextPlayerPos = assertExist(
+            this.game.getNextPlayer().pathTile?.get().position,
+            'nextPlayerPos',
+        );
 
         await Anim.processAndWait(
             this.broadcastAnimation,
@@ -97,7 +103,7 @@ export class Moved extends StateMachineState {
 
     private async processPropertyManagement() {
         const currentPlayer = this.game.getCurrentPlayer();
-        const currentPathTile = currentPlayer.pathTile.get();
+        const currentPathTile = assertExist(currentPlayer.pathTile?.get(), 'currentPathTile');
 
         if (currentPathTile.hasProperties.length > 0) {
             const properties = currentPathTile.hasProperties.map((propertyRef) =>
@@ -137,7 +143,7 @@ export class Moved extends StateMachineState {
     // return true if should continue current state
     private async processChance() {
         const currentPlayer = this.game.getCurrentPlayer();
-        const currentTile = currentPlayer.pathTile.get();
+        const currentTile = assertExist(currentPlayer.pathTile?.get(), 'currentTile');
 
         if (!exist(currentTile.chancePool)) {
             return;

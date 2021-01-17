@@ -5,7 +5,7 @@ import { World } from './World';
 
 export class Ref<T extends GameObject> {
     id;
-    world: World;
+    world?: World;
 
     static of<T extends GameObject>(object: T | Id<T>, world: World): Ref<T> {
         const ref = new Ref<T>(object instanceof GameObject ? object.id : object);

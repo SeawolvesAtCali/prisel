@@ -1,7 +1,7 @@
-import { Coordinate } from '@prisel/monopoly-common';
+import { coordinate } from '@prisel/protos';
 import { TILE_SIZE } from './consts';
 
-export function getTileKeyFromCoordinate(coor: Coordinate): string {
+export function getTileKeyFromCoordinate(coor: coordinate.Coordinate): string {
     return `${coor.row}-${coor.col}`;
 }
 
@@ -27,8 +27,8 @@ export function getRand<T>(list: T[]): T {
     return null;
 }
 
-export function legacyPlayAnimation(node: cc.Node, animationName: string): Promise<never> {
-    return new Promise((resolve, reject) => {
+export function legacyPlayAnimation(node: cc.Node, animationName: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
         const animationComp = node.getComponent(cc.Animation);
         if (!animationComp) {
             reject(new Error('cannot find animation component'));
@@ -81,7 +81,7 @@ export function assertNever(x: never): never {
     throw new Error('Unexpected value ' + x);
 }
 
-export function getTileAnchorPos(coor: Coordinate) {
+export function getTileAnchorPos(coor: coordinate.Coordinate) {
     return new cc.Vec2(coor.col * TILE_SIZE, -(coor.row + 1) * TILE_SIZE);
 }
 
@@ -99,7 +99,7 @@ export function playPromise(
     durationInMs: number,
 ): Promise<unknown> {
     const animationComp = play(comp, clip, durationInMs);
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
         const offListeners = () => {
             animationComp.off('stop', offListeners);
             animationComp.off('finished', offListeners);

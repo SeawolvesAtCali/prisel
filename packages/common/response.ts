@@ -13,8 +13,8 @@ function isResponse(p: packet.Packet | undefined): p is Response {
 }
 
 export class ResponseBuilder extends PacketBuilder {
-    id: Response['requestId'];
-    status: status.Status;
+    id: Response['requestId'] = '';
+    status: status.Status = { code: status.Status_Code.UNSPECIFIED };
     static forRequest(request: Request) {
         const builder = new ResponseBuilder();
         if (request.message.oneofKind === undefined) {

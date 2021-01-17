@@ -12,7 +12,7 @@ export class Tile extends GameObject {
     readonly type = 'tile';
 
     @jsonSerializable
-    position: coordinate.Coordinate;
+    position: coordinate.Coordinate = { row: -1, col: -1 };
 
     @listRefSerializable
     prev: Ref<Tile>[] = [];
@@ -66,5 +66,9 @@ export class Tile extends GameObject {
                 : // Choose a random next
                   getRand(current.prev)?.get(),
         );
+    }
+
+    hasPath() {
+        return this.prev.length > 0 || this.next.length > 0;
     }
 }

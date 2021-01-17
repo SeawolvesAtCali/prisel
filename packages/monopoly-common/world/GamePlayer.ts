@@ -1,5 +1,6 @@
 import { coordinate, game_player, payment, prompt_purchase_spec, property } from '@prisel/protos';
 import { serializable } from 'serializr';
+import { exist } from '../exist';
 import { GameObject } from './GameObject';
 import { Id } from './Id';
 import type { Property } from './Property';
@@ -27,7 +28,7 @@ export class GamePlayer extends GameObject {
     owning: Ref<Property>[] = [];
 
     @refSerializable
-    pathTile: Ref<Tile>;
+    pathTile?: Ref<Tile>;
 
     @serializable
     rolled = false;
@@ -76,9 +77,12 @@ export class GamePlayer extends GameObject {
     }
 
     public rollAndMove(): coordinate.Coordinate[] {
-        const path = this.roll(this.pathTile);
-        this.rolled = true;
-        return this.move(path);
+        if (exist(this.pathTile)) {
+            const path = this.roll(this.pathTile);
+            this.rolled = true;
+            return this.move(path);
+        }
+        throw new Error('player not in a pathTile, cannot roll and move');
     }
 
     public move(path: Tile[]) {
@@ -111,7 +115,7 @@ export class GamePlayer extends GameObject {
         return {
             id: this.id,
             money: this.money,
-            pos: this.pathTile.get().position,
+            pos: this.pathTile?.get().position,
             character: this.character,
         };
     }

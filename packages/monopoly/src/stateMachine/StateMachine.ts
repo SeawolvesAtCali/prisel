@@ -1,3 +1,4 @@
+import { exist } from '@prisel/monopoly-common';
 import { assertExist } from '@prisel/server';
 import Game from '../Game';
 import { log } from '../log';
@@ -6,7 +7,7 @@ import { StateMachineState } from './StateMachineState';
 export class StateMachine {
     private currentState?: StateMachineState;
     private game: Game;
-    private onEnd: () => void;
+    private onEnd?: () => void;
     constructor(game: Game) {
         this.game = game;
     }
@@ -27,7 +28,9 @@ export class StateMachine {
     public end() {
         assertExist(this.currentState).onExit();
         this.currentState = undefined;
-        setImmediate(this.onEnd);
+        if (exist(this.onEnd)) {
+            setImmediate(this.onEnd);
+        }
     }
 
     public transition(stateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {

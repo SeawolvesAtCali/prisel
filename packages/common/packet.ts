@@ -12,9 +12,10 @@ export type PayloadKey = Exclude<
     undefined | 'actionPayload'
 >;
 export class PacketBuilder {
-    message: 'systemAction' | 'action';
-    systemAction: system_action_type.SystemActionType;
-    action: string;
+    message: 'systemAction' | 'action' = 'action';
+    systemAction: system_action_type.SystemActionType =
+        system_action_type.SystemActionType.UNSPECIFIED;
+    action: string = 'unspecified';
     payload?: payload.Payload;
 
     public static forSystemAction(action: system_action_type.SystemActionType) {

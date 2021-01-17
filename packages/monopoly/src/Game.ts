@@ -1,5 +1,5 @@
 import { GamePlayer, Id, World } from '@prisel/monopoly-common';
-import { broadcast, Packet, Player, PlayerId, Room } from '@prisel/server';
+import { assertExist, broadcast, Packet, Player, PlayerId, Room } from '@prisel/server';
 import { StateMachine } from './stateMachine/StateMachine';
 
 interface Props {
@@ -12,21 +12,30 @@ interface Props {
 }
 
 export default class Game {
-    public id: string;
+    public id: string = '';
     // map of Id<GamePlayer>, GamePlayer
-    public players: Map<string, GamePlayer>;
-    public turnOrder: GamePlayer[];
-    public room: Room;
-    public stateMachine: StateMachine;
-    public world: World;
-    private getGamePlayerByPlayer: Props['getGamePlayerByPlayer'];
+    public players: Map<string, GamePlayer> = new Map();
+    public turnOrder: GamePlayer[] = [];
+    private _room?: Room;
+    public get room() {
+        return assertExist(this._room);
+    }
+
+    public stateMachine?: StateMachine;
+
+    private _world?: World;
+    public get world() {
+        return assertExist(this._world);
+    }
+
+    private getGamePlayerByPlayer: Props['getGamePlayerByPlayer'] = () => undefined;
 
     public init(props: Props) {
         this.id = props.id;
         this.players = props.players;
         this.turnOrder = props.turnOrder;
-        this.room = props.room;
-        this.world = props.world;
+        this._room = props.room;
+        this._world = props.world;
         this.getGamePlayerByPlayer = props.getGamePlayerByPlayer;
         return this;
     }

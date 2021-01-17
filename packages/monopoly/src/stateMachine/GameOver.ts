@@ -5,7 +5,7 @@ import { StateMachineState } from './StateMachineState';
 import { Sync, syncGamePlayer } from './utils';
 
 export class GameOver extends StateMachineState {
-    private sync: Sync;
+    private sync?: Sync;
     public async onEnter() {
         this.sync = syncGamePlayer(this.game);
         this.game.broadcast(
@@ -55,7 +55,7 @@ export class GameOver extends StateMachineState {
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
         if (Request.isRequest(packet) && Packet.getAction(packet) === Action.BACK_TO_ROOM) {
             gamePlayer.player.respond(packet);
-            if (this.sync.add(gamePlayer.id)) {
+            if (this.sync?.add(gamePlayer.id)) {
                 this.end();
             }
             return true;
@@ -64,7 +64,7 @@ export class GameOver extends StateMachineState {
     }
 
     public onPlayerLeave(gamePlayer: GamePlayer) {
-        if (this.sync.isSynced()) {
+        if (this.sync?.isSynced()) {
             this.end();
         }
     }

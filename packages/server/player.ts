@@ -27,7 +27,7 @@ export interface Player {
     request(requestBuilder: RequestBuilder, timeout?: number): Promise<Response>;
     respond(response: Response): void;
     getSocket(): WebSocket;
-    equals(player: Player | null): boolean;
+    equals(player: Player | undefined): boolean;
 }
 
 export interface PlayerOption {

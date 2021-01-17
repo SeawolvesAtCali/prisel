@@ -54,7 +54,7 @@ export class Client<T = State> {
     private requestManager: RequestManager;
     private listeners: PubSub | undefined = new PubSub();
     private systemActionListener = new PubSub();
-    private onEmitCallback: (packet: Packet) => void;
+    private onEmitCallback?: (packet: Packet) => void;
 
     constructor(server: string = SERVER) {
         this.state = {};

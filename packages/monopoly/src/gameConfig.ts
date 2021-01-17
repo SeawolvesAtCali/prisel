@@ -59,7 +59,7 @@ const MonopolyGameConfig: GameConfig = {
     onRemovePlayer(room, player) {
         const game = room.getGame<Game>();
         const gamePlayer = game.getGamePlayer(player);
-        if (game && game.stateMachine && exist(gamePlayer)) {
+        if (exist(game?.stateMachine) && exist(gamePlayer)) {
             game.stateMachine.state?.onPlayerLeave(gamePlayer);
         }
     },

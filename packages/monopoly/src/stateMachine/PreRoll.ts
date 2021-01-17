@@ -6,7 +6,7 @@ import {
     announce_start_turn_spec,
     roll_spec,
 } from '@prisel/protos';
-import { Packet, Request, Response } from '@prisel/server';
+import { assertExist, Packet, Request, Response } from '@prisel/server';
 import { getPlayer } from '../utils';
 import { GameOver } from './GameOver';
 import { Moved } from './Moved';
@@ -70,7 +70,10 @@ export class PreRoll extends StateMachineState {
                     Request.isRequest(packet) &&
                     this.game.isCurrentPlayer(gamePlayer)
                 ) {
-                    const initialPos = gamePlayer.pathTile.get().position;
+                    const initialPos = assertExist(
+                        gamePlayer.pathTile?.get().position,
+                        'initialPos',
+                    );
                     const pathCoordinates = gamePlayer.rollAndMove();
                     this.rolled = true;
                     const steps = pathCoordinates.length;

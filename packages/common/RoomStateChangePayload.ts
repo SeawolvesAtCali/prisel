@@ -3,8 +3,8 @@ import { player_info, room_state_change_spec, update_token } from '@prisel/proto
 export type RoomStateChangePayload = room_state_change_spec.RoomStateChangePayload;
 
 class Builder {
-    payload: Partial<room_state_change_spec.RoomStateChangePayload>;
-    token: update_token.UpdateToken;
+    payload: Partial<room_state_change_spec.RoomStateChangePayload> = {};
+    token?: update_token.UpdateToken;
 
     public static forPlayerJoin(playerInfo: player_info.PlayerInfo) {
         const builder = new Builder();

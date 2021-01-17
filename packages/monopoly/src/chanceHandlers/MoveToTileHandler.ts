@@ -1,4 +1,4 @@
-import { Action, Anim, animationMap } from '@prisel/monopoly-common';
+import { Action, Anim, animationMap, exist } from '@prisel/monopoly-common';
 import { animation_spec, announce_received_chance_spec } from '@prisel/protos';
 import { Packet } from '@prisel/server';
 import { Moved } from '../stateMachine/Moved';
@@ -8,7 +8,10 @@ import { ChanceHandler } from './ChanceHander';
 const MAX_PATH_LENGTH = 1000;
 export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, input) => {
     const currentPlayer = game.getCurrentPlayer();
-    const currentTile = currentPlayer.pathTile.get();
+    const currentTile = currentPlayer.pathTile?.get();
+    if (!exist(currentTile)) {
+        return;
+    }
     const currentLocation = currentTile.position;
 
     const path = currentTile.genPathWith((current, length) => {

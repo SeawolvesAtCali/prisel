@@ -11,7 +11,7 @@ function isRequest(p: packet.Packet | undefined): p is Request {
 }
 
 export class RequestBuilder extends PacketBuilder {
-    id: Request['requestId'];
+    id: Request['requestId'] = '';
 
     public static forSystemAction(action: system_action_type.SystemActionType) {
         const builder = new RequestBuilder();

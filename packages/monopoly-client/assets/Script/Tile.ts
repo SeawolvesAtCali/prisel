@@ -1,4 +1,4 @@
-import { Mixins, Tile } from '@prisel/monopoly-common';
+import { Tile } from '@prisel/monopoly-common';
 import {
     LANDING_POS_OFFSET,
     PLAYER_Z_INDEX_OFFSET,
@@ -51,13 +51,13 @@ export default class TileWrapper extends cc.Component {
 
     public getSprite(): string {
         const pos = this.tile.position;
-        if (Mixins.hasMixin(this.tile, Mixins.PathMixinConfig)) {
+        if (this.tile.hasPath()) {
             let up = false;
             let down = false;
             let left = false;
             let right = false;
-            for (const prevRef of this.tile.path.prev) {
-                const prev = prevRef();
+            for (const prevRef of this.tile.prev) {
+                const prev = prevRef.get();
                 if (prev.position.col === pos.col && prev.position.row === pos.row + 1) {
                     down = true;
                 }
@@ -71,8 +71,8 @@ export default class TileWrapper extends cc.Component {
                     left = true;
                 }
             }
-            for (const nextRef of this.tile.path.next) {
-                const next = nextRef();
+            for (const nextRef of this.tile.next) {
+                const next = nextRef.get();
                 if (next.position.col === pos.col && next.position.row === pos.row + 1) {
                     down = true;
                 }

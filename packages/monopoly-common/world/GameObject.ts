@@ -1,4 +1,5 @@
 import { deserialize, serialize } from 'serializr';
+import { exist } from '../exist';
 import { Serialized } from './serializeUtil';
 import { World } from './World';
 
@@ -12,9 +13,18 @@ export abstract class GameObject {
     /**
      * Id uniquely identify a game object
      */
-    public id: string;
+    public id: string = '';
 
-    public world: World;
+    private _world?: World;
+    public get world() {
+        if (exist(this._world)) {
+            return this._world;
+        }
+        throw new Error(`GameObject with id ${this.id} doesn't have a world assigned`);
+    }
+    public set world(world: World) {
+        this._world = world;
+    }
 
     // Child type of GameObject should all provide a no argument constructor, or
     // just don't add constructor. This allows world to create any GameObject

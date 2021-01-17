@@ -12,10 +12,10 @@ export class Property extends GameObject {
     readonly type = 'property';
 
     @jsonSerializable
-    anchor: coordinate.Coordinate;
+    anchor: coordinate.Coordinate = { row: -1, col: -1 };
 
     @jsonSerializable
-    size: Size;
+    size: Size = { width: 0, height: 0 };
 
     @serializable
     currentLevel = -1;

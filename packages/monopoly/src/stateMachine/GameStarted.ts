@@ -28,7 +28,7 @@ import { Sync, syncGamePlayer } from './utils';
  * animations: game_start, pan
  */
 export class GameStarted extends StateMachineState {
-    private sync: Sync;
+    private sync?: Sync;
 
     public onEnter() {
         this.sync = syncGamePlayer(this.game);
@@ -56,18 +56,18 @@ export class GameStarted extends StateMachineState {
                 return true;
             case Action.READY_TO_START_GAME:
                 (async () => {
-                    if (!this.sync.has(gamePlayer.id)) {
+                    if (!this.sync?.has(gamePlayer.id)) {
                         const startAndPan = Anim.sequence(
                             Anim.create('game_start').setLength(animationMap.game_start),
                             Anim.create('pan', animation_spec.PanExtra)
                                 .setExtra({
-                                    target: this.game.getCurrentPlayer().pathTile.get().position,
+                                    target: this.game.getCurrentPlayer().pathTile?.get().position,
                                 })
                                 .setLength(300),
                         );
                         getPlayer(gamePlayer).emit(toAnimationPacket(startAndPan));
-                        this.sync.add(gamePlayer.id);
-                        if (this.sync.isSynced()) {
+                        this.sync?.add(gamePlayer.id);
+                        if (this.sync?.isSynced()) {
                             await Anim.wait(startAndPan).promise;
                             if (this.isTransitioned()) {
                                 return;

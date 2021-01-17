@@ -1,16 +1,12 @@
-import {
-    Client,
-    JoinPayload,
-    JoinResponsePayload,
-    LobbyRoomViewInfo,
-    Messages,
-    ResponseWrapper,
-} from '@prisel/client';
+import { Client, Messages, Packet } from '@prisel/client';
+import { exist } from '@prisel/monopoly-common';
+import { get_lobby_state_spec } from '@prisel/protos';
 import { client, ClientState } from './Client';
 import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
+type LobbyRoomViewInfo = get_lobby_state_spec.GetLobbyStateResponse_LobbyRoomViewInfo;
 @ccclass
 export default class RoomView extends cc.Component {
     @property(cc.Label)
@@ -36,12 +32,12 @@ export default class RoomView extends cc.Component {
     }
 
     private async handleJoin() {
-        const response: ResponseWrapper<JoinResponsePayload> = await this.client.request<
-            JoinPayload
-        >(Messages.getJoin(this.client.newId(), nullCheck(this.roomViewInfo).room.id));
-
-        if (response.ok()) {
-            const payload = response.payload;
+        const response = await this.client.request(
+            Messages.getJoin(this.client.newId(), nullCheck(this.roomViewInfo).room.id),
+        );
+        // Packet.getPayload()
+        const payload = Packet.getPayload(response, 'joinResponse');
+        if (Packet.isStatusOk(response) && exist(payload)) {
             this.client.setState({
                 roomId: payload.room.id,
                 roomName: payload.room.name,

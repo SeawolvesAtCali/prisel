@@ -2,11 +2,7 @@ module.exports = {
     verbose: true,
     globals: {
         'ts-jest': {
-            tsConfig: '<rootDir>/tsconfig.json',
-            // this is required otherwise ts-jest throw warning for not able to
-            // find project root
-            // https://github.com/kulshekhar/ts-jest/issues/823#issuecomment-515529012
-            packageJson: 'package.json',
+            tsconfig: '<rootDir>/tsconfig.json',
         },
     },
     transform: {
@@ -20,5 +16,5 @@ module.exports = {
     // TODO(minor) Although this seems to conflict with TestEnvironment in e2e. With
     // TestEnvironment, we still output to stderr.
     reporters: ['jest-standard-reporter'],
-    testEnvironment: "node"
+    testEnvironment: 'node',
 };

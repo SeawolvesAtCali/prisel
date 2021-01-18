@@ -39,6 +39,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@protobuf-ts/protoc",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@protobuf-ts/runtime",
       "allowedCategories": [ "production", "prototype" ]
     },

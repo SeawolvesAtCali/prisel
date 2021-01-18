@@ -1,5 +1,6 @@
 dependencies:
   '@protobuf-ts/plugin': 1.0.12
+  '@protobuf-ts/protoc': 1.0.12
   '@protobuf-ts/runtime': 1.0.12
   '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
   '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
@@ -16470,6 +16471,7 @@ packages:
   'file:projects/protos.tgz':
     dependencies:
       '@protobuf-ts/plugin': 1.0.12
+      '@protobuf-ts/protoc': 1.0.12
       '@protobuf-ts/runtime': 1.0.12
       '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
       '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
@@ -16488,7 +16490,7 @@ packages:
     dev: false
     name: '@rush-temp/protos'
     resolution:
-      integrity: sha512-W/nItffN3a7nPpFjqrpiy0g7yb49VNYOFeunUxROeUctMCxNo7w5HISCLZp63y8wl3Vef+qSnmiKQrswVQzfrg==
+      integrity: sha512-dHwMh4E9YmBL/dgtQU8wN6vV81ilob9/hHzo29hu2eP9lKkCe2ws5x3P1+UioTdY8gP4RWbgJMmSILpDNUUJfw==
       tarball: 'file:projects/protos.tgz'
     version: 0.0.0
   'file:projects/react.tgz_ts-node@8.10.2':
@@ -16597,7 +16599,8 @@ packages:
     version: 9.0.3
 registry: ''
 specifiers:
-  '@protobuf-ts/plugin': ^1.0.10
+  '@protobuf-ts/plugin': 1.0.12
+  '@protobuf-ts/protoc': 1.0.12
   '@protobuf-ts/runtime': ^1.0.10
   '@rollup/plugin-commonjs': ^11.1.0
   '@rollup/plugin-node-resolve': ^7.1.3

@@ -22,7 +22,8 @@
     },
     "devDependencies": {
         "@prisel/configs": "1.0.0",
-        "@protobuf-ts/plugin": "^1.0.10",
+        "@protobuf-ts/protoc": "1.0.12",
+        "@protobuf-ts/plugin": "1.0.12",
         "barrelsby": "^2.2.0",
         "nps": "^5.9.12",
         "rollup": "^2.7.6",

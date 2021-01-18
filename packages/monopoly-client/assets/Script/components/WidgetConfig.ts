@@ -1,12 +1,13 @@
+import { exist } from '@prisel/monopoly-common';
 import { ComponentConfig } from './ComponentConfig';
 
 export class WidgetConfig extends ComponentConfig {
-    public top: number | undefined = undefined;
-    public bottom: number | undefined = undefined;
-    public left: number | undefined = undefined;
-    public right: number | undefined = undefined;
-    public horizontalCenter: boolean = undefined;
-    public veritcalCenter: boolean = undefined;
+    public top?: number;
+    public bottom?: number;
+    public left?: number;
+    public right?: number;
+    public horizontalCenter?: boolean;
+    public veritcalCenter?: boolean;
 
     protected getClass() {
         return cc.Widget;
@@ -68,21 +69,25 @@ export class WidgetConfig extends ComponentConfig {
         widget.isAlignLeft = this.left !== undefined;
         widget.isAlignRight = this.right !== undefined;
 
-        if (widget.isAlignTop) {
+        if (widget.isAlignTop && exist(this.top)) {
             widget.top = this.top;
         }
-        if (widget.isAlignLeft) {
+        if (widget.isAlignLeft && exist(this.left)) {
             widget.left = this.left;
         }
-        if (widget.isAlignRight) {
+        if (widget.isAlignRight && exist(this.right)) {
             widget.right = this.right;
         }
-        if (widget.isAlignBottom) {
+        if (widget.isAlignBottom && exist(this.bottom)) {
             widget.bottom = this.bottom;
         }
 
-        widget.isAlignHorizontalCenter = this.horizontalCenter;
-        widget.isAlignVerticalCenter = this.veritcalCenter;
+        if (exist(this.horizontalCenter)) {
+            widget.isAlignHorizontalCenter = this.horizontalCenter;
+        }
+        if (exist(this.veritcalCenter)) {
+            widget.isAlignVerticalCenter = this.veritcalCenter;
+        }
 
         // Default align mode is ON_WINDOW_RESIZE. This doesn't respond to
         // contentSize change due to setContentSize or new items added to Layout

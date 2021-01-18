@@ -1,4 +1,4 @@
-import { GamePlayer, Id, World } from '@prisel/monopoly-common';
+import { exist, GamePlayer, Id, World } from '@prisel/monopoly-common';
 import { assertExist, broadcast, Packet, Player, PlayerId, Room } from '@prisel/server';
 import { StateMachine } from './stateMachine/StateMachine';
 
@@ -49,7 +49,9 @@ export default class Game {
     }
 
     public isCurrentPlayer(player: GamePlayer) {
-        return this.turnOrder[0].player.equals(player.player);
+        const currentPlayerId = this.turnOrder[0].id;
+        const playerId = player.getGamePlayerInfo().id;
+        return exist(currentPlayerId) && currentPlayerId === playerId;
     }
 
     public getCurrentPlayer(): GamePlayer {

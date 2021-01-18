@@ -1,3 +1,4 @@
+import { assertExist } from '@prisel/client';
 import { EVENT, EVENT_BUS } from './consts';
 import { legacyPlayAnimation } from './utils';
 
@@ -7,9 +8,9 @@ const { ccclass, property } = cc._decorator;
 export default class Dice extends cc.Component {
     @property(cc.SpriteFrame)
     private pointSprites: cc.SpriteFrame[] = [];
-    private value: 1 | 2 | 3 | 4 | 5 | 6;
-    private sprite: cc.Sprite = null;
-    private eventBus: cc.Node = null;
+    private value: 1 | 2 | 3 | 4 | 5 | 6 = 1;
+    private sprite?: cc.Sprite;
+    private eventBus?: cc.Node;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -22,7 +23,7 @@ export default class Dice extends cc.Component {
 
     // called by animation event, set through timeline editor
     public updateSprite() {
-        this.sprite.spriteFrame = this.pointSprites[this.value - 1];
+        assertExist(this.sprite).spriteFrame = this.pointSprites[this.value - 1];
     }
 
     public setValue(num: number) {

@@ -10,6 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { PlayerInfo } from "../prisel/player_info";
 import { Coordinate } from "./coordinate";
 /**
  * @generated from protobuf message monopoly.GamePlayer
@@ -34,6 +35,10 @@ export interface GamePlayer {
      * @generated from protobuf field: int32 character = 4;
      */
     character: number;
+    /**
+     * @generated from protobuf field: prisel.PlayerInfo bound_player = 5;
+     */
+    boundPlayer?: PlayerInfo;
 }
 /**
  * Type for protobuf message monopoly.GamePlayer
@@ -44,7 +49,8 @@ class GamePlayer$Type extends MessageType<GamePlayer> {
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "money", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "pos", kind: "message", T: () => Coordinate },
-            { no: 4, name: "character", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 4, name: "character", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "bound_player", kind: "message", T: () => PlayerInfo }
         ]);
     }
     create(value?: PartialMessage<GamePlayer>): GamePlayer {
@@ -70,6 +76,9 @@ class GamePlayer$Type extends MessageType<GamePlayer> {
                 case /* int32 character */ 4:
                     message.character = reader.int32();
                     break;
+                case /* prisel.PlayerInfo bound_player */ 5:
+                    message.boundPlayer = PlayerInfo.internalBinaryRead(reader, reader.uint32(), options, message.boundPlayer);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -94,6 +103,9 @@ class GamePlayer$Type extends MessageType<GamePlayer> {
         /* int32 character = 4; */
         if (message.character !== 0)
             writer.tag(4, WireType.Varint).int32(message.character);
+        /* prisel.PlayerInfo bound_player = 5; */
+        if (message.boundPlayer)
+            PlayerInfo.internalBinaryWrite(message.boundPlayer, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

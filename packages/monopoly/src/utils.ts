@@ -24,5 +24,5 @@ export function checkType<T>(a: T): T {
 }
 
 export function getPlayer(gamePlayer: GamePlayer): Player {
-    return gamePlayer.player;
+    return gamePlayer.player as Player;
 }

@@ -1,6 +1,7 @@
 import { Action, exist, GamePlayer, Property } from '@prisel/monopoly-common';
 import { announce_game_over_spec, rank } from '@prisel/protos';
-import { Packet, Request } from '@prisel/server';
+import { Packet, Request, Response } from '@prisel/server';
+import { getPlayer } from '../utils';
 import { StateMachineState } from './StateMachineState';
 import { Sync, syncGamePlayer } from './utils';
 
@@ -54,7 +55,7 @@ export class GameOver extends StateMachineState {
 
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
         if (Request.isRequest(packet) && Packet.getAction(packet) === Action.BACK_TO_ROOM) {
-            gamePlayer.player.respond(packet);
+            getPlayer(gamePlayer).respond(Response.forRequest(packet).build());
             if (this.sync?.add(gamePlayer.id)) {
                 this.end();
             }

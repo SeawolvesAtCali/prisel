@@ -20,7 +20,7 @@ export class LabelConfig extends ComponentConfig {
     public verticalAlign: cc.Label.VerticalAlign = cc.Label.VerticalAlign.CENTER;
     public fontSize: number = 40;
     public lineHeight: number = 40;
-    public font: cc.Font;
+    public font?: cc.Font;
     public overflow: cc.Label.Overflow = cc.Label.Overflow.NONE;
 
     protected getClass() {
@@ -55,6 +55,8 @@ export class LabelConfig extends ComponentConfig {
         comp.verticalAlign = this.verticalAlign;
         comp.fontSize = this.fontSize;
         comp.lineHeight = this.lineHeight;
-        comp.font = this.font;
+        if (this.font) {
+            comp.font = this.font;
+        }
     }
 }

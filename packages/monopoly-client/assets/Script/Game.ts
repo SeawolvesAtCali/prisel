@@ -1,29 +1,24 @@
-import { Client, Messages, Packet, PacketType, Request, ResponseWrapper } from '@prisel/client';
+import { assertExist, Messages, Packet, Request, Response } from '@prisel/client';
+import { Action, BoardSetup, GamePlayer, Property, Tile, World } from '@prisel/monopoly-common';
 import {
-    Action,
-    BoardSetup,
-    GameOverPayload,
-    GamePlayerInfo,
-    InitialStatePayload,
-    PlayerBankruptPayload,
-    PlayerEndTurnPayload,
-    PlayerLeftPayload,
-    PlayerPayRentPayload,
-    PlayerPurchasePayload,
-    PlayerRollPayload,
-    PlayerStartTurnPayload,
-    PromptPurchasePayload,
-    PromptPurchaseResponsePayload,
-    PropertyClass,
-    RollResponsePayload,
-    TileClass,
-    World,
-} from '@prisel/monopoly-common';
-import { client, ClientState } from './Client';
+    announce_bankrupt_spec,
+    announce_end_turn_spec,
+    announce_game_over_spec,
+    announce_pay_rent_spec,
+    announce_player_left_spec,
+    announce_purchase_spec,
+    announce_roll_spec,
+    announce_start_turn_spec,
+    game_player,
+    get_initial_state_spec,
+    prompt_purchase_spec,
+    roll_spec,
+} from '@prisel/protos';
+import { client } from './Client';
 import { CHARACTER_COLORS, EVENT, EVENT_BUS } from './consts';
 import MapLoader from './MapLoader';
 import Player from './Player';
-import { lifecycle, nullCheck } from './utils';
+import { lifecycle } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
@@ -33,26 +28,26 @@ export default class Game extends cc.Component {
     private mapJsonPath = '';
 
     @property(cc.Prefab)
-    private playerPrefab: cc.Prefab = null;
+    private playerPrefab?: cc.Prefab;
 
     @property(cc.Node)
-    private mapNode: cc.Node = null;
+    private mapNode?: cc.Node;
 
     private funcWaitingForStart: Array<() => void> = [];
     private started = false;
-    private client: Client<ClientState> = null;
+    private client = client;
     private offPacketListeners: Array<() => void> = [];
-    private map: MapLoader = null;
+    private map?: MapLoader;
     private playerNodes: cc.Node[] = [];
 
-    public world: World = null;
+    public world?: World;
 
-    private eventBus: cc.Node = null;
+    private eventBus?: cc.Node;
 
-    private static instance: Game = null;
+    private static instance?: Game;
 
     public static get() {
-        return Game.instance;
+        return assertExist(Game.instance);
     }
 
     @lifecycle
@@ -75,10 +70,11 @@ export default class Game extends cc.Component {
 
     private async setupGame(boardSetup: BoardSetup) {
         this.world = new World()
-            .registerObject(TileClass)
-            .registerObject(PropertyClass)
+            .registerObject(Tile)
+            .registerObject(Property)
+            .registerObject(GamePlayer)
             .deserialize(boardSetup.world);
-        this.map = this.mapNode.getComponent(MapLoader);
+        this.map = assertExist(this.mapNode).getComponent(MapLoader);
         this.map.renderMap(this.world, boardSetup);
 
         this.offPacketListeners.push(
@@ -115,146 +111,186 @@ export default class Game extends cc.Component {
             ),
         );
 
-        const response: ResponseWrapper<InitialStatePayload> = await this.client.request({
-            type: PacketType.REQUEST,
-            request_id: this.client.newId(),
-            action: Action.GET_INITIAL_STATE,
-            payload: {},
-        });
+        // inital state payload
+        const response = await this.client.request(
+            Request.forAction(Action.GET_INITIAL_STATE).setId(this.client.newId()).build(),
+        );
+
+        const initialStateResponse = assertExist(
+            Packet.getPayload(response, get_initial_state_spec.GetInitialStateResponse),
+        );
 
         // CHARACTER_COLORS[gamePlayer.character]
-        for (const gamePlayer of response.payload.gamePlayers) {
-            if (gamePlayer.player.id === this.client.state.id) {
-                this.eventBus.emit(EVENT.UPDATE_MY_GAME_PLAYER_INFO, gamePlayer);
+        for (const gamePlayer of initialStateResponse.players) {
+            if (gamePlayer.boundPlayer?.id === this.client.state.id) {
+                this.client.setState({ gamePlayerId: gamePlayer.id });
+                this.eventBus?.emit(EVENT.UPDATE_MY_GAME_PLAYER_INFO, gamePlayer);
             }
             const newPlayer = this.instantiatePlayer(gamePlayer);
             this.playerNodes.push(newPlayer);
         }
 
-        this.client.emit<Packet>({
-            type: PacketType.DEFAULT,
-            action: Action.READY_TO_START_GAME,
-            payload: {},
-        });
+        this.client.emit<Packet>(Packet.forAction(Action.READY_TO_START_GAME).build());
     }
 
-    private handleAnnounceStartTurn(packet: Packet<PlayerStartTurnPayload>) {
-        const isCurrentPlayerTurn = packet.payload.id === this.client.state.id;
+    private handleAnnounceStartTurn(packet: Packet) {
+        const announceStartTurnPayload = assertExist(
+            Packet.getPayload(packet, announce_start_turn_spec.AnnounceStartTurnPayload),
+        );
+
+        const isCurrentPlayerTurn =
+            announceStartTurnPayload.player === this.client.state.gamePlayerId;
         if (isCurrentPlayerTurn) {
-            this.eventBus.emit(EVENT.START_CURRENT_PLAYER_TURN);
+            this.eventBus?.emit(EVENT.START_CURRENT_PLAYER_TURN);
         }
     }
 
     public getPlayerNodes(): cc.Node[] {
         return this.playerNodes;
     }
-    public getPlayerNode(id: string): cc.Node {
+    public getPlayerNode(id: string): cc.Node | undefined {
         return this.getPlayerNodes().find((node) => node.getComponent(Player).getId() === id);
     }
 
-    private async handleAnnounceRoll(packet: Packet<PlayerRollPayload>) {
-        const { id } = packet.payload;
+    private async handleAnnounceRoll(packet: Packet) {
+        const announceRollPayload = assertExist(
+            Packet.getPayload(packet, announce_roll_spec.AnnounceRollPayload),
+        );
+        const { player } = announceRollPayload;
 
-        const playerNode = this.getPlayerNode(id);
+        const playerNode = assertExist(this.getPlayerNode(player));
         const playerComponent = playerNode.getComponent(Player);
-        playerComponent.pos = packet.payload.path.slice(-1)[0];
+        playerComponent.pos = announceRollPayload.path.slice(-1)[0];
     }
 
-    private handleAnnouncePayRent(packet: Packet<PlayerPayRentPayload>) {
-        this.eventBus.emit(EVENT.UPDATE_MY_MONEY, packet.payload.myCurrentMoney);
+    private handleAnnouncePayRent(packet: Packet) {
+        const announcePayRentPayload = assertExist(
+            Packet.getPayload(packet, announce_pay_rent_spec.AnnouncePayRentPayload),
+        );
+        this.eventBus?.emit(EVENT.UPDATE_MY_MONEY, announcePayRentPayload.myCurrentMoney);
     }
 
-    private async handlePurchasePrompt(packet: Request<PromptPurchasePayload>) {
-        this.eventBus.emit(EVENT.PROMPT_PURCHASE, packet.payload);
+    private async handlePurchasePrompt(packet: Request) {
+        const promptPurchaseRequest = assertExist(
+            Packet.getPayload(packet, prompt_purchase_spec.PromptPurchaseRequest),
+        );
+
+        this.eventBus?.emit(EVENT.PROMPT_PURCHASE, promptPurchaseRequest);
         const purchase = await new Promise<boolean>((resolve) => {
-            this.eventBus.once(EVENT.PURCHASE_DECISION, resolve);
+            this.eventBus?.once(EVENT.PURCHASE_DECISION, resolve);
         });
         cc.log('purchase decision ' + purchase);
 
-        this.client.respond<PromptPurchaseResponsePayload>(packet, {
-            purchase: !!purchase,
-        });
+        this.client.respond(
+            Response.forRequest(packet)
+                .setPayload(prompt_purchase_spec.PromptPurchaseResponse, {
+                    purchased: purchase,
+                })
+                .build(),
+        );
         if (purchase) {
-            this.eventBus.emit(EVENT.UPDATE_MY_MONEY, packet.payload.moneyAfterPurchase);
+            this.eventBus?.emit(EVENT.UPDATE_MY_MONEY, promptPurchaseRequest.moneyAfterPurchase);
         }
     }
 
     private async handleChanceConfirmationPrompt(packet: Request) {
-        await new Promise((resolve) => this.eventBus.once(EVENT.CONFIRM_CHANCE, resolve));
+        await new Promise<void>((resolve) => this.eventBus?.once(EVENT.CONFIRM_CHANCE, resolve));
         // TODO if user doesn't click on the chance to dismiss it. It will be
         // dismissed after 10 seconds. We will still have this promise, which
         // is a memory leak
 
-        this.client.respond(packet, {});
+        this.client.respond(Response.forRequest(packet).build());
     }
 
-    private handleAnnouncePurchase(packet: Packet<PlayerPurchasePayload>) {
-        const { property: purchasedProperty, id } = packet.payload;
+    private handleAnnouncePurchase(packet: Packet) {
+        const announcePlayerPurchasePayload = assertExist(
+            Packet.getPayload(packet, announce_purchase_spec.AnnouncePurchasePayload),
+        );
+
+        const { property: purchasedProperty, player: gamePlayerId } = announcePlayerPurchasePayload;
         const player = this.playerNodes
-            .find((playerNode) => playerNode.getComponent(Player).getId() === id)
-            .getComponent(Player);
-        const property = this.map.getPropertyTileAt(purchasedProperty.pos);
-        property.setOwner(player, purchasedProperty);
+            .find((playerNode) => playerNode.getComponent(Player).getId() === gamePlayerId)
+            ?.getComponent(Player);
+        if (player) {
+            const property = this.map?.getPropertyTileAt(assertExist(purchasedProperty?.pos));
+            property?.setOwner(player, assertExist(purchasedProperty));
+        } else {
+            cc.error(
+                `Cannot find Player with id ${gamePlayerId} that purchased property ${purchasedProperty?.name}`,
+            );
+        }
     }
 
-    private handleAnnounceEndTurn(packet: Packet<PlayerEndTurnPayload>) {
-        const isCurrentPlayerTurn = packet.payload.currentPlayerId === this.client.state.id;
+    private handleAnnounceEndTurn(packet: Packet) {
+        const announceEndTurnPayload = assertExist(
+            Packet.getPayload(packet, announce_end_turn_spec.AnnounceEndTurnPayload),
+        );
+
+        const isCurrentPlayerTurn =
+            announceEndTurnPayload.currentPlayer === this.client.state.gamePlayerId;
         if (isCurrentPlayerTurn) {
-            this.eventBus.emit(EVENT.END_CURRENT_PLAYER_TURN);
+            this.eventBus?.emit(EVENT.END_CURRENT_PLAYER_TURN);
         }
 
-        this.eventBus.emit(EVENT.NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN);
+        this.eventBus?.emit(EVENT.NO_MORE_PACKET_FROM_SERVER_FOR_CURRENT_TURN);
     }
 
-    private handleAnnounceBankrupt(packet: Packet<PlayerBankruptPayload>) {
-        cc.log('player bankrupted ' + packet.payload.id);
+    private handleAnnounceBankrupt(packet: Packet) {
+        const announceBankruptPayload = assertExist(
+            Packet.getPayload(packet, announce_bankrupt_spec.AnnounceBankruptPayload),
+        );
+        cc.log('player bankrupted ' + announceBankruptPayload.player);
     }
 
-    private async handleAnnounceGameOver(packet: Packet<GameOverPayload>) {
-        cc.log('game over ', packet.payload);
-        this.eventBus.emit(EVENT.SHOW_RANKING, packet.payload.ranks);
+    private async handleAnnounceGameOver(packet: Packet) {
+        const announceGameOverPayload = assertExist(
+            Packet.getPayload(packet, announce_game_over_spec.AnnounceGameOverPayload),
+        );
+        cc.log('game over ', announceGameOverPayload);
+        this.eventBus?.emit(EVENT.SHOW_RANKING, announceGameOverPayload.ranks);
         await new Promise((resolve) => {
-            this.eventBus.once(EVENT.RANKING_CLOSED, resolve);
+            this.eventBus?.once(EVENT.RANKING_CLOSED, resolve);
         });
-        const response = await this.client.request({
-            type: PacketType.REQUEST,
-            request_id: this.client.newId(),
-            action: Action.BACK_TO_ROOM,
-            payload: {},
-        });
-        if (response.ok()) {
+        const response = await this.client.request(
+            Request.forAction(Action.BACK_TO_ROOM).setId(this.client.newId()).build(),
+        );
+
+        if (Packet.isStatusOk(response)) {
             cc.director.loadScene('room');
         } else {
-            cc.log(response.getMessage());
+            cc.log(Packet.getStatusMessage(response));
         }
     }
 
-    private handleAnnounceLeft(packet: Packet<PlayerLeftPayload>) {
-        cc.log('player left', packet);
+    private handleAnnounceLeft(packet: Packet) {
+        const announcePlayerLeftPayload = Packet.getPayload(
+            packet,
+            announce_player_left_spec.AnnouncePlayerLeftPayload,
+        );
+        cc.log('player left', announcePlayerLeftPayload);
     }
 
-    private requestRoll() {
-        this.client
-            .request({
-                type: PacketType.REQUEST,
-                request_id: this.client.newId(),
-                action: Action.ROLL,
-                payload: {},
-            })
-            .then((response: ResponseWrapper<RollResponsePayload>) => {
-                if (response.ok()) {
-                    this.eventBus.emit(EVENT.DICE_ROLLED_RESPONSE, response.payload.steps);
-                }
-            });
+    private async requestRoll() {
+        const response = await this.client.request(
+            Request.forAction(Action.ROLL).setId(this.client.newId()).build(),
+        );
+        const rollResponse = Packet.getPayload(response, roll_spec.RollResponse);
+
+        if (Packet.isStatusOk(response) && rollResponse) {
+            this.eventBus?.emit(EVENT.DICE_ROLLED_RESPONSE, rollResponse.steps);
+        }
     }
 
-    private instantiatePlayer(gamePlayer: GamePlayerInfo): cc.Node {
-        const playerNode = this.map.addToMap(cc.instantiate(this.playerPrefab), gamePlayer.pos);
+    private instantiatePlayer(gamePlayer: game_player.GamePlayer): cc.Node {
+        const playerNode = assertExist(this.map).addToMap(
+            (cc.instantiate(this.playerPrefab) as unknown) as cc.Node,
+            assertExist(gamePlayer.pos),
+        );
         const playerComponent = playerNode.getComponent(Player);
         playerComponent.init(
-            gamePlayer.player,
+            gamePlayer,
             CHARACTER_COLORS[gamePlayer.character],
-            gamePlayer.pos,
+            assertExist(gamePlayer.pos),
         );
         return playerNode;
     }
@@ -269,7 +305,7 @@ export default class Game extends cc.Component {
 
     private async onLeave() {
         const response = await this.client.request(Messages.getLeave(this.client.newId()));
-        if (response.ok()) {
+        if (Packet.isStatusOk(response)) {
             cc.director.loadScene('lobby');
         }
     }
@@ -277,7 +313,7 @@ export default class Game extends cc.Component {
     @lifecycle
     protected start() {
         this.started = true;
-        this.eventBus = nullCheck(cc.find(EVENT_BUS));
+        this.eventBus = assertExist(cc.find(EVENT_BUS));
         const debugNode = this.node.getChildByName('debug');
         if (debugNode) {
             this.node.removeChild(debugNode);

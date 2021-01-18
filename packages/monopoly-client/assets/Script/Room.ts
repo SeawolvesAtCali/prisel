@@ -1,10 +1,6 @@
-import {
-    Client,
-    Messages,
-    ResponseWrapper,
-    RoomChangePayload,
-    RoomStateResponsePayload,
-} from '@prisel/client';
+import { assertExist, Client, Messages, Packet, RoomStateChangePayload } from '@prisel/client';
+import { exist } from '@prisel/monopoly-common';
+import { room_state_change_spec } from '@prisel/protos';
 import { client, ClientState } from './Client';
 import PlayerInfo from './PlayerInfo';
 
@@ -21,42 +17,42 @@ const PLAYER_CARD_HEIGHT = 150;
 @ccclass
 export default class Room extends cc.Component {
     @property(cc.Prefab)
-    public playerInfoPrefab: cc.Prefab = null;
+    public playerInfoPrefab?: cc.Prefab;
 
     @property(cc.Node)
-    public playersContainer: cc.Node = null;
+    public playersContainer?: cc.Node;
 
     @property(cc.Label)
-    private roomLabel: cc.Label = null;
+    private roomLabel?: cc.Label;
 
     @property(cc.Button)
-    private startButton: cc.Button = null;
+    private startButton?: cc.Button;
 
     private playerDataList: PlayerInfoData[] = [];
 
-    private client: Client<ClientState>;
+    private client: Client<ClientState> = client;
 
-    private stateToken: string = null;
+    private stateToken?: string;
 
     public onLoad() {
-        this.client = client;
         const offGameStartListener = this.client.onGameStart(() => {
             offGameStartListener();
             cc.director.loadScene('game');
         });
     }
 
-    private handleRoomStateChange(roomStateChange: RoomChangePayload) {
-        if (roomStateChange.token.previousToken !== this.stateToken) {
+    private handleRoomStateChange(roomStateChange: room_state_change_spec.RoomStateChangePayload) {
+        if (roomStateChange.token?.previousToken !== this.stateToken) {
             // we lost some packages. For now, lets just log and quit
             cc.log(
-                `room state package lost, our token is ${this.stateToken}, token from server is ${roomStateChange.token.previousToken}`,
+                `room state package lost, our token is ${this.stateToken}, token from server is ${roomStateChange.token?.previousToken}`,
             );
             return;
         }
-        const { token, playerJoin, playerLeave, hostLeave } = roomStateChange;
-        this.stateToken = token.token;
-        if (playerJoin) {
+        this.stateToken = roomStateChange.token?.token;
+
+        if (RoomStateChangePayload.isPlayerJoin(roomStateChange)) {
+            const playerJoin = assertExist(RoomStateChangePayload.getJoinedPlayer(roomStateChange));
             cc.log(`player joined ${playerJoin.name}`);
             this.playerDataList.push({
                 name: playerJoin.name,
@@ -65,13 +61,13 @@ export default class Room extends cc.Component {
                 key: playerJoin.id,
             });
         }
-        if (playerLeave) {
-            cc.log(`player left ${playerLeave.id}`);
-            this.playerDataList = this.playerDataList.filter(
-                (player) => player.id !== playerLeave.id,
-            );
+        if (RoomStateChangePayload.isPlayerLeave(roomStateChange)) {
+            const playerLeft = assertExist(RoomStateChangePayload.getLeftPlayer(roomStateChange));
+            cc.log(`player left ${playerLeft}`);
+            this.playerDataList = this.playerDataList.filter((player) => player.id !== playerLeft);
         }
-        if (hostLeave) {
+        if (RoomStateChangePayload.isHostLeave(roomStateChange)) {
+            const hostLeave = assertExist(RoomStateChangePayload.getHostLeaveData(roomStateChange));
             cc.log(`host left ${hostLeave.hostId}, new host ${hostLeave.newHostId}`);
             this.playerDataList = this.playerDataList.filter(
                 (player) => player.id !== hostLeave.hostId,
@@ -87,27 +83,31 @@ export default class Room extends cc.Component {
 
     private loadRoomData() {
         cc.log('start loading room data');
-        this.client
-            .request(Messages.getGetRoomState(this.client.newId()))
-            .then((response: ResponseWrapper<RoomStateResponsePayload>) => {
-                if (response.failed()) {
-                    cc.log('Loading room data failed');
-                    return;
-                }
-                this.playerDataList = response.payload.players.map((player) => ({
+        this.client.request(Messages.getGetRoomState(this.client.newId())).then((response) => {
+            if (Packet.isStatusFailed(response)) {
+                cc.log('Loading room data failed');
+                return;
+            }
+            const payload = Packet.getPayload(response, 'getRoomStateResponse');
+            if (payload) {
+                this.playerDataList = payload.players.map((player) => ({
                     name: player.name,
                     id: player.id,
-                    isHost: player.id === response.payload.hostId,
+                    isHost: player.id === payload.hostId,
                     key: player.id,
                 }));
-                this.setupForHost(response.payload.hostId === this.client.state.id);
+                this.setupForHost(payload.hostId === this.client.state.id);
                 this.updatePlayerListUi();
                 this.client.onRoomStateChange(this.handleRoomStateChange.bind(this));
-                this.stateToken = response.payload.token;
-            });
+                this.stateToken = payload.token;
+            }
+        });
     }
 
     private setupForHost(isHost: boolean) {
+        if (!exist(this.startButton)) {
+            return;
+        }
         if (isHost) {
             this.startButton.node.active = true;
         } else {
@@ -117,13 +117,17 @@ export default class Room extends cc.Component {
 
     protected start() {
         cc.log('start');
-        this.roomLabel.string = `${this.client.state.roomName} - ${this.client.state.roomId}`;
+        assertExist(
+            this.roomLabel,
+        ).string = `${this.client.state.roomName} - ${this.client.state.roomId}`;
         this.loadRoomData();
     }
 
     private addPlayer(player: PlayerInfoData) {
-        const playerInfo = cc.instantiate(this.playerInfoPrefab);
-        this.playersContainer.addChild(playerInfo);
+        const playerInfo = (assertExist(
+            cc.instantiate(this.playerInfoPrefab),
+        ) as unknown) as cc.Node;
+        assertExist(this.playersContainer).addChild(playerInfo);
         playerInfo.getComponent(PlayerInfo).init(player.name, player.id);
         playerInfo.active = true;
         return playerInfo;
@@ -132,7 +136,7 @@ export default class Room extends cc.Component {
     private updatePlayerListUi() {
         // remove all children
         cc.log('update ui');
-        this.playersContainer.removeAllChildren();
+        assertExist(this.playersContainer).removeAllChildren();
         let height = 0;
         for (const player of this.playerDataList) {
             const playerInfo = this.addPlayer(player);
@@ -144,20 +148,16 @@ export default class Room extends cc.Component {
     }
 
     private async startGame() {
-        const response: ResponseWrapper = await this.client.request(
-            Messages.getGameStart(this.client.newId()),
-        );
+        const response = await this.client.request(Messages.getGameStart(this.client.newId()));
 
-        if (response.ok()) {
+        if (Packet.isStatusOk(response)) {
             cc.director.loadScene('game');
         }
     }
 
     private async leaveRoom() {
-        const response: ResponseWrapper = await this.client.request(
-            Messages.getLeave(this.client.newId()),
-        );
-        if (response.ok()) {
+        const response = await this.client.request(Messages.getLeave(this.client.newId()));
+        if (Packet.isStatusOk(response)) {
             cc.director.loadScene('lobby');
         }
     }

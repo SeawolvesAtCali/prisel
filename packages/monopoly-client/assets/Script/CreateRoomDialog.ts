@@ -1,40 +1,34 @@
-import {
-    Client,
-    CreateRoomPayload,
-    CreateRoomResponsePayload,
-    Messages,
-    ResponseWrapper,
-} from '@prisel/client';
-import { client, ClientState } from './Client';
-import { nullCheck } from './utils';
+import { assertExist, Messages, Packet } from '@prisel/client';
+import { exist } from '@prisel/monopoly-common';
+import { client } from './Client';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class CreateRoomDialog extends cc.Component {
     @property(cc.EditBox)
-    private roomNameInput: cc.EditBox = null;
-    private client: Client<ClientState> = null;
+    private roomNameInput?: cc.EditBox;
+    private client = client;
 
     protected start() {
-        this.client = nullCheck(client);
-        nullCheck(this.roomNameInput);
+        this.client = assertExist(client);
+        assertExist(this.roomNameInput);
         this.node.active = false;
     }
 
     // call when edit box enter or "CREATE" button click
     // handlers wired in cocoscreator
     private async createRoom() {
-        const response: ResponseWrapper<CreateRoomResponsePayload> = await this.client.request<
-            CreateRoomPayload
-        >(Messages.getCreateRoom(this.client.newId(), this.roomNameInput.string));
+        const response = await this.client.request(
+            Messages.getCreateRoom(this.client.newId(), this.roomNameInput?.string || 'room name'),
+        );
 
-        if (response.ok()) {
-            const payload = response.payload;
+        const createRoomResponse = Packet.getPayload(response, 'createRoomResponse');
+        if (Packet.isStatusOk(response) && exist(createRoomResponse)) {
             this.client.setState({
-                roomId: payload.room.id,
+                roomId: createRoomResponse.room?.id,
                 isInRoom: true,
-                roomName: payload.room.name,
+                roomName: createRoomResponse.room?.name,
             });
             cc.director.loadScene('room');
         } else {

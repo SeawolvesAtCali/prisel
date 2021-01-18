@@ -8,6 +8,7 @@ import {
 import { animation_spec, announce_received_chance_spec } from '@prisel/protos';
 import { Packet } from '@prisel/server';
 import { log } from '../log';
+import { getPlayer } from '../utils';
 import { ChanceHandler } from './ChanceHander';
 
 export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game, input) => {
@@ -76,7 +77,7 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
 
     await Anim.processAndWait(
         (animation) => {
-            currentPlayer.player.emit(animation);
+            getPlayer(currentPlayer).emit(animation);
         },
         Anim.create('player_emotion', animation_spec.PlayerEmotionExtra)
             .setExtra({

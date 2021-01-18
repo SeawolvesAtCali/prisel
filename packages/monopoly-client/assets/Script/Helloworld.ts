@@ -1,20 +1,20 @@
-import { Client, LoginResponsePayload, Messages, ResponseWrapper } from '@prisel/client';
+import { assertExist, Client, Messages, Packet } from '@prisel/client';
+import { exist } from '@prisel/monopoly-common';
 import { client } from './Client';
 import { createDialog } from './components/DialogUtil';
 import { createInput } from './components/Input';
 import { WidgetConfig } from './components/WidgetConfig';
 import { PERSISTENT_NODE } from './consts';
-import { nullCheck } from './utils';
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class Helloworld extends cc.Component {
-    private client: Client;
-    private nickname: string;
-    private actionButton: cc.Button;
+    private client: Client = client;
+    private nickname = 'player';
+    private actionButton?: cc.Button;
 
     public async start() {
-        cc.game.addPersistRootNode(nullCheck(cc.find(PERSISTENT_NODE)));
+        cc.game.addPersistRootNode(assertExist(cc.find(PERSISTENT_NODE)));
         const canvas = cc.find('Canvas');
 
         const connectingDialog = createDialog({
@@ -29,8 +29,6 @@ export default class Helloworld extends cc.Component {
         this.client = client;
 
         canvas.removeChild(connectingDialog);
-
-        this.nickname = 'player';
 
         const joinDialogConfig = createDialog({
             name: 'join dialog',
@@ -52,7 +50,7 @@ export default class Helloworld extends cc.Component {
         const joinDialog = joinDialogConfig.render();
         canvas.addChild(joinDialog);
         this.actionButton = cc
-            .find(nullCheck(joinDialogConfig.exports).actionButton, joinDialog)
+            .find(assertExist(joinDialogConfig.exports).actionButton, joinDialog)
             .getComponent(cc.Button);
 
         this.validateInput();
@@ -61,10 +59,14 @@ export default class Helloworld extends cc.Component {
     // called when input change
     private validateInput(): boolean {
         if (this.nickname === '') {
-            this.actionButton.interactable = false;
+            if (this.actionButton) {
+                this.actionButton.interactable = false;
+            }
             return false;
         }
-        this.actionButton.interactable = true;
+        if (this.actionButton) {
+            this.actionButton.interactable = true;
+        }
         return true;
     }
 
@@ -75,14 +77,17 @@ export default class Helloworld extends cc.Component {
             return;
         }
         const name = this.nickname;
-        this.actionButton.interactable = false;
-        const loginResponse: ResponseWrapper<LoginResponsePayload> = await this.client.request(
-            Messages.getLogin(this.client.newId(), name),
-        );
-        this.actionButton.interactable = true;
-        if (loginResponse.ok()) {
+        if (this.actionButton) {
+            this.actionButton.interactable = false;
+        }
+        const response = await this.client.request(Messages.getLogin(this.client.newId(), name));
+        if (this.actionButton) {
+            this.actionButton.interactable = true;
+        }
+        const loginResponsePayload = Packet.getPayload(response, 'loginResponse');
+        if (Packet.isStatusOk(response) && exist(loginResponsePayload)) {
             this.client.setState({
-                id: loginResponse.payload.userId,
+                id: loginResponsePayload.userId,
                 name,
             });
             cc.director.loadScene('lobby');

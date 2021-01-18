@@ -1,3 +1,4 @@
+import { assertExist } from '@prisel/client';
 import { coordinate } from '@prisel/protos';
 import { TILE_SIZE } from './consts';
 
@@ -20,7 +21,7 @@ export function callOnMoveAction(
     });
 }
 
-export function getRand<T>(list: T[]): T {
+export function getRand<T>(list: T[]): T | null {
     if (list.length > 0) {
         return list[Math.trunc(Math.random() * list.length)];
     }
@@ -53,13 +54,6 @@ export function toVec2(vec: cc.Vec3): cc.Vec2 {
     return cc.v2(vec.x, vec.y);
 }
 
-export function nullCheck<T>(value: T): T {
-    if (value === null || value === undefined) {
-        throw new Error('checking value not empty, but is ' + value);
-    }
-    return value;
-}
-
 const LIFECYCLE_SET = new Set([
     'onLoad',
     'start',
@@ -69,7 +63,7 @@ const LIFECYCLE_SET = new Set([
     'onEnable',
     'onDisable',
 ]);
-export function lifecycle(container, key, other1) {
+export function lifecycle(container: any, key: string) {
     if (CC_DEBUG && !LIFECYCLE_SET.has(key)) {
         throw new Error(
             'Method ' + key + ' of ' + container.constructor.name + ' is not a lifecycle method',
@@ -86,7 +80,7 @@ export function getTileAnchorPos(coor: coordinate.Coordinate) {
 }
 
 export function play(comp: cc.Component, clip: string, durationInMs: number) {
-    const anim = nullCheck(comp.getComponent(cc.Animation));
+    const anim = assertExist(comp.getComponent(cc.Animation));
     const animState = anim.play(clip);
     const originalDuration = animState.duration;
     animState.speed = (originalDuration * 1000) / durationInMs;

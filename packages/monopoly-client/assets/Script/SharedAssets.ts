@@ -1,38 +1,56 @@
+import { assertExist } from '@prisel/client';
 import { PERSISTENT_NODE } from './consts';
-import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class SharedAssets extends cc.Component {
     @property(cc.SpriteAtlas)
-    public uiAtlas: cc.SpriteAtlas = null;
+    private _uiAtlas?: cc.SpriteAtlas;
+    public get uiAtlas() {
+        return assertExist(this._uiAtlas);
+    }
 
     @property(cc.SpriteAtlas)
-    public tileAtlas: cc.SpriteAtlas = null;
+    private _tileAtlas?: cc.SpriteAtlas;
+    public get tileAtlas() {
+        return assertExist(this._tileAtlas);
+    }
 
     @property(cc.SpriteAtlas)
-    public characterAtlas: cc.SpriteAtlas = null;
+    private _characterAtlas?: cc.SpriteAtlas;
+    public get characterAtlas() {
+        return assertExist(this._characterAtlas);
+    }
 
     @property(cc.Font)
-    public font: cc.Font = null;
+    private _font?: cc.Font;
+    public get font() {
+        return assertExist(this._font);
+    }
 
     @property(cc.Prefab)
-    public rankPrefab: cc.Prefab = null;
+    private _rankPrefab?: cc.Prefab;
+    public get rankPrefab() {
+        return assertExist(this._rankPrefab);
+    }
 
     @property(cc.Prefab)
-    public inputPrefab: cc.Prefab = null;
+    private _inputPrefab?: cc.Prefab;
+    public get inputPrefab() {
+        return assertExist(this._inputPrefab);
+    }
 
     protected start() {
-        nullCheck(this.uiAtlas);
-        nullCheck(this.tileAtlas);
-        nullCheck(this.characterAtlas);
-        nullCheck(this.font);
-        nullCheck(this.rankPrefab);
-        nullCheck(this.inputPrefab);
+        assertExist(this.uiAtlas);
+        assertExist(this.tileAtlas);
+        assertExist(this.characterAtlas);
+        assertExist(this.font);
+        assertExist(this.rankPrefab);
+        assertExist(this.inputPrefab);
     }
 
     public static instance(): SharedAssets {
-        return nullCheck(cc.find(PERSISTENT_NODE).getComponent(SharedAssets));
+        return assertExist(cc.find(PERSISTENT_NODE).getComponent(SharedAssets));
     }
 }

@@ -1,3 +1,4 @@
+import { assertExist } from '@prisel/client';
 import { Tile } from '@prisel/monopoly-common';
 import {
     LANDING_POS_OFFSET,
@@ -11,9 +12,9 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class TileWrapper extends cc.Component {
-    private tile: Tile = null;
+    private tile: Tile | null = null;
     @property(cc.SpriteAtlas)
-    private tileAtlas: cc.SpriteAtlas = null;
+    private tileAtlas: cc.SpriteAtlas | null = null;
 
     public init(tile: Tile) {
         this.tile = tile;
@@ -31,32 +32,35 @@ export default class TileWrapper extends cc.Component {
     // top left corner.
     public getInitialAnchorPos() {
         return new cc.Vec2(
-            this.tile.position.col * TILE_SIZE,
-            -(this.tile.position.row + 1) * TILE_SIZE,
+            assertExist(this.tile).position.col * TILE_SIZE,
+            -(assertExist(this.tile).position.row + 1) * TILE_SIZE,
         );
     }
 
     public getLandingZIndex() {
-        return this.tile.position.row * 10 + PLAYER_Z_INDEX_OFFSET;
+        return assertExist(this.tile).position.row * 10 + PLAYER_Z_INDEX_OFFSET;
     }
 
     public getZIndex() {
-        return this.tile.position.row * 10 + TILE_Z_INDEX_OFFSET;
+        return assertExist(this.tile).position.row * 10 + TILE_Z_INDEX_OFFSET;
     }
 
     @lifecycle
     protected start() {
-        this.getComponent(cc.Sprite).spriteFrame = this.tileAtlas.getSpriteFrame(this.getSprite());
+        this.getComponent(cc.Sprite).spriteFrame = assertExist(this.tileAtlas).getSpriteFrame(
+            this.getSprite(),
+        );
     }
 
     public getSprite(): string {
-        const pos = this.tile.position;
-        if (this.tile.hasPath()) {
+        const tile = assertExist(this.tile);
+        const pos = tile.position;
+        if (tile.hasPath()) {
             let up = false;
             let down = false;
             let left = false;
             let right = false;
-            for (const prevRef of this.tile.prev) {
+            for (const prevRef of tile.prev) {
                 const prev = prevRef.get();
                 if (prev.position.col === pos.col && prev.position.row === pos.row + 1) {
                     down = true;
@@ -71,7 +75,7 @@ export default class TileWrapper extends cc.Component {
                     left = true;
                 }
             }
-            for (const nextRef of this.tile.next) {
+            for (const nextRef of tile.next) {
                 const next = nextRef.get();
                 if (next.position.col === pos.col && next.position.row === pos.row + 1) {
                     down = true;
@@ -114,6 +118,6 @@ export default class TileWrapper extends cc.Component {
                 return 'right-down';
             }
         }
-        return getRand(['slice1', 'slice2', 'slice3', 'slice4', 'slice5']);
+        return assertExist(getRand(['slice1', 'slice2', 'slice3', 'slice4', 'slice5']));
     }
 }

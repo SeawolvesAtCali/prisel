@@ -103,6 +103,15 @@ export const Anim = {
     ): AnimationBuilder<ExtraType> {
         return new AnimationBuilder<ExtraType>(AnimationType.DEFAULT, extraType).setName(name);
     },
+    getExtra<T extends object>(
+        animation: animation_spec.Animation,
+        extraType: IMessageType<T>,
+    ): T | undefined {
+        if (animation.extra && protobuf.any.Any.contains(animation.extra, extraType)) {
+            return protobuf.any.Any.unpack(animation.extra, extraType);
+        }
+        return undefined;
+    },
     all(...animations: Animation[]): Animation {
         return new AnimationBuilder(AnimationType.ALL).addChildren(...animations).build();
     },

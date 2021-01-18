@@ -1,15 +1,18 @@
-import { Packet } from '@prisel/common';
+import { Packet, Request, Response } from '@prisel/common';
 
 export class PubSub {
     private subscription:
-        | Map<any, Set<(packet: Packet, action?: any) => void>>
+        | Map<any, Set<(packet: any, action?: any) => void>>
         | undefined = new Map();
 
     public isOpen() {
         return !!this.subscription;
     }
 
-    public on<T>(action: T, handler: (packet: Packet, action?: T) => void) {
+    public on<T, P extends Packet | Response | Request>(
+        action: T,
+        handler: (packet: P, action?: T) => void,
+    ) {
         if (!this.subscription) {
             throw new Error('pubsub is already closed, cannot listen for more action');
         }

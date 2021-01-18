@@ -1,43 +1,46 @@
-import { GamePlayerInfo } from '@prisel/monopoly-common';
+import { assertExist } from '@prisel/client';
+import { game_player } from '@prisel/protos';
 import { EVENT, EVENT_BUS, getCharacterAvatarSpriteName } from './consts';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class NewClass extends cc.Component {
+export default class MyPlayerStatHud extends cc.Component {
     @property(cc.SpriteAtlas)
-    private avatarAtlas: cc.SpriteAtlas = null;
+    private avatarAtlas?: cc.SpriteAtlas;
 
     @property(cc.Sprite)
-    private avatarSprite: cc.Sprite = null;
+    private avatarSprite?: cc.Sprite;
 
     @property(cc.Label)
-    private nameLabel: cc.Label = null;
+    private nameLabel?: cc.Label;
 
     @property(cc.Label)
-    private moneyLabel: cc.Label = null;
+    private moneyLabel?: cc.Label;
 
-    private eventBus: cc.Node = null;
-    // LIFE-CYCLE CALLBACKS:
-
-    // onLoad () {}
+    private eventBus?: cc.Node;
 
     protected start() {
-        this.eventBus = cc.find(EVENT_BUS);
+        this.eventBus = assertExist(cc.find(EVENT_BUS));
         this.eventBus.on(EVENT.UPDATE_MY_GAME_PLAYER_INFO, this.updateHud, this);
         this.eventBus.on(EVENT.UPDATE_MY_MONEY, this.updateMoneyHud, this);
     }
 
-    private updateHud(gamePlayer: GamePlayerInfo) {
-        this.avatarSprite.spriteFrame = this.avatarAtlas.getSpriteFrame(
-            getCharacterAvatarSpriteName(gamePlayer.character),
-        );
-        this.nameLabel.string = gamePlayer.player.name;
+    private updateHud(gamePlayer: game_player.GamePlayer) {
+        if (this.avatarSprite && this.avatarAtlas) {
+            this.avatarSprite.spriteFrame = this.avatarAtlas.getSpriteFrame(
+                getCharacterAvatarSpriteName(gamePlayer.character),
+            );
+        }
+        if (this.nameLabel) {
+            this.nameLabel.string = gamePlayer.boundPlayer?.name || 'unnamed';
+        }
         this.updateMoneyHud(gamePlayer.money);
     }
-    private updateMoneyHud(money: number) {
-        this.moneyLabel.string = `${money}`;
-    }
 
-    // update (dt) {}
+    private updateMoneyHud(money: number) {
+        if (this.moneyLabel) {
+            this.moneyLabel.string = `${money}`;
+        }
+    }
 }

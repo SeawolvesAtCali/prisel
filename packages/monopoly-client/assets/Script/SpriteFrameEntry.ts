@@ -5,5 +5,5 @@ export class SpriteFrameEntry {
     @property(cc.String)
     public name: string = '';
     @property(cc.SpriteFrame)
-    public sprite: cc.SpriteFrame = null;
+    public sprite?: cc.SpriteFrame = undefined;
 }

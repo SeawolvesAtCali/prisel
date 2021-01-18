@@ -4,7 +4,7 @@ import { Id } from './Id';
 import { World } from './World';
 
 export class Ref<T extends GameObject> {
-    id;
+    id: Id<T>;
     world?: World;
 
     static of<T extends GameObject>(object: T | Id<T>, world: World): Ref<T> {

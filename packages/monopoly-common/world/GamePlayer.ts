@@ -1,4 +1,11 @@
-import { coordinate, game_player, payment, prompt_purchase_spec, property } from '@prisel/protos';
+import {
+    coordinate,
+    game_player,
+    payment,
+    player_info,
+    prompt_purchase_spec,
+    property,
+} from '@prisel/protos';
 import { serializable } from 'serializr';
 import { exist } from '../exist';
 import { GameObject } from './GameObject';
@@ -8,9 +15,12 @@ import { Ref } from './ref2';
 import { listRefSerializable, refSerializable } from './serializeUtil';
 import type { Tile } from './Tile';
 
+interface BoundPlayer {
+    getPlayerInfo(): player_info.PlayerInfo;
+}
 interface Props {
     id: Id<GamePlayer>;
-    player: any;
+    player: BoundPlayer;
     pathTile: Tile;
     owning: Property[];
     money: number;
@@ -36,7 +46,7 @@ export class GamePlayer extends GameObject {
     @serializable
     character = 0;
 
-    player: any;
+    player?: BoundPlayer;
 
     forcedRollPoint = 0;
 

@@ -1,7 +1,7 @@
 import { ChanceInputArgs } from '@prisel/monopoly-common';
 import { log } from '../log';
-import { moneyExchangeHandler } from './CashExchangeHandler';
 import { ChanceHandler } from './ChanceHander';
+import { moneyExchangeHandler } from './MoneyExchangeHandler';
 import { moveStepsHandler } from './MoveStepsHandler';
 import { moveToTileHandler } from './MoveToTileHandler';
 

@@ -1,4 +1,5 @@
 import { assertExist, Packet, RequestBuilder, Response } from '@prisel/common';
+import { player_info } from '@prisel/protos';
 import WebSocket from 'ws';
 import debug from './debug';
 import { Context } from './objects';
@@ -12,6 +13,7 @@ const DEFAULT_REQUEST_TIMEOUT = 1000;
 export interface Player {
     getName(): string;
     getId(): PlayerId;
+    getPlayerInfo(): player_info.PlayerInfo;
     getRoom(): Room | null;
     findRoomById(roomId: RoomId): Room | null;
     createRoom(config: Omit<RoomOption, 'id'>): Room;
@@ -55,6 +57,12 @@ class PlayerImpl implements Player {
 
     public getId() {
         return this.id;
+    }
+    public getPlayerInfo() {
+        return {
+            name: this.name,
+            id: this.id,
+        };
     }
     public newRequestId() {
         return this.context.newRequestId();

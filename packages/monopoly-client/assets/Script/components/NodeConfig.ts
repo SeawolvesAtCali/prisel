@@ -12,13 +12,13 @@ export class NodeConfig<Export extends NodeConfigExport = {}> {
     public name: string = '';
     public zIndex: number = 0;
     public children: NodeConfig[] = [];
-    public parent: NodeConfig;
+    public parent?: NodeConfig;
     public size: cc.Size = cc.Size.ZERO;
     public color: cc.Color = cc.Color.WHITE;
     public anchor: cc.Vec2 = cc.v2(0.5, 0.5);
-    public prefab: cc.Prefab;
-    private onApply: (node: cc.Node) => void;
-    public exports: Export;
+    public prefab?: cc.Prefab;
+    private onApply?: (node: cc.Node) => void;
+    public exports?: Export;
 
     private zeroAreaWarningSuppressed = false;
 
@@ -109,7 +109,7 @@ export class NodeConfig<Export extends NodeConfigExport = {}> {
             return undefined;
         }
 
-        const parentPath = this.parent.getPathInternal(start);
+        const parentPath = this.parent?.getPathInternal(start);
         if (parentPath === undefined) {
             return undefined;
         }

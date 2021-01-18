@@ -1,5 +1,5 @@
+import { assertExist } from '@prisel/client';
 import SharedAssets from '../SharedAssets';
-import { nullCheck } from '../utils';
 import { NodeConfig } from './NodeConfig';
 import { WidgetConfig } from './WidgetConfig';
 
@@ -35,7 +35,7 @@ export function createInput(props: InputProps): NodeConfig {
     // we don't have a EditBoxConfig, let's for now just modify the prefab value
     // in postApply
     root.postApply((node) => {
-        const editBox = nullCheck(node.getComponent(cc.EditBox));
+        const editBox = assertExist(node.getComponent(cc.EditBox));
         node.name = name;
         node.setContentSize(size);
         editBox.maxLength = maxLength;

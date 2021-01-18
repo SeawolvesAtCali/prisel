@@ -146,7 +146,10 @@ export class Client<T = State> {
      * @param action
      * @param listener
      */
-    public on(action: any, listener: (packet: Packet, action?: any) => void): RemoveListenerFunc {
+    public on<T extends Packet | Response | Request>(
+        action: any,
+        listener: (packet: T, action?: any) => unknown,
+    ): RemoveListenerFunc {
         return assertExist(this.listeners?.on(action, listener), 'pubsub');
     }
 

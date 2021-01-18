@@ -47,7 +47,7 @@ export default class Game extends cc.Component {
     private static instance?: Game;
 
     public static get() {
-        return assertExist(Game.instance);
+        return assertExist(Game.instance, 'Game instance');
     }
 
     @lifecycle
@@ -74,7 +74,7 @@ export default class Game extends cc.Component {
             .registerObject(Property)
             .registerObject(GamePlayer)
             .deserialize(boardSetup.world);
-        this.map = assertExist(this.mapNode).getComponent(MapLoader);
+        this.map = assertExist(this.mapNode, 'mapNode').getComponent(MapLoader);
         this.map.renderMap(this.world, boardSetup);
 
         this.offPacketListeners.push(
@@ -118,6 +118,7 @@ export default class Game extends cc.Component {
 
         const initialStateResponse = assertExist(
             Packet.getPayload(response, get_initial_state_spec.GetInitialStateResponse),
+            'initialStateResponse',
         );
 
         // CHARACTER_COLORS[gamePlayer.character]
@@ -134,10 +135,14 @@ export default class Game extends cc.Component {
     }
 
     private handleAnnounceStartTurn(packet: Packet) {
+        cc.log('handleAnnounceStartTurn');
         const announceStartTurnPayload = assertExist(
             Packet.getPayload(packet, announce_start_turn_spec.AnnounceStartTurnPayload),
+            'announceStartTurnPayload',
         );
-
+        cc.log(
+            `is current player? ${announceStartTurnPayload.player}==${this.client.state.gamePlayerId}`,
+        );
         const isCurrentPlayerTurn =
             announceStartTurnPayload.player === this.client.state.gamePlayerId;
         if (isCurrentPlayerTurn) {
@@ -155,10 +160,14 @@ export default class Game extends cc.Component {
     private async handleAnnounceRoll(packet: Packet) {
         const announceRollPayload = assertExist(
             Packet.getPayload(packet, announce_roll_spec.AnnounceRollPayload),
+            'announceRollPayload',
         );
         const { player } = announceRollPayload;
 
-        const playerNode = assertExist(this.getPlayerNode(player));
+        const playerNode = assertExist(
+            this.getPlayerNode(player),
+            'playerNode in handleAnnounceRoll',
+        );
         const playerComponent = playerNode.getComponent(Player);
         playerComponent.pos = announceRollPayload.path.slice(-1)[0];
     }
@@ -166,6 +175,7 @@ export default class Game extends cc.Component {
     private handleAnnouncePayRent(packet: Packet) {
         const announcePayRentPayload = assertExist(
             Packet.getPayload(packet, announce_pay_rent_spec.AnnouncePayRentPayload),
+            'announcePayRentPayload',
         );
         this.eventBus?.emit(EVENT.UPDATE_MY_MONEY, announcePayRentPayload.myCurrentMoney);
     }
@@ -173,6 +183,7 @@ export default class Game extends cc.Component {
     private async handlePurchasePrompt(packet: Request) {
         const promptPurchaseRequest = assertExist(
             Packet.getPayload(packet, prompt_purchase_spec.PromptPurchaseRequest),
+            'promptPurchaseRequest',
         );
 
         this.eventBus?.emit(EVENT.PROMPT_PURCHASE, promptPurchaseRequest);
@@ -205,6 +216,7 @@ export default class Game extends cc.Component {
     private handleAnnouncePurchase(packet: Packet) {
         const announcePlayerPurchasePayload = assertExist(
             Packet.getPayload(packet, announce_purchase_spec.AnnouncePurchasePayload),
+            'announcePlayerPurchasePayload',
         );
 
         const { property: purchasedProperty, player: gamePlayerId } = announcePlayerPurchasePayload;
@@ -212,8 +224,10 @@ export default class Game extends cc.Component {
             .find((playerNode) => playerNode.getComponent(Player).getId() === gamePlayerId)
             ?.getComponent(Player);
         if (player) {
-            const property = this.map?.getPropertyTileAt(assertExist(purchasedProperty?.pos));
-            property?.setOwner(player, assertExist(purchasedProperty));
+            const property = this.map?.getPropertyTileAt(
+                assertExist(purchasedProperty?.pos, 'purchasedProperty?.pos'),
+            );
+            property?.setOwner(player, assertExist(purchasedProperty, 'purchasedProperty'));
         } else {
             cc.error(
                 `Cannot find Player with id ${gamePlayerId} that purchased property ${purchasedProperty?.name}`,
@@ -224,6 +238,7 @@ export default class Game extends cc.Component {
     private handleAnnounceEndTurn(packet: Packet) {
         const announceEndTurnPayload = assertExist(
             Packet.getPayload(packet, announce_end_turn_spec.AnnounceEndTurnPayload),
+            'announceEndTurnPayload',
         );
 
         const isCurrentPlayerTurn =
@@ -238,6 +253,7 @@ export default class Game extends cc.Component {
     private handleAnnounceBankrupt(packet: Packet) {
         const announceBankruptPayload = assertExist(
             Packet.getPayload(packet, announce_bankrupt_spec.AnnounceBankruptPayload),
+            'announceBankruptPayload',
         );
         cc.log('player bankrupted ' + announceBankruptPayload.player);
     }
@@ -245,6 +261,7 @@ export default class Game extends cc.Component {
     private async handleAnnounceGameOver(packet: Packet) {
         const announceGameOverPayload = assertExist(
             Packet.getPayload(packet, announce_game_over_spec.AnnounceGameOverPayload),
+            'announceGameOverPayload',
         );
         cc.log('game over ', announceGameOverPayload);
         this.eventBus?.emit(EVENT.SHOW_RANKING, announceGameOverPayload.ranks);
@@ -282,15 +299,15 @@ export default class Game extends cc.Component {
     }
 
     private instantiatePlayer(gamePlayer: game_player.GamePlayer): cc.Node {
-        const playerNode = assertExist(this.map).addToMap(
+        const playerNode = assertExist(this.map, 'Game.map').addToMap(
             (cc.instantiate(this.playerPrefab) as unknown) as cc.Node,
-            assertExist(gamePlayer.pos),
+            assertExist(gamePlayer.pos, 'gamePlayer.pos'),
         );
         const playerComponent = playerNode.getComponent(Player);
         playerComponent.init(
             gamePlayer,
             CHARACTER_COLORS[gamePlayer.character],
-            assertExist(gamePlayer.pos),
+            assertExist(gamePlayer.pos, 'gamePlayer.pos'),
         );
         return playerNode;
     }
@@ -313,7 +330,7 @@ export default class Game extends cc.Component {
     @lifecycle
     protected start() {
         this.started = true;
-        this.eventBus = assertExist(cc.find(EVENT_BUS));
+        this.eventBus = assertExist(cc.find(EVENT_BUS), 'EVENT_BUS');
         const debugNode = this.node.getChildByName('debug');
         if (debugNode) {
             this.node.removeChild(debugNode);

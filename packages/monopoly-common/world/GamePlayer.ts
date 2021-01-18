@@ -127,6 +127,7 @@ export class GamePlayer extends GameObject {
             money: this.money,
             pos: this.pathTile?.get().position,
             character: this.character,
+            boundPlayer: this.player?.getPlayerInfo(),
         };
     }
 }

@@ -5,49 +5,42 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class SharedAssets extends cc.Component {
+    // properties starting with _ will not show up in cocos editor. So use
+    // ending _ to denote internal variable.
     @property(cc.SpriteAtlas)
-    private _uiAtlas?: cc.SpriteAtlas;
+    private uiAtlas_?: cc.SpriteAtlas;
     public get uiAtlas() {
-        return assertExist(this._uiAtlas);
+        return assertExist(this.uiAtlas_);
     }
 
     @property(cc.SpriteAtlas)
-    private _tileAtlas?: cc.SpriteAtlas;
+    private tileAtlas_?: cc.SpriteAtlas;
     public get tileAtlas() {
-        return assertExist(this._tileAtlas);
+        return assertExist(this.tileAtlas_);
     }
 
     @property(cc.SpriteAtlas)
-    private _characterAtlas?: cc.SpriteAtlas;
+    private characterAtlas_?: cc.SpriteAtlas;
     public get characterAtlas() {
-        return assertExist(this._characterAtlas);
+        return assertExist(this.characterAtlas_);
     }
 
     @property(cc.Font)
-    private _font?: cc.Font;
+    private font_?: cc.Font;
     public get font() {
-        return assertExist(this._font);
+        return assertExist(this.font_);
     }
 
     @property(cc.Prefab)
-    private _rankPrefab?: cc.Prefab;
+    private rankPrefab_?: cc.Prefab;
     public get rankPrefab() {
-        return assertExist(this._rankPrefab);
+        return assertExist(this.rankPrefab_);
     }
 
     @property(cc.Prefab)
-    private _inputPrefab?: cc.Prefab;
+    private inputPrefab_?: cc.Prefab;
     public get inputPrefab() {
-        return assertExist(this._inputPrefab);
-    }
-
-    protected start() {
-        assertExist(this.uiAtlas);
-        assertExist(this.tileAtlas);
-        assertExist(this.characterAtlas);
-        assertExist(this.font);
-        assertExist(this.rankPrefab);
-        assertExist(this.inputPrefab);
+        return assertExist(this.inputPrefab_);
     }
 
     public static instance(): SharedAssets {

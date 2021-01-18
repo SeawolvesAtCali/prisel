@@ -1,3 +1,4 @@
+import './registerProtoTypes';
 export * from './animationSpec';
 export * from './animationUtils';
 export * from './chanceSpec';

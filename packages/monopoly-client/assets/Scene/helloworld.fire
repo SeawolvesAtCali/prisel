@@ -177,7 +177,7 @@
       "array": [
         0,
         0,
-        400.10373654841067,
+        406.1659143749018,
         0,
         0,
         0,
@@ -486,22 +486,22 @@
       "__id__": 11
     },
     "_enabled": true,
-    "uiAtlas": {
+    "uiAtlas_": {
       "__uuid__": "e562b2d6-8ad4-4f22-bd85-688266e1c1cb"
     },
-    "tileAtlas": {
+    "tileAtlas_": {
       "__uuid__": "2a76583b-3f5f-48c4-b955-f8ed4c594efe"
     },
-    "characterAtlas": {
+    "characterAtlas_": {
       "__uuid__": "411a96c9-688e-4be4-b27d-dcf5e292be66"
     },
-    "font": {
+    "font_": {
       "__uuid__": "646bd328-55c6-406d-8eb6-5c4d7bea940d"
     },
-    "rankPrefab": {
+    "rankPrefab_": {
       "__uuid__": "5a6882de-2a31-4ce9-940a-6feb43ed4437"
     },
-    "inputPrefab": {
+    "inputPrefab_": {
       "__uuid__": "6babb8eb-669f-492e-8511-0d38033bdc60"
     },
     "_id": "8bp3TW1fNHiKKFbVKV3c1V"

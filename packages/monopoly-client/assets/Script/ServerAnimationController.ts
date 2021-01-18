@@ -1,6 +1,6 @@
 import { assertExist, Client, Packet } from '@prisel/client';
 import { Action, Anim, exist } from '@prisel/monopoly-common';
-import { animation_spec } from '../../../common/node_modules/@prisel/protos/dist';
+import { animation_spec } from '@prisel/protos';
 import { animEmitter } from './animations';
 import { client, ClientState } from './Client';
 import { EVENT, EVENT_BUS } from './consts';

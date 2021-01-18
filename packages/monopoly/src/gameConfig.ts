@@ -17,7 +17,7 @@ const MonopolyGameConfig: GameConfig = {
     onStart(room) {
         (async () => {
             const playerMap = new WeakMap<Player, GamePlayer>();
-            const addPlayerMapping = playerMap.set;
+            const addPlayerMapping = playerMap.set.bind(playerMap);
             const game = await createIntialState(room, addPlayerMapping, (player: Player) =>
                 playerMap.get(player),
             );

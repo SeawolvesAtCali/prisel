@@ -1,5 +1,6 @@
 export function assert(condition: boolean, message: string): true {
     if (!condition) {
+        console.trace();
         throw new Error(message);
     }
     return true;

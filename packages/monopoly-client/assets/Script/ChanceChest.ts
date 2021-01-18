@@ -1,19 +1,19 @@
-import { Mixins } from '@prisel/monopoly-common';
+import { assertExist } from '@prisel/client';
+import { exist } from '@prisel/monopoly-common';
 import TileWrapper from './Tile';
-import { lifecycle, nullCheck } from './utils';
+import { lifecycle } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class ChanceChest extends cc.Component {
     @property(cc.Node)
-    private chestNode: cc.Node = null;
+    private chestNode?: cc.Node;
 
     @lifecycle
     protected start() {
-        nullCheck(this.chestNode).active = !!Mixins.hasMixin(
-            nullCheck(this.getComponent(TileWrapper)).getTile(),
-            Mixins.ChancePoolMixinConfig,
+        assertExist(this.chestNode).active = exist(
+            this.getComponent(TileWrapper).getTile()?.chancePool,
         );
     }
 }

@@ -1,16 +1,13 @@
-import {
-    Client,
-    RoomChangePayload,
-    Messages,
-    ResponseWrapper,
-    LoginResponsePayload,
-} from '@prisel/client';
+import { Client, Messages, Packet } from '@prisel/client';
+import { room_state_change_spec } from '../common/node_modules/@prisel/protos/dist';
 
 export function createClients(num = 1) {
     return Array.from({ length: num }).map(() => new Client());
 }
 
-export function waitForRoomUpdate(client: Client): Promise<RoomChangePayload> {
+export function waitForRoomUpdate(
+    client: Client,
+): Promise<room_state_change_spec.RoomStateChangePayload> {
     return new Promise((resolve) => {
         const off = client.onRoomStateChange((roomStateChange) => {
             off();
@@ -19,12 +16,10 @@ export function waitForRoomUpdate(client: Client): Promise<RoomChangePayload> {
     });
 }
 
-export async function connectAndLogin(client: Client): Promise<string> {
+export async function connectAndLogin(client: Client): Promise<string | undefined> {
     await client.connect();
-    const loginResponse: ResponseWrapper<LoginResponsePayload> = await client.request(
-        Messages.getLogin(client.newId(), 'username'),
-    );
-    return loginResponse.payload.userId;
+    const loginResponse = await client.request(Messages.getLogin(client.newId(), 'username'));
+    return Packet.getPayload(loginResponse, 'loginResponse')?.userId;
 }
 
 export async function createLoginedClients(num = 1): Promise<Client[]> {

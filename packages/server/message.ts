@@ -1,87 +1,38 @@
-import {
-    MessageType,
-    Packet,
-    PacketType,
-    Request,
-    Status,
-    Response,
-    LoginPayload,
-    Code,
-} from '@prisel/common';
+import { Packet, Request, Response } from '@prisel/common';
+import { error_spec, packet, player_info, system_action_type } from '@prisel/protos';
 
-interface BroadcastMessagePayload {
-    username: string;
-    message: string;
-}
-export function getBroadcastMessage(
-    username: string,
-    message: string,
-): Packet<BroadcastMessagePayload> {
-    return {
-        type: PacketType.DEFAULT,
-        system_action: MessageType.BROADCAST,
-        payload: {
-            username,
+export function getBroadcast(player: player_info.PlayerInfo, message: string): Packet {
+    return Packet.forSystemAction(system_action_type.SystemActionType.BROADCAST)
+        .setPayload('broadcastPayload', {
             message,
-        },
-    };
+            player,
+        })
+        .build();
 }
 
-export function getWelcome(): Packet<never> {
-    return {
-        type: PacketType.DEFAULT,
-        system_action: MessageType.WELCOME,
-    };
-}
-
-export function getResponseFor<T = never>(
-    request: Request<any>,
-    status: Status,
-    payload?: T,
-): Response<T> {
-    const response: Response<T> = {
-        type: PacketType.RESPONSE,
-        request_id: request.request_id,
-        status,
-    };
-    if (payload !== undefined) {
-        response.payload = payload;
-    }
-    if (request.action !== undefined) {
-        response.action = request.action;
-        return response;
-    }
-    response.system_action = request.system_action;
-    return response;
-}
-export function getSuccessFor<Payload = never>(
-    request: Request<any>,
-    payload?: Payload,
-): Response<Payload> {
-    return getResponseFor(request, { code: Code.OK }, payload);
-}
-
-export function getFailureFor(
-    request: Request<any>,
-    message?: string,
-    detail?: any,
-): Response<never> {
-    const status: Status = {
-        code: Code.FAILED,
-    };
-    if (message) {
-        status.message = message;
-    }
-    if (detail !== undefined) {
-        status.detail = detail;
-    }
-    return getResponseFor(request, status);
+export function getWelcome(): Packet {
+    return Packet.forSystemAction(system_action_type.SystemActionType.WELCOME).build();
 }
 
 /**
  * Success response for client login
  * @param {String} userId
  */
-export function getLoginSuccess(loginRequest: Request<LoginPayload>, userId: string) {
-    return getSuccessFor(loginRequest, { userId });
+export function getLoginSuccess(loginRequest: Request, userId: string): Response {
+    return Response.forRequest(loginRequest)
+        .setPayload('loginResponse', {
+            userId,
+        })
+        .build();
+}
+
+export function getError(message: string, detail?: string): packet.Packet {
+    const payload: error_spec.ErrorPayload = { message };
+
+    if (detail) {
+        payload.detail = detail;
+    }
+    return Packet.forSystemAction(system_action_type.SystemActionType.ERROR)
+        .setPayload('errorPayload', payload)
+        .build();
 }

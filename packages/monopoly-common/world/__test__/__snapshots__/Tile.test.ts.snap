@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tile serialize 1`] = `
+Object {
+  "data": Object {
+    "chancePool": "[{\\"display\\":{\\"title\\":\\"move to tile\\",\\"description\\":\\"description\\"},\\"type\\":\\"move_to_tile\\",\\"inputArgs\\":{\\"tileId\\":\\"1\\",\\"isTeleport\\":false}}]",
+    "hasProperties": Array [
+      "property1",
+    ],
+    "isStart": true,
+    "next": Array [
+      "3",
+    ],
+    "position": "{\\"row\\":1,\\"col\\":2}",
+    "prev": Array [
+      "1",
+      "2",
+    ],
+  },
+  "id": "123",
+  "type": "tile",
+}
+`;

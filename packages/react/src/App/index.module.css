@@ -13,3 +13,7 @@
     flex-direction: row;
     overflow: hidden;
 }
+
+body {
+    margin: 0;
+}

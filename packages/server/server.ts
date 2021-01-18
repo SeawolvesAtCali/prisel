@@ -1,31 +1,31 @@
-import { Context } from './objects';
+import { Packet, Response } from '@prisel/common';
+import http from 'http';
+import clientHandlerRegister from './clientHandlerRegister';
 import createContext from './createContext';
 import debug from './debug';
-import './handler';
-import {
-    createServerWithInternalHTTPServer,
-    watchForDisconnection,
-    getConnectionToken,
-    emit,
-    createServerFromHTTPServer,
-    deserialize,
-} from './utils/networkUtils';
-import clientHandlerRegister from './clientHandlerRegister';
-import { handleDisconnect } from './handler/handleDisconnect';
-import { getWelcome } from './message';
-import { GameConfig, BaseGameConfig } from './utils/gameConfig';
-import { RoomConfig, BaseRoomConfig } from './utils/roomConfig';
-import http from 'http';
-import { getPlayer, getRoom } from './utils/stateUtils';
-import { isResponse, isSupportedPacket, ErrorPayload, Packet, PacketType } from '@prisel/common';
-import { GAME_PHASE } from './objects/gamePhase';
 import { DEBUG_MODE } from './flags';
+import { handleDisconnect } from './handler/handleDisconnect';
+import './handler/index';
+import { getError, getWelcome } from './message';
+import { Context } from './objects';
+import { GAME_PHASE } from './objects/gamePhase';
+import { BaseGameConfig, GameConfig } from './utils/gameConfig';
+import {
+    createServerFromHTTPServer,
+    createServerWithInternalHTTPServer,
+    emit,
+    getConnectionToken,
+    watchForDisconnection,
+} from './utils/networkUtils';
+import { BaseRoomConfig, RoomConfig } from './utils/roomConfig';
+import { safeStringify } from './utils/safeStringify';
+import { getPlayer, getRoom } from './utils/stateUtils';
 
 interface ServerConfig {
     host?: string;
     port?: number;
-    gameConfig?: Partial<GameConfig>;
-    roomConfig?: Partial<RoomConfig>;
+    gameConfig?: GameConfig;
+    roomConfig?: RoomConfig;
     server?: http.Server;
 }
 /**
@@ -58,8 +58,8 @@ interface ServerConfig {
  * ```
  */
 export class Server {
-    private context: Context;
-    private onClose: () => void;
+    private context: Context | undefined;
+    private onClose: (() => void) | undefined;
 
     /**
      * Create and start the server and setup listeners for websocket events.
@@ -73,10 +73,10 @@ export class Server {
         },
     ) {
         const server = (() => {
-            if ('server' in config) {
+            if (config.server) {
                 return createServerFromHTTPServer(config.server);
             }
-            if ('host' in config && 'port' in config) {
+            if (config.host && config.port) {
                 const [wsServer, httpServer] = createServerWithInternalHTTPServer({
                     host: config.host,
                     port: config.port,
@@ -98,41 +98,48 @@ export class Server {
         const context: Context = createContext({
             gameConfig,
             roomConfig,
+            server,
         });
 
         this.context = context;
 
         server.on('connection', (socket) => {
+            if (!this.context) {
+                return;
+            }
             debug('client connected');
             emit(socket, getWelcome());
             socket.on('message', (data: any) => {
-                debug(`received ${data}`);
+                debug(`received socket message`);
                 if (!data) {
                     return;
                 }
-                const packet = deserialize(data);
-                if (DEBUG_MODE && !isSupportedPacket(packet)) {
-                    debug(`packet structure is invalid`);
-                    const player = getPlayer(context, socket);
-                    if (player) {
-                        player.emit<Packet<ErrorPayload>>({
-                            type: PacketType.DEFAULT,
-                            payload: {
-                                message: 'packet structure is invalid',
-                                detail: packet,
-                            },
-                        });
-                    } else {
-                        debug(`player is not logged in, cannot send error report`);
-                    }
-                    // TODO send info back to client
+                if (!this.context) {
                     return;
                 }
+                const packet = Packet.deserialize(data);
+                if (!Packet.is(packet)) {
+                    debug(`packet structure is invalid ${safeStringify(packet)}`);
+                    if (DEBUG_MODE) {
+                        const player = getPlayer(this.context, socket);
+                        if (player) {
+                            player.emit(
+                                getError('packet structure is invalid', safeStringify(packet)),
+                            );
+                        } else {
+                            debug(`player is not logged in, cannot send error report`);
+                        }
+                        // TODO send info back to client
+                        return;
+                    }
+                    return;
+                }
+
                 // handle response
-                if (isResponse(packet)) {
-                    const { request_id: id } = packet;
-                    if (context.requests.isWaitingFor(id)) {
-                        context.requests.onResponse(packet);
+                if (Response.isResponse(packet)) {
+                    const { requestId: id } = packet;
+                    if (this.context.requests.isWaitingFor(id)) {
+                        this.context.requests.onResponse(packet);
                     } else {
                         debug(`response with id ${id} is unclaimed ${JSON.stringify(packet)}`);
                     }
@@ -140,15 +147,17 @@ export class Server {
                 }
                 // handle packet or request
                 // systemAction are handled by pre-registered handlers.
-                const { system_action: systemAction, action } = packet;
-
-                if (action) {
-                    const player = getPlayer(context, socket);
-                    const room = getRoom(context, socket);
+                if (Packet.isAnyCustomAction(packet)) {
+                    const player = getPlayer(this.context, socket);
+                    const room = getRoom(this.context, socket);
                     if (player && room && room.getGamePhase() === GAME_PHASE.GAME) {
                         room.dispatchGamePacket(packet, player);
                     }
-                } else if (systemAction !== undefined) {
+                } else if (Packet.isAnySystemAction(packet)) {
+                    const systemAction = Packet.getSystemAction(packet);
+                    if (!systemAction) {
+                        return;
+                    }
                     const handler = clientHandlerRegister.get(systemAction);
                     if (!handler) {
                         debug(
@@ -158,29 +167,33 @@ export class Server {
                         );
                         return;
                     }
-                    handler(context, socket)(packet);
+                    handler(this.context, socket)(packet);
                 }
             });
 
             const connectionToken = getConnectionToken();
             socket.on('disconnect', () => {
                 connectionToken.safeDisconnect();
-                handleDisconnect(context, socket);
-                debug('client disconnected');
+                if (this.context) {
+                    handleDisconnect(this.context, socket);
+                    debug('client disconnected');
+                }
             });
 
             watchForDisconnection(socket, connectionToken).then(() => {
                 if (!connectionToken.safeDisconnected) {
                     // client is not responding
                     // forcefully terminate connection
-                    const client = getPlayer(context, socket);
+                    const client = getPlayer(this.context, socket);
                     if (client) {
                         debug(`client ${client.getId()} lost connection`);
                     } else {
                         debug('a not logged-in user lost connection');
                     }
                     socket.terminate();
-                    handleDisconnect(context, socket);
+                    if (this.context) {
+                        handleDisconnect(this.context, socket);
+                    }
                 }
             });
         });
@@ -199,7 +212,7 @@ export class Server {
             this.context.server.close();
             if (this.onClose) {
                 this.onClose();
-                this.onClose = null;
+                this.onClose = undefined;
             }
             this.context = undefined;
         }

@@ -5,8 +5,8 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class DicePad extends cc.Component {
-    private dice: Dice;
-    private eventBus: cc.Node = null;
+    private dice?: Dice;
+    private eventBus?: cc.Node;
     private rolled = false;
 
     // LIFE-CYCLE CALLBACKS:
@@ -31,13 +31,13 @@ export default class DicePad extends cc.Component {
         if (this.rolled) {
             return;
         }
-        this.eventBus.emit(EVENT.DICE_ROLLED);
+        this.eventBus?.emit(EVENT.DICE_ROLLED);
         this.rolled = true;
-        this.dice.playRollAnimation().then(() => {
+        this.dice?.playRollAnimation().then(() => {
             // hopefully when animation ends, dice already receive event to
             // update the value.
-            this.dice.updateSprite();
-            this.eventBus.emit(EVENT.DICE_ROLLED_END);
+            this.dice?.updateSprite();
+            this.eventBus?.emit(EVENT.DICE_ROLLED_END);
         });
     }
 

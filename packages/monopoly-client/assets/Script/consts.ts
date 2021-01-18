@@ -8,25 +8,35 @@ export const TILE_CENTER_OFFSET = cc.v2(TILE_SIZE / 2, TILE_SIZE / 2);
 
 export const CAMERA_FOLLOW_OFFSET = cc.v2(0, TILE_SIZE);
 
-export const CHARACTER_COLORS = {
-    0: 'green',
-    1: 'blue',
-    2: 'beige',
-    3: 'pink',
-    4: 'yellow',
-};
+export const CHARACTER_COLORS = [
+    // 0:
+    'green',
+    // 1:
+    'blue',
+    // 2:
+    'beige',
+    // 3:
+    'pink',
+    // 4:
+    'yellow',
+];
 
 export const TILE_Z_INDEX_OFFSET = 0;
 export const PROPERTY_Z_INDEX_OFFSET = 1;
 export const PLAYER_Z_INDEX_OFFSET = 5;
 
-export const CHARACTER_AVATAR_SPRITE_NAME = {
-    0: 'alienGreen_badge1',
-    1: 'alienBlue_badge1',
-    2: 'alienBeige_badge1',
-    3: 'alienPink_badge1',
-    4: 'alienYellow_badge1',
-};
+export const CHARACTER_AVATAR_SPRITE_NAME = [
+    // 0:
+    'alienGreen_badge1',
+    // 1:
+    'alienBlue_badge1',
+    // 2:
+    'alienBeige_badge1',
+    // 3:
+    'alienPink_badge1',
+    // 4:
+    'alienYellow_badge1',
+];
 
 export function getCharacterColor(character: number) {
     return CHARACTER_COLORS[character % 5];

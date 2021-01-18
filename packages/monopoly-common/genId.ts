@@ -1,5 +1,5 @@
-import { generate } from 'shortid';
+import { nanoid } from 'nanoid';
 
 export function genId() {
-    return generate();
+    return nanoid(8);
 }

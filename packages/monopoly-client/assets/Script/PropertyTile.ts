@@ -1,41 +1,41 @@
-import { Coordinate, PropertyInfo } from '@prisel/monopoly-common';
+import { assertExist } from '@prisel/client';
+import { coordinate, property as propertypb } from '@prisel/protos';
 import { LANDING_POS_OFFSET, PROPERTY_Z_INDEX_OFFSET } from './consts';
 import Player from './Player';
-import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class PropertyTile extends cc.Component {
     @property(cc.SpriteAtlas)
-    private spriteAtlas: cc.SpriteAtlas = null;
+    private spriteAtlas?: cc.SpriteAtlas;
 
     @property(cc.Prefab)
-    private particle: cc.Prefab = null;
+    private particle?: cc.Prefab;
 
-    private owner: Player = null;
+    private owner?: Player;
 
-    public coor: Coordinate = null;
+    public coor?: coordinate.Coordinate;
 
-    public init(coor: Coordinate) {
+    public init(coor: coordinate.Coordinate) {
         this.coor = coor;
     }
 
     public getZIndex() {
-        return this.coor.row * 10 + PROPERTY_Z_INDEX_OFFSET;
+        return assertExist(this.coor).row * 10 + PROPERTY_Z_INDEX_OFFSET;
     }
     public getOwner() {
         return this.owner;
     }
 
-    public setOwner(player: Player, propertyInfo: PropertyInfo) {
+    public setOwner(player: Player, propertyInfo: propertypb.PropertyInfo) {
         this.owner = player;
-        this.getComponent(cc.Sprite).spriteFrame = this.spriteAtlas.getSpriteFrame(
+        this.getComponent(cc.Sprite).spriteFrame = assertExist(this.spriteAtlas).getSpriteFrame(
             `property-${this.levelString(propertyInfo)}-${player.color}`,
         );
     }
 
-    private levelString(propertyInfo: PropertyInfo) {
+    private levelString(propertyInfo: propertypb.PropertyInfo) {
         switch (propertyInfo.currentLevel) {
             case 0:
                 return 'owned';
@@ -47,7 +47,7 @@ export default class PropertyTile extends cc.Component {
     }
 
     public playInvestedEffect(durationInMs?: number) {
-        const particleNode = cc.instantiate(nullCheck(this.particle));
+        const particleNode = (cc.instantiate(assertExist(this.particle)) as unknown) as cc.Node;
         this.node.addChild(particleNode);
         particleNode.setPosition(LANDING_POS_OFFSET);
     }

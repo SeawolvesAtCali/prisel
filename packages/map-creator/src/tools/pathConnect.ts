@@ -1,13 +1,10 @@
-import { RefIdSymbol, Tile2, World } from '@prisel/monopoly-common';
-import { ensurePath } from './ensurePath';
+import { Tile, World } from '@prisel/monopoly-common';
 
-export function pathConnect(from: Tile2, to: Tile2, world: World) {
-    const fromWithPath = ensurePath(from);
-    const toWithPath = ensurePath(to);
-    if (!fromWithPath.path.next.some((ref) => ref[RefIdSymbol] === to.id)) {
-        fromWithPath.path.next = [...fromWithPath.path.next, world.getRef(toWithPath)];
+export function pathConnect(from: Tile, to: Tile, world: World) {
+    if (!from.next.some((ref) => ref.id === to.id)) {
+        from.next = [...from.next, world.makeRef(to)];
     }
-    if (!toWithPath.path.next.some((ref) => ref[RefIdSymbol] === from.id)) {
-        toWithPath.path.prev = [...toWithPath.path.prev, world.getRef(fromWithPath)];
+    if (!to.next.some((ref) => ref.id === from.id)) {
+        to.prev = [...to.prev, world.makeRef(from)];
     }
 }

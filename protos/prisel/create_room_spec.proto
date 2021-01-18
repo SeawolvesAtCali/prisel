@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package prisel;
+
+import "prisel/annotations.proto";
+import "prisel/room_info.proto";
+import "prisel/room_state_snapshot.proto";
+
+message CreateRoomRequest {
+  option (for_system_action) = {
+    type : CREATE_ROOM,
+    packet_type : REQUEST
+  };
+  string roomName = 1;
+}
+
+message CreateRoomResponse {
+  option (for_system_action) = {
+    type : CREATE_ROOM,
+    packet_type : RESPONSE
+  };
+  RoomInfo room = 1;
+  RoomStateSnapshot room_state = 2;
+}

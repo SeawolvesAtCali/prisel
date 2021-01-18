@@ -1,14 +1,15 @@
-import { Context, Socket } from '../objects';
-import clientHandlerRegister from '../clientHandlerRegister';
-import { MessageType, Request } from '@prisel/common';
-import { getPlayerOrRespondError } from './utils';
+import { system_action_type } from '@prisel/protos';
+import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
+import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
-const handleGameStart = (context: Context, socket: Socket) => (request: Request) => {
+const handleGameStart: Handler = (context, socket) => (request) => {
+    if (!verifyIsRequest(request)) {
+        return;
+    }
     const player = getPlayerOrRespondError(context, socket, request);
     if (!player) {
         return;
     }
-
     const { roomConfig, gameConfig } = context;
     const failureResponse = roomConfig.preGameStart(player, request, gameConfig.canStart);
     if (failureResponse) {
@@ -18,4 +19,4 @@ const handleGameStart = (context: Context, socket: Socket) => (request: Request)
     roomConfig.onGameStart(player, request);
 };
 
-clientHandlerRegister.push(MessageType.GAME_START, handleGameStart);
+clientHandlerRegister.push(system_action_type.SystemActionType.GAME_START, handleGameStart);

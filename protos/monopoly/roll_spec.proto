@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "prisel/annotations.proto";
+import "monopoly/coordinate.proto";
+
+message RollResponse {
+  option (prisel.for_action) = {
+    type : "roll"
+    packet_type : RESPONSE
+  };
+  int32 steps = 1;
+  repeated Coordinate path = 2;
+}

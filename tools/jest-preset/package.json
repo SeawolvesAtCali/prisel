@@ -9,7 +9,7 @@
     "author": "",
     "license": "MIT",
     "dependencies": {
-        "ts-jest": "^26.1.0",
+        "ts-jest": "26.4.4",
         "jest-standard-reporter": "^1.0.4"
     }
 }

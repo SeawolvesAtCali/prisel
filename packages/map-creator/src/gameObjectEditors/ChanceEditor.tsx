@@ -1,10 +1,10 @@
 import {
-    CashExchangeDirection,
-    CashExchangeType,
     ChanceInput,
     ChanceInputArgs,
-    CollectableType,
+    MoneyExchangeDirection,
+    MoneyExchangeType,
 } from '@prisel/monopoly-common';
+import { chance } from '@prisel/protos';
 import React from 'react';
 import { BooleanInput } from './BooleanInput';
 import { EnumInput } from './EnumInput';
@@ -47,7 +47,7 @@ const MoveToTileChanceEditor: React.FC<ChanceEditorProps<'move_to_tile'>> = ({
     );
 };
 
-export const CashExchangeChanceEditor: React.FC<ChanceEditorProps<'cash_exchange'>> = ({
+export const CashExchangeChanceEditor: React.FC<ChanceEditorProps<'money_exchange'>> = ({
     autoFocus = false,
     input,
 }) => {
@@ -58,12 +58,12 @@ export const CashExchangeChanceEditor: React.FC<ChanceEditorProps<'cash_exchange
                 initialValue={input.inputArgs.direction}
                 autoFocus={autoFocus}
                 enumMap={{
-                    'to bank': CashExchangeDirection.TO_BANK,
-                    'to all other players': CashExchangeDirection.TO_ALL_OTHER_PLAYERS,
-                    'from bank': CashExchangeDirection.FROM_BANK,
-                    'from all other players': CashExchangeDirection.FROM_ALL_OTHER_PLAYERS,
+                    'to bank': MoneyExchangeDirection.TO_BANK,
+                    'to all other players': MoneyExchangeDirection.TO_ALL_OTHER_PLAYERS,
+                    'from bank': MoneyExchangeDirection.FROM_BANK,
+                    'from all other players': MoneyExchangeDirection.FROM_ALL_OTHER_PLAYERS,
                 }}
-                onCommit={(direction: CashExchangeDirection) => {
+                onCommit={(direction: MoneyExchangeDirection) => {
                     input.inputArgs.direction = direction;
                 }}
             />
@@ -72,10 +72,10 @@ export const CashExchangeChanceEditor: React.FC<ChanceEditorProps<'cash_exchange
                 initialValue={input.inputArgs.type}
                 autoFocus={false}
                 enumMap={{
-                    default: CashExchangeType.UNSPECIFIED,
-                    'property tax': CashExchangeType.OWN_PROPERTY_PER_HUNDRED,
+                    default: MoneyExchangeType.UNSPECIFIED,
+                    'property tax': MoneyExchangeType.OWN_PROPERTY_PER_HUNDRED,
                 }}
-                onCommit={(exchangeType: CashExchangeType) => {
+                onCommit={(exchangeType: MoneyExchangeType) => {
                     input.inputArgs.type = exchangeType;
                 }}
             />
@@ -106,7 +106,7 @@ const MoveStepsChanceEditor: React.FC<ChanceEditorProps<'move_steps'>> = ({
     );
 };
 
-const CollectableChanceEditor: React.FC<ChanceEditorProps<'collectable'>> = ({
+const CollectableChanceEditor: React.FC<ChanceEditorProps<'collectible'>> = ({
     input,
     autoFocus,
 }) => {
@@ -116,9 +116,9 @@ const CollectableChanceEditor: React.FC<ChanceEditorProps<'collectable'>> = ({
             initialValue={input.inputArgs.type}
             autoFocus={autoFocus}
             enumMap={{
-                'Get out of jail': CollectableType.GET_OUT_OF_JAIL_FREE,
+                'Get out of jail': chance.CollectibleExtra_CollectibleType.GET_OUT_OF_JAIL_FREE,
             }}
-            onCommit={(collectable: CollectableType) => {
+            onCommit={(collectable: chance.CollectibleExtra_CollectibleType) => {
                 input.inputArgs.type = collectable;
             }}
         />

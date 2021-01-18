@@ -1,8 +1,8 @@
 import { genId } from '../genId';
 import { GameObject, GameObjectClass } from './GameObject';
 import { Id } from './Id';
-import { Ref, RefIdSymbol } from './Ref';
-import { Serialized } from './serialize';
+import { Ref as Ref2 } from './ref2';
+import { Serialized } from './serializeUtil';
 
 export interface SerializedWorld {
     [key: string]: Array<Serialized<GameObject>>;
@@ -16,6 +16,10 @@ export class World {
     private idMap: Map<string, Set<Id>> = new Map();
     private gameObjectTypeRegistry: Map<string, GameObjectClass<any>> = new Map();
     private serializedTypes = new Set<string>();
+
+    constructor() {
+        this.makeRef = this.makeRef.bind(this);
+    }
 
     public registerObject<T extends GameObjectClass<any>>(clazz: T, enableSerialization = true) {
         const type = clazz.TYPE;
@@ -44,7 +48,7 @@ export class World {
         return (object as InstanceType<T>) || null;
     }
 
-    private getRespectiveSet(object: GameObject) {
+    private getIdSetOfSameType(object: GameObject) {
         const type = object.type;
         const gameObjectClass = this.gameObjectTypeRegistry.get(type);
         if (gameObjectClass && object instanceof gameObjectClass) {
@@ -74,10 +78,11 @@ export class World {
         id?: Id<InstanceType<T>>,
     ): InstanceType<T> {
         const object = new clazz();
+        object.world = this;
         const objectId = this.createId<InstanceType<T>>(id);
         object.id = objectId;
         this.objectMap.set(objectId, object);
-        this.getRespectiveSet(object)?.add(objectId);
+        this.getIdSetOfSameType(object)?.add(objectId);
 
         return object;
     }
@@ -85,8 +90,19 @@ export class World {
     public createRef<T extends GameObjectClass<any>>(
         clazz: T,
         id?: Id<InstanceType<T>>,
-    ): Ref<InstanceType<T>> {
-        return this.getRef(this.create(clazz, id));
+    ): Ref2<InstanceType<T>> {
+        return this.makeRef(this.create(clazz, id));
+    }
+
+    public add<T extends GameObject>(object: T) {
+        if (!this.idMap.has(object.type)) {
+            throw new Error(`object type ${object.type} is not registered`);
+        }
+        if (this.idMap.get(object.type)?.has(object.id)) {
+            throw new Error(`object ${object.type} already has an id ${object.id}`);
+        }
+        this.objectMap.set(object.id, object);
+        this.getIdSetOfSameType(object)?.add(object.id);
     }
 
     public remove<T extends GameObject>(idOrGameObject: Id | T) {
@@ -99,17 +115,12 @@ export class World {
             this.objectMap.delete(idOrGameObject.id);
         }
         if (deletedObject) {
-            this.getRespectiveSet(deletedObject)?.delete(deletedObject.id);
+            this.getIdSetOfSameType(deletedObject)?.delete(deletedObject.id);
         }
     }
 
-    public getRef<T extends GameObjectClass<any>>(
-        keyOrObject: Id<InstanceType<T>> | InstanceType<T>,
-    ): Ref<InstanceType<T>> {
-        const id = typeof keyOrObject === 'string' ? keyOrObject : keyOrObject.id;
-        const ref = <Ref<InstanceType<T>>>(() => this.get(id));
-        ref[RefIdSymbol] = id;
-        return ref;
+    public makeRef<T extends GameObject>(keyOrObject: Id<T> | T): Ref2<T> {
+        return Ref2.of<T>(keyOrObject, this);
     }
 
     public serialize(): SerializedWorld {
@@ -117,7 +128,9 @@ export class World {
         for (const serializedObjectType of Array.from(this.serializedTypes)) {
             Object.assign(serialized, {
                 [serializedObjectType]:
-                    this.getAll(serializedObjectType).map((object) => object.serialize()) ?? [],
+                    this.getAll(serializedObjectType).map((object: GameObject) =>
+                        object.serialize(),
+                    ) ?? [],
             });
         }
         return serialized;
@@ -136,6 +149,10 @@ export class World {
                     for (const serializedObject of serialized[key]) {
                         clazz.deserialize(serializedObject, this);
                     }
+                } else {
+                    console.error(
+                        `Cannot deserialize object of type ${key}, type might not be registered in this world.`,
+                    );
                 }
             }
         }

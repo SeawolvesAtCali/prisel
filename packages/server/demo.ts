@@ -1,6 +1,6 @@
-import { Server, debug } from './index';
+import { debug, Server } from './index';
 
-const server = new Server();
+const server = Server.create();
 process.stdout.write('starting server');
 
 process.title = 'prisel-server';

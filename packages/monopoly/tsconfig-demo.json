@@ -1,0 +1,10 @@
+{
+    // used by package-scripts.yml to run server in demo
+    "extends": "./tsconfig",
+    "compilerOptions": {
+        "rootDir": "./",
+        "noEmit": true,
+        "module": "commonjs"
+    },
+    "exclude": ["node_modules", "**/lib"]
+}

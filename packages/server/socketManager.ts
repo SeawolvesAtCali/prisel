@@ -1,6 +1,5 @@
-import { Socket } from './objects';
-
 import debug from './debug';
+import { Socket } from './objects';
 
 /**
  * Singleton class to manage sockets and their ids.
@@ -48,12 +47,12 @@ class SocketManager {
         this.idMap.set(id, socket);
     }
 
-    public getId(socket: Socket): string {
+    public getId(socket: Socket): string | undefined {
         const id = this.socketMap.get(socket);
         return id;
     }
 
-    public getSocket(id: string): Socket {
+    public getSocket(id: string): Socket | undefined {
         const socket = this.idMap.get(id);
         return socket;
     }

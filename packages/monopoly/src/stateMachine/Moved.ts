@@ -4,26 +4,26 @@ import {
     animationMap,
     ChanceInputArgs,
     exist,
-    log,
-    Mixins,
-    Payment,
-    PlayerBankruptPayload,
-    PlayerEndTurnPayload,
-    PlayerLeftPayload,
-    PlayerPayRentPayload,
-    PlayerPurchasePayload,
-    PromptPurchasePayload,
-    PromptPurchaseResponsePayload,
-    Properties,
-    Property2,
+    GamePlayer,
+    Property,
 } from '@prisel/monopoly-common';
-import { broadcast, PacketType, ResponseWrapper } from '@prisel/server';
-import { chanceHandlers } from '../chanceHandlers';
-import { GamePlayer } from '../gameObjects/GamePlayer';
-import { getRand } from '../utils';
+import {
+    animation_spec,
+    announce_bankrupt_spec,
+    announce_end_turn_spec,
+    announce_pay_rent_spec,
+    announce_player_left_spec,
+    announce_purchase_spec,
+    payment,
+    prompt_purchase_spec,
+} from '@prisel/protos';
+import { assertExist, Packet, Request } from '@prisel/server';
+import { chanceHandlers } from '../chanceHandlers/index';
+import { log } from '../log';
+import { getPlayer, getRand } from '../utils';
 import { GameOver } from './GameOver';
 import { PreRoll } from './PreRoll';
-import { StateMachineConstructor, StateMachineState } from './StateMachineState';
+import { StateMachineState } from './StateMachineState';
 
 /**
  * This state starts after the current player moves to the destination after
@@ -47,7 +47,6 @@ import { StateMachineConstructor, StateMachineState } from './StateMachineState'
  * Animation: pay_rent, invested, pan
  */
 export class Moved extends StateMachineState {
-    private shouldTransition: StateMachineConstructor = null;
     public async onEnter() {
         const currentPlayer = this.game.getCurrentPlayer();
 
@@ -61,22 +60,30 @@ export class Moved extends StateMachineState {
             return;
         }
 
-        broadcast<PlayerEndTurnPayload>(this.game.room.getPlayers(), {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_END_TURN,
-            payload: {
-                currentPlayerId: currentPlayer.id,
-                nextPlayerId: this.game.getNextPlayer().id,
-            },
-        });
-        const currentPlayerPos = this.game.getCurrentPlayer().pathTile.position;
-        const nextPlayerPos = this.game.getNextPlayer().pathTile.position;
+        this.game.broadcast(
+            Packet.forAction(Action.ANNOUNCE_END_TURN)
+                .setPayload(announce_end_turn_spec.AnnounceEndTurnPayload, {
+                    currentPlayer: currentPlayer.id,
+                    nextPlayer: this.game.getNextPlayer().id,
+                })
+                .build(),
+        );
+
+        const currentPlayerPos = assertExist(
+            this.game.getCurrentPlayer().pathTile?.get().position,
+            'currentPlayerPos',
+        );
+        const nextPlayerPos = assertExist(
+            this.game.getNextPlayer().pathTile?.get().position,
+            'nextPlayerPos',
+        );
 
         await Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('pan', {
-                target: nextPlayerPos,
-            })
+            Anim.create('pan', animation_spec.PanExtra)
+                .setExtra({
+                    target: nextPlayerPos,
+                })
                 .setLength(
                     Math.trunc(
                         Math.sqrt(
@@ -96,12 +103,12 @@ export class Moved extends StateMachineState {
 
     private async processPropertyManagement() {
         const currentPlayer = this.game.getCurrentPlayer();
-        const currentPathTile = currentPlayer.pathTile;
+        const currentPathTile = assertExist(currentPlayer.pathTile?.get(), 'currentPathTile');
 
-        const { hasProperties } = currentPathTile;
-
-        if (exist(hasProperties)) {
-            const properties = hasProperties.map((propertyRef) => propertyRef());
+        if (currentPathTile.hasProperties.length > 0) {
+            const properties = currentPathTile.hasProperties.map((propertyRef) =>
+                propertyRef.get(),
+            );
             const handlePayRentPromise = this.handlePayRents(properties, currentPlayer);
             if (handlePayRentPromise) {
                 await handlePayRentPromise;
@@ -123,7 +130,7 @@ export class Moved extends StateMachineState {
 
     private checkGameOver() {
         for (const player of this.game.players.values()) {
-            if (player.cash < 0) {
+            if (player.money < 0) {
                 // player bankrupted.
                 this.announceBankrupt(player);
                 this.transition(GameOver);
@@ -136,21 +143,25 @@ export class Moved extends StateMachineState {
     // return true if should continue current state
     private async processChance() {
         const currentPlayer = this.game.getCurrentPlayer();
-        const currentTile = currentPlayer.pathTile;
+        const currentTile = assertExist(currentPlayer.pathTile?.get(), 'currentTile');
 
-        if (!Mixins.hasMixin(currentTile, Mixins.ChancePoolMixinConfig)) {
+        if (!exist(currentTile.chancePool)) {
             return;
         }
 
         // randomly select a chance
         const chanceInput = getRand(currentTile.chancePool);
 
+        if (!exist(chanceInput)) {
+            return;
+        }
         await Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('open_chance_chest', {
-                chance_chest_tile: currentTile.position,
-                chance: chanceInput.display,
-            })
+            Anim.create('open_chance_chest', animation_spec.OpenChanceChestExtra)
+                .setExtra({
+                    chanceChestTile: currentTile.position,
+                    chance: chanceInput.display,
+                })
                 .setLength(animationMap.open_chance_chest)
                 .build(),
         ).promise;
@@ -160,14 +171,11 @@ export class Moved extends StateMachineState {
         }
 
         // wait for current player to dismiss the chance card
-        const responseWrapper = await this.game.getCurrentPlayer().player.request(
-            {
-                type: PacketType.REQUEST,
-                action: Action.PROMPT_CHANCE_CONFIRMATION,
-                payload: {},
-            },
+        await getPlayer(this.game.getCurrentPlayer()).request(
+            Request.forAction(Action.PROMPT_CHANCE_CONFIRMATION),
             10000,
         );
+
         if (this.isTransitioned()) {
             return;
         }
@@ -180,8 +188,9 @@ export class Moved extends StateMachineState {
             return;
         }
 
-        const chanceType = chanceInput.type as keyof ChanceInputArgs;
+        const chanceType = (chanceInput.type as keyof ChanceInputArgs) || 'unspecified';
         const maybeState = await chanceHandlers[chanceType](this.game, chanceInput);
+
         if (this.isTransitioned()) {
             return;
         }
@@ -193,136 +202,128 @@ export class Moved extends StateMachineState {
             this.transition(maybeState);
             return;
         }
+
         return;
     }
 
     private handlePayRents(
-        properties: Property2[],
+        properties: Property[],
         currentPlayer: GamePlayer,
     ): Promise<void> | void {
-        const rentPayments: Payment[] = [];
+        const rentPayments: payment.Payment[] = [];
 
         // check for rent payment first
         for (const property of properties) {
-            if (property.owner && property.owner !== currentPlayer.id) {
+            if (property.owner && property.owner.id !== currentPlayer.id) {
                 rentPayments.push(
-                    currentPlayer.payRent(
-                        this.game.world.get<typeof GamePlayer>(property.owner),
-                        Properties.getPropertyInfoForRent(property),
-                    ),
+                    currentPlayer.payRent(property.owner.get(), property.getBasicPropertyInfo()),
                 );
             }
         }
 
-        if (rentPayments.length <= 0) {
+        if (!exist(rentPayments[0])) {
             return;
         }
         this.announcePayRent(rentPayments);
         return Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('pay_rent', {
-                // TODO: here we assume we are paying one player only
-                payer: this.game.getGamePlayerById(rentPayments[0].from).getGamePlayerInfo(),
-                receiver: this.game.getGamePlayerById(rentPayments[0].to).getGamePlayerInfo(),
-            })
+            Anim.create('pay_rent', animation_spec.PayRentExtra)
+                .setExtra({
+                    // TODO: here we assume we are paying one player only
+                    payer: this.game.getGamePlayerById(rentPayments[0].payer)?.getGamePlayerInfo(),
+                    payee: this.game.getGamePlayerById(rentPayments[0].payee)?.getGamePlayerInfo(),
+                })
                 .setLength(animationMap.pay_rent)
                 .build(),
         ).promise;
     }
 
     private handleInvest(
-        properties: Property2[],
+        properties: Property[],
         currentPlayer: GamePlayer,
     ): Promise<void> | undefined {
-        if (!properties.some((property) => Properties.investable(property, currentPlayer))) {
+        if (!properties.some((property) => property.investable(currentPlayer))) {
             return;
         }
         return this.promptForPurchases(properties);
     }
 
     private announceBankrupt(player: GamePlayer) {
-        broadcast<PlayerBankruptPayload>(this.game.room.getPlayers(), {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_BANKRUPT,
-            payload: {
-                id: player.id,
-            },
+        this.game.broadcast(
+            Packet.forAction(Action.ANNOUNCE_BANKRUPT)
+                .setPayload(announce_bankrupt_spec.AnnounceBankruptPayload, {
+                    player: player.id,
+                })
+                .build(),
+        );
+    }
+
+    private announcePayRent(payments: payment.Payment[]) {
+        this.game.broadcast((player) => {
+            return Packet.forAction(Action.ANNOUNCE_PAY_RENT)
+                .setPayload(announce_pay_rent_spec.AnnouncePayRentPayload, {
+                    payer: this.game.getCurrentPlayer().id,
+                    payments,
+                    myCurrentMoney: player.money || 0,
+                })
+                .build();
         });
     }
 
-    private announcePayRent(payments: Payment[]) {
-        broadcast<PlayerPayRentPayload>(this.game.room.getPlayers(), (player) => ({
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_PAY_RENT,
-            payload: {
-                id: this.game.getCurrentPlayer().id,
-                payments,
-                myCurrentMoney: this.game.getGamePlayer(player).cash,
-            },
-        }));
-    }
-
-    private async promptForPurchases(properties: Property2[]) {
+    private async promptForPurchases(properties: Property[]) {
         const currentPlayer = this.game.getCurrentPlayer();
 
         for (const property of properties) {
-            if (!Properties.investable(property, currentPlayer)) {
+            if (!property.investable(currentPlayer)) {
                 continue;
             }
 
-            const propertyForPurchase = Properties.getPropertyInfoForInvesting(
-                property,
+            const propertyForPurchase = property.getPromptPurchaseRequest(
                 currentPlayer,
+                currentPlayer.money,
             );
-            if (currentPlayer.cash < propertyForPurchase.cost) {
-                // not enough money
+            if (!propertyForPurchase) {
                 continue;
             }
 
             // TODO it might happen that a player left and force the game to
             // end while we are waiting for current player.
-            const response: ResponseWrapper<PromptPurchaseResponsePayload> = await currentPlayer.player.request<
-                PromptPurchasePayload
-            >(
-                {
-                    type: PacketType.REQUEST,
-                    action: Action.PROMPT_PURCHASE,
-                    payload: {
-                        property: propertyForPurchase,
-                        moneyAfterPurchase: currentPlayer.cash - propertyForPurchase.cost,
-                    },
-                },
+            const response = await getPlayer(currentPlayer).request(
+                Request.forAction(Action.PROMPT_PURCHASE).setPayload(
+                    prompt_purchase_spec.PromptPurchaseRequest,
+                    propertyForPurchase,
+                ),
                 0, // 0 timeout means no timeout
             );
 
             if (!this.isCurrent()) {
                 return;
             }
-            log.info('receive response for purchase' + JSON.stringify(response.get()));
+            log.info('receive response for purchase' + JSON.stringify(response));
             // although client shouldn't send a error response, let's just
             // check the status as well
-            if (!response.ok()) {
+            if (!Packet.isStatusOk(response)) {
                 return;
             }
 
-            if (response.payload.purchase) {
-                currentPlayer.purchaseProperty(
-                    property,
-                    Properties.getPropertyInfoForInvesting(property, currentPlayer),
-                );
+            if (
+                Packet.getPayload(response, prompt_purchase_spec.PromptPurchaseResponse)?.purchased
+            ) {
+                currentPlayer.purchaseProperty(property, propertyForPurchase);
                 // broadcast purchase
-                broadcast<PlayerPurchasePayload>(this.game.room.getPlayers(), {
-                    type: PacketType.DEFAULT,
-                    action: Action.ANNOUNCE_PURCHASE,
-                    payload: {
-                        id: currentPlayer.id,
-                        property: Properties.getBasicPropertyInfo(property),
-                    },
-                });
+                this.game.broadcast(
+                    Packet.forAction(Action.ANNOUNCE_PURCHASE)
+                        .setPayload(announce_purchase_spec.AnnouncePurchasePayload, {
+                            player: currentPlayer.id,
+                            property: property.getBasicPropertyInfo(),
+                        })
+                        .build(),
+                );
 
                 await Anim.processAndWait(
                     this.broadcastAnimation,
-                    Anim.create('invested', { property: Properties.getBasicPropertyInfo(property) })
+                    Anim.create('invested', animation_spec.InvestedExtra)
+                        .setExtra({ property: property.getBasicPropertyInfo() })
                         .setLength(animationMap.invested)
                         .build(),
                 ).promise;
@@ -335,13 +336,13 @@ export class Moved extends StateMachineState {
 
     public onPlayerLeave(gamePlayer: GamePlayer) {
         // player left, let's just end the game
-        broadcast<PlayerLeftPayload>(this.game.room.getPlayers(), {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_PLAYER_LEFT,
-            payload: {
-                player: gamePlayer.getGamePlayerInfo(),
-            },
-        });
+        this.game.broadcast(
+            Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
+                .setPayload(announce_player_left_spec.AnnouncePlayerLeftPayload, {
+                    player: gamePlayer.getGamePlayerInfo(),
+                })
+                .build(),
+        );
         this.transition(GameOver);
     }
 

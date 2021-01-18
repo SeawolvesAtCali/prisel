@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package prisel;
+
+enum PacketType {
+  DEFAULT = 0;
+  REQUEST = 1;
+  RESPONSE = 2;
+}

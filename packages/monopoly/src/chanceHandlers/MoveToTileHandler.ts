@@ -1,26 +1,24 @@
-import {
-    Action,
-    Anim,
-    animationMap,
-    ChanceArgs,
-    PlayerReceiveChancePayload,
-    Tiles,
-} from '@prisel/monopoly-common';
-import { broadcast, PacketType } from '@prisel/server';
+import { Action, Anim, animationMap, exist } from '@prisel/monopoly-common';
+import { animation_spec, announce_received_chance_spec } from '@prisel/protos';
+import { Packet } from '@prisel/server';
 import { Moved } from '../stateMachine/Moved';
-import { checkType, getRand } from '../utils';
+import { getRand } from '../utils';
 import { ChanceHandler } from './ChanceHander';
 
 const MAX_PATH_LENGTH = 1000;
 export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, input) => {
     const currentPlayer = game.getCurrentPlayer();
-    const currentLocation = currentPlayer.pathTile.position;
+    const currentTile = currentPlayer.pathTile?.get();
+    if (!exist(currentTile)) {
+        return;
+    }
+    const currentLocation = currentTile.position;
 
-    const path = Tiles.genPathWith(currentPlayer.pathTile, (current, length) => {
+    const path = currentTile.genPathWith((current, length) => {
         if ((length > 0 && current.id === input.inputArgs.tileId) || length >= MAX_PATH_LENGTH) {
             return undefined;
         }
-        return getRand(current.path.next)();
+        return getRand(current.next)?.get();
     });
 
     if (path.length === 0) {
@@ -30,31 +28,36 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
     // move to the specified tile
     const coordinates = currentPlayer.move(path);
     // construct PlayerReceiveChancePayload
-    broadcast<PlayerReceiveChancePayload>(game.room.getPlayers(), {
-        type: PacketType.DEFAULT,
-        action: Action.ANNOUNCE_CHANCE,
-        payload: {
-            id: currentPlayer.id,
-            chance: {
-                display: input.display,
-                type: 'move_to_tile',
-                args: checkType<ChanceArgs['move_to_tile']>({
-                    tile: { position: path[path.length - 1].position },
-                    isTeleport: input.inputArgs.isTeleport,
-                }),
-            },
-        },
-    });
+
+    game.broadcast(
+        Packet.forAction(Action.ANNOUNCE_CHANCE)
+            .setPayload(announce_received_chance_spec.AnnounceRecievedChancePayload, {
+                player: currentPlayer.id,
+                chance: {
+                    display: input.display,
+                    extra: {
+                        oneofKind: 'moveToTile',
+                        moveToTile: {
+                            tile: path[path.length - 1].position,
+                            isTeleport: input.inputArgs.isTeleport,
+                        },
+                    },
+                },
+            })
+            .build(),
+    );
 
     await Anim.processAndWait(
         (packet) => {
-            broadcast(game.room.getPlayers(), packet);
+            game.broadcast(packet);
         },
-        Anim.create('move', {
-            player: currentPlayer.getGamePlayerInfo(),
-            start: currentLocation,
-            path: coordinates,
-        }).setLength(animationMap.move * coordinates.length),
+        Anim.create('move', animation_spec.MoveExtra)
+            .setExtra({
+                player: currentPlayer.getGamePlayerInfo(),
+                start: currentLocation,
+                path: coordinates,
+            })
+            .setLength(animationMap.move * coordinates.length),
     ).promise;
 
     return Moved;

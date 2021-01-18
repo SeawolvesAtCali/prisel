@@ -1,36 +1,33 @@
-import { Context, Socket } from '../objects';
-import { emit } from '../utils/networkUtils';
-import { MessageType, PacketType, ChatPayload, Packet, BroadcastPayload } from '@prisel/common';
-import clientHandlerRegister from '../clientHandlerRegister';
-import { getPlayer, getRoom } from '../utils/stateUtils';
+import { Packet } from '@prisel/common';
+import { system_action_type } from '@prisel/protos';
+import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { broadcast } from '../utils/broadcast';
+import { getPlayerInfo, getRoom } from '../utils/stateUtils';
 import { getPlayerOrRespondError } from './utils';
 
 // send chat message to everyone in the room including the sender
-export const handleChat = (context: Context, socket: Socket) => (
-    chatPacket: Packet<ChatPayload>,
-): void => {
+export const handleChat: Handler = (context, socket) => (chatPacket) => {
     const player = getPlayerOrRespondError(context, socket, chatPacket);
     if (!player) {
         return;
     }
-    const { message } = chatPacket.payload;
+    const payload = Packet.getPayload(chatPacket, 'chatPayload');
+    if (!payload) {
+        return;
+    }
+    const { message } = payload;
     const room = getRoom(context, socket);
 
     if (player && room) {
-        const packet: Packet<BroadcastPayload> = {
-            type: PacketType.DEFAULT,
-            system_action: MessageType.CHAT,
-            payload: {
-                from: {
-                    userId: player.getId(),
-                    username: player.getName(),
-                },
+        const packet = Packet.forSystemAction(system_action_type.SystemActionType.BROADCAST)
+            .setPayload('broadcastPayload', {
+                player: getPlayerInfo(player),
                 message,
-            },
-        };
+            })
+            .build();
+
         broadcast(room.getPlayers(), packet);
     }
 };
 
-clientHandlerRegister.push(MessageType.CHAT, handleChat);
+clientHandlerRegister.push(system_action_type.SystemActionType.CHAT, handleChat);

@@ -1,5 +1,7 @@
-import { Anim, Coordinate } from '@prisel/monopoly-common';
-import { createAnimationEvent } from './animations';
+import { assertExist } from '@prisel/client';
+import { Anim, exist } from '@prisel/monopoly-common';
+import { animation_spec, coordinate } from '@prisel/protos';
+import { subscribeAnimation } from './animations';
 import {
     AUTO_PANNING_PX_PER_SECOND,
     CAMERA_FOLLOW_OFFSET,
@@ -14,15 +16,15 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class GameCameraControl extends cc.Component {
-    private followingNode: cc.Node = null;
-    private resolveMoveToNode: (value?: void | PromiseLike<void>) => void = null;
-    private moveToNodeTween: cc.Tween = null;
-    private offset: cc.Vec2 = null;
+    private followingNode?: cc.Node;
+    private resolveMoveToNode?: (value?: void | PromiseLike<void>) => void;
+    private moveToNodeTween?: cc.Tween;
+    private offset?: cc.Vec2;
 
-    private static instance: GameCameraControl;
+    private static instance?: GameCameraControl;
 
     public static get() {
-        return GameCameraControl.instance;
+        return assertExist(GameCameraControl.instance, 'GameCameraControl');
     }
 
     @lifecycle
@@ -37,24 +39,35 @@ export default class GameCameraControl extends cc.Component {
 
     @lifecycle
     protected start() {
-        createAnimationEvent('pan').sub((anim) => {
-            this.moveToTileAtPos(anim.args.target, anim.length);
+        subscribeAnimation('pan', (anim) => {
+            const panExtra = Anim.getExtra(anim, animation_spec.PanExtra);
+            if (panExtra && panExtra.target) {
+                this.moveToTileAtPos(panExtra.target, anim.length);
+            }
         });
-        createAnimationEvent('move').sub(async (anim) => {
-            const currentGamePlayerNode = Game.get().getPlayerNode(anim.args.player.player.id);
-            if (currentGamePlayerNode) {
-                this.startFollowing(currentGamePlayerNode);
-                await Anim.wait(anim).promise;
-                this.stopFollowing();
-                this.moveToTileAtPos(anim.args.path.slice(-1)[0]);
+        subscribeAnimation('move', async (anim) => {
+            const moveExtra = Anim.getExtra(anim, animation_spec.MoveExtra);
+            if (moveExtra) {
+                const playerId = moveExtra.player?.id;
+
+                const currentGamePlayerNode = exist(playerId)
+                    ? Game.get().getPlayerNode(playerId)
+                    : null;
+                if (currentGamePlayerNode) {
+                    this.startFollowing(currentGamePlayerNode);
+                    await Anim.wait(anim).promise;
+                    this.stopFollowing();
+                    this.moveToTileAtPos(moveExtra.path.slice(-1)[0]);
+                }
             }
         });
     }
 
-    private moveToTileAtPos(pos: Coordinate, durationInMs?: number) {
-        if (pos && MapLoader.get().getTile(pos)) {
+    private moveToTileAtPos(pos: coordinate.Coordinate, durationInMs?: number) {
+        const targetTile = MapLoader.get().getTile(pos);
+        if (pos && targetTile) {
             this.moveToNode(
-                MapLoader.get().getTile(pos).node,
+                targetTile.node,
                 CAMERA_FOLLOW_OFFSET.add(LANDING_POS_OFFSET),
                 durationInMs,
             );
@@ -65,7 +78,7 @@ export default class GameCameraControl extends cc.Component {
      * Convert tile coordinate to canvas position
      * @param tile Coordinate of the tile
      */
-    public tileToScreenPos(tile: Coordinate): cc.Vec2 | null {
+    public tileToScreenPos(tile: coordinate.Coordinate): cc.Vec2 | null {
         const tileComp = MapLoader.get().getTile(tile);
         if (tileComp) {
             return toVec2(
@@ -80,18 +93,18 @@ export default class GameCameraControl extends cc.Component {
     public startFollowing(node: cc.Node, offset: cc.Vec2 = CAMERA_FOLLOW_OFFSET) {
         if (this.moveToNodeTween) {
             this.moveToNodeTween.stop();
-            this.moveToNodeTween = null;
+            this.moveToNodeTween = undefined;
         }
         if (this.resolveMoveToNode) {
             this.resolveMoveToNode();
-            this.resolveMoveToNode = null;
+            this.resolveMoveToNode = undefined;
         }
         this.followingNode = node;
         this.offset = offset;
     }
 
     public stopFollowing() {
-        this.followingNode = null;
+        this.followingNode = undefined;
     }
 
     private getTargetPositionInParentSpace(target: cc.Node): cc.Vec2 {
@@ -116,7 +129,7 @@ export default class GameCameraControl extends cc.Component {
         durationInMs?: number,
     ): Promise<void> {
         if (this.followingNode) {
-            this.followingNode = null;
+            this.followingNode = undefined;
         }
         const targetPos = offset
             ? this.getTargetPositionInParentSpace(node).add(offset)
@@ -132,8 +145,8 @@ export default class GameCameraControl extends cc.Component {
                 .tween(this.node)
                 .to(duration, { position: targetPos }, { easing: 'sineInOut' })
                 .call(() => {
-                    this.moveToNodeTween = null;
-                    this.resolveMoveToNode = null;
+                    this.moveToNodeTween = undefined;
+                    this.resolveMoveToNode = undefined;
                     resolve();
                 })
                 .start();

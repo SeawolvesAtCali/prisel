@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json.schemastore.org/tsconfig",
+    "extends": "./tsconfig-base",
+    // Although this package will be used in node enviroment only, there are
+    // some definition, such as TextEncoder not available @types/node as global
+    // definitions. https://github.com/microsoft/TypeScript/issues/31535
+    // TextEncoder is used by the generated files from protobuf-ts
+    "compilerOptions": {
+        "lib": ["dom", "es2015", "es2016", "es2017", "esnext.array", "es2017.object"]
+    }
+}

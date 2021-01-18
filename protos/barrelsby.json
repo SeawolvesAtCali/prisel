@@ -1,0 +1,5 @@
+{
+    "directory": "./gen_ts",
+    "structure": "filesystem",
+    "location": "below"
+}

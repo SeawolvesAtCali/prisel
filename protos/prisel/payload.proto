@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+// keep sorted
+import "prisel/broadcast_spec.proto";
+import "prisel/chat_spec.proto";
+import "prisel/create_room_spec.proto";
+import "prisel/error_spec.proto";
+import "prisel/get_lobby_state_spec.proto";
+import "prisel/get_room_state_spec.proto";
+import "prisel/join_spec.proto";
+import "prisel/login_spec.proto";
+import "prisel/room_state_change_spec.proto";
+import "tic_tac_toe/tic_tac_toe_spec.proto";
+
+import "google/protobuf/any.proto";
+
+package prisel;
+
+message Payload {
+  oneof payload {
+    ChatPayload chat_payload = 1;
+    BroadcastPayload broadcast_payload = 2;
+
+    CreateRoomRequest create_room_request = 3;
+    CreateRoomResponse create_room_response = 4;
+
+    ErrorPayload error_payload = 5;
+
+    GetLobbyStateResponse get_lobby_state_response = 6;
+
+    GetRoomStateResponse get_room_state_response = 7;
+
+    JoinRequest join_request = 8;
+    JoinResponse join_response = 9;
+
+    LoginRequest login_request = 10;
+    LoginResponse login_response = 11;
+
+    RoomStateChangePayload room_state_change_payload = 12;
+
+    tic_tac_toe.MovePayload tic_tac_toe_move_payload = 13;
+
+    tic_tac_toe.GameStatePayload tic_tac_toe_game_state_payload = 14;
+    google.protobuf.Any action_payload = 15;
+  }
+}

@@ -1,4 +1,4 @@
-import { Coordinate } from '@prisel/monopoly-common';
+import { coordinate } from '@prisel/protos';
 import * as React from 'react';
 
 export enum Mode {
@@ -9,7 +9,7 @@ export enum Mode {
     PROPERTY = 'property',
     START = 'start',
 }
-
+type Coordinate = coordinate.Coordinate;
 export const TILE_SIZE_PX = 50;
 export const GAP_PX = 4;
 

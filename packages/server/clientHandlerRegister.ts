@@ -1,15 +1,16 @@
+import { Packet } from '@prisel/common';
+import { system_action_type } from '@prisel/protos';
 import { Context, Socket } from './objects';
-import { MessageType, Packet } from '@prisel/common';
 
 export type Handler = (context: Context, socket: Socket) => (data: Packet) => void;
 
-class ClientHandlerRegister {
-    private map = new Map<MessageType, Handler>();
-    public push(key: MessageType, handler: Handler) {
+class SystemActionHandlerRegister {
+    private map = new Map<system_action_type.SystemActionType, Handler>();
+    public push(key: system_action_type.SystemActionType, handler: Handler) {
         this.map.set(key, handler);
     }
 
-    public get(key: MessageType) {
+    public get(key: system_action_type.SystemActionType) {
         return this.map.get(key);
     }
 
@@ -18,4 +19,4 @@ class ClientHandlerRegister {
     }
 }
 
-export default new ClientHandlerRegister();
+export default new SystemActionHandlerRegister();

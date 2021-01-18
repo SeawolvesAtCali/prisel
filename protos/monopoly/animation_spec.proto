@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "google/protobuf/any.proto";
+import "prisel/annotations.proto";
+import "monopoly/game_player.proto";
+import "monopoly/property.proto";
+import "monopoly/coordinate.proto";
+import "monopoly/chance.proto";
+
+enum AnimationType {
+  DEFAULT = 0;
+
+  // container that plays child animations one by one
+  SEQUENCE = 1;
+
+  // container that plays child animations and finish when one of them finishes.
+  // Other animations are truncated if possible
+  RACE = 2;
+
+  // container that plays child animations and wait for the longest one to
+  // finish.
+  ALL = 3;
+}
+
+message Animation {
+  string name = 1;
+  AnimationType type = 2;
+  // the duration in ms, specified when type is DEFAULT
+  int32 length = 3;
+  optional google.protobuf.Any extra = 4;
+  repeated Animation children = 5;
+}
+
+message AnimationPayload {
+  option (prisel.for_action) = {
+    type : "animation"
+    packet_type : DEFAULT
+  };
+  Animation animation = 1;
+}
+
+// extra for "dice_roll"
+message DiceRollExtra { GamePlayer player = 1; }
+
+// extra for "dice_down"
+// dice drop and review final number
+message DiceDownExtra {
+  int32 steps = 1;
+  GamePlayer player = 2;
+}
+
+// extra for "move"
+// player move along tile path
+message MoveExtra {
+  GamePlayer player = 1;
+  Coordinate start = 2;
+  repeated Coordinate path = 3;
+}
+
+// extra for "focus_land"
+// highlight the property for purchase
+message FocusLandExtra { PropertyInfo property = 1; }
+
+// extra for "invested"
+// show animation for purchase/upgrade
+message InvestedExtra { PropertyInfo property = 1; }
+
+// extra for "pan"
+// pan camera to next player
+message PanExtra { Coordinate target = 1; }
+
+// extra for "turn_start"
+// current player play ready to start animation
+message TurnStartExtra { GamePlayer player = 1; }
+
+// extra for "pay_rent"
+message PayRentExtra {
+  GamePlayer payer = 1;
+  GamePlayer payee = 2;
+}
+
+// extra for "player_emotion"
+// a general purpose animation to play to show player's emotion
+message PlayerEmotionExtra {
+  enum EmotionType {
+    UNSPECIFIED = 0;
+    CHEER = 1;
+    ANGRY = 2;
+  }
+  GamePlayer player = 1;
+  EmotionType emotion = 2;
+}
+
+// extra for "open_chance_chest"
+// When player arrive at the tile with chance chest, a card flyout from the
+// chance chest to the center of the screen. The current player would need
+// to click on anywhere to dismiss it after reading card. Other clients will
+// play the same animation except they won't be able to dismiss the card.
+// The card will be automatically dismissed when the current player dismiss it.
+message OpenChanceChestExtra {
+  Coordinate chance_chest_tile = 1;
+  ChanceDisplay chance = 2;
+}

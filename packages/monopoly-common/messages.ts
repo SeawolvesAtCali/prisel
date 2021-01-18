@@ -1,13 +1,3 @@
-import {
-    Animation,
-    Chance,
-    Coordinate,
-    GamePlayerInfo,
-    Payment,
-    PropertyInfo,
-    Rank,
-} from './types';
-
 export enum Action {
     UNSPECIFIED = '',
 
@@ -31,7 +21,7 @@ export enum Action {
 
     // request/response
     // initiate from server
-    PROMPT_PURCHASE = 'promp_purchase',
+    PROMPT_PURCHASE = 'prompt_purchase',
 
     // request/response
     // initiate from client
@@ -79,81 +69,6 @@ export enum Action {
     PROMPT_CHANCE_CONFIRMATION = 'prompt_chance_confirmation',
     ANNOUNCE_CHANCE = 'announce_chance',
     ANIMATION = 'animation', // server request client play an animation
-}
-
-export interface PlayerLeftPayload {
-    player: GamePlayerInfo;
-}
-export interface PromptPurchasePayload {
-    property: PropertyInfo;
-    moneyAfterPurchase: number;
-}
-
-export interface PromptPurchaseResponsePayload {
-    purchase: boolean;
-}
-
-export interface RollResponsePayload {
-    steps: number;
-    path: Coordinate[]; // not including the current position
-}
-
-export interface PurchasePayload {
-    propertyPos: Coordinate;
-}
-
-export interface PurchaseResponsePayload {
-    property: PropertyInfo;
-    remainingMoney: number;
-}
-
-export interface PlayerEndTurnPayload {
-    currentPlayerId: string;
-    nextPlayerId: string;
-}
-
-export interface PlayerStartTurnPayload {
-    id: string;
-}
-
-export interface PlayerPurchasePayload {
-    id: string;
-    property: PropertyInfo;
-}
-
-export interface PlayerRollPayload {
-    id: string;
-    steps: number;
-    path: Coordinate[];
-    myMoney: number;
-}
-
-export interface PlayerPayRentPayload {
-    id: string;
-    payments: Payment[];
-    myCurrentMoney: number; // the updated money of the current player. This normally only affect payer and payee. All other players will receive an unchanged amount.
-}
-
-export interface InitialStatePayload {
-    gamePlayers: GamePlayerInfo[];
-    firstPlayerId: string;
-}
-
-export interface PlayerBankruptPayload {
-    id: string;
-}
-
-export interface GameOverPayload {
-    ranks: Rank[];
-}
-
-export interface AnimationPayload {
-    animation: Animation;
-}
-
-export interface PlayerReceiveChancePayload {
-    id: string;
-    chance: Chance<any>;
 }
 
 // Server Client

@@ -1,0 +1,11 @@
+syntax = "proto3";
+package monopoly;
+
+import "monopoly/property.proto";
+
+message Payment {
+  string payee = 1;
+  string payer = 2;
+  int32 amount = 3;
+  PropertyInfo for_property = 4;
+}

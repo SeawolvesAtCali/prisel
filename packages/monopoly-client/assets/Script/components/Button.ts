@@ -1,4 +1,4 @@
-import { nullCheck } from '../utils';
+import { assertExist } from '@prisel/client';
 import { ButtonConfig } from './ButtonConfig';
 import { LabelConfig, LabelTheme, themeToColor } from './LabelConfig';
 import { NodeConfig } from './NodeConfig';
@@ -36,9 +36,9 @@ export function createButton(props: ButtonProps) {
             WidgetConfig.fullSize(),
         );
     root.postApply((rootNode) => {
-        const target = nullCheck(cc.find(background.getPath(root), rootNode));
+        const target = assertExist(cc.find(background.getPath(root), rootNode));
         rootNode.getComponent(cc.Button).target = target;
-        nullCheck(target.getComponent(cc.Sprite)).spriteFrame = button.getInitialSpriteFrame();
+        assertExist(target.getComponent(cc.Sprite)).spriteFrame = button.getInitialSpriteFrame();
     });
 
     if (text) {

@@ -1,0 +1,12 @@
+{
+    "extends": "../configs/tsconfig-base",
+    "compilerOptions": {
+        "strict": false,
+        // strictNullChecks is required for oneof to work in generated code https://github.com/timostamm/protobuf-ts/blob/master/MANUAL.md#oneof-representation
+        "strictNullChecks": true,
+
+        "outDir": "./dist",
+        "rootDir": "./"
+    },
+    "files": ["index.ts"]
+}

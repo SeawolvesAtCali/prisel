@@ -1,6 +1,7 @@
-import { Action, log } from '@prisel/monopoly-common';
+import { Action, exist, GamePlayer } from '@prisel/monopoly-common';
 import { GameConfig, Packet, Player } from '@prisel/server';
 import Game from './Game';
+import { log } from './log';
 import { createIntialState } from './state';
 import { GameStarted } from './stateMachine/GameStarted';
 import { StateMachine } from './stateMachine/StateMachine';
@@ -15,15 +16,26 @@ const MonopolyGameConfig: GameConfig = {
     },
     onStart(room) {
         (async () => {
-            const game = await createIntialState(room);
+            const playerMap = new WeakMap<Player, GamePlayer>();
+            const addPlayerMapping = playerMap.set.bind(playerMap);
+            const game = await createIntialState(room, addPlayerMapping, (player: Player) =>
+                playerMap.get(player),
+            );
             room.setGame(game);
             const stateMachine = new StateMachine(game);
 
             const handleGamePacket = (player: Player, packet: Packet) => {
-                if (!stateMachine.state.onPacket(packet, game.getGamePlayer(player))) {
-                    log.verbose(
-                        `packet ${packet.action} is not processed by state ${
-                            stateMachine.state[Symbol.toStringTag]
+                const gamePlayer = playerMap.get(player);
+                if (!gamePlayer) {
+                    log.error(
+                        `player with playerId ${player.getId()} doesn't have a corresponding GamePlayer, cannot receive game packet`,
+                    );
+                    return;
+                }
+                if (!stateMachine.state?.onPacket(packet, gamePlayer)) {
+                    log.warn(
+                        `packet ${Packet.getAction(packet)} is not processed by state ${
+                            stateMachine.state?.[Symbol.toStringTag]
                         }`,
                     );
                 }
@@ -34,7 +46,7 @@ const MonopolyGameConfig: GameConfig = {
                 .forEach((action) => room.listenGamePacket(action, handleGamePacket));
 
             stateMachine.init(GameStarted);
-            await new Promise((resolve) => {
+            await new Promise<void>((resolve) => {
                 stateMachine.setOnEnd(resolve);
             });
             room.endGame();
@@ -46,8 +58,9 @@ const MonopolyGameConfig: GameConfig = {
     },
     onRemovePlayer(room, player) {
         const game = room.getGame<Game>();
-        if (game && game.stateMachine) {
-            game.stateMachine.state.onPlayerLeave(game.getGamePlayer(player));
+        const gamePlayer = game.getGamePlayer(player);
+        if (exist(game?.stateMachine) && exist(gamePlayer)) {
+            game.stateMachine.state?.onPlayerLeave(gamePlayer);
         }
     },
 };

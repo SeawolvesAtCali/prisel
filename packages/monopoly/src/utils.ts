@@ -1,6 +1,11 @@
-import { Coordinate } from '@prisel/monopoly-common';
+import { GamePlayer } from '@prisel/monopoly-common';
+import { coordinate } from '@prisel/protos';
+import { Player } from '@prisel/server';
 
-export function samePos(pos1: Coordinate, pos2: Coordinate): boolean {
+export function samePos(
+    pos1: coordinate.Coordinate | undefined,
+    pos2: coordinate.Coordinate | undefined,
+): boolean {
     if (!pos1 || !pos2) {
         return false;
     }
@@ -16,4 +21,8 @@ export function getRand<T>(list: T[]): T | undefined {
 
 export function checkType<T>(a: T): T {
     return a;
+}
+
+export function getPlayer(gamePlayer: GamePlayer): Player {
+    return gamePlayer.player as Player;
 }

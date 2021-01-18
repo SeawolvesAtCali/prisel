@@ -1,56 +1,57 @@
-import {
-    BoardSetup,
-    Coordinate,
-    genId,
-    Mixins,
-    PropertyClass,
-    TileClass,
-    World,
-} from '@prisel/monopoly-common';
-import { Room } from '@prisel/server';
+import { BoardSetup, GamePlayer, genId, Property, Tile, World } from '@prisel/monopoly-common';
+import { coordinate } from '@prisel/protos';
+import { Player, Room } from '@prisel/server';
 import fs from 'fs';
 import path from 'path';
 import { COMMON_DATA_DIR } from '../PATH';
 import Game, { create as createGame } from './Game';
-import { GamePlayer } from './gameObjects/GamePlayer';
 import { getRand } from './utils';
 
 const CASH = 500;
 const MAP_PATH = path.resolve(COMMON_DATA_DIR, 'map', 'demoMap.json');
 
-export function getTileKeyFromCoordinate(coor: Coordinate): string {
+export function getTileKeyFromCoordinate(coor: coordinate.Coordinate): string {
     return `${coor.row}-${coor.col}`;
 }
 
-export async function createIntialState(room: Room): Promise<Game> {
+export async function createIntialState(
+    room: Room,
+    addPlayerMapping: (player: Player, gamePlayer: GamePlayer) => void,
+    getGamePlayerByPlayer: (player: Player) => GamePlayer | undefined,
+): Promise<Game> {
     const rawBoardSetup = await fs.promises.readFile(MAP_PATH);
     if (!rawBoardSetup) {
         throw new Error('Cannot load map');
     }
     const boardSetup: BoardSetup = JSON.parse(rawBoardSetup.toString());
     const world = new World()
-        .registerObject(TileClass)
+        .registerObject(Tile)
         .registerObject(GamePlayer)
-        .registerObject(PropertyClass)
+        .registerObject(Property)
         .deserialize(boardSetup.world);
-    const startPathTiles = world
-        .getAll(TileClass)
-        .filter((tile) => Mixins.hasMixin(tile, Mixins.StartMixinConfig));
+    const startPathTiles = world.getAll(Tile).filter((tile) => tile.isStart);
     const players = room.getPlayers();
-    const playerMap = new Map(
-        players.map((player, index) => [
-            player.getId(),
-            world.create(GamePlayer, player.getId()).init({
-                cash: CASH,
-                id: player.getId(),
-                player,
-                owning: [],
-                rolled: false,
-                pathTile: getRand(startPathTiles),
-                character: index,
-            }),
-        ]),
-    );
+    const playerMap = new Map<string, GamePlayer>();
+    let characterCount = 0;
+    for (const player of players) {
+        const playerId = player.getId();
+        const startTile = getRand(startPathTiles);
+        if (!startTile) {
+            throw new Error('no start tile');
+        }
+        const gamePlayer = world.create(GamePlayer, playerId).init({
+            money: CASH,
+            id: player.getId(),
+            player,
+            owning: [],
+            rolled: false,
+            pathTile: startTile,
+            character: characterCount,
+        });
+        characterCount++;
+        playerMap.set(playerId, gamePlayer);
+        addPlayerMapping(player, gamePlayer);
+    }
 
     const game = createGame({
         id: genId(),
@@ -58,6 +59,7 @@ export async function createIntialState(room: Room): Promise<Game> {
         turnOrder: Array.from(playerMap.values()),
         room,
         world,
+        getGamePlayerByPlayer: getGamePlayerByPlayer,
     });
     return game;
 }

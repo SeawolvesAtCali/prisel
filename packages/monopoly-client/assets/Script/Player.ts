@@ -1,44 +1,45 @@
-import { PlayerInfo } from '@prisel/client';
-import { Coordinate } from '@prisel/monopoly-common';
-import { createAnimationEvent } from './animations';
+import { assertExist } from '@prisel/client';
+import { Anim, exist } from '@prisel/monopoly-common';
+import { animation_spec, coordinate, game_player } from '@prisel/protos';
+import { subscribeAnimation } from './animations';
 import { EVENT_BUS, FLIP_THRESHHOLD } from './consts';
 import MapLoader from './MapLoader';
 import { SpriteFrameEntry } from './SpriteFrameEntry';
-import { lifecycle, nullCheck } from './utils';
+import { lifecycle } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class Player extends cc.Component {
     @property(cc.Label)
-    private label: cc.Label = null;
+    private label?: cc.Label;
 
     @property(cc.Label)
-    private statusLabel: cc.Label = null;
+    private statusLabel?: cc.Label;
 
     @property(SpriteFrameEntry)
     private sprites: SpriteFrameEntry[] = [];
 
-    private character: cc.Node = null;
+    private character?: cc.Node;
 
-    private characterSprite: cc.Sprite = null;
+    private characterSprite?: cc.Sprite;
 
-    private characterAnim: cc.Animation = null;
+    private characterAnim?: cc.Animation;
 
     private playerName: string = '';
-    private playerId: string = '';
-    public color: string = null;
-    private idleSprite: cc.SpriteFrame = null;
+    private gamePlayerId: string = '';
+    public color?: string;
+    private idleSprite?: cc.SpriteFrame;
 
-    public pos: Coordinate = null;
+    public pos?: coordinate.Coordinate;
 
     private get eventBus() {
         return cc.find(EVENT_BUS);
     }
 
-    public init(playerData: PlayerInfo, color: string, pos: Coordinate) {
-        this.playerName = playerData.name;
-        this.playerId = playerData.id;
+    public init(playerData: game_player.GamePlayer, color: string, pos: coordinate.Coordinate) {
+        this.playerName = playerData.boundPlayer?.name ?? 'unnamed';
+        this.gamePlayerId = playerData.id;
         this.color = color;
         this.turnToLeft = this.turnToLeft.bind(this);
         this.turnToRight = this.turnToRight.bind(this);
@@ -47,13 +48,13 @@ export default class Player extends cc.Component {
     }
 
     public getId() {
-        return this.playerId;
+        return this.gamePlayerId;
     }
 
     @lifecycle
     public start() {
-        this.label.string = this.playerName;
-        nullCheck(this.statusLabel).string = '';
+        assertExist(this.label).string = this.playerName;
+        assertExist(this.statusLabel).string = '';
         this.character = this.node.getChildByName('character');
         this.characterSprite = this.character.getComponent(cc.Sprite);
         this.characterAnim = this.character.getComponent(cc.Animation);
@@ -61,32 +62,35 @@ export default class Player extends cc.Component {
             (spriteEntry) => spriteEntry.name === this.color,
         );
 
-        this.idleSprite = spriteFrameEntry.sprite;
+        this.idleSprite = spriteFrameEntry?.sprite;
         this.stale();
         this.walk = this.walk.bind(this);
         this.stop = this.stop.bind(this);
 
-        createAnimationEvent('turn_start').sub((anim) => {
-            if (this.getId() === anim.args.player.player.id) {
+        subscribeAnimation('turn_start', (anim) => {
+            const turnStartExtra = Anim.getExtra(anim, animation_spec.TurnStartExtra);
+            if (this.getId() === turnStartExtra?.player?.id) {
                 const animState = this.getComponent(cc.Animation).playAdditive('turn_start');
                 animState.speed = (animState.duration * 1000) / anim.length;
             }
         });
 
-        createAnimationEvent('dice_down').sub((anim) => {
-            if (this.getId() === anim.args.player.player.id) {
-                this.statusLabel.string = '' + anim.args.steps;
+        subscribeAnimation('dice_down', (anim) => {
+            const diceDownExtra = Anim.getExtra(anim, animation_spec.DiceDownExtra);
+            if (this.getId() === diceDownExtra?.player?.id) {
+                assertExist(this.statusLabel).string = '' + diceDownExtra.steps;
                 const animState = this.getComponent(cc.Animation).playAdditive('status_popup');
                 animState.speed = (animState.duration * 1000) / anim.length;
             }
         });
 
-        createAnimationEvent('move').sub(async (anim) => {
-            if (this.getId() === anim.args.player.player.id) {
+        subscribeAnimation('move', async (anim) => {
+            const moveExtra = Anim.getExtra(anim, animation_spec.MoveExtra);
+            if (this.getId() === moveExtra?.player?.id) {
                 this.walk();
-                await nullCheck(MapLoader.get()).moveAlongPath(
+                await assertExist(MapLoader.get()).moveAlongPath(
                     this.node,
-                    anim.args.path,
+                    moveExtra.path,
                     anim.length,
                     (node, targetPos: cc.Vec2) => {
                         if (targetPos.x - node.position.x > FLIP_THRESHHOLD) {
@@ -98,7 +102,7 @@ export default class Player extends cc.Component {
                     },
                 );
 
-                const finalTile = nullCheck(MapLoader.get().getTile(anim.args.path.slice(-1)[0]));
+                const finalTile = assertExist(MapLoader.get().getTile(moveExtra.path.slice(-1)[0]));
                 this.node.setPosition(finalTile.getLandingPos());
                 this.node.zIndex = finalTile.getLandingZIndex();
 
@@ -108,23 +112,25 @@ export default class Player extends cc.Component {
     }
 
     private stale() {
-        this.characterSprite.spriteFrame = this.idleSprite;
+        if (exist(this.idleSprite)) {
+            assertExist(this.characterSprite).spriteFrame = this.idleSprite;
+        }
     }
 
     public walk() {
-        this.characterAnim.play(this.color);
+        this.characterAnim?.play(this.color);
     }
 
     public stop() {
-        this.characterAnim.stop();
+        this.characterAnim?.stop();
         this.stale();
     }
 
     public turnToLeft() {
-        this.character.setScale(-1, 1);
+        this.character?.setScale(-1, 1);
     }
 
     public turnToRight() {
-        this.character.setScale(1, 1);
+        this.character?.setScale(1, 1);
     }
 }

@@ -1,4 +1,4 @@
-const { ACTION_CONFIG } = require('./lib/actionConfigs.cjs');
+const { ACTION_CONFIG } = require('./lib/actionConfigs.cjs.js');
 const fs = require('fs');
 
 // print table header
@@ -17,8 +17,8 @@ const content = [
         .repeat(headers.length + 1)
         .split('')
         .join('---'),
-    ...Object.entries(ACTION_CONFIG).map(([action, config]) => {
-        const name = action;
+    ...ACTION_CONFIG.map((config) => {
+        const name = config.type;
         const initiator = config.from;
         const description = config.desc;
         const isRequestResponse = config.isRest ? '✓' : '';

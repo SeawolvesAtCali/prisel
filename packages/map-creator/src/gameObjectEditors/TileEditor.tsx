@@ -1,4 +1,4 @@
-import { ChanceInput, ChanceInputArgs, Mixins, Tile2 } from '@prisel/monopoly-common';
+import { ChanceInput, ChanceInputArgs, exist, Tile } from '@prisel/monopoly-common';
 import React from 'react';
 import { BooleanInput } from './BooleanInput';
 import { ChanceEditor } from './ChanceEditor';
@@ -11,17 +11,15 @@ import { ListEditor } from './ListEditor';
 const chanceTypeSelectorMap: { [description: string]: keyof ChanceInputArgs } = {
     'please select': 'unspecified',
     'move to tile': 'move_to_tile',
-    'cash exchange': 'cash_exchange',
+    'money exchange': 'money_exchange',
     'move steps': 'move_steps',
-    collectable: 'collectable',
+    collectible: 'collectible',
 };
 interface TileEditorProps {
-    tile: Tile2;
+    tile: Tile;
 }
 export const TileEditor: React.FC<TileEditorProps> = ({ tile }) => {
-    const [hasChance, setHasChance] = React.useState(
-        Mixins.hasMixin(tile, Mixins.ChancePoolMixinConfig),
-    );
+    const [hasChance, setHasChance] = React.useState(exist(tile.chancePool));
 
     const [newChanceType, setNewChanceType] = React.useState<keyof ChanceInputArgs>('unspecified');
 
@@ -29,13 +27,9 @@ export const TileEditor: React.FC<TileEditorProps> = ({ tile }) => {
         <div className={styles.container}>
             <BooleanInput
                 autoFocus
-                initialValue={tile.start}
+                initialValue={tile.isStart}
                 onCommit={(value) => {
-                    if (value) {
-                        tile.start = {};
-                    } else {
-                        delete tile.start;
-                    }
+                    tile.isStart = value;
                 }}
             >
                 start
@@ -54,7 +48,7 @@ export const TileEditor: React.FC<TileEditorProps> = ({ tile }) => {
             >
                 hasChance
             </BooleanInput>
-            {hasChance && Mixins.hasMixin(tile, Mixins.ChancePoolMixinConfig) && (
+            {hasChance && exist(tile.chancePool) && (
                 <ListEditor
                     list={tile.chancePool}
                     itemRenderer={(item: ChanceInput<any>) => <ChanceEditor input={item} />}

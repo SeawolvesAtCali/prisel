@@ -7,7 +7,7 @@ const db = low(
     process.env.NODE_ENV === 'development' ? new FileSync('.flags') : new Memory('.flags-memory'),
 );
 
-console.log('environemtn is development', process.env.NODE_ENV === 'development');
+console.log('environment is development', process.env.NODE_ENV === 'development');
 
 (db as any).defaults(defaultFlags).write();
 

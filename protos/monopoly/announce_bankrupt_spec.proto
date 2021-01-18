@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "prisel/annotations.proto";
+
+message AnnounceBankruptPayload {
+  option (prisel.for_action) = {
+    type : "announce_bankrupt"
+    packet_type : DEFAULT
+  };
+
+  string player = 1;
+}

@@ -1,10 +1,7 @@
+import { player_info, room_info, room_state_snapshot } from '@prisel/protos';
 import { Context, Socket } from '../objects';
-
 import { Player } from '../player';
 import { Room } from '../room';
-import { RoomStateSnapshot } from '@prisel/common';
-import { PlayerInfo } from '@prisel/common';
-import { RoomInfo } from '@prisel/common';
 
 // Some utility functions for working with state
 
@@ -13,7 +10,7 @@ import { RoomInfo } from '@prisel/common';
  * @param context
  * @param client
  */
-export function getPlayer(context: Context, client: Socket): Player | void {
+export function getPlayer(context: Context | undefined, client: Socket | undefined): Player | void {
     if (!context || !client) {
         return;
     }
@@ -36,34 +33,43 @@ export function getRooms(context: Context): Room[] {
  * @param context
  * @param client
  */
-export function getRoom(context: Context, client: Socket): Room {
+export function getRoom(context: Context, client: Socket): Room | null {
     if (!context || !client) {
-        return;
+        return null;
     }
     const player = getPlayer(context, client);
     if (player) {
         return player.getRoom();
     }
+    return null;
 }
 
-export function getRoomStateSnapshot(room: Room): RoomStateSnapshot {
+export function getRoomStateSnapshot(room: Room): room_state_snapshot.RoomStateSnapshot {
     const host = room.getHost();
 
+    const players = room.getPlayers().map((player) => getPlayerInfo(player));
+    const token = room.getStateToken();
+    if (host) {
+        return {
+            players,
+            hostId: host.getId(),
+            token,
+        };
+    }
     return {
         players: room.getPlayers().map((player) => getPlayerInfo(player)),
-        hostId: host ? host.getId() : null,
         token: room.getStateToken(),
     };
 }
 
-export function getPlayerInfo(player: Player): PlayerInfo {
+export function getPlayerInfo(player: Player): player_info.PlayerInfo {
     return {
         name: player.getName(),
         id: player.getId(),
     };
 }
 
-export function getRoomInfo(room: Room): RoomInfo {
+export function getRoomInfo(room: Room): room_info.RoomInfo {
     return {
         name: room.getName(),
         id: room.getId(),

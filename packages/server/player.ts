@@ -1,71 +1,54 @@
-import { Room, newRoom, RoomConfig, RoomId } from './room';
-import { Context } from './objects';
-import {
-    Packet,
-    Request,
-    ResponseWrapper,
-    wrapResponse,
-    PacketType,
-    Response,
-    Code,
-} from '@prisel/common';
+import { assertExist, Packet, RequestBuilder, Response } from '@prisel/common';
+import { player_info } from '@prisel/protos';
 import WebSocket from 'ws';
-import { emit } from './utils/networkUtils';
-import { getSuccessFor, getFailureFor } from './message';
 import debug from './debug';
+import { Context } from './objects';
+import { newRoom, Room, RoomId, RoomOption } from './room';
+import { emit } from './utils/networkUtils';
 
 export type PlayerId = string;
 
 const DEFAULT_REQUEST_TIMEOUT = 1000;
 
-export abstract class Player {
-    public abstract getName(): string;
-    public abstract getId(): PlayerId;
-    public abstract getRoom(): Room | null;
-    public abstract findRoomById(roomId: RoomId): Room | null;
-    public abstract createRoom(config: Omit<RoomConfig, 'id'>): Room;
-    public abstract joinRoom(roomId: RoomId): Room | null;
-    public abstract leaveRoom(): void;
-    public abstract emit<T extends Packet<any>>(packet: T): void;
+export interface Player {
+    getName(): string;
+    getId(): PlayerId;
+    getPlayerInfo(): player_info.PlayerInfo;
+    getRoom(): Room | null;
+    findRoomById(roomId: RoomId): Room | null;
+    createRoom(config: Omit<RoomOption, 'id'>): Room;
+    joinRoom(roomId: RoomId): Room | null;
+    leaveRoom(): void;
+    emit(packet: Packet): void;
     /**
      * Send a request to client
-     * @param request partial Request. no need to specify requst_id as it will
+     * @param requestBuilder partial Request. no need to specify requstId as it will
      * be auto populated
      * @param timeout timeout in ms. 0 for no timeout
      */
-    public abstract request<Payload = any>(
-        request: Omit<Request<Payload>, 'request_id'>,
-        timeout?: number,
-    ): Promise<ResponseWrapper>;
-    public abstract respond<Payload = never>(request: Request<any>, payload?: Payload): void;
-    public abstract respondFailure(request: Request<any>, message?: string, detail?: any): void;
-    public abstract getSocket(): WebSocket;
-    public equals(player: Player): boolean {
-        if (!player) {
-            return false;
-        }
-        return this.getId() === player.getId();
-    }
+    request(requestBuilder: RequestBuilder, timeout?: number): Promise<Response>;
+    respond(response: Response): void;
+    getSocket(): WebSocket;
+    equals(player: Player | undefined): boolean;
 }
 
-export interface PlayerConfig {
+export interface PlayerOption {
     name: string;
     id: string;
 }
 /* tslint:disable: max-classes-per-file*/
-class PlayerImpl extends Player {
-    private room: Room = null;
+class PlayerImpl implements Player {
+    private room: Room | null = null;
     private context: Context;
     private id: string;
     private name: string;
-    constructor(context: Context, config: PlayerConfig) {
-        super();
+    constructor(context: Context, config: PlayerOption) {
         this.context = context;
         this.id = config.id;
         this.name = config.name;
     }
     public getSocket(): WebSocket {
-        return this.context.SocketManager.getSocket(this.id);
+        return assertExist(this.context.SocketManager.getSocket(this.id));
     }
 
     public getName() {
@@ -75,13 +58,19 @@ class PlayerImpl extends Player {
     public getId() {
         return this.id;
     }
+    public getPlayerInfo() {
+        return {
+            name: this.name,
+            id: this.id,
+        };
+    }
     public newRequestId() {
         return this.context.newRequestId();
     }
     public getRoom() {
         return this.room;
     }
-    public createRoom(config: Omit<RoomConfig, 'id'>) {
+    public createRoom(config: Omit<RoomOption, 'id'>) {
         return newRoom(this.context, config);
     }
 
@@ -105,52 +94,37 @@ class PlayerImpl extends Player {
         }
     }
 
-    public emit<T extends Packet<any>>(packet: T) {
+    public emit(packet: Packet) {
         setImmediate(emit, this.getSocket(), packet);
     }
 
-    public request<Payload = any>(
-        request: Omit<Request<Payload>, 'request_id'>,
-        timeout = DEFAULT_REQUEST_TIMEOUT,
-    ) {
-        const fullRequest: Request<Payload> = {
-            ...request,
-            request_id: this.newRequestId(),
-        };
+    public request(requestBuilder: RequestBuilder, timeout = DEFAULT_REQUEST_TIMEOUT) {
+        const fullRequest = requestBuilder.setId(this.newRequestId()).build();
         this.emit(fullRequest);
         return this.context.requests.addRequest(fullRequest, timeout).catch((_) => {
             debug('request timeout');
-            const responseForTimeout: Response = {
-                type: PacketType.RESPONSE,
-                request_id: fullRequest.request_id,
-                status: {
-                    code: Code.FAILED,
-                    message: 'timeout',
-                },
-                payload: {},
-            };
-            if (fullRequest.system_action !== undefined) {
-                responseForTimeout.system_action = fullRequest.system_action;
-            }
-            if (fullRequest.action !== undefined) {
-                responseForTimeout.action = fullRequest.action;
-            }
-            return wrapResponse(responseForTimeout);
+            const responseForTimeout: Response = Response.forRequest(fullRequest)
+                .setFailure('timeout')
+                .build();
+            return responseForTimeout;
         });
     }
 
-    public respond<Payload = never>(request: Request<any>, payload?: Payload) {
-        this.emit(getSuccessFor(request, payload));
+    public respond(response: Response) {
+        this.emit(response);
     }
-
-    public respondFailure(request: Request<any>, message?: string, detail?: any) {
-        this.emit(getFailureFor(request, message, detail));
+    public equals(player: Player): boolean {
+        if (!player) {
+            return false;
+        }
+        return this.getId() === player.getId();
     }
 }
 
-export function newPlayer(context: Context, config: PlayerConfig): Player {
-    if (context.players.has(config.id)) {
-        return context.players.get(config.id);
+export function newPlayer(context: Context, config: PlayerOption): Player {
+    const existingPlayer = context.players.get(config.id);
+    if (existingPlayer) {
+        return existingPlayer;
     }
     const player = new PlayerImpl(context, config);
     context.players.set(config.id, player);

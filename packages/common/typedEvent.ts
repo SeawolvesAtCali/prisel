@@ -3,12 +3,12 @@ import events from 'events';
 export interface TypedEvent {
     pub: () => void;
     sub: (callback: () => unknown) => () => void;
-    event: string | number;
+    event: string;
     emitter: events.EventEmitter;
 }
 
 export function createEvent(
-    event: string | number,
+    event: string,
     emitter: events.EventEmitter = new events.EventEmitter(),
 ): TypedEvent {
     return {
@@ -26,12 +26,12 @@ export function createEvent(
 export interface TypedEventWithArg<Arg> {
     pub: (arg: Arg) => void;
     sub: (callback: (arg: Arg) => unknown) => () => void;
-    event: string | number;
+    event: string;
     emitter: events.EventEmitter;
 }
 
 export function createArgEvent<Arg = never>(
-    event: string | number,
+    event: string,
     emitter: events.EventEmitter = new events.EventEmitter(),
 ): TypedEventWithArg<Arg> {
     return {

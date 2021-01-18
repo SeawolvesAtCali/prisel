@@ -1,7 +1,8 @@
-import { Coordinate } from '@prisel/monopoly-common';
+import { assertExist } from '@prisel/client';
+import { coordinate } from '@prisel/protos';
 import { TILE_SIZE } from './consts';
 
-export function getTileKeyFromCoordinate(coor: Coordinate): string {
+export function getTileKeyFromCoordinate(coor: coordinate.Coordinate): string {
     return `${coor.row}-${coor.col}`;
 }
 
@@ -20,15 +21,15 @@ export function callOnMoveAction(
     });
 }
 
-export function getRand<T>(list: T[]): T {
+export function getRand<T>(list: T[]): T | null {
     if (list.length > 0) {
         return list[Math.trunc(Math.random() * list.length)];
     }
     return null;
 }
 
-export function legacyPlayAnimation(node: cc.Node, animationName: string): Promise<never> {
-    return new Promise((resolve, reject) => {
+export function legacyPlayAnimation(node: cc.Node, animationName: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
         const animationComp = node.getComponent(cc.Animation);
         if (!animationComp) {
             reject(new Error('cannot find animation component'));
@@ -53,13 +54,6 @@ export function toVec2(vec: cc.Vec3): cc.Vec2 {
     return cc.v2(vec.x, vec.y);
 }
 
-export function nullCheck<T>(value: T): T {
-    if (value === null || value === undefined) {
-        throw new Error('checking value not empty, but is ' + value);
-    }
-    return value;
-}
-
 const LIFECYCLE_SET = new Set([
     'onLoad',
     'start',
@@ -69,7 +63,7 @@ const LIFECYCLE_SET = new Set([
     'onEnable',
     'onDisable',
 ]);
-export function lifecycle(container, key, other1) {
+export function lifecycle(container: any, key: string) {
     if (CC_DEBUG && !LIFECYCLE_SET.has(key)) {
         throw new Error(
             'Method ' + key + ' of ' + container.constructor.name + ' is not a lifecycle method',
@@ -81,12 +75,12 @@ export function assertNever(x: never): never {
     throw new Error('Unexpected value ' + x);
 }
 
-export function getTileAnchorPos(coor: Coordinate) {
+export function getTileAnchorPos(coor: coordinate.Coordinate) {
     return new cc.Vec2(coor.col * TILE_SIZE, -(coor.row + 1) * TILE_SIZE);
 }
 
 export function play(comp: cc.Component, clip: string, durationInMs: number) {
-    const anim = nullCheck(comp.getComponent(cc.Animation));
+    const anim = assertExist(comp.getComponent(cc.Animation));
     const animState = anim.play(clip);
     const originalDuration = animState.duration;
     animState.speed = (originalDuration * 1000) / durationInMs;
@@ -99,7 +93,7 @@ export function playPromise(
     durationInMs: number,
 ): Promise<unknown> {
     const animationComp = play(comp, clip, durationInMs);
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
         const offListeners = () => {
             animationComp.off('stop', offListeners);
             animationComp.off('finished', offListeners);

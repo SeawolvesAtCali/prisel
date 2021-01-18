@@ -1,10 +1,11 @@
-import { GameConfig, debug, broadcast, Packet, PacketType } from '@prisel/server';
+import { tic_tac_toe_spec } from '@prisel/protos';
+import { broadcast, debug, GameConfig, Packet } from '@prisel/server';
 
 interface GameState {
     player: string[];
     map: string[];
     currentPlayer: number;
-    winner: string;
+    winner?: string;
 }
 
 const GAME_STATE = 'GAME_STATE';
@@ -18,10 +19,11 @@ export const TicTacToe: GameConfig = {
         room.removeAllGamePacketListener();
     },
     onStart(room) {
-        const stopListenForMessage = room.listenGamePacket('MESSAGE', (player, packet) => {
+        const stopListenForMessage = room.listenGamePacket('move', (player, packet) => {
             debug('tic-tac-toe receive game message ', packet);
             const gameState = room.getGame<GameState>();
-            if (gameState.winner !== null) {
+            if (gameState.winner != null) {
+                debug('game already ended, exit');
                 // game already finished
                 return;
             }
@@ -34,9 +36,17 @@ export const TicTacToe: GameConfig = {
             };
             newGameState.currentPlayer = 1 - gameState.currentPlayer;
             newGameState.map = gameState.map.slice();
-            const newMove = packet.payload;
-            if (newMove < 9 && newMove >= 0 && gameState.map[newMove] === '') {
-                newGameState.map[packet.payload] = sign;
+            const newMove = Packet.getPayload(packet, tic_tac_toe_spec.MovePayload)?.position;
+            if (
+                typeof newMove === 'number' &&
+                newMove < 9 &&
+                newMove >= 0 &&
+                gameState.map[newMove] === ''
+            ) {
+                newGameState.map[newMove] = sign;
+            } else {
+                debug('invalid move');
+                return;
             }
             let gameOver = false;
             if (checkWin(newGameState)) {
@@ -46,38 +56,35 @@ export const TicTacToe: GameConfig = {
                 newGameState.winner = 'even';
                 gameOver = true;
             }
-            const newGameStateMessage: Packet<GameState> = {
-                type: PacketType.DEFAULT,
-                action: GAME_STATE,
-                payload: newGameState,
-            };
+            const newGameStateMessage = Packet.forAction('game_state')
+                .setPayload(tic_tac_toe_spec.GameStatePayload, newGameState)
+                .build();
             room.setGame(newGameState);
             broadcast(room.getPlayers(), newGameStateMessage);
             if (gameOver) {
                 stopListenForMessage();
                 // end the game 500 ms later to allow clients to paint the last move
                 setTimeout(() => {
-                    const gameOverMessage: Packet = {
-                        type: PacketType.DEFAULT,
-                        action: 'GAME_OVER',
-                    };
+                    const gameOverMessage = Packet.forAction('game_over').build();
                     broadcast(room.getPlayers(), gameOverMessage);
                     room.endGame();
                 }, 500);
             }
         });
 
+        // setting initial state
         room.setGame<GameState>({
             player: room.getPlayers().map((player) => player.getId()),
             map: new Array(9).fill(''),
             currentPlayer: 0,
-            winner: null,
         });
-        const gameStateMessage: Packet<GameState> = {
-            type: PacketType.DEFAULT,
-            action: GAME_STATE,
-            payload: room.getGame<GameState>(),
-        };
+        const gameStateMessage = Packet.forAction('game_state')
+            .setPayload(tic_tac_toe_spec.GameStatePayload, {
+                player: room.getGame<GameState>().player,
+                map: room.getGame<GameState>().map,
+                currentPlayer: room.getGame<GameState>().currentPlayer,
+            })
+            .build();
         broadcast(room.getPlayers(), gameStateMessage);
     },
 };

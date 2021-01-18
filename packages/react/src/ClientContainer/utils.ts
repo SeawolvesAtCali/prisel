@@ -1,12 +1,4 @@
-import {
-    Client,
-    Messages,
-    CreateRoomPayload,
-    CreateRoomResponsePayload,
-    Packet,
-    ResponseWrapper,
-    LoginResponsePayload,
-} from '@prisel/client';
+import { Client, Messages, Packet } from '@prisel/client';
 import { Message } from '../LogPanel';
 
 export type AddToLogs = (message: Message) => void;
@@ -77,14 +69,12 @@ export async function login(client: Client<ClientState>): Promise<Client<ClientS
     }
     const username = client.state.username || 'unnamed';
 
-    const loginResponse: ResponseWrapper<LoginResponsePayload> = await client.request(
-        Messages.getLogin(client.newId(), username),
-    );
+    const loginResponse = await client.request(Messages.getLogin(client.newId(), username));
 
-    if (loginResponse.ok() && loginResponse.payload) {
+    if (Packet.isStatusOk(loginResponse) && Packet.hasPayload(loginResponse, 'loginResponse')) {
         client.setState({
             loggingIn: false,
-            userId: loginResponse.payload.userId,
+            userId: Packet.getPayload(loginResponse, 'loginResponse')?.userId,
         });
         return client;
     }
@@ -92,12 +82,10 @@ export async function login(client: Client<ClientState>): Promise<Client<ClientS
 }
 
 export async function createRoom(client: Client<ClientState>) {
-    const response: ResponseWrapper<CreateRoomResponsePayload> = await client.request<
-        CreateRoomPayload
-    >(Messages.getCreateRoom(client.newId(), 'default-room'));
+    const response = await client.request(Messages.getCreateRoom(client.newId(), 'default-room'));
 
-    if (response.ok() && response.payload) {
-        return response.payload.room.id;
+    if (Packet.isStatusOk(response) && Packet.hasPayload(response, 'createRoomResponse')) {
+        return Packet.getPayload(response, 'createRoomResponse')?.room?.id;
     }
 
     throw new Error('createRoom error: ' + response.status.message);
@@ -105,7 +93,7 @@ export async function createRoom(client: Client<ClientState>) {
 
 export async function joinRoom(client: Client<ClientState>, roomId: string) {
     const response = await client.request(Messages.getJoin(client.newId(), roomId));
-    if (response.failed()) {
-        throw new Error('joinRoom error: ' + response.getMessage());
+    if (Packet.isStatusFailed(response)) {
+        throw new Error('joinRoom error: ' + Packet.getStatusMessage(response));
     }
 }

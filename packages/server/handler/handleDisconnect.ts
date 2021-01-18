@@ -1,3 +1,5 @@
+import { Packet } from '@prisel/common';
+import { system_action_type } from '@prisel/protos';
 import { Context, Socket } from '../objects';
 import { handleExit } from './handleExit';
 
@@ -8,6 +10,8 @@ import { handleExit } from './handleExit';
  * @param socket
  */
 export const handleDisconnect = (context: Context, socket: Socket) => {
-    const { SocketManager } = context;
-    handleExit(context, socket)(null);
+    handleExit(
+        context,
+        socket,
+    )(Packet.forSystemAction(system_action_type.SystemActionType.EXIT).build());
 };

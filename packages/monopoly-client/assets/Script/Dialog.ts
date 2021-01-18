@@ -1,4 +1,4 @@
-import { nullCheck } from './utils';
+import { assertExist } from '@prisel/client';
 
 const { ccclass, property } = cc._decorator;
 
@@ -14,38 +14,38 @@ export default class Dialog extends cc.Component {
     private onAction: cc.Component.EventHandler[] = [];
 
     @property(cc.Label)
-    private titleLabel: cc.Label = null;
+    private titleLabel?: cc.Label;
 
     @property(cc.Button)
-    private actionButton: cc.Button = null;
+    private actionButton?: cc.Button;
 
     @property(cc.Button)
-    private closeButton: cc.Button = null;
+    private closeButton?: cc.Button;
 
     @property(cc.Node)
-    private shadow: cc.Node = null;
+    private shadow?: cc.Node;
 
     public setTitle(value: string) {
         this.title = value;
-        this.titleLabel.string = value;
+        assertExist(this.titleLabel).string = value;
     }
 
     public toggleShadow(showShadow: boolean) {
-        this.shadow.active = showShadow;
+        assertExist(this.shadow).active = showShadow;
     }
 
     public toggleCloseButton(showCloseButton: boolean) {
-        this.closeButton.node.active = showCloseButton;
+        assertExist(this.closeButton).node.active = showCloseButton;
     }
 
     public toggleActionButton(enabled: boolean) {
-        this.actionButton.interactable = enabled;
+        assertExist(this.actionButton).interactable = enabled;
     }
 
     protected start() {
-        nullCheck(this.titleLabel).string = this.title;
-        nullCheck(this.shadow);
-        nullCheck(this.actionButton).clickEvents = this.onAction;
-        nullCheck(this.closeButton).clickEvents = this.onClose;
+        assertExist(this.titleLabel).string = this.title;
+        assertExist(this.shadow);
+        assertExist(this.actionButton).clickEvents = this.onAction;
+        assertExist(this.closeButton).clickEvents = this.onClose;
     }
 }

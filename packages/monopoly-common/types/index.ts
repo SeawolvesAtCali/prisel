@@ -1,11 +1,4 @@
-export * from './animation';
-export * from './boardSetup';
-export * from './chance';
-export * from './collectable';
-export * from './coordinate';
-export * from './coordinatePair';
-export * from './gamePlayerInfo';
-export * from './payment';
-export * from './propertyInfo';
-export * from './rank';
-export * from './size';
+export type { BoardSetup } from './boardSetup';
+export type { ChanceInput } from './chance';
+export type { CoordinatePair } from './coordinatePair';
+export type { Size } from './size';

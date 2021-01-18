@@ -1,35 +1,22 @@
-import {
-    MessageType,
-    CreateRoomPayload,
-    Request,
-    JoinPayload,
-    Response,
-    RoomChangePayload,
-    PacketType,
-    JoinResponsePayload,
-    CreateRoomResponsePayload,
-} from '@prisel/common';
+import { Packet, Request, Response } from '@prisel/common';
+import { system_action_type } from '@prisel/protos';
 import { GAME_PHASE } from '../objects/gamePhase';
-import { getFailureFor } from '../message';
 import { Player } from '../player';
-import { GameConfig } from './gameConfig';
 import { broadcast } from './broadcast';
-import { getRoomStateSnapshot, getRoomInfo, getPlayerInfo } from './stateUtils';
+import { GameConfig } from './gameConfig';
+import { getPlayerInfo, getRoomInfo, getRoomStateSnapshot } from './stateUtils';
 
-type PreCallback<T extends Request = Request> = (
-    player: Player,
-    packet: T,
-) => Response<never> | void;
-type Callback<T extends Request = Request> = (player: Player, packet: T) => void;
+type PreCallback = (player: Player, packet: Request) => Response | void;
+type Callback = (player: Player, packet: Request) => void;
 
 type ExitCallback = (player: Player) => void;
 
-interface FullRoomConfig {
+export interface FullRoomConfig {
     type: string;
-    preCreate: PreCallback<Request<CreateRoomPayload>>;
-    onCreate: Callback<Request<CreateRoomPayload>>;
-    preJoin: PreCallback<Request<JoinPayload>>;
-    onJoin: Callback<Request<JoinPayload>>;
+    preCreate: PreCallback;
+    onCreate: Callback;
+    preJoin: PreCallback;
+    onJoin: Callback;
     preLeave: PreCallback;
     onLeave: Callback;
     onExit: ExitCallback;
@@ -37,7 +24,7 @@ interface FullRoomConfig {
         player: Player,
         packet: Request,
         canStart: GameConfig['canStart'],
-    ) => Response<never> | void;
+    ) => Response | void;
     onGameStart: Callback;
 }
 
@@ -51,62 +38,91 @@ export const BaseRoomConfig: FullRoomConfig = {
     preCreate(player, packet) {
         const currentRoom = player.getRoom();
         if (currentRoom) {
-            return getFailureFor(packet, `ALREADY IN A ROOM ${currentRoom.getName()}`);
+            return Response.forRequest(packet)
+                .setFailure(`ALREADY IN A ROOM ${currentRoom.getName()}`)
+                .build();
         }
     },
     onCreate(player, packet) {
-        const { payload } = packet;
+        const payload = Packet.getPayload(packet, 'createRoomRequest');
+        if (!payload) {
+            return;
+        }
         const { roomName } = payload;
         const room = player.createRoom({ name: roomName });
         const roomId = room.getId();
         player.joinRoom(roomId);
         room.setHost(player);
-        player.respond<CreateRoomResponsePayload>(packet, {
-            room: getRoomInfo(room),
-            roomState: getRoomStateSnapshot(room),
-        });
+        player.emit(
+            Response.forRequest(packet)
+                .setPayload('createRoomResponse', {
+                    room: getRoomInfo(room),
+                    roomState: getRoomStateSnapshot(room),
+                })
+                .build(),
+        );
     },
     preJoin(player, packet) {
-        const { roomId } = packet.payload;
+        const payload = Packet.getPayload(packet, 'joinRequest');
+        if (!payload) {
+            return Response.forRequest(packet).setFailure(`No payload`).build();
+        }
+        const { roomId } = payload;
         const currentRoom = player.getRoom();
         if (currentRoom) {
-            return getFailureFor(packet, `ALREADY IN A ROOM ${currentRoom.getId()}`);
+            return Response.forRequest(packet)
+                .setFailure(`ALREADY IN A ROOM ${currentRoom.getId()}`)
+                .build();
         }
         const targetRoom = player.findRoomById(roomId);
         if (!targetRoom) {
-            return getFailureFor(packet, `ROOM ${roomId} DOES NOT EXIST`);
+            return Response.forRequest(packet).setFailure(`ROOM ${roomId} DOES NOT EXIST`).build();
         }
         if (targetRoom.getGamePhase() === GAME_PHASE.GAME) {
-            return getFailureFor(packet, 'Cannot join when game is already started');
+            return Response.forRequest(packet)
+                .setFailure('Cannot join when game is already started')
+                .build();
         }
     },
     onJoin(player, packet) {
-        const { roomId } = packet.payload;
+        const payload = Packet.getPayload(packet, 'joinRequest');
+        if (!payload) {
+            return;
+        }
+        const { roomId } = payload;
         const room = player.joinRoom(roomId);
+        if (!room) {
+            return;
+        }
         const updateToken = room.updateStateToken();
-        player.respond<JoinResponsePayload>(packet, {
-            room: getRoomInfo(room),
-            roomState: getRoomStateSnapshot(room),
-        });
-        broadcast<RoomChangePayload>(room.getPlayers(), (playerInRoom) => {
+        player.respond(
+            Response.forRequest(packet)
+                .setPayload('joinResponse', {
+                    room: getRoomInfo(room),
+                    roomState: getRoomStateSnapshot(room),
+                })
+                .build(),
+        );
+        broadcast(room.getPlayers(), (playerInRoom) => {
             if (playerInRoom === player) {
                 return;
             }
-            return {
-                type: PacketType.DEFAULT,
-                system_action: MessageType.ROOM_STATE_CHANGE,
-                payload: {
-                    playerJoin: getPlayerInfo(player),
+            return Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
+                .setPayload('roomStateChangePayload', {
+                    change: {
+                        oneofKind: 'playerJoin',
+                        playerJoin: getPlayerInfo(player),
+                    },
                     token: updateToken,
-                },
-            };
+                })
+                .build();
         });
         // TODO(minor): currently, room members can grow infinitely. needs to
         // check gameConfig.maxPlayers
     },
     preLeave(player, packet) {
         if (!player.getRoom()) {
-            return getFailureFor(packet, `NOT IN A ROOM`);
+            return Response.forRequest(packet).setFailure(`NOT IN A ROOM`).build();
         }
     },
     onLeave(player, packet) {
@@ -119,26 +135,32 @@ export const BaseRoomConfig: FullRoomConfig = {
         const currentRoom = player.getRoom();
 
         if (!currentRoom) {
-            return getFailureFor(packet, 'NOT IN A ROOM');
+            return Response.forRequest(packet).setFailure('NOT IN A ROOM').build();
         }
         if (currentRoom.getGamePhase() === GAME_PHASE.GAME) {
-            return getFailureFor(packet, 'GAME ALREADY STARTED');
+            return Response.forRequest(packet).setFailure('GAME ALREADY STARTED').build();
         }
         if (player !== currentRoom.getHost()) {
-            return getFailureFor(packet, 'NOT ENOUGH PRIVILEGE TO START GAME');
+            return Response.forRequest(packet)
+                .setFailure('NOT ENOUGH PRIVILEGE TO START GAME')
+                .build();
         }
-        if (!canStart(currentRoom)) {
-            return getFailureFor(packet, 'GAME_CONFIG DISALLOW STARTING GAME');
+        if (canStart && !canStart(currentRoom)) {
+            return Response.forRequest(packet)
+                .setFailure('GAME_CONFIG DISALLOW STARTING GAME')
+                .build();
         }
     },
     onGameStart(player, packet) {
-        player.respond(packet);
+        player.respond(Response.forRequest(packet).build());
         const currentRoom = player.getRoom();
         if (currentRoom) {
-            broadcast(currentRoom.getPlayers(), {
-                type: PacketType.DEFAULT,
-                system_action: MessageType.ANNOUNCE_GAME_START,
-            });
+            broadcast(
+                currentRoom.getPlayers(),
+                Packet.forSystemAction(
+                    system_action_type.SystemActionType.ANNOUNCE_GAME_START,
+                ).build(),
+            );
             currentRoom.startGame();
         }
     },
@@ -149,7 +171,7 @@ function onLeave(player: Player, leaveRequest?: Request) {
     if (currentRoom) {
         player.leaveRoom();
         if (leaveRequest) {
-            player.respond(leaveRequest);
+            player.respond(Response.forRequest(leaveRequest).build());
         }
 
         if (currentRoom.getPlayers().length === 0) {
@@ -160,33 +182,38 @@ function onLeave(player: Player, leaveRequest?: Request) {
 
         if (currentRoom.getHost()) {
             // host didn't leave.
-            broadcast<RoomChangePayload>(currentRoom.getPlayers(), {
-                type: PacketType.DEFAULT,
-                system_action: MessageType.ROOM_STATE_CHANGE,
-                payload: {
-                    playerLeave: {
-                        id: player.getId(),
-                    },
-                    token: currentRoom.updateStateToken(),
-                },
-            });
+            broadcast(
+                currentRoom.getPlayers(),
+                Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
+                    .setPayload('roomStateChangePayload', {
+                        change: {
+                            oneofKind: 'playerLeave',
+                            playerLeave: player.getId(),
+                        },
+                        token: currentRoom.updateStateToken(),
+                    })
+                    .build(),
+            );
             return;
         }
         // host left, replace host
         const newHost = currentRoom.getPlayers()[0];
         currentRoom.setHost(newHost);
-        const updateToken = currentRoom.updateStateToken();
 
-        broadcast<RoomChangePayload>(currentRoom.getPlayers(), {
-            type: PacketType.DEFAULT,
-            system_action: MessageType.ROOM_STATE_CHANGE,
-            payload: {
-                hostLeave: {
-                    hostId: player.getId(),
-                    newHostId: newHost.getId(),
-                },
-                token: updateToken,
-            },
-        });
+        broadcast(
+            currentRoom.getPlayers(),
+            Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
+                .setPayload('roomStateChangePayload', {
+                    change: {
+                        oneofKind: 'hostLeave',
+                        hostLeave: {
+                            hostId: player.getId(),
+                            newHostId: newHost.getId(),
+                        },
+                    },
+                    token: currentRoom.updateStateToken(),
+                })
+                .build(),
+        );
     }
 }

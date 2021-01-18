@@ -1,14 +1,13 @@
+import { Action, Anim, animationMap, GamePlayer } from '@prisel/monopoly-common';
 import {
-    Action,
-    Anim,
-    animationMap,
-    PlayerLeftPayload,
-    PlayerRollPayload,
-    PlayerStartTurnPayload,
-    RollResponsePayload,
-} from '@prisel/monopoly-common';
-import { broadcast, isRequest, Packet, PacketType } from '@prisel/server';
-import { GamePlayer } from '../gameObjects/GamePlayer';
+    animation_spec,
+    announce_player_left_spec,
+    announce_roll_spec,
+    announce_start_turn_spec,
+    roll_spec,
+} from '@prisel/protos';
+import { assertExist, Packet, Request, Response } from '@prisel/server';
+import { getPlayer } from '../utils';
 import { GameOver } from './GameOver';
 import { Moved } from './Moved';
 import { StateMachineState } from './StateMachineState';
@@ -40,67 +39,87 @@ import { StateMachineState } from './StateMachineState';
  */
 export class PreRoll extends StateMachineState {
     private rolled = false;
+
     public onEnter() {
         // start the turn
-        const startTurnPacket: Packet<PlayerStartTurnPayload> = {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_START_TURN,
-            payload: {
-                id: this.game.getCurrentPlayer().id,
-            },
-        };
-        broadcast(this.game.room.getPlayers(), startTurnPacket);
+        this.game.broadcast(
+            Packet.forAction(Action.ANNOUNCE_START_TURN)
+                .setPayload(announce_start_turn_spec.AnnounceStartTurnPayload, {
+                    player: this.game.getCurrentPlayer().id,
+                })
+                .build(),
+        );
 
         Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('turn_start', { player: this.game.getCurrentPlayer().getGamePlayerInfo() })
+            Anim.create('turn_start', animation_spec.TurnStartExtra)
+                .setExtra({
+                    player: this.game.getCurrentPlayer().getGamePlayerInfo(),
+                })
                 .setLength(animationMap.turn_start)
                 .build(),
         );
     }
+
     // override
     public onPacket(packet: Packet, gamePlayer: GamePlayer) {
-        const action = packet.action;
-        switch (action) {
+        switch (Packet.getAction(packet)) {
             case Action.ROLL:
-                if (!this.rolled && isRequest(packet) && this.game.isCurrentPlayer(gamePlayer)) {
-                    const initialPos = gamePlayer.pathTile.position;
+                if (
+                    !this.rolled &&
+                    Request.isRequest(packet) &&
+                    this.game.isCurrentPlayer(gamePlayer)
+                ) {
+                    const initialPos = assertExist(
+                        gamePlayer.pathTile?.get().position,
+                        'initialPos',
+                    );
                     const pathCoordinates = gamePlayer.rollAndMove();
                     this.rolled = true;
                     const steps = pathCoordinates.length;
-                    gamePlayer.player.respond<RollResponsePayload>(packet, {
-                        steps,
-                        path: pathCoordinates,
-                    });
+                    getPlayer(gamePlayer).respond(
+                        Response.forRequest(packet)
+                            .setPayload(roll_spec.RollResponse, {
+                                steps,
+                                path: pathCoordinates,
+                            })
+                            .build(),
+                    );
 
                     // notify other players about current player's move
-                    broadcast<PlayerRollPayload>(this.game.room.getPlayers(), (playerInGame) => ({
-                        type: PacketType.DEFAULT,
-                        action: Action.ANNOUNCE_ROLL,
-                        payload: {
-                            id: gamePlayer.id,
-                            steps,
-                            path: pathCoordinates,
-                            myMoney: this.game.getGamePlayer(playerInGame).cash,
-                        },
-                    }));
+                    this.game.broadcast((player) => {
+                        return Packet.forAction(Action.ANNOUNCE_ROLL)
+                            .setPayload(announce_roll_spec.AnnounceRollPayload, {
+                                player: gamePlayer.id,
+                                steps,
+                                path: pathCoordinates,
+                                myMoney: player.money,
+                            })
+                            .build();
+                    });
                     Anim.processAndWait(
                         this.broadcastAnimation,
                         Anim.sequence(
                             // turn_start animation should be terminated when dice_roll
                             // is received.
-                            Anim.create('dice_roll', {
-                                player: gamePlayer.getGamePlayerInfo(),
-                            }).setLength(animationMap.dice_roll),
-                            Anim.create('dice_down', {
-                                steps,
-                                player: gamePlayer.getGamePlayerInfo(),
-                            }).setLength(animationMap.dice_down),
-                            Anim.create('move', {
-                                player: gamePlayer.getGamePlayerInfo(),
-                                start: initialPos,
-                                path: pathCoordinates,
-                            }).setLength(animationMap.move * pathCoordinates.length),
+                            Anim.create('dice_roll', animation_spec.DiceRollExtra)
+                                .setExtra({
+                                    player: gamePlayer.getGamePlayerInfo(),
+                                })
+                                .setLength(animationMap.dice_roll),
+                            Anim.create('dice_down', animation_spec.DiceDownExtra)
+                                .setExtra({
+                                    steps,
+                                    player: gamePlayer.getGamePlayerInfo(),
+                                })
+                                .setLength(animationMap.dice_down),
+                            Anim.create('move', animation_spec.MoveExtra)
+                                .setExtra({
+                                    player: gamePlayer.getGamePlayerInfo(),
+                                    start: initialPos,
+                                    path: pathCoordinates,
+                                })
+                                .setLength(animationMap.move * pathCoordinates.length),
                         ),
                     ).promise.then(() => {
                         if (this.isCurrent()) {
@@ -115,13 +134,13 @@ export class PreRoll extends StateMachineState {
     }
     public onPlayerLeave(gamePlayer: GamePlayer) {
         // player left, let's just end the game
-        broadcast<PlayerLeftPayload>(this.game.room.getPlayers(), {
-            type: PacketType.DEFAULT,
-            action: Action.ANNOUNCE_PLAYER_LEFT,
-            payload: {
-                player: gamePlayer.getGamePlayerInfo(),
-            },
-        });
+        this.game.broadcast(
+            Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
+                .setPayload(announce_player_left_spec.AnnouncePlayerLeftPayload, {
+                    player: gamePlayer.getGamePlayerInfo(),
+                })
+                .build(),
+        );
         this.transition(GameOver);
     }
     public get [Symbol.toStringTag]() {

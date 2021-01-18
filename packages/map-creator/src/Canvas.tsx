@@ -1,16 +1,5 @@
-import {
-    ChanceInput,
-    Coordinate,
-    exist,
-    GameObject,
-    log,
-    Mixins,
-    Property2,
-    PropertyClass,
-    Tile2,
-    TileClass,
-    World,
-} from '@prisel/monopoly-common';
+import { ChanceInput, exist, GameObject, Property, Tile, World } from '@prisel/monopoly-common';
+import { coordinate } from '@prisel/protos';
 import {
     AnimateCallbackFn,
     CanvasForm,
@@ -33,6 +22,8 @@ import { toolCreatorMap } from './tools';
 import { Tool } from './tools/Tool';
 import { useMutable } from './useMutable';
 import { arrowBetweenTiles } from './utils/arrow';
+
+type Coordinate = coordinate.Coordinate;
 
 const Palette = {
     BOARD: Color.fromHex('#9ab'),
@@ -140,7 +131,7 @@ function getDrawWorldFn(
         timePercent = 0.3 + 0.7 * Num.cycle(t);
     }, timePercent);
     return function (time, ftime) {
-        const tiles = world.getAll(TileClass);
+        const tiles = world.getAll(Tile);
         tempo.animate(time, ftime);
         for (const tile of tiles) {
             if (tile === selectedObjectRef.current) {
@@ -149,7 +140,7 @@ function getDrawWorldFn(
                 drawTile(tile, form);
             }
         }
-        for (const property of world.getAll(PropertyClass)) {
+        for (const property of world.getAll(Property)) {
             // draw property
             if (property === selectedObjectRef.current) {
                 drawProperty(property, form, timePercent);
@@ -159,15 +150,15 @@ function getDrawWorldFn(
         }
         // draw arrows representing move to tile for currently selected tile
         if (
-            selectedObjectRef.current instanceof TileClass &&
-            Mixins.hasMixin(selectedObjectRef.current, Mixins.ChancePoolMixinConfig)
+            selectedObjectRef.current instanceof Tile &&
+            exist(selectedObjectRef.current.chancePool)
         ) {
             const selectedTile = selectedObjectRef.current;
-            const conncetedTileIds = selectedTile.chancePool
+            const conncetedTileIds = selectedObjectRef.current.chancePool
                 .filter((chance) => chance.type === 'move_to_tile')
                 .map((chance: ChanceInput<'move_to_tile'>) => chance.inputArgs.tileId);
             const connectedTiles = world
-                .getAll(TileClass)
+                .getAll(Tile)
                 .filter((tile) => conncetedTileIds.includes(tile.id));
             connectedTiles.forEach((connectedTile) =>
                 arrowBetweenTiles(selectedTile, connectedTile, form),
@@ -176,25 +167,23 @@ function getDrawWorldFn(
 
         // draw start flag
         for (const tile of tiles) {
-            if (Mixins.hasMixin(tile, Mixins.StartMixinConfig)) {
+            if (tile.isStart) {
                 drawStartFlag(tile, form);
             }
-            if (Mixins.hasMixin(tile, Mixins.ChancePoolMixinConfig)) {
+            if (exist(tile.chancePool)) {
                 drawChanceFlag(tile, form);
             }
         }
         // draw arrows
         for (const tile of tiles) {
-            if (tile.path) {
-                for (const nextRef of tile.path.next) {
-                    const nextTile = nextRef();
-                    if (nextTile) {
-                        arrowBetweenTiles(tile, nextTile, form);
-                    } else {
-                        log.severe(
-                            `tile at (${tile.position.row}, ${tile.position.col}) has a missing ref for next`,
-                        );
-                    }
+            for (const nextRef of tile.next) {
+                const nextTile = nextRef.get();
+                if (nextTile) {
+                    arrowBetweenTiles(tile, nextTile, form);
+                } else {
+                    console.error(
+                        `tile at (${tile.position.row}, ${tile.position.col}) has a missing ref for next`,
+                    );
                 }
             }
         }
@@ -206,33 +195,33 @@ function alpha(color: Color, alpha: number) {
     newColor.alpha = alpha;
     return newColor;
 }
-function drawStartFlag(tile: Tile2, form: CanvasForm) {
+function drawStartFlag(tile: Tile, form: CanvasForm) {
     form.fillOnly(Palette.START.hex)
         .font(24)
         .alignText('start', 'middle')
         .textBox(getTileRect(tile), 'S', 'center');
 }
-function drawChanceFlag(tile: Tile2, form: CanvasForm) {
+function drawChanceFlag(tile: Tile, form: CanvasForm) {
     form.fillOnly(Palette.START.hex)
         .font(24)
         .alignText('end', 'middle')
         .textBox(getTileRect(tile), 'C', 'center');
 }
 
-function getTileRect(tile: Tile2): Group {
+function getTileRect(tile: Tile): Group {
     return Rectangle.from(
         new Pt(tile.position.col * TILE_SIZE_PX, tile.position.row * TILE_SIZE_PX),
         TILE_SIZE_PX,
         TILE_SIZE_PX,
     );
 }
-function drawTile(tile: Tile2, form: CanvasForm, selectedVaryingOpacity: number = 1) {
+function drawTile(tile: Tile, form: CanvasForm, selectedVaryingOpacity: number = 1) {
     const tileRect = Rectangle.from(
         new Pt(tile.position.col * TILE_SIZE_PX + 1, tile.position.row * TILE_SIZE_PX + 1),
         TILE_SIZE_PX - 2,
         TILE_SIZE_PX - 2,
     );
-    if (tile.path) {
+    if (tile.prev.length > 0 || tile.next.length > 0) {
         form.fillOnly(
             selectedVaryingOpacity === 1
                 ? Palette.ROAD.hex
@@ -246,12 +235,12 @@ function drawTile(tile: Tile2, form: CanvasForm, selectedVaryingOpacity: number 
         ).rect(tileRect);
     }
 }
-function drawProperty(property: Property2, form: CanvasForm, selectedVaryingOpacity: number = 1) {
+function drawProperty(property: Property, form: CanvasForm, selectedVaryingOpacity: number = 1) {
     const propertyInset = 4;
     const propertyRect = Rectangle.from(
         new Pt(
-            property.dimension.anchor.col * TILE_SIZE_PX + propertyInset,
-            property.dimension.anchor.row * TILE_SIZE_PX + propertyInset,
+            property.anchor.col * TILE_SIZE_PX + propertyInset,
+            property.anchor.row * TILE_SIZE_PX + propertyInset,
         ),
         TILE_SIZE_PX - propertyInset * 2,
         TILE_SIZE_PX - propertyInset * 2,

@@ -1,38 +1,49 @@
+import { assertExist } from '@prisel/client';
 import { PERSISTENT_NODE } from './consts';
-import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class SharedAssets extends cc.Component {
+    // properties starting with _ will not show up in cocos editor. So use
+    // ending _ to denote internal variable.
     @property(cc.SpriteAtlas)
-    public uiAtlas: cc.SpriteAtlas = null;
+    private uiAtlas_?: cc.SpriteAtlas;
+    public get uiAtlas() {
+        return assertExist(this.uiAtlas_);
+    }
 
     @property(cc.SpriteAtlas)
-    public tileAtlas: cc.SpriteAtlas = null;
+    private tileAtlas_?: cc.SpriteAtlas;
+    public get tileAtlas() {
+        return assertExist(this.tileAtlas_);
+    }
 
     @property(cc.SpriteAtlas)
-    public characterAtlas: cc.SpriteAtlas = null;
+    private characterAtlas_?: cc.SpriteAtlas;
+    public get characterAtlas() {
+        return assertExist(this.characterAtlas_);
+    }
 
     @property(cc.Font)
-    public font: cc.Font = null;
+    private font_?: cc.Font;
+    public get font() {
+        return assertExist(this.font_);
+    }
 
     @property(cc.Prefab)
-    public rankPrefab: cc.Prefab = null;
+    private rankPrefab_?: cc.Prefab;
+    public get rankPrefab() {
+        return assertExist(this.rankPrefab_);
+    }
 
     @property(cc.Prefab)
-    public inputPrefab: cc.Prefab = null;
-
-    protected start() {
-        nullCheck(this.uiAtlas);
-        nullCheck(this.tileAtlas);
-        nullCheck(this.characterAtlas);
-        nullCheck(this.font);
-        nullCheck(this.rankPrefab);
-        nullCheck(this.inputPrefab);
+    private inputPrefab_?: cc.Prefab;
+    public get inputPrefab() {
+        return assertExist(this.inputPrefab_);
     }
 
     public static instance(): SharedAssets {
-        return nullCheck(cc.find(PERSISTENT_NODE).getComponent(SharedAssets));
+        return assertExist(cc.find(PERSISTENT_NODE).getComponent(SharedAssets));
     }
 }

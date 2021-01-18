@@ -1,6 +1,5 @@
 scripts:
-    default: env DEBUG=debug ts-node --project demo.tsconfig.json demo.ts
-    ts-check: tsc
-    clean: rm -rf ./lib
+    default: env DEBUG=debug ts-node --project tsconfig-demo.json demo.ts
+    clean: rm -rf ./lib ./dist
+    ts-check: tsc --project tsconfig-build.json
     build: rollup --config --silent
-    gendef: tsc --project build.tsconfig.json

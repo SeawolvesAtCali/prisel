@@ -1,4 +1,5 @@
-import { PromptPurchasePayload } from '@prisel/monopoly-common';
+import { assertExist } from '@prisel/client';
+import { prompt_purchase_spec } from '@prisel/protos';
 import { createDialog, DialogPosition } from './components/DialogUtil';
 import { LabelConfig, LabelTheme, themeToColor } from './components/LabelConfig';
 import { LayoutConfig } from './components/LayoutConfig';
@@ -11,22 +12,21 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class PurchaseDialog extends cc.Component {
-    private eventBus: cc.Node = null;
-    private dialog: cc.Node = null;
+    private eventBus?: cc.Node;
+    private dialog?: cc.Node;
 
     protected start() {
-        this.eventBus = cc.find(EVENT_BUS);
-
+        this.eventBus = assertExist(cc.find(EVENT_BUS));
         this.eventBus.on(EVENT.PROMPT_PURCHASE, this.promptPurchase, this);
     }
 
-    private promptPurchase(promptPurchase: PromptPurchasePayload) {
+    private promptPurchase(promptPurchase: prompt_purchase_spec.PromptPurchaseRequest) {
         this.dialog = new cc.Node();
         this.node.addChild(this.dialog);
         createDialog({
             name: 'purchase dialog',
-            title: promptPurchase.property.name,
-            actionText: promptPurchase.property.isUpgrade ? 'UPGRADE' : 'BUY',
+            title: promptPurchase.property?.name || '',
+            actionText: promptPurchase.isUpgrade ? 'UPGRADE' : 'BUY',
             position: DialogPosition.BOTTOM_CENTER,
             content: NodeConfig.create('price bar')
                 .setSize(new cc.Size(0, 35)) // width set by WidgetConfig
@@ -40,7 +40,7 @@ export default class PurchaseDialog extends cc.Component {
                         .addComponents(SpriteConfig.coin()),
                     NodeConfig.create('price label')
                         .setColor(themeToColor(LabelTheme.ON_LIGHT))
-                        .addComponents(LabelConfig.p(`${promptPurchase.property.cost}`))
+                        .addComponents(LabelConfig.p(`${promptPurchase.property?.cost || 0}`))
                         .setAnchor(cc.v2(0, 0.5)),
                 ),
             onAction: this.handlePurchase.bind(this),
@@ -51,14 +51,18 @@ export default class PurchaseDialog extends cc.Component {
     }
 
     private handlePurchase() {
-        this.eventBus.emit(EVENT.PURCHASE_DECISION, true);
-        this.node.removeChild(this.dialog);
-        this.dialog = undefined;
+        assertExist(this.eventBus).emit(EVENT.PURCHASE_DECISION, true);
+        if (this.dialog) {
+            this.node.removeChild(this.dialog);
+            this.dialog = undefined;
+        }
     }
 
     private handleCancel() {
-        this.eventBus.emit(EVENT.PURCHASE_DECISION, false);
-        this.node.removeChild(this.dialog);
-        this.dialog = undefined;
+        assertExist(this.eventBus).emit(EVENT.PURCHASE_DECISION, false);
+        if (this.dialog) {
+            this.node.removeChild(this.dialog);
+            this.dialog = undefined;
+        }
     }
 }

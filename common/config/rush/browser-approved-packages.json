@@ -1,0 +1,302 @@
+// DO NOT ADD COMMENTS IN THIS FILE.  They will be lost when the Rush tool resaves it.
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
+  "packages": [
+    {
+      "name": "@prisel/client",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "@prisel/common",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@prisel/configs",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "@prisel/gen-tsconfig",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@prisel/jest-preset",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@prisel/monopoly-common",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "@prisel/protos",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@prisel/server",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "@protobuf-ts/plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@protobuf-ts/protoc",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@protobuf-ts/runtime",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "@rollup/plugin-commonjs",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@rollup/plugin-node-resolve",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@rollup/plugin-typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@testing-library/jest-dom",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "@testing-library/react",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "@testing-library/react-hooks",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@testing-library/user-event",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "@types/debug",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@types/events",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "@types/jest",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@types/koa",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@types/lodash",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "@types/long",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@types/lowdb",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "@types/node",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "@types/prismjs",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@types/react",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@types/react-dom",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@types/shortid",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "@types/testing-library__react-hooks",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@types/ws",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "barrelsby",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "buffer",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "debug",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "deepcopy",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "events",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "jest",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "jest-dev-server",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "jest-environment-jsdom",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "jest-standard-reporter",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "koa",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "lodash",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "long",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "lowdb",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "mock-socket",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "nanoid",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "normalize.css",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "nps",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "prettier",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "prismjs",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "protobufjs",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "pts",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "react",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "react-dom",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "react-scripts",
+      "allowedCategories": [ "prototype", "tools" ]
+    },
+    {
+      "name": "react-simple-code-editor",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "react-test-renderer",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "rollup",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "rollup-plugin-copy",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "rollup-plugin-dts",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "rollup-plugin-node-builtins",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "rollup-plugin-typescript2",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "serializr",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "shortid",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
+      "name": "ts-jest",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "ts-node",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "ts-proto",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "tsc-files",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "tslib",
+      "allowedCategories": [ "production", "prototype" ]
+    },
+    {
+      "name": "typedoc",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "typedoc-plugin-markdown",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "typescript",
+      "allowedCategories": [ "production", "prototype", "tools" ]
+    },
+    {
+      "name": "ws",
+      "allowedCategories": [ "production" ]
+    }
+  ]
+}

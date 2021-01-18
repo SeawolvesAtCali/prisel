@@ -1,11 +1,13 @@
-import { log } from '@prisel/monopoly-common';
+import { exist } from '@prisel/monopoly-common';
+import { assertExist } from '@prisel/server';
 import Game from '../Game';
+import { log } from '../log';
 import { StateMachineState } from './StateMachineState';
 
 export class StateMachine {
-    private currentState: StateMachineState;
+    private currentState?: StateMachineState;
     private game: Game;
-    private onEnd: () => void;
+    private onEnd?: () => void;
     constructor(game: Game) {
         this.game = game;
     }
@@ -20,22 +22,28 @@ export class StateMachine {
         this.onEnd = onEnd;
     }
 
-    public get state(): StateMachineState {
+    public get state(): StateMachineState | undefined {
         return this.currentState;
     }
     public end() {
-        this.currentState.onExit();
-        this.currentState = null;
-        setImmediate(this.onEnd);
+        assertExist(this.currentState).onExit();
+        this.currentState = undefined;
+        if (exist(this.onEnd)) {
+            setImmediate(this.onEnd);
+        }
     }
 
     public transition(stateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {
         setImmediate(() => {
             const previousState = this.currentState;
-            previousState.onExit();
+            if (previousState) {
+                previousState.onExit();
+            } else {
+                log.warn('no previous state to transition from.');
+            }
             this.currentState = new stateClass(this.game, this);
             log.info(
-                `transition from ${previousState[Symbol.toStringTag]} to ${
+                `transition from ${previousState?.[Symbol.toStringTag]} to ${
                     this.currentState[Symbol.toStringTag]
                 }`,
             );

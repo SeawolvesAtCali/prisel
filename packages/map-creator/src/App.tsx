@@ -1,5 +1,5 @@
-import { GameObject, PropertyClass, TileClass } from '@prisel/monopoly-common';
-import * as React from 'react';
+import { GameObject, Property, Tile } from '@prisel/monopoly-common';
+import React from 'react';
 import styles from './App.module.css';
 import { AppContext, TempSelectingConfig } from './AppContext';
 import { clearSaved, saveToStorage } from './browserStorage';
@@ -137,10 +137,10 @@ export const Container: React.FC = () => {
                     <Canvas />
                 </section>
                 <section className={styles.propertyPanel}>
-                    {selectedObject instanceof TileClass && (
+                    {selectedObject instanceof Tile && (
                         <TileEditor tile={selectedObject} key={selectedObject.id} />
                     )}
-                    {selectedObject instanceof PropertyClass && (
+                    {selectedObject instanceof Property && (
                         <PropertyEditor property={selectedObject} />
                     )}
                 </section>

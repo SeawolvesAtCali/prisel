@@ -1,17 +1,18 @@
-import { emit } from './networkUtils';
-import { Player } from '../player';
 import { Packet } from '@prisel/common';
+import { Player } from '../player';
+import { emit } from './networkUtils';
 
-export function broadcast<Payload = any>(
+export function broadcast(
     players: Player[],
-    packetBuilder: ((player: Player) => Packet<Payload>) | Packet<Payload>,
+    packetBuilder: ((player: Player) => Packet | undefined) | Packet,
 ) {
     if (typeof packetBuilder === 'function') {
         const packets = players.map(packetBuilder);
         setImmediate(() => {
             for (let i = 0; i < players.length; i++) {
-                if (packets[i]) {
-                    emit(players[i].getSocket(), packets[i]);
+                const currentPacket = packets[i];
+                if (currentPacket) {
+                    emit(players[i].getSocket(), currentPacket);
                 }
             }
         });

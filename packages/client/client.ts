@@ -1,21 +1,18 @@
-import once from 'lodash/once';
-import { getExit } from './message';
 import {
-    SERVER,
+    assert,
+    assertExist,
     newRequestManager,
     Packet,
-    RequestManager,
     Request,
+    RequestManager,
     Response,
-    PacketType,
-    isResponse,
-    MessageType,
-    RoomChangePayload,
-    Code,
+    SERVER,
 } from '@prisel/common';
+import { room_state_change_spec, system_action_type } from '@prisel/protos';
+import once from 'lodash/once';
+import { getExit } from './message';
 import { PubSub } from './pubSub';
 import withTimer from './withTimer';
-import { assert } from './assert';
 
 type RemoveListenerFunc = () => void;
 
@@ -24,19 +21,6 @@ const CONNECTION_TIMEOUT = DEFAULT_TIMEOUT;
 
 export interface State {
     [property: string]: unknown;
-}
-
-export function serialize(packet: Packet): string {
-    return JSON.stringify(packet);
-}
-
-export function deserialize(buffer: string): Packet | void {
-    try {
-        return JSON.parse(buffer) as Packet;
-    } catch {
-        // tslint:disable-next-line:no-console
-        console.log('Error parsing packet: ' + buffer);
-    }
 }
 
 const NOT_CONNECTED = 'not connected';
@@ -55,9 +39,9 @@ const NOT_CONNECTED = 'not connected';
  *
  * After a client is connected, we can attach message handler using `client.on`
  */
-class Client<T = State> {
+export class Client<T = State> {
     public get connection(): WebSocket {
-        return this.conn;
+        return assertExist(this.conn, 'connection');
     }
 
     public get isConnected(): boolean {
@@ -65,12 +49,12 @@ class Client<T = State> {
     }
 
     public state: Partial<T>;
-    private conn: WebSocket;
+    private conn: WebSocket | undefined;
     private serverUri: string;
     private requestManager: RequestManager;
-    private listeners = new PubSub();
+    private listeners: PubSub | undefined = new PubSub();
     private systemActionListener = new PubSub();
-    private onEmitCallback: (packet: Packet) => void;
+    private onEmitCallback?: (packet: Packet) => void;
 
     constructor(server: string = SERVER) {
         this.state = {};
@@ -87,12 +71,13 @@ class Client<T = State> {
     /**
      * Connect to server
      */
-    public async connect(): Promise<WebSocket> {
+    public async connect(): Promise<WebSocket | undefined> {
         if (this.isConnected) {
             return;
         }
         // TODO if it is already connecting, we should also exit
         const connection = new WebSocket(this.serverUri);
+        connection.binaryType = 'arraybuffer';
 
         connection.onclose = () => {
             this.disconnect();
@@ -106,7 +91,7 @@ class Client<T = State> {
             this.handleMessage(message.data);
         };
         await withTimer(
-            new Promise((resolve, reject) => {
+            new Promise<void>((resolve) => {
                 const onOpen = () => {
                     this.conn = connection;
                     resolve();
@@ -127,11 +112,11 @@ class Client<T = State> {
         }
     }
 
-    private listenForSystemAction<Payload = never>(
-        systemAction: MessageType,
-        listener: (payload: Payload) => void,
+    private listenForSystemAction(
+        systemAction: system_action_type.SystemActionType,
+        listener: (packet?: Packet) => void,
     ): RemoveListenerFunc {
-        return this.systemActionListener.on(systemAction, (packet) => listener(packet.payload));
+        return this.systemActionListener.on(systemAction, (packet) => listener(packet));
     }
 
     /**
@@ -141,72 +126,52 @@ class Client<T = State> {
      */
     public emit<P extends Packet = any>(packet: P) {
         assert(this.isConnected, NOT_CONNECTED);
-        this.connection.send(serialize(packet));
+        assertExist(this.connection).send(Packet.serialize(packet));
         if (this.onEmitCallback) {
             this.onEmitCallback(packet);
         }
     }
 
-    public async request<Payload = any>(request: Request<Payload>) {
+    public async request(request: Request) {
         this.emit(request);
         return this.requestManager.addRequest(request, DEFAULT_TIMEOUT);
     }
 
-    public respond<Payload>(request: Request, payload: Payload) {
-        const response: Response<Payload> = {
-            type: PacketType.RESPONSE,
-            request_id: request.request_id,
-            status: {
-                code: Code.OK,
-            },
-            payload,
-        };
-        if (request.system_action !== undefined) {
-            response.system_action = request.system_action;
-        }
-        if (request.action !== undefined) {
-            response.action = request.action;
-        }
-        this.emit(response);
-    }
-
-    public respondFailure(request: Request, message?: string, detail?: any) {
-        const response: Response<never> = {
-            type: PacketType.RESPONSE,
-            request_id: request.request_id,
-            status: {
-                code: Code.FAILED,
-            },
-        };
-        if (message) {
-            response.status.message = message;
-        }
-        if (detail !== undefined) {
-            response.status.detail = detail;
-        }
+    public respond(response: Response) {
         this.emit(response);
     }
 
     /**
      * Attach handler for messages from server
-     * @param messageTypeOrFilter
-     * @param callback
+     * @param action
+     * @param listener
      */
-    public on(action: any, listener: (packet: Packet, action?: any) => void): RemoveListenerFunc {
-        return this.listeners.on(action, listener);
+    public on<T extends Packet | Response | Request>(
+        action: any,
+        listener: (packet: T, action?: any) => unknown,
+    ): RemoveListenerFunc {
+        return assertExist(this.listeners?.on(action, listener), 'pubsub');
     }
 
     public onRoomStateChange(
-        listener: (roomStateChange: RoomChangePayload) => void,
+        listener: (roomStateChange: room_state_change_spec.RoomStateChangePayload) => void,
     ): RemoveListenerFunc {
-        return this.listenForSystemAction<RoomChangePayload>(
-            MessageType.ROOM_STATE_CHANGE,
-            listener,
+        return this.listenForSystemAction(
+            system_action_type.SystemActionType.ROOM_STATE_CHANGE,
+            (packet) => {
+                const payload = Packet.getPayload(packet, 'roomStateChangePayload');
+                if (payload) {
+                    listener(payload);
+                }
+            },
         );
     }
 
     public onGameStart(listener: () => void): RemoveListenerFunc {
-        return this.listenForSystemAction(MessageType.ANNOUNCE_GAME_START, listener);
+        return this.listenForSystemAction(
+            system_action_type.SystemActionType.ANNOUNCE_GAME_START,
+            listener,
+        );
     }
 
     /**
@@ -222,24 +187,24 @@ class Client<T = State> {
     }
 
     protected processPacket(packet: Packet) {
-        if (isResponse(packet)) {
+        if (Response.isResponse(packet)) {
             // handle response using requestManager
             this.requestManager.onResponse(packet);
             return;
         }
 
-        if (packet.action !== undefined) {
-            this.listeners.dispatch(packet.action, packet);
-        } else if (packet.system_action !== undefined) {
-            this.systemActionListener.dispatch(packet.system_action, packet);
+        if (Packet.isAnySystemAction(packet)) {
+            this.systemActionListener.dispatch(packet.message.systemAction, packet);
+        } else if (Packet.isAnyCustomAction(packet)) {
+            this.listeners?.dispatch(packet.message.action, packet);
         } else {
             this.log('Packet without action is not supported', packet);
         }
     }
 
-    private handleMessage(rawMessage: string) {
+    private handleMessage(rawMessage: any) {
         if (this.isConnected) {
-            const message = deserialize(rawMessage);
+            const message = Packet.deserialize(rawMessage);
             if (!message) {
                 return;
             }
@@ -248,14 +213,12 @@ class Client<T = State> {
     }
 
     private disconnect() {
-        if (this.isConnected) {
-            this.connection.onclose = undefined;
+        if (this.isConnected && this.connection) {
+            this.connection.onclose = null;
             this.connection.close();
             this.conn = undefined;
         }
-        this.listeners.close();
+        this.listeners?.close();
         this.listeners = undefined;
     }
 }
-
-export default Client;

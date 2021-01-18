@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "prisel/annotations.proto";
+import "monopoly/property.proto";
+
+message PromptPurchaseRequest {
+  option (prisel.for_action) = {
+    type : "prompt_purchase"
+    packet_type : REQUEST
+  };
+  PropertyInfo property = 1;
+  repeated PropertyLevel levels = 2;
+  // Whether this property can be upgraded right now. Only purchased
+  // land/property that has not reached the upgrade limit can be upgraded.
+  bool is_upgrade = 7;
+  int32 money_after_purchase = 8;
+}
+
+message PromptPurchaseResponse {
+  option (prisel.for_action) = {
+    type : "prompt_purchase"
+    packet_type : REQUEST
+  };
+  bool purchased = 1;
+}

@@ -1,9 +1,11 @@
-import { MessageType, JoinPayload, Request } from '@prisel/common';
-import { Socket, Context } from '../objects';
-import clientHandlerRegister from '../clientHandlerRegister';
-import { getPlayerOrRespondError } from './utils';
+import { system_action_type } from '@prisel/protos';
+import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
+import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
-export const handleJoin = (context: Context, socket: Socket) => (request: Request<JoinPayload>) => {
+export const handleJoin: Handler = (context, socket) => (request) => {
+    if (!verifyIsRequest(request)) {
+        return;
+    }
     const player = getPlayerOrRespondError(context, socket, request);
     if (!player) {
         return;
@@ -18,4 +20,4 @@ export const handleJoin = (context: Context, socket: Socket) => (request: Reques
     roomConfig.onJoin(player, request);
 };
 
-clientHandlerRegister.push(MessageType.JOIN, handleJoin);
+clientHandlerRegister.push(system_action_type.SystemActionType.JOIN, handleJoin);

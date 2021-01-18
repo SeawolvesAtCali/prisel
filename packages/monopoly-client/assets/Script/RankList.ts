@@ -1,4 +1,5 @@
-import { Rank } from '@prisel/monopoly-common';
+import { assertExist } from '@prisel/client';
+import { rank } from '@prisel/protos';
 import { createDropShadow } from './components/DropShadow';
 import { LabelConfig } from './components/LabelConfig';
 import { LayoutConfig } from './components/LayoutConfig';
@@ -7,19 +8,18 @@ import { WidgetConfig } from './components/WidgetConfig';
 import { EVENT, EVENT_BUS } from './consts';
 import RankView from './RankView';
 import SharedAssets from './SharedAssets';
-import { nullCheck } from './utils';
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class RankList extends cc.Component {
-    private rankPrefab: cc.Prefab = null;
-    private list: cc.Node = null;
-    private eventBus: cc.Node = null;
+    private rankPrefab?: cc.Prefab;
+    private list?: cc.Node;
+    private eventBus?: cc.Node;
 
     protected start() {
-        this.rankPrefab = nullCheck(SharedAssets.instance().rankPrefab);
-        this.eventBus = nullCheck(cc.find(EVENT_BUS));
+        this.rankPrefab = assertExist(SharedAssets.instance().rankPrefab);
+        this.eventBus = assertExist(cc.find(EVENT_BUS));
         this.eventBus.once(EVENT.SHOW_RANKING, this.showRanking, this);
 
         this.render();
@@ -42,23 +42,25 @@ export default class RankList extends cc.Component {
             )
             .getPath();
         root.apply(this.node);
-        this.list = nullCheck(cc.find(rankListPath, this.node));
+        this.list = assertExist(cc.find(rankListPath, this.node));
     }
 
-    private showRanking(ranks: Rank[]) {
+    private showRanking(ranks: rank.Rank[]) {
         this.node.active = true;
-        this.list.removeAllChildren();
+        this.list?.removeAllChildren();
         ranks.forEach((rank, index) => {
-            const rankNode = cc.instantiate(this.rankPrefab);
-            rankNode.getComponent(RankView).init(rank.player.name, rank.assets.total, index);
-            this.list.addChild(rankNode);
+            const rankNode = (cc.instantiate(this.rankPrefab) as unknown) as cc.Node;
+            rankNode
+                .getComponent(RankView)
+                .init(rank.player?.id || 'player', rank.asset?.total || 0, index);
+            this.list?.addChild(rankNode);
         });
         // display the ranking for 5 seconds, and then close
         this.scheduleOnce(this.closeView, 5);
     }
 
     private closeView() {
-        this.eventBus.emit(EVENT.RANKING_CLOSED);
+        this.eventBus?.emit(EVENT.RANKING_CLOSED);
         this.node.active = false;
     }
 }

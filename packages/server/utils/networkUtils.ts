@@ -1,17 +1,9 @@
-import debug from '../debug';
-import { HEARTBEAT_INTERVAL, toDebugString } from '@prisel/common';
-import WebSocket from 'ws';
+import { HEARTBEAT_INTERVAL, Packet } from '@prisel/common';
 import http from 'http';
 import Koa from 'koa';
-import { Packet } from '@prisel/common';
-
-export function serialize(packet: Packet<any>): string {
-    return JSON.stringify(packet);
-}
-
-export function deserialize(packet: string): Packet<any> {
-    return JSON.parse(packet);
-}
+import WebSocket from 'ws';
+import debug from '../debug';
+import { DEBUG_MODE } from '../flags';
 
 export function createServerWithInternalHTTPServer({
     host,
@@ -55,7 +47,7 @@ export function getConnectionToken(): ConnectionToken {
 }
 
 export function watchForDisconnection(socket: WebSocket, connectionToken: ConnectionToken) {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
         socket.on('pong', () => {
             connectionToken.isAlive = true;
         });
@@ -76,17 +68,18 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
  * Utility functions to perform network calls.
  */
 
-export function emit<T extends Packet<any>>(client: WebSocket, packet: T): T | void {
-    const { system_action: systemAction, action } = packet;
-    if (action !== undefined) {
-        debug(`SERVER: [custom action] ${toDebugString(packet)}`);
-    } else if (systemAction !== undefined) {
-        debug(`SERVER: [standard action] ${toDebugString(packet)}`);
-    } else {
-        debug(`SERVER: emitting packet without action ${JSON.stringify(packet)}`);
+export function emit(client: WebSocket, packet: Packet): Packet | void {
+    if (DEBUG_MODE) {
+        if (Packet.isAnyCustomAction(packet)) {
+            debug(`SERVER: [custom action] ${Packet.toDebugString(packet)}`);
+        } else if (Packet.isAnySystemAction(packet)) {
+            debug(`SERVER: [system action] ${Packet.toDebugString(packet)}`);
+        } else {
+            debug(`SERVER: emitting packet without action ${JSON.stringify(packet)}`);
+        }
     }
     if (client && client.readyState === WebSocket.OPEN) {
-        client.send(serialize(packet));
+        client.send(Packet.serialize(packet));
         return packet;
     }
 }

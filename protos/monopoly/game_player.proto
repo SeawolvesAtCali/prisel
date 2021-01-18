@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "monopoly/coordinate.proto";
+import "prisel/player_info.proto";
+
+message GamePlayer {
+  string id = 1;
+  int32 money = 2;
+  Coordinate pos = 3;
+  // character determine the sprite set, or color client side use to
+  // denote the player
+  int32 character = 4;
+  prisel.PlayerInfo bound_player = 5;
+}

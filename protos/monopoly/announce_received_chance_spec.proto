@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package monopoly;
+
+import "prisel/annotations.proto";
+import "monopoly/chance.proto";
+
+message AnnounceRecievedChancePayload {
+  option (prisel.for_action) = {
+    type : "announce_received_chance"
+    packet_type : DEFAULT
+  };
+  string player = 1;
+  Chance chance = 2;
+}

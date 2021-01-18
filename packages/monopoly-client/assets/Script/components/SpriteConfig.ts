@@ -1,9 +1,9 @@
+import { assertExist } from '@prisel/client';
 import SharedAssets from '../SharedAssets';
-import { nullCheck } from '../utils';
 import { ComponentConfig } from './ComponentConfig';
 
 export class SpriteConfig extends ComponentConfig {
-    public spriteFrame: cc.SpriteFrame;
+    public spriteFrame?: cc.SpriteFrame;
     public type: cc.Sprite.Type = cc.Sprite.Type.SIMPLE;
     public blendScrBlendFactor: cc.macro.BlendFactor = cc.macro.BlendFactor.SRC_ALPHA;
     public blendDstBlendFactor: cc.macro.BlendFactor = cc.macro.BlendFactor.ONE_MINUS_SRC_ALPHA;
@@ -14,7 +14,7 @@ export class SpriteConfig extends ComponentConfig {
 
     public static background(): SpriteConfig {
         const config = new SpriteConfig();
-        config.spriteFrame = nullCheck(SharedAssets.instance().uiAtlas.getSpriteFrame('shadow'));
+        config.spriteFrame = assertExist(SharedAssets.instance().uiAtlas.getSpriteFrame('shadow'));
         config.blendScrBlendFactor = cc.macro.BlendFactor.DST_COLOR;
         config.blendDstBlendFactor = cc.macro.BlendFactor.ONE_MINUS_DST_ALPHA;
         return config;
@@ -22,7 +22,7 @@ export class SpriteConfig extends ComponentConfig {
 
     public static panel(): SpriteConfig {
         const config = new SpriteConfig();
-        config.spriteFrame = nullCheck(
+        config.spriteFrame = assertExist(
             SharedAssets.instance().uiAtlas.getSpriteFrame('panel-round'),
         );
         config.type = cc.Sprite.Type.SLICED;
@@ -32,7 +32,7 @@ export class SpriteConfig extends ComponentConfig {
 
     public static coin(): SpriteConfig {
         const config = new SpriteConfig();
-        config.spriteFrame = nullCheck(SharedAssets.instance().uiAtlas.getSpriteFrame('coin'));
+        config.spriteFrame = assertExist(SharedAssets.instance().uiAtlas.getSpriteFrame('coin'));
         return config;
     }
 
@@ -50,7 +50,9 @@ export class SpriteConfig extends ComponentConfig {
 
     public update(comp: cc.Sprite): void {
         comp.sizeMode = cc.Sprite.SizeMode.CUSTOM;
-        comp.spriteFrame = this.spriteFrame;
+        if (this.spriteFrame) {
+            comp.spriteFrame = this.spriteFrame;
+        }
         comp.type = this.type;
 
         (comp as any).srcBlendFactor = this.blendScrBlendFactor;

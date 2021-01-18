@@ -1,20 +1,21 @@
-import React, { useContext, useEffect, useState, useCallback } from 'react';
-import {
-    createClient,
-    connect,
-    login,
-    ClientState,
-    createRoom,
-    AddToLogs,
-    joinRoom,
-} from './utils';
-import GameContext from '../GameContext';
-import LogPanel, { MessageWithMetaData, createMessage } from '../LogPanel';
-import { Client, PacketType, Request } from '@prisel/client';
+import { Client, Request } from '@prisel/client';
+import { packet_type } from '@prisel/protos';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Container, { BorderBox } from '../Container';
-import Suggestion from '../Suggestion';
+import GameContext from '../GameContext';
+import LogPanel, { createMessage, MessageWithMetaData } from '../LogPanel';
 import Prompt from '../Prompt';
+import Suggestion from '../Suggestion';
 import run from '../suggestionProviders/runCommand';
+import {
+    AddToLogs,
+    ClientState,
+    connect,
+    createClient,
+    createRoom,
+    joinRoom,
+    login,
+} from './utils';
 
 interface HostContainerProps extends BorderBox {
     username: string;
@@ -31,17 +32,17 @@ function useRun(client: Client | null, addToLogs: AddToLogs) {
                 (key) => {},
                 (packet) => {
                     switch (packet.type) {
-                        case PacketType.DEFAULT:
-                        case PacketType.RESPONSE:
+                        case packet_type.PacketType.DEFAULT:
+                        case packet_type.PacketType.RESPONSE:
                             // TODO(minor): currently, let's hardcode the
                             // response id
                             client.emit(packet);
                             break;
-                        case PacketType.REQUEST:
+                        case packet_type.PacketType.REQUEST:
                             const request: Request = {
                                 ...packet,
-                                type: PacketType.REQUEST,
-                                request_id: client.newId(),
+                                type: packet_type.PacketType.REQUEST,
+                                requestId: client.newId(),
                             };
                             client.emit(request);
                             break;
@@ -92,8 +93,9 @@ export function HostContainer({ username, displayBorder }: HostContainerProps) {
             await connect(myClient);
             setClient(myClient);
             await login(myClient);
-            if (setRoomId) {
-                setRoomId(await createRoom(myClient));
+            const roomId = await createRoom(myClient);
+            if (setRoomId && roomId) {
+                setRoomId(roomId);
             }
             // stop logging emit because emit will be log when command is executed.
             shouldLogEmit = false;

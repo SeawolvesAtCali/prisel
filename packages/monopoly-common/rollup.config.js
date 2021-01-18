@@ -1,20 +1,7 @@
-import typescript from 'rollup-plugin-typescript2';
+import { browserBuild, cjsAndEsBuild } from '@prisel/configs/rollupHelper';
 import pkg from './package.json';
 
-const config = [
-    {
-        input: 'index.ts',
-        plugins: [
-            typescript({
-                tsconfigOverride: {
-                    compilerOptions: {
-                        declaration: false,
-                    },
-                },
-            }),
-        ],
-        output: [{ file: pkg.main, format: 'cjs' }],
-    },
+export default [
+    browserBuild(/* entry= */ 'dist/index.js', /* pkgJson= */ pkg),
+    cjsAndEsBuild(/* entry= */ 'dist/index.js', /* pkgJson= */ pkg),
 ];
-
-export default config;

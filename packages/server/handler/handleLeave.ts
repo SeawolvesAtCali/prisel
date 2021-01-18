@@ -1,12 +1,13 @@
-import { Context, Socket } from '../objects';
-import { MessageType, Request } from '@prisel/common';
-import clientHandlerRegister from '../clientHandlerRegister';
-import { getPlayerOrRespondError } from './utils';
-import { getRoom } from '../utils/stateUtils';
+import { system_action_type } from '@prisel/protos';
+import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { GAME_PHASE } from '../objects/gamePhase';
-import { debug } from '../debug';
+import { getRoom } from '../utils/stateUtils';
+import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
-export const handleLeave = (context: Context, socket: Socket) => (request: Request) => {
+export const handleLeave: Handler = (context, socket) => (request) => {
+    if (!verifyIsRequest(request)) {
+        return;
+    }
     const player = getPlayerOrRespondError(context, socket, request);
     if (!player) {
         return;
@@ -21,9 +22,9 @@ export const handleLeave = (context: Context, socket: Socket) => (request: Reque
     const room = getRoom(context, socket);
     roomConfig.onLeave(player, request);
 
-    if (!room.isClosed && room.getGamePhase() === GAME_PHASE.GAME) {
+    if (!room?.isClosed && room?.getGamePhase() === GAME_PHASE.GAME) {
         gameConfig.onRemovePlayer(room, player);
     }
 };
 
-clientHandlerRegister.push(MessageType.LEAVE, handleLeave);
+clientHandlerRegister.push(system_action_type.SystemActionType.LEAVE, handleLeave);

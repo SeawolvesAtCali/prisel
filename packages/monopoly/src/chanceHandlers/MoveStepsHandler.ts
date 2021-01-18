@@ -1,54 +1,55 @@
-import {
-    Action,
-    Anim,
-    animationMap,
-    ChanceArgs,
-    PlayerReceiveChancePayload,
-    Tile2,
-    Tiles,
-} from '@prisel/monopoly-common';
-import { broadcast, PacketType } from '@prisel/server';
+import { Action, Anim, animationMap, exist, Tile } from '@prisel/monopoly-common';
+import { animation_spec, announce_received_chance_spec } from '@prisel/protos';
+import { Packet } from '@prisel/server';
 import { Moved } from '../stateMachine/Moved';
-import { checkType } from '../utils';
 import { ChanceHandler } from './ChanceHander';
 
 export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input) => {
     const inputArgs = input.inputArgs;
     const currentPlayer = game.getCurrentPlayer();
-    const startLocation = currentPlayer.pathTile.position;
-    let path: Tile2[] = [];
+    const currentTile = currentPlayer.pathTile?.get();
+    if (!exist(currentTile)) {
+        return;
+    }
+    const startLocation = currentTile.position;
+    let path: Tile[] = [];
     if (inputArgs.steps > 0) {
-        path = Tiles.genPath(currentPlayer.pathTile, inputArgs.steps);
+        path = currentTile.genPath(inputArgs.steps);
         currentPlayer.move(path);
     }
     if (inputArgs.steps < 0) {
-        path = Tiles.genPathReverse(currentPlayer.pathTile, -inputArgs.steps);
+        path = currentTile.genPathReverse(-inputArgs.steps);
         currentPlayer.move(path);
     }
 
-    broadcast<PlayerReceiveChancePayload>(game.room.getPlayers(), {
-        type: PacketType.DEFAULT,
-        action: Action.ANNOUNCE_CHANCE,
-        payload: {
-            id: currentPlayer.id,
-            chance: {
-                display: input.display,
-                type: 'move_steps',
-                args: checkType<ChanceArgs['move_steps']>({
-                    steps: inputArgs.steps,
-                }),
-            },
-        },
-    });
+    game.broadcast(
+        Packet.forAction(Action.ANNOUNCE_CHANCE)
+            .setPayload(announce_received_chance_spec.AnnounceRecievedChancePayload, {
+                player: currentPlayer.id,
+                chance: {
+                    display: input.display,
+                    extra: {
+                        oneofKind: 'moveSteps',
+                        moveSteps: {
+                            steps: inputArgs.steps,
+                        },
+                    },
+                },
+            })
+            .build(),
+    );
+
     await Anim.processAndWait(
         (packet) => {
-            broadcast(game.room.getPlayers(), packet);
+            game.broadcast(packet);
         },
-        Anim.create('move', {
-            player: currentPlayer.getGamePlayerInfo(),
-            start: startLocation,
-            path: path.map((pathTile) => pathTile.position),
-        }).setLength(animationMap.move * path.length),
+        Anim.create('move', animation_spec.MoveExtra)
+            .setExtra({
+                player: currentPlayer.getGamePlayerInfo(),
+                start: startLocation,
+                path: path.map((pathTile) => pathTile.position),
+            })
+            .setLength(animationMap.move * path.length),
     ).promise;
     return Moved;
 };

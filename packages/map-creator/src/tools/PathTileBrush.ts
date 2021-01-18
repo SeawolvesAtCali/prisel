@@ -1,5 +1,5 @@
 import { Tile, World } from '@prisel/monopoly-common';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { CanvasForm } from 'pts';
 import { getOrCreateCurrentTile } from './getOrCreateCurrentTile';
 import { pathConnect } from './pathConnect';
@@ -9,10 +9,10 @@ export class PathTileBrush implements Tool {
     private previousTile: Tile | undefined;
     constructor(private world: World, private form: CanvasForm) {}
 
-    public onDown(coor: coordinate.Coordinate): void {
+    public onDown(coor: monopolypb.Coordinate): void {
         this.previousTile = undefined;
     }
-    public onDraw(coor: coordinate.Coordinate): void {
+    public onDraw(coor: monopolypb.Coordinate): void {
         const tileAtCurrentCoor = getOrCreateCurrentTile(coor, this.world);
 
         if (!this.previousTile) {

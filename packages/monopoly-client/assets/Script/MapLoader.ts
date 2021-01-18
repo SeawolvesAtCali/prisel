@@ -1,6 +1,6 @@
 import { assertExist } from '@prisel/client';
 import { Anim, BoardSetup, exist, Property, Tile, World } from '@prisel/monopoly-common';
-import { animation_spec, coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { subscribeAnimation } from './animations';
 import { TILE_SIZE } from './consts';
 import PropertyTile from './PropertyTile';
@@ -82,7 +82,7 @@ export default class MapLoader extends cc.Component {
             this.renderProperty(property);
         }
         subscribeAnimation('invested', (anim) => {
-            const investedExtra = Anim.getExtra(anim, animation_spec.InvestedExtra);
+            const investedExtra = Anim.getExtra(anim, monopolypb.InvestedExtra);
             if (investedExtra) {
                 const property = investedExtra.property?.pos
                     ? this.getPropertyTileAt(investedExtra.property?.pos)
@@ -126,18 +126,18 @@ export default class MapLoader extends cc.Component {
         this.propertyMap.set(getTileKeyFromCoordinate(property.anchor), propertyComp);
     }
 
-    public getPropertyTileAt(pos: coordinate.Coordinate) {
+    public getPropertyTileAt(pos: monopolypb.Coordinate) {
         const node = this.propertyMap.get(getTileKeyFromCoordinate(pos));
         if (node) {
             return node.getComponent(PropertyTile);
         }
     }
 
-    public getTile(pos: coordinate.Coordinate) {
+    public getTile(pos: monopolypb.Coordinate) {
         return this.tileMap.get(getTileKeyFromCoordinate(pos));
     }
     // position node at the tile. Node needs to be a child of map
-    public moveToPos(node: cc.Node, pos: coordinate.Coordinate) {
+    public moveToPos(node: cc.Node, pos: monopolypb.Coordinate) {
         const tileComp = this.getTile(pos);
         if (tileComp) {
             node.setPosition(tileComp.getLandingPos());
@@ -147,7 +147,7 @@ export default class MapLoader extends cc.Component {
         }
     }
 
-    public addToMap(node: cc.Node, pos: coordinate.Coordinate) {
+    public addToMap(node: cc.Node, pos: monopolypb.Coordinate) {
         this.node.addChild(node, 0);
         this.moveToPos(node, pos);
         return node;
@@ -155,7 +155,7 @@ export default class MapLoader extends cc.Component {
 
     public moveAlongPath(
         node: cc.Node,
-        coors: coordinate.Coordinate[],
+        coors: monopolypb.Coordinate[],
         durationInMs: number,
         onMove?: (node: cc.Node, next: cc.Vec2) => void,
         onEnd?: () => void,

@@ -4,7 +4,7 @@ import {
     MoneyExchangeDirection,
     MoneyExchangeType,
 } from '@prisel/monopoly-common';
-import { chance } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import React from 'react';
 import { BooleanInput } from './BooleanInput';
 import { EnumInput } from './EnumInput';
@@ -116,9 +116,9 @@ const CollectableChanceEditor: React.FC<ChanceEditorProps<'collectible'>> = ({
             initialValue={input.inputArgs.type}
             autoFocus={autoFocus}
             enumMap={{
-                'Get out of jail': chance.CollectibleExtra_CollectibleType.GET_OUT_OF_JAIL_FREE,
+                'Get out of jail': monopolypb.CollectibleExtra_CollectibleType.GET_OUT_OF_JAIL_FREE,
             }}
-            onCommit={(collectable: chance.CollectibleExtra_CollectibleType) => {
+            onCommit={(collectable: monopolypb.CollectibleExtra_CollectibleType) => {
                 input.inputArgs.type = collectable;
             }}
         />

@@ -1,6 +1,6 @@
 import { assertExist, Client, Packet } from '@prisel/client';
 import { Action, Anim, exist } from '@prisel/monopoly-common';
-import { animation_spec } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { animEmitter } from './animations';
 import { client, ClientState } from './Client';
 import { EVENT, EVENT_BUS } from './consts';
@@ -22,7 +22,7 @@ export default class ServerAnimationController extends cc.Component {
     @lifecycle
     protected start() {
         this.removeAnimationListener = this.client.on(Action.ANIMATION, (packet) => {
-            const animationPayload = Packet.getPayload(packet, animation_spec.AnimationPayload);
+            const animationPayload = Packet.getPayload(packet, monopolypb.AnimationPayload);
             if (exist(animationPayload) && exist(animationPayload.animation)) {
                 this.handleAnimation(animationPayload.animation);
             }
@@ -38,22 +38,22 @@ export default class ServerAnimationController extends cc.Component {
         animEmitter.removeAllListeners();
     }
 
-    private handleAnimation(animation: animation_spec.Animation): Promise<unknown> {
+    private handleAnimation(animation: monopolypb.Animation): Promise<unknown> {
         switch (animation.type) {
-            case animation_spec.AnimationType.DEFAULT:
+            case monopolypb.AnimationType.DEFAULT:
                 cc.log('server animation ', animation.name, animation.length);
                 this.eventBus?.emit(EVENT.ANIMATION, animation);
                 animEmitter.emit(animation.name, animation);
                 return Anim.wait(animation).promise;
-            case animation_spec.AnimationType.SEQUENCE:
+            case monopolypb.AnimationType.SEQUENCE:
                 return (async () => {
                     for (const child of animation.children) {
                         await this.handleAnimation(child);
                     }
                 })();
-            case animation_spec.AnimationType.RACE:
+            case monopolypb.AnimationType.RACE:
                 return Promise.race(animation.children.map(this.handleAnimation.bind(this)));
-            case animation_spec.AnimationType.ALL:
+            case monopolypb.AnimationType.ALL:
                 return Promise.all<unknown>(
                     animation.children.map(this.handleAnimation.bind(this)),
                 );

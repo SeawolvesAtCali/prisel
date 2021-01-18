@@ -1,10 +1,10 @@
 import { assertNever, Packet } from '@prisel/common';
-import { animation_spec, protobuf } from '@prisel/protos';
+import { monopolypb, protobuf } from '@prisel/protos';
 import type { IMessageType } from '@protobuf-ts/runtime';
 
-type Animation = animation_spec.Animation;
-type AnimationType = animation_spec.AnimationType;
-const AnimationType = animation_spec.AnimationType;
+type Animation = monopolypb.Animation;
+type AnimationType = monopolypb.AnimationType;
+const AnimationType = monopolypb.AnimationType;
 // Utilities for working with animations
 export class AnimationBuilder<ExtraType extends object = {}> implements Animation {
     private _name: string = 'unspecified';
@@ -104,7 +104,7 @@ export const Anim = {
         return new AnimationBuilder<ExtraType>(AnimationType.DEFAULT, extraType).setName(name);
     },
     getExtra<T extends object>(
-        animation: animation_spec.Animation,
+        animation: monopolypb.Animation,
         extraType: IMessageType<T>,
     ): T | undefined {
         if (animation.extra && protobuf.any.Any.contains(animation.extra, extraType)) {
@@ -163,7 +163,7 @@ function computeAnimationLength(animation: Animation): number {
 
 export function toAnimationPacket(animation: Animation): Packet {
     return Packet.forAction('animation')
-        .setPayload(animation_spec.AnimationPayload, {
+        .setPayload(monopolypb.AnimationPayload, {
             animation: animation instanceof AnimationBuilder ? animation.build() : animation,
         })
         .build();

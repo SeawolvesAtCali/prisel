@@ -1,5 +1,5 @@
 import { Packet, Request, Response } from '@prisel/common';
-import { update_token } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { EventEmitter } from 'events';
 import debug from './debug';
 import { DEBUG_MODE } from './flags';
@@ -40,7 +40,7 @@ export interface Room {
     removeAllGamePacketListener(): void;
     dispatchGamePacket(packet: Packet, player: Player): void;
     equals(room: Room): boolean;
-    updateStateToken(): update_token.UpdateToken;
+    updateStateToken(): priselpb.UpdateToken;
     getStateToken(): string;
 }
 
@@ -146,7 +146,7 @@ class RoomImpl implements Room {
         this.actionListeners.removeAllListeners();
     }
 
-    public updateStateToken(): update_token.UpdateToken {
+    public updateStateToken(): priselpb.UpdateToken {
         const previousToken = this.getStateToken();
         this.currentToken = this.currentToken + 1;
         return {

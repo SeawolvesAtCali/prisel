@@ -1,4 +1,4 @@
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { serializable } from 'serializr';
 import { getRand } from '../getRand';
 import { ChanceInput } from '../types';
@@ -12,7 +12,7 @@ export class Tile extends GameObject {
     readonly type = 'tile';
 
     @jsonSerializable
-    position: coordinate.Coordinate = { row: -1, col: -1 };
+    position: monopolypb.Coordinate = { row: -1, col: -1 };
 
     @listRefSerializable
     prev: Ref<Tile>[] = [];

@@ -1,5 +1,5 @@
 import { Packet, Request, Response } from '@prisel/common';
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { GAME_PHASE } from '../objects/gamePhase';
 import { Player } from '../player';
 import { broadcast } from './broadcast';
@@ -107,7 +107,7 @@ export const BaseRoomConfig: FullRoomConfig = {
             if (playerInRoom === player) {
                 return;
             }
-            return Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
+            return Packet.forSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE)
                 .setPayload('roomStateChangePayload', {
                     change: {
                         oneofKind: 'playerJoin',
@@ -157,9 +157,7 @@ export const BaseRoomConfig: FullRoomConfig = {
         if (currentRoom) {
             broadcast(
                 currentRoom.getPlayers(),
-                Packet.forSystemAction(
-                    system_action_type.SystemActionType.ANNOUNCE_GAME_START,
-                ).build(),
+                Packet.forSystemAction(priselpb.SystemActionType.ANNOUNCE_GAME_START).build(),
             );
             currentRoom.startGame();
         }
@@ -184,7 +182,7 @@ function onLeave(player: Player, leaveRequest?: Request) {
             // host didn't leave.
             broadcast(
                 currentRoom.getPlayers(),
-                Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
+                Packet.forSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE)
                     .setPayload('roomStateChangePayload', {
                         change: {
                             oneofKind: 'playerLeave',
@@ -202,7 +200,7 @@ function onLeave(player: Player, leaveRequest?: Request) {
 
         broadcast(
             currentRoom.getPlayers(),
-            Packet.forSystemAction(system_action_type.SystemActionType.ROOM_STATE_CHANGE)
+            Packet.forSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE)
                 .setPayload('roomStateChangePayload', {
                     change: {
                         oneofKind: 'hostLeave',

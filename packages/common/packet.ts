@@ -1,24 +1,23 @@
-import { packet, packet_type, payload, protobuf, status, system_action_type } from '@prisel/protos';
+import { priselpb, protobuf } from '@prisel/protos';
 import { IMessageType } from '@protobuf-ts/runtime';
 import type { SelectOneOf } from './oneof';
 import { typeRegistry } from './typeRegistry';
 
-export type Packet = packet.Packet;
+export type Packet = priselpb.Packet;
 
-export type OneofPayload<Key extends string> = SelectOneOf<Key, payload.Payload['payload']>;
+export type OneofPayload<Key extends string> = SelectOneOf<Key, priselpb.Payload['payload']>;
 
 export type PayloadKey = Exclude<
-    payload.Payload['payload']['oneofKind'],
+    priselpb.Payload['payload']['oneofKind'],
     undefined | 'actionPayload'
 >;
 export class PacketBuilder {
     message: 'systemAction' | 'action' = 'action';
-    systemAction: system_action_type.SystemActionType =
-        system_action_type.SystemActionType.UNSPECIFIED;
+    systemAction: priselpb.SystemActionType = priselpb.SystemActionType.UNSPECIFIED;
     action: string = 'unspecified';
-    payload?: payload.Payload;
+    payload?: priselpb.Payload;
 
-    public static forSystemAction(action: system_action_type.SystemActionType) {
+    public static forSystemAction(action: priselpb.SystemActionType) {
         const builder = new PacketBuilder();
         builder.message = 'systemAction';
         builder.systemAction = action;
@@ -41,7 +40,7 @@ export class PacketBuilder {
                     oneofKind: payloadTypeOrMessageType,
                     [payloadTypeOrMessageType]: payload,
                 },
-            } as unknown) as payload.Payload;
+            } as unknown) as priselpb.Payload;
             return this;
         }
         this.payload = {
@@ -53,9 +52,9 @@ export class PacketBuilder {
         return this;
     }
 
-    public build(): packet.Packet {
-        const result: packet.Packet = {
-            type: packet_type.PacketType.DEFAULT,
+    public build(): priselpb.Packet {
+        const result: priselpb.Packet = {
+            type: priselpb.PacketType.DEFAULT,
             message:
                 this.message === 'systemAction'
                     ? {
@@ -75,19 +74,19 @@ export class PacketBuilder {
 }
 
 export function isValidRequest(p: Packet | undefined) {
-    return p?.type === packet_type.PacketType.REQUEST && p?.requestId !== undefined;
+    return p?.type === priselpb.PacketType.REQUEST && p?.requestId !== undefined;
 }
 
 export function isValidResponse(p: Packet | undefined) {
     return (
-        p?.type === packet_type.PacketType.RESPONSE &&
+        p?.type === priselpb.PacketType.RESPONSE &&
         p?.requestId !== undefined &&
         p?.status !== undefined
     );
 }
 
 class Packet$Type {
-    public forSystemAction(action: system_action_type.SystemActionType) {
+    public forSystemAction(action: priselpb.SystemActionType) {
         return PacketBuilder.forSystemAction(action);
     }
     public forAction(action: string) {
@@ -108,14 +107,14 @@ class Packet$Type {
     public isAnySystemAction(
         packet: Packet | undefined,
     ): packet is Packet & {
-        message: { oneofKind: 'systemAction'; systemAction: system_action_type.SystemActionType };
+        message: { oneofKind: 'systemAction'; systemAction: priselpb.SystemActionType };
     } {
         return (
             packet?.message?.oneofKind === 'systemAction' &&
             packet.message.systemAction != undefined
         );
     }
-    public isSystemAction<T extends system_action_type.SystemActionType>(
+    public isSystemAction<T extends priselpb.SystemActionType>(
         packet: Packet | undefined,
         systemActionType: T,
     ): packet is Packet & {
@@ -203,10 +202,10 @@ class Packet$Type {
         return undefined;
     }
     public isStatusOk(packet: Packet | undefined) {
-        return packet?.status?.code === status.Status_Code.OK;
+        return packet?.status?.code === priselpb.Status_Code.OK;
     }
     public isStatusFailed(packet: Packet | undefined) {
-        return packet?.status?.code === status.Status_Code.FAILED;
+        return packet?.status?.code === priselpb.Status_Code.FAILED;
     }
     public getStatusMessage(packet: Packet | undefined) {
         return packet?.status?.message ?? '';
@@ -220,25 +219,29 @@ class Packet$Type {
      */
     public is(p: any): p is Packet {
         return (
-            packet.Packet.is(p) &&
-            (isValidRequest(p) || isValidResponse(p) || p.type === packet_type.PacketType.DEFAULT)
+            priselpb.Packet.is(p) &&
+            (isValidRequest(p) || isValidResponse(p) || p.type === priselpb.PacketType.DEFAULT)
         );
     }
     public toDebugString(p: Packet): string {
         try {
-            return JSON.stringify(packet.Packet.toJson(p, { typeRegistry: typeRegistry }), null, 2);
+            return JSON.stringify(
+                priselpb.Packet.toJson(p, { typeRegistry: typeRegistry }),
+                null,
+                2,
+            );
         } catch (_) {
             return `${p}`;
         }
     }
     public serialize(pkt: Packet): Uint8Array {
-        return packet.Packet.toBinary(pkt);
+        return priselpb.Packet.toBinary(pkt);
     }
     public deserialize(buffer: any): Packet | undefined {
         if (buffer instanceof ArrayBuffer) {
-            return packet.Packet.fromBinary(new Uint8Array(buffer));
+            return priselpb.Packet.fromBinary(new Uint8Array(buffer));
         } else if (buffer instanceof Uint8Array) {
-            return packet.Packet.fromBinary(buffer);
+            return priselpb.Packet.fromBinary(buffer);
         }
     }
 }

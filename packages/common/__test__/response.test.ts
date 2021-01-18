@@ -1,15 +1,15 @@
-import { packet_type, system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { Request } from '../request';
 import { Response } from '../response';
 
 describe('response', () => {
     it('isResponse works for response created using ResponseBuilder', () => {
         const request: Request = {
-            type: packet_type.PacketType.REQUEST,
+            type: priselpb.PacketType.REQUEST,
             requestId: '1',
             message: {
                 oneofKind: 'systemAction',
-                systemAction: system_action_type.SystemActionType.LOGIN,
+                systemAction: priselpb.SystemActionType.LOGIN,
             },
             payload: {
                 payload: {

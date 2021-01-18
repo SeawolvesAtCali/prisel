@@ -8,7 +8,7 @@ import {
     Response,
     SERVER,
 } from '@prisel/common';
-import { room_state_change_spec, system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import once from 'lodash/once';
 import { getExit } from './message';
 import { PubSub } from './pubSub';
@@ -113,7 +113,7 @@ export class Client<T = State> {
     }
 
     private listenForSystemAction(
-        systemAction: system_action_type.SystemActionType,
+        systemAction: priselpb.SystemActionType,
         listener: (packet?: Packet) => void,
     ): RemoveListenerFunc {
         return this.systemActionListener.on(systemAction, (packet) => listener(packet));
@@ -154,24 +154,18 @@ export class Client<T = State> {
     }
 
     public onRoomStateChange(
-        listener: (roomStateChange: room_state_change_spec.RoomStateChangePayload) => void,
+        listener: (roomStateChange: priselpb.RoomStateChangePayload) => void,
     ): RemoveListenerFunc {
-        return this.listenForSystemAction(
-            system_action_type.SystemActionType.ROOM_STATE_CHANGE,
-            (packet) => {
-                const payload = Packet.getPayload(packet, 'roomStateChangePayload');
-                if (payload) {
-                    listener(payload);
-                }
-            },
-        );
+        return this.listenForSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE, (packet) => {
+            const payload = Packet.getPayload(packet, 'roomStateChangePayload');
+            if (payload) {
+                listener(payload);
+            }
+        });
     }
 
     public onGameStart(listener: () => void): RemoveListenerFunc {
-        return this.listenForSystemAction(
-            system_action_type.SystemActionType.ANNOUNCE_GAME_START,
-            listener,
-        );
+        return this.listenForSystemAction(priselpb.SystemActionType.ANNOUNCE_GAME_START, listener);
     }
 
     /**

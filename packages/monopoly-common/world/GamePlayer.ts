@@ -1,11 +1,4 @@
-import {
-    coordinate,
-    game_player,
-    payment,
-    player_info,
-    prompt_purchase_spec,
-    property,
-} from '@prisel/protos';
+import { monopolypb, priselpb } from '@prisel/protos';
 import { serializable } from 'serializr';
 import { exist } from '../exist';
 import { GameObject } from './GameObject';
@@ -16,7 +9,7 @@ import { listRefSerializable, refSerializable } from './serializeUtil';
 import type { Tile } from './Tile';
 
 interface BoundPlayer {
-    getPlayerInfo(): player_info.PlayerInfo;
+    getPlayerInfo(): priselpb.PlayerInfo;
 }
 interface Props {
     id: Id<GamePlayer>;
@@ -61,7 +54,7 @@ export class GamePlayer extends GameObject {
         return this;
     }
 
-    public payRent(owner: GamePlayer, property: property.PropertyInfo): payment.Payment {
+    public payRent(owner: GamePlayer, property: monopolypb.PropertyInfo): monopolypb.Payment {
         this.money = this.money - property.rent;
         owner.gainMoney(property.rent);
         return {
@@ -86,7 +79,7 @@ export class GamePlayer extends GameObject {
         return startingNode.get().genPath(steps);
     }
 
-    public rollAndMove(): coordinate.Coordinate[] {
+    public rollAndMove(): monopolypb.Coordinate[] {
         if (exist(this.pathTile)) {
             const path = this.roll(this.pathTile);
             this.rolled = true;
@@ -105,7 +98,7 @@ export class GamePlayer extends GameObject {
 
     public purchaseProperty(
         property: Property,
-        nextLevelPropertyInfo: prompt_purchase_spec.PromptPurchaseRequest,
+        nextLevelPropertyInfo: monopolypb.PromptPurchaseRequest,
     ) {
         if (!nextLevelPropertyInfo.property) {
             return;
@@ -121,7 +114,7 @@ export class GamePlayer extends GameObject {
         }
     }
 
-    public getGamePlayerInfo(): game_player.GamePlayer {
+    public getGamePlayerInfo(): monopolypb.GamePlayer {
         return {
             id: this.id,
             money: this.money,

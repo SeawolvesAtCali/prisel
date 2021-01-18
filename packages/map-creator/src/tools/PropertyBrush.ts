@@ -1,5 +1,5 @@
 import { Property, World } from '@prisel/monopoly-common';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { CanvasForm } from 'pts';
 import { CanvasOps } from '../CanvasOps';
 import { equal } from '../common';
@@ -9,7 +9,7 @@ import { Tool } from './Tool';
 export class PropertyBrush implements Tool {
     constructor(private world: World, private form: CanvasForm, private ops: CanvasOps) {}
 
-    onDown(coor: coordinate.Coordinate): void {
+    onDown(coor: monopolypb.Coordinate): void {
         const existingProperty = this.world
             .getAll(Property)
             .find((property) => equal(property.anchor, coor));

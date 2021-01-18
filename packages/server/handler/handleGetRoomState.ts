@@ -1,5 +1,5 @@
 import { Response } from '@prisel/common';
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { getRoom, getRoomStateSnapshot } from '../utils/stateUtils';
 import { getPlayerOrRespondError, verifyIsRequest } from './utils';
@@ -24,4 +24,4 @@ export const handleGetRoomState: Handler = (context, socket) => (request) => {
     );
 };
 
-clientHandlerRegister.push(system_action_type.SystemActionType.GET_ROOM_STATE, handleGetRoomState);
+clientHandlerRegister.push(priselpb.SystemActionType.GET_ROOM_STATE, handleGetRoomState);

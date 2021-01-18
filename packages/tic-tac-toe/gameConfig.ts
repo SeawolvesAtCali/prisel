@@ -1,4 +1,4 @@
-import { tic_tac_toe_spec } from '@prisel/protos';
+import { tic_tac_toepb } from '@prisel/protos';
 import { broadcast, debug, GameConfig, Packet } from '@prisel/server';
 
 interface GameState {
@@ -36,7 +36,7 @@ export const TicTacToe: GameConfig = {
             };
             newGameState.currentPlayer = 1 - gameState.currentPlayer;
             newGameState.map = gameState.map.slice();
-            const newMove = Packet.getPayload(packet, tic_tac_toe_spec.MovePayload)?.position;
+            const newMove = Packet.getPayload(packet, tic_tac_toepb.MovePayload)?.position;
             if (
                 typeof newMove === 'number' &&
                 newMove < 9 &&
@@ -57,7 +57,7 @@ export const TicTacToe: GameConfig = {
                 gameOver = true;
             }
             const newGameStateMessage = Packet.forAction('game_state')
-                .setPayload(tic_tac_toe_spec.GameStatePayload, newGameState)
+                .setPayload(tic_tac_toepb.GameStatePayload, newGameState)
                 .build();
             room.setGame(newGameState);
             broadcast(room.getPlayers(), newGameStateMessage);
@@ -79,7 +79,7 @@ export const TicTacToe: GameConfig = {
             currentPlayer: 0,
         });
         const gameStateMessage = Packet.forAction('game_state')
-            .setPayload(tic_tac_toe_spec.GameStatePayload, {
+            .setPayload(tic_tac_toepb.GameStatePayload, {
                 player: room.getGame<GameState>().player,
                 map: room.getGame<GameState>().map,
                 currentPlayer: room.getGame<GameState>().currentPlayer,

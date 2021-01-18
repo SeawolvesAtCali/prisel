@@ -1,8 +1,8 @@
 import { assertExist } from '@prisel/client';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { TILE_SIZE } from './consts';
 
-export function getTileKeyFromCoordinate(coor: coordinate.Coordinate): string {
+export function getTileKeyFromCoordinate(coor: monopolypb.Coordinate): string {
     return `${coor.row}-${coor.col}`;
 }
 
@@ -75,7 +75,7 @@ export function assertNever(x: never): never {
     throw new Error('Unexpected value ' + x);
 }
 
-export function getTileAnchorPos(coor: coordinate.Coordinate) {
+export function getTileAnchorPos(coor: monopolypb.Coordinate) {
     return new cc.Vec2(coor.col * TILE_SIZE, -(coor.row + 1) * TILE_SIZE);
 }
 

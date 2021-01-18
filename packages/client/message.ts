@@ -1,7 +1,7 @@
 import { Packet, Request } from '@prisel/common';
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 
-const { SystemActionType } = system_action_type;
+const { SystemActionType } = priselpb;
 /**
  * Login
  * @param {String} username

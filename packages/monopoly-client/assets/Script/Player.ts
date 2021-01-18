@@ -1,6 +1,6 @@
 import { assertExist } from '@prisel/client';
 import { Anim, exist } from '@prisel/monopoly-common';
-import { animation_spec, coordinate, game_player } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { subscribeAnimation } from './animations';
 import { EVENT_BUS, FLIP_THRESHHOLD } from './consts';
 import MapLoader from './MapLoader';
@@ -31,13 +31,13 @@ export default class Player extends cc.Component {
     public color?: string;
     private idleSprite?: cc.SpriteFrame;
 
-    public pos?: coordinate.Coordinate;
+    public pos?: monopolypb.Coordinate;
 
     private get eventBus() {
         return cc.find(EVENT_BUS);
     }
 
-    public init(playerData: game_player.GamePlayer, color: string, pos: coordinate.Coordinate) {
+    public init(playerData: monopolypb.GamePlayer, color: string, pos: monopolypb.Coordinate) {
         this.playerName = playerData.boundPlayer?.name ?? 'unnamed';
         this.gamePlayerId = playerData.id;
         this.color = color;
@@ -68,7 +68,7 @@ export default class Player extends cc.Component {
         this.stop = this.stop.bind(this);
 
         subscribeAnimation('turn_start', (anim) => {
-            const turnStartExtra = Anim.getExtra(anim, animation_spec.TurnStartExtra);
+            const turnStartExtra = Anim.getExtra(anim, monopolypb.TurnStartExtra);
             if (this.getId() === turnStartExtra?.player?.id) {
                 const animState = this.getComponent(cc.Animation).playAdditive('turn_start');
                 animState.speed = (animState.duration * 1000) / anim.length;
@@ -76,7 +76,7 @@ export default class Player extends cc.Component {
         });
 
         subscribeAnimation('dice_down', (anim) => {
-            const diceDownExtra = Anim.getExtra(anim, animation_spec.DiceDownExtra);
+            const diceDownExtra = Anim.getExtra(anim, monopolypb.DiceDownExtra);
             if (this.getId() === diceDownExtra?.player?.id) {
                 assertExist(this.statusLabel).string = '' + diceDownExtra.steps;
                 const animState = this.getComponent(cc.Animation).playAdditive('status_popup');
@@ -85,7 +85,7 @@ export default class Player extends cc.Component {
         });
 
         subscribeAnimation('move', async (anim) => {
-            const moveExtra = Anim.getExtra(anim, animation_spec.MoveExtra);
+            const moveExtra = Anim.getExtra(anim, monopolypb.MoveExtra);
             if (this.getId() === moveExtra?.player?.id) {
                 this.walk();
                 await assertExist(MapLoader.get()).moveAlongPath(

@@ -1,5 +1,5 @@
 import { Action, Anim, animationMap, exist, Tile } from '@prisel/monopoly-common';
-import { animation_spec, announce_received_chance_spec } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
 import { Moved } from '../stateMachine/Moved';
 import { ChanceHandler } from './ChanceHander';
@@ -24,7 +24,7 @@ export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input)
 
     game.broadcast(
         Packet.forAction(Action.ANNOUNCE_CHANCE)
-            .setPayload(announce_received_chance_spec.AnnounceRecievedChancePayload, {
+            .setPayload(monopolypb.AnnounceRecievedChancePayload, {
                 player: currentPlayer.id,
                 chance: {
                     display: input.display,
@@ -43,7 +43,7 @@ export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input)
         (packet) => {
             game.broadcast(packet);
         },
-        Anim.create('move', animation_spec.MoveExtra)
+        Anim.create('move', monopolypb.MoveExtra)
             .setExtra({
                 player: currentPlayer.getGamePlayerInfo(),
                 start: startLocation,

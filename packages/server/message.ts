@@ -1,8 +1,8 @@
 import { Packet, Request, Response } from '@prisel/common';
-import { error_spec, packet, player_info, system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 
-export function getBroadcast(player: player_info.PlayerInfo, message: string): Packet {
-    return Packet.forSystemAction(system_action_type.SystemActionType.BROADCAST)
+export function getBroadcast(player: priselpb.PlayerInfo, message: string): Packet {
+    return Packet.forSystemAction(priselpb.SystemActionType.BROADCAST)
         .setPayload('broadcastPayload', {
             message,
             player,
@@ -11,7 +11,7 @@ export function getBroadcast(player: player_info.PlayerInfo, message: string): P
 }
 
 export function getWelcome(): Packet {
-    return Packet.forSystemAction(system_action_type.SystemActionType.WELCOME).build();
+    return Packet.forSystemAction(priselpb.SystemActionType.WELCOME).build();
 }
 
 /**
@@ -26,13 +26,13 @@ export function getLoginSuccess(loginRequest: Request, userId: string): Response
         .build();
 }
 
-export function getError(message: string, detail?: string): packet.Packet {
-    const payload: error_spec.ErrorPayload = { message };
+export function getError(message: string, detail?: string): priselpb.Packet {
+    const payload: priselpb.ErrorPayload = { message };
 
     if (detail) {
         payload.detail = detail;
     }
-    return Packet.forSystemAction(system_action_type.SystemActionType.ERROR)
+    return Packet.forSystemAction(priselpb.SystemActionType.ERROR)
         .setPayload('errorPayload', payload)
         .build();
 }

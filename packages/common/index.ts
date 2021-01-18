@@ -1,3 +1,4 @@
+export type { IMessageType } from '@protobuf-ts/runtime';
 export { assert, assertExist, assertNever } from './assert';
 export * from './constants';
 export type { SelectOneOf } from './oneof';

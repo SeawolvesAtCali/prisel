@@ -1,5 +1,5 @@
 import { Client, Request } from '@prisel/client';
-import { packet_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Container, { BorderBox } from '../Container';
 import GameContext from '../GameContext';
@@ -32,16 +32,16 @@ function useRun(client: Client | null, addToLogs: AddToLogs) {
                 (key) => {},
                 (packet) => {
                     switch (packet.type) {
-                        case packet_type.PacketType.DEFAULT:
-                        case packet_type.PacketType.RESPONSE:
+                        case priselpb.PacketType.DEFAULT:
+                        case priselpb.PacketType.RESPONSE:
                             // TODO(minor): currently, let's hardcode the
                             // response id
                             client.emit(packet);
                             break;
-                        case packet_type.PacketType.REQUEST:
+                        case priselpb.PacketType.REQUEST:
                             const request: Request = {
                                 ...packet,
-                                type: packet_type.PacketType.REQUEST,
+                                type: priselpb.PacketType.REQUEST,
                                 requestId: client.newId(),
                             };
                             client.emit(request);

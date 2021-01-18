@@ -1,5 +1,5 @@
 import { Property, Tile, World } from '@prisel/monopoly-common';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { CanvasForm, Pt } from 'pts';
 import { CanvasOps } from '../CanvasOps';
 import { equal } from '../common';
@@ -10,7 +10,7 @@ import { Tool } from './Tool';
 export class Selector implements Tool {
     constructor(private world: World, private form: CanvasForm, private ops: CanvasOps) {}
 
-    onUp(coor: coordinate.Coordinate, _: Pt, layer: LayerType) {
+    onUp(coor: monopolypb.Coordinate, _: Pt, layer: LayerType) {
         if (this.ops.tempSelectingConfig) {
             // temp selecting
             const { tempSelectingConfig } = this.ops;

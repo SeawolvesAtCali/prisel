@@ -1,10 +1,10 @@
-import { property } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import React from 'react';
 import { ListEditor } from './ListEditor';
 import { NumberInput } from './NumberInput';
 
 interface PropertyLevelEditorProps {
-    propertyLevel: property.PropertyLevel;
+    propertyLevel: monopolypb.PropertyLevel;
     level: number;
 }
 const PropertyLevelEditor: React.FC<PropertyLevelEditorProps> = ({ propertyLevel, level }) => {
@@ -30,7 +30,7 @@ const PropertyLevelEditor: React.FC<PropertyLevelEditorProps> = ({ propertyLevel
 };
 
 interface PropertyLevelsEditorProps {
-    propertyLevels: property.PropertyLevel[];
+    propertyLevels: monopolypb.PropertyLevel[];
 }
 
 export const PropertyLevelsEditor: React.FC<PropertyLevelsEditorProps> = ({ propertyLevels }) => {
@@ -38,7 +38,7 @@ export const PropertyLevelsEditor: React.FC<PropertyLevelsEditorProps> = ({ prop
         <ListEditor
             list={propertyLevels}
             fixedLength
-            itemRenderer={(level: property.PropertyLevel, index: number) => (
+            itemRenderer={(level: monopolypb.PropertyLevel, index: number) => (
                 <PropertyLevelEditor propertyLevel={level} level={index} />
             )}
         />

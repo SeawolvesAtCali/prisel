@@ -1,5 +1,5 @@
 import { assertExist } from '@prisel/client';
-import { coordinate, property as propertypb } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { LANDING_POS_OFFSET, PROPERTY_Z_INDEX_OFFSET } from './consts';
 import Player from './Player';
 
@@ -15,9 +15,9 @@ export default class PropertyTile extends cc.Component {
 
     private owner?: Player;
 
-    public coor?: coordinate.Coordinate;
+    public coor?: monopolypb.Coordinate;
 
-    public init(coor: coordinate.Coordinate) {
+    public init(coor: monopolypb.Coordinate) {
         this.coor = coor;
     }
 
@@ -28,14 +28,14 @@ export default class PropertyTile extends cc.Component {
         return this.owner;
     }
 
-    public setOwner(player: Player, propertyInfo: propertypb.PropertyInfo) {
+    public setOwner(player: Player, propertyInfo: monopolypb.PropertyInfo) {
         this.owner = player;
         this.getComponent(cc.Sprite).spriteFrame = assertExist(this.spriteAtlas).getSpriteFrame(
             `property-${this.levelString(propertyInfo)}-${player.color}`,
         );
     }
 
-    private levelString(propertyInfo: propertypb.PropertyInfo) {
+    private levelString(propertyInfo: monopolypb.PropertyInfo) {
         switch (propertyInfo.currentLevel) {
             case 0:
                 return 'owned';

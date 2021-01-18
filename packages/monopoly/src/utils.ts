@@ -1,10 +1,10 @@
 import { GamePlayer } from '@prisel/monopoly-common';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { Player } from '@prisel/server';
 
 export function samePos(
-    pos1: coordinate.Coordinate | undefined,
-    pos2: coordinate.Coordinate | undefined,
+    pos1: monopolypb.Coordinate | undefined,
+    pos2: monopolypb.Coordinate | undefined,
 ): boolean {
     if (!pos1 || !pos2) {
         return false;

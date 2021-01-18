@@ -1,20 +1,20 @@
-import { packet, packet_type, status, system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { isValidResponse, PacketBuilder } from './packet';
 import { Request } from './request';
 
-export interface Response extends packet.Packet {
-    type: packet_type.PacketType.RESPONSE;
+export interface Response extends priselpb.Packet {
+    type: priselpb.PacketType.RESPONSE;
     requestId: string;
-    status: status.Status;
+    status: priselpb.Status;
 }
 
-function isResponse(p: packet.Packet | undefined): p is Response {
+function isResponse(p: priselpb.Packet | undefined): p is Response {
     return isValidResponse(p);
 }
 
 export class ResponseBuilder extends PacketBuilder {
     id: Response['requestId'] = '';
-    status: status.Status = { code: status.Status_Code.UNSPECIFIED };
+    status: priselpb.Status = { code: priselpb.Status_Code.UNSPECIFIED };
     static forRequest(request: Request) {
         const builder = new ResponseBuilder();
         if (request.message.oneofKind === undefined) {
@@ -24,7 +24,7 @@ export class ResponseBuilder extends PacketBuilder {
             // the payload as well as status.
             builder.message = 'systemAction';
             builder.id = request.requestId;
-            builder.systemAction = system_action_type.SystemActionType.ERROR;
+            builder.systemAction = priselpb.SystemActionType.ERROR;
             builder.setFailure('Request should either be systemAction or action');
             builder.setPayload('errorPayload', {
                 message: 'Request should either be systemAction or action',
@@ -44,14 +44,14 @@ export class ResponseBuilder extends PacketBuilder {
 
     public setSuccess(): this {
         this.status = {
-            code: status.Status_Code.OK,
+            code: priselpb.Status_Code.OK,
         };
         return this;
     }
 
     public setFailure(message?: string, detail?: string): this {
         this.status = {
-            code: status.Status_Code.FAILED,
+            code: priselpb.Status_Code.FAILED,
         };
         if (message != undefined) {
             this.status.message = message;
@@ -66,7 +66,7 @@ export class ResponseBuilder extends PacketBuilder {
         const packet = super.build();
         return {
             ...packet,
-            type: packet_type.PacketType.RESPONSE,
+            type: priselpb.PacketType.RESPONSE,
             requestId: this.id,
             status: this.status,
             message:

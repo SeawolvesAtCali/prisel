@@ -1,13 +1,11 @@
 import { Client, Messages, Packet } from '@prisel/client';
-import { room_state_change_spec } from '../common/node_modules/@prisel/protos/dist';
+import { priselpb } from '../common/node_modules/@prisel/protos/dist';
 
 export function createClients(num = 1) {
     return Array.from({ length: num }).map(() => new Client());
 }
 
-export function waitForRoomUpdate(
-    client: Client,
-): Promise<room_state_change_spec.RoomStateChangePayload> {
+export function waitForRoomUpdate(client: Client): Promise<priselpb.RoomStateChangePayload> {
     return new Promise((resolve) => {
         const off = client.onRoomStateChange((roomStateChange) => {
             off();

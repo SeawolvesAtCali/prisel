@@ -1,5 +1,5 @@
 import { Client, Messages, Packet, RoomStateChangePayload } from '@prisel/client';
-import { tic_tac_toe_spec } from '@prisel/protos';
+import { tic_tac_toepb } from '@prisel/protos';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 export const phases = {
@@ -95,7 +95,7 @@ export function useGameState(client, onEnd) {
     const handleMove = useCallback(
         (index) => {
             const movePacket = Packet.forAction('move')
-                .setPayload(tic_tac_toe_spec.MovePayload, {
+                .setPayload(tic_tac_toepb.MovePayload, {
                     position: index,
                 })
                 .build();
@@ -106,7 +106,7 @@ export function useGameState(client, onEnd) {
 
     useEffect(() => {
         return client.on('game_state', (packet) => {
-            const newState = Packet.getPayload(packet, tic_tac_toe_spec.GameStatePayload);
+            const newState = Packet.getPayload(packet, tic_tac_toepb.GameStatePayload);
             setGameState(newState);
             if (newState.winner) {
                 setWinner(newState.winner);

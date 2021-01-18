@@ -1,5 +1,5 @@
 import { BoardSetup, GamePlayer, genId, Property, Tile, World } from '@prisel/monopoly-common';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { Player, Room } from '@prisel/server';
 import fs from 'fs';
 import path from 'path';
@@ -10,7 +10,7 @@ import { getRand } from './utils';
 const CASH = 500;
 const MAP_PATH = path.resolve(COMMON_DATA_DIR, 'map', 'demoMap.json');
 
-export function getTileKeyFromCoordinate(coor: coordinate.Coordinate): string {
+export function getTileKeyFromCoordinate(coor: monopolypb.Coordinate): string {
     return `${coor.row}-${coor.col}`;
 }
 

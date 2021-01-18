@@ -1,5 +1,5 @@
 import { assertExist } from '@prisel/client';
-import { rank } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { createDropShadow } from './components/DropShadow';
 import { LabelConfig } from './components/LabelConfig';
 import { LayoutConfig } from './components/LayoutConfig';
@@ -45,7 +45,7 @@ export default class RankList extends cc.Component {
         this.list = assertExist(cc.find(rankListPath, this.node));
     }
 
-    private showRanking(ranks: rank.Rank[]) {
+    private showRanking(ranks: monopolypb.Rank[]) {
         this.node.active = true;
         this.list?.removeAllChildren();
         ranks.forEach((rank, index) => {

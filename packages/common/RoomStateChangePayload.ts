@@ -1,12 +1,12 @@
-import { player_info, room_state_change_spec, update_token } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 
-export type RoomStateChangePayload = room_state_change_spec.RoomStateChangePayload;
+export type RoomStateChangePayload = priselpb.RoomStateChangePayload;
 
 class Builder {
-    payload: Partial<room_state_change_spec.RoomStateChangePayload> = {};
-    token?: update_token.UpdateToken;
+    payload: Partial<priselpb.RoomStateChangePayload> = {};
+    token?: priselpb.UpdateToken;
 
-    public static forPlayerJoin(playerInfo: player_info.PlayerInfo) {
+    public static forPlayerJoin(playerInfo: priselpb.PlayerInfo) {
         const builder = new Builder();
         builder.payload = {
             change: {
@@ -40,12 +40,12 @@ class Builder {
         return builder;
     }
 
-    public setToken(token: update_token.UpdateToken): Builder {
+    public setToken(token: priselpb.UpdateToken): Builder {
         this.token = token;
         return this;
     }
 
-    public build(): room_state_change_spec.RoomStateChangePayload {
+    public build(): priselpb.RoomStateChangePayload {
         if (this.payload.change === undefined) {
             throw new Error('RoomStateChangePayload should specifiy change');
         }
@@ -61,37 +61,37 @@ export const RoomStateChangePayload = {
     forPlayerLeave: Builder.forPlayerLeave,
     forHostLeave: Builder.forHostLeave,
     isPlayerJoin(
-        payload: room_state_change_spec.RoomStateChangePayload,
-    ): payload is room_state_change_spec.RoomStateChangePayload & {
+        payload: priselpb.RoomStateChangePayload,
+    ): payload is priselpb.RoomStateChangePayload & {
         change: { oneofKind: 'playerJoin' };
     } {
         return payload?.change?.oneofKind === 'playerJoin';
     },
     isPlayerLeave(
-        payload: room_state_change_spec.RoomStateChangePayload,
-    ): payload is room_state_change_spec.RoomStateChangePayload & {
+        payload: priselpb.RoomStateChangePayload,
+    ): payload is priselpb.RoomStateChangePayload & {
         change: { oneofKind: 'playerLeave' };
     } {
         return payload?.change?.oneofKind === 'playerLeave';
     },
     isHostLeave(
-        payload: room_state_change_spec.RoomStateChangePayload,
-    ): payload is room_state_change_spec.RoomStateChangePayload & {
+        payload: priselpb.RoomStateChangePayload,
+    ): payload is priselpb.RoomStateChangePayload & {
         change: { oneofKind: 'hostLeave' };
     } {
         return payload?.change?.oneofKind === 'hostLeave';
     },
-    getJoinedPlayer(payload: room_state_change_spec.RoomStateChangePayload) {
+    getJoinedPlayer(payload: priselpb.RoomStateChangePayload) {
         if (RoomStateChangePayload.isPlayerJoin(payload)) {
             return payload.change.playerJoin;
         }
     },
-    getLeftPlayer(payload: room_state_change_spec.RoomStateChangePayload) {
+    getLeftPlayer(payload: priselpb.RoomStateChangePayload) {
         if (RoomStateChangePayload.isPlayerLeave(payload)) {
             return payload.change.playerLeave;
         }
     },
-    getHostLeaveData(payload: room_state_change_spec.RoomStateChangePayload) {
+    getHostLeaveData(payload: priselpb.RoomStateChangePayload) {
         if (RoomStateChangePayload.isHostLeave(payload)) {
             return payload.change.hostLeave;
         }

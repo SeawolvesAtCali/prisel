@@ -1,4 +1,4 @@
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { GAME_PHASE } from '../objects/gamePhase';
 import { getRoom } from '../utils/stateUtils';
@@ -27,4 +27,4 @@ export const handleLeave: Handler = (context, socket) => (request) => {
     }
 };
 
-clientHandlerRegister.push(system_action_type.SystemActionType.LEAVE, handleLeave);
+clientHandlerRegister.push(priselpb.SystemActionType.LEAVE, handleLeave);

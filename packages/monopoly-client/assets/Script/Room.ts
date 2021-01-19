@@ -1,6 +1,6 @@
 import { assertExist, Client, Messages, Packet, RoomStateChangePayload } from '@prisel/client';
 import { exist } from '@prisel/monopoly-common';
-import { room_state_change_spec } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { client, ClientState } from './Client';
 import PlayerInfo from './PlayerInfo';
 
@@ -41,7 +41,7 @@ export default class Room extends cc.Component {
         });
     }
 
-    private handleRoomStateChange(roomStateChange: room_state_change_spec.RoomStateChangePayload) {
+    private handleRoomStateChange(roomStateChange: priselpb.RoomStateChangePayload) {
         if (roomStateChange.token?.previousToken !== this.stateToken) {
             // we lost some packages. For now, lets just log and quit
             cc.log(

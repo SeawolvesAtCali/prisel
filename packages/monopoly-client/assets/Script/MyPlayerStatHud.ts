@@ -1,5 +1,5 @@
 import { assertExist } from '@prisel/client';
-import { game_player } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { EVENT, EVENT_BUS, getCharacterAvatarSpriteName } from './consts';
 
 const { ccclass, property } = cc._decorator;
@@ -26,7 +26,7 @@ export default class MyPlayerStatHud extends cc.Component {
         this.eventBus.on(EVENT.UPDATE_MY_MONEY, this.updateMoneyHud, this);
     }
 
-    private updateHud(gamePlayer: game_player.GamePlayer) {
+    private updateHud(gamePlayer: monopolypb.GamePlayer) {
         if (this.avatarSprite && this.avatarAtlas) {
             this.avatarSprite.spriteFrame = this.avatarAtlas.getSpriteFrame(
                 getCharacterAvatarSpriteName(gamePlayer.character),

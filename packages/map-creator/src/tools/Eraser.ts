@@ -1,12 +1,12 @@
 import { Property, Tile, World } from '@prisel/monopoly-common';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { CanvasForm, Pt } from 'pts';
 import { equal } from '../common';
 import { LayerType } from '../Layer';
 import { clearTilePath } from './clearTilePath';
 import { Tool } from './Tool';
 
-type Coordinate = coordinate.Coordinate;
+type Coordinate = monopolypb.Coordinate;
 
 export class Eraser implements Tool {
     constructor(private world: World, private form: CanvasForm) {}

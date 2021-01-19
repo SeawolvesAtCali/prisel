@@ -1,5 +1,5 @@
 import { Action, exist, GamePlayer, Property } from '@prisel/monopoly-common';
-import { announce_game_over_spec, rank } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { Packet, Request, Response } from '@prisel/server';
 import { getPlayer } from '../utils';
 import { StateMachineState } from './StateMachineState';
@@ -11,7 +11,7 @@ export class GameOver extends StateMachineState {
         this.sync = syncGamePlayer(this.game);
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_GAME_OVER)
-                .setPayload(announce_game_over_spec.AnnounceGameOverPayload, {
+                .setPayload(monopolypb.AnnounceGameOverPayload, {
                     ranks: this.computeRanks(),
                 })
                 .build(),
@@ -34,7 +34,7 @@ export class GameOver extends StateMachineState {
         }
         return playerPropertiesWorth;
     }
-    private computeRanks(): rank.Rank[] {
+    private computeRanks(): monopolypb.Rank[] {
         const propertiesWorthMap = this.computeProperties();
         return Array.from(this.game.players.values())
             .map((player) => ({

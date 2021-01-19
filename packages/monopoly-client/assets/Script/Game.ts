@@ -1,19 +1,6 @@
 import { assertExist, Messages, Packet, Request, Response } from '@prisel/client';
 import { Action, BoardSetup, GamePlayer, Property, Tile, World } from '@prisel/monopoly-common';
-import {
-    announce_bankrupt_spec,
-    announce_end_turn_spec,
-    announce_game_over_spec,
-    announce_pay_rent_spec,
-    announce_player_left_spec,
-    announce_purchase_spec,
-    announce_roll_spec,
-    announce_start_turn_spec,
-    game_player,
-    get_initial_state_spec,
-    prompt_purchase_spec,
-    roll_spec,
-} from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { client } from './Client';
 import { CHARACTER_COLORS, EVENT, EVENT_BUS } from './consts';
 import MapLoader from './MapLoader';
@@ -117,7 +104,7 @@ export default class Game extends cc.Component {
         );
 
         const initialStateResponse = assertExist(
-            Packet.getPayload(response, get_initial_state_spec.GetInitialStateResponse),
+            Packet.getPayload(response, monopolypb.GetInitialStateResponse),
             'initialStateResponse',
         );
 
@@ -137,7 +124,7 @@ export default class Game extends cc.Component {
     private handleAnnounceStartTurn(packet: Packet) {
         cc.log('handleAnnounceStartTurn');
         const announceStartTurnPayload = assertExist(
-            Packet.getPayload(packet, announce_start_turn_spec.AnnounceStartTurnPayload),
+            Packet.getPayload(packet, monopolypb.AnnounceStartTurnPayload),
             'announceStartTurnPayload',
         );
         cc.log(
@@ -159,7 +146,7 @@ export default class Game extends cc.Component {
 
     private async handleAnnounceRoll(packet: Packet) {
         const announceRollPayload = assertExist(
-            Packet.getPayload(packet, announce_roll_spec.AnnounceRollPayload),
+            Packet.getPayload(packet, monopolypb.AnnounceRollPayload),
             'announceRollPayload',
         );
         const { player } = announceRollPayload;
@@ -174,7 +161,7 @@ export default class Game extends cc.Component {
 
     private handleAnnouncePayRent(packet: Packet) {
         const announcePayRentPayload = assertExist(
-            Packet.getPayload(packet, announce_pay_rent_spec.AnnouncePayRentPayload),
+            Packet.getPayload(packet, monopolypb.AnnouncePayRentPayload),
             'announcePayRentPayload',
         );
         this.eventBus?.emit(EVENT.UPDATE_MY_MONEY, announcePayRentPayload.myCurrentMoney);
@@ -182,7 +169,7 @@ export default class Game extends cc.Component {
 
     private async handlePurchasePrompt(packet: Request) {
         const promptPurchaseRequest = assertExist(
-            Packet.getPayload(packet, prompt_purchase_spec.PromptPurchaseRequest),
+            Packet.getPayload(packet, monopolypb.PromptPurchaseRequest),
             'promptPurchaseRequest',
         );
 
@@ -194,7 +181,7 @@ export default class Game extends cc.Component {
 
         this.client.respond(
             Response.forRequest(packet)
-                .setPayload(prompt_purchase_spec.PromptPurchaseResponse, {
+                .setPayload(monopolypb.PromptPurchaseResponse, {
                     purchased: purchase,
                 })
                 .build(),
@@ -215,7 +202,7 @@ export default class Game extends cc.Component {
 
     private handleAnnouncePurchase(packet: Packet) {
         const announcePlayerPurchasePayload = assertExist(
-            Packet.getPayload(packet, announce_purchase_spec.AnnouncePurchasePayload),
+            Packet.getPayload(packet, monopolypb.AnnouncePurchasePayload),
             'announcePlayerPurchasePayload',
         );
 
@@ -237,7 +224,7 @@ export default class Game extends cc.Component {
 
     private handleAnnounceEndTurn(packet: Packet) {
         const announceEndTurnPayload = assertExist(
-            Packet.getPayload(packet, announce_end_turn_spec.AnnounceEndTurnPayload),
+            Packet.getPayload(packet, monopolypb.AnnounceEndTurnPayload),
             'announceEndTurnPayload',
         );
 
@@ -252,7 +239,7 @@ export default class Game extends cc.Component {
 
     private handleAnnounceBankrupt(packet: Packet) {
         const announceBankruptPayload = assertExist(
-            Packet.getPayload(packet, announce_bankrupt_spec.AnnounceBankruptPayload),
+            Packet.getPayload(packet, monopolypb.AnnounceBankruptPayload),
             'announceBankruptPayload',
         );
         cc.log('player bankrupted ' + announceBankruptPayload.player);
@@ -260,7 +247,7 @@ export default class Game extends cc.Component {
 
     private async handleAnnounceGameOver(packet: Packet) {
         const announceGameOverPayload = assertExist(
-            Packet.getPayload(packet, announce_game_over_spec.AnnounceGameOverPayload),
+            Packet.getPayload(packet, monopolypb.AnnounceGameOverPayload),
             'announceGameOverPayload',
         );
         cc.log('game over ', announceGameOverPayload);
@@ -282,7 +269,7 @@ export default class Game extends cc.Component {
     private handleAnnounceLeft(packet: Packet) {
         const announcePlayerLeftPayload = Packet.getPayload(
             packet,
-            announce_player_left_spec.AnnouncePlayerLeftPayload,
+            monopolypb.AnnouncePlayerLeftPayload,
         );
         cc.log('player left', announcePlayerLeftPayload);
     }
@@ -291,14 +278,14 @@ export default class Game extends cc.Component {
         const response = await this.client.request(
             Request.forAction(Action.ROLL).setId(this.client.newId()).build(),
         );
-        const rollResponse = Packet.getPayload(response, roll_spec.RollResponse);
+        const rollResponse = Packet.getPayload(response, monopolypb.RollResponse);
 
         if (Packet.isStatusOk(response) && rollResponse) {
             this.eventBus?.emit(EVENT.DICE_ROLLED_RESPONSE, rollResponse.steps);
         }
     }
 
-    private instantiatePlayer(gamePlayer: game_player.GamePlayer): cc.Node {
+    private instantiatePlayer(gamePlayer: monopolypb.GamePlayer): cc.Node {
         const playerNode = assertExist(this.map, 'Game.map').addToMap(
             (cc.instantiate(this.playerPrefab) as unknown) as cc.Node,
             assertExist(gamePlayer.pos, 'gamePlayer.pos'),

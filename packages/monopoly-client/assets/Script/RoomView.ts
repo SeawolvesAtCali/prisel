@@ -1,11 +1,11 @@
 import { assertExist, Client, Messages, Packet } from '@prisel/client';
 import { exist } from '@prisel/monopoly-common';
-import { get_lobby_state_spec } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { client, ClientState } from './Client';
 
 const { ccclass, property } = cc._decorator;
 
-type LobbyRoomViewInfo = get_lobby_state_spec.GetLobbyStateResponse_LobbyRoomViewInfo;
+type LobbyRoomViewInfo = priselpb.GetLobbyStateResponse_LobbyRoomViewInfo;
 @ccclass
 export default class RoomView extends cc.Component {
     @property(cc.Label)

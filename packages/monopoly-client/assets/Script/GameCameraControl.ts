@@ -1,6 +1,6 @@
 import { assertExist } from '@prisel/client';
 import { Anim, exist } from '@prisel/monopoly-common';
-import { animation_spec, coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { subscribeAnimation } from './animations';
 import {
     AUTO_PANNING_PX_PER_SECOND,
@@ -40,13 +40,13 @@ export default class GameCameraControl extends cc.Component {
     @lifecycle
     protected start() {
         subscribeAnimation('pan', (anim) => {
-            const panExtra = Anim.getExtra(anim, animation_spec.PanExtra);
+            const panExtra = Anim.getExtra(anim, monopolypb.PanExtra);
             if (panExtra && panExtra.target) {
                 this.moveToTileAtPos(panExtra.target, anim.length);
             }
         });
         subscribeAnimation('move', async (anim) => {
-            const moveExtra = Anim.getExtra(anim, animation_spec.MoveExtra);
+            const moveExtra = Anim.getExtra(anim, monopolypb.MoveExtra);
             if (moveExtra) {
                 const playerId = moveExtra.player?.id;
 
@@ -63,7 +63,7 @@ export default class GameCameraControl extends cc.Component {
         });
     }
 
-    private moveToTileAtPos(pos: coordinate.Coordinate, durationInMs?: number) {
+    private moveToTileAtPos(pos: monopolypb.Coordinate, durationInMs?: number) {
         const targetTile = MapLoader.get().getTile(pos);
         if (pos && targetTile) {
             this.moveToNode(
@@ -78,7 +78,7 @@ export default class GameCameraControl extends cc.Component {
      * Convert tile coordinate to canvas position
      * @param tile Coordinate of the tile
      */
-    public tileToScreenPos(tile: coordinate.Coordinate): cc.Vec2 | null {
+    public tileToScreenPos(tile: monopolypb.Coordinate): cc.Vec2 | null {
         const tileComp = MapLoader.get().getTile(tile);
         if (tileComp) {
             return toVec2(

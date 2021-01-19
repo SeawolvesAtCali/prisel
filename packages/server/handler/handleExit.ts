@@ -1,4 +1,4 @@
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { closeSocket } from '../utils/networkUtils';
 import { getPlayer, getRoom } from '../utils/stateUtils';
@@ -20,4 +20,4 @@ export const handleExit: Handler = (context, socket) => (_packet) => {
     SocketManager.removeBySocket(socket);
 };
 
-clientHandlerRegister.push(system_action_type.SystemActionType.EXIT, handleExit);
+clientHandlerRegister.push(priselpb.SystemActionType.EXIT, handleExit);

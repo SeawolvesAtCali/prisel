@@ -1,5 +1,5 @@
 import { Packet, Request, Response } from '@prisel/common';
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { debug } from '../debug';
 import { getError } from '../message';
 import { Context, Socket } from '../objects';
@@ -28,11 +28,11 @@ export function getPlayerOrRespondError(
 export function verifyIsRequest(p: Packet): p is Request {
     if (!Request.isRequest(p)) {
         const maybeSystemAction =
-            Packet.getSystemAction(p) ?? system_action_type.SystemActionType.UNSPECIFIED;
+            Packet.getSystemAction(p) ?? priselpb.SystemActionType.UNSPECIFIED;
         debug(
             `Received ${
                 Packet.isAnySystemAction(p)
-                    ? system_action_type.SystemActionType[maybeSystemAction]
+                    ? priselpb.SystemActionType[maybeSystemAction]
                     : Packet.getAction(p)
             } but packet is not a request: ${safeStringify(p)}`,
         );

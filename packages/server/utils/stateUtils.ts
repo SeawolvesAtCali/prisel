@@ -1,4 +1,4 @@
-import { player_info, room_info, room_state_snapshot } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { Context, Socket } from '../objects';
 import { Player } from '../player';
 import { Room } from '../room';
@@ -44,7 +44,7 @@ export function getRoom(context: Context, client: Socket): Room | null {
     return null;
 }
 
-export function getRoomStateSnapshot(room: Room): room_state_snapshot.RoomStateSnapshot {
+export function getRoomStateSnapshot(room: Room): priselpb.RoomStateSnapshot {
     const host = room.getHost();
 
     const players = room.getPlayers().map((player) => getPlayerInfo(player));
@@ -62,14 +62,14 @@ export function getRoomStateSnapshot(room: Room): room_state_snapshot.RoomStateS
     };
 }
 
-export function getPlayerInfo(player: Player): player_info.PlayerInfo {
+export function getPlayerInfo(player: Player): priselpb.PlayerInfo {
     return {
         name: player.getName(),
         id: player.getId(),
     };
 }
 
-export function getRoomInfo(room: Room): room_info.RoomInfo {
+export function getRoomInfo(room: Room): priselpb.RoomInfo {
     return {
         name: room.getName(),
         id: room.getId(),

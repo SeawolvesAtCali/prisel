@@ -1,5 +1,5 @@
 import { Request, Response } from '@prisel/common';
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { getWelcome } from '../message';
 import { newPlayer } from '../player';
 import { emit } from '../utils/networkUtils';
@@ -62,7 +62,7 @@ describe('player', () => {
         jest.useFakeTimers();
         const context = mockContext();
         const player = newPlayer(context, { name: 'player', id: '1' });
-        const request = Request.forSystemAction(system_action_type.SystemActionType.CHAT);
+        const request = Request.forSystemAction(priselpb.SystemActionType.CHAT);
         const socket = mockSocket();
         jest.spyOn(player, 'getSocket').mockImplementation(() => socket);
         player.request(request);
@@ -76,7 +76,7 @@ describe('player', () => {
             name: 'player',
             id: '1',
         });
-        const request = Request.forSystemAction(system_action_type.SystemActionType.CREATE_ROOM)
+        const request = Request.forSystemAction(priselpb.SystemActionType.CREATE_ROOM)
             .setId('123')
             .build();
         const response = Response.forRequest(request).setFailure('failure message').build();

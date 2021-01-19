@@ -1,7 +1,7 @@
 import { BoardSetup, existOrThrow, Property, Ref, Tile, World } from '@prisel/monopoly-common';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 
-type Coordinate = coordinate.Coordinate;
+type Coordinate = monopolypb.Coordinate;
 
 type CoordinateKey = string;
 const toKey = (tile: Coordinate): CoordinateKey => `${tile.row}-${tile.col}`;

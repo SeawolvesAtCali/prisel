@@ -1,13 +1,13 @@
 import { createArgEvent } from '@prisel/client';
 import { animationMap } from '@prisel/monopoly-common';
-import { animation_spec } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { EventEmitter } from 'events';
 
 export const animEmitter = new EventEmitter();
 
 export function subscribeAnimation(
     animationName: keyof typeof animationMap,
-    callback: (arg: animation_spec.Animation) => unknown,
+    callback: (arg: monopolypb.Animation) => unknown,
 ) {
-    createArgEvent<animation_spec.Animation>(animationName, animEmitter).sub(callback);
+    createArgEvent<monopolypb.Animation>(animationName, animEmitter).sub(callback);
 }

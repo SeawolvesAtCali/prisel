@@ -1,7 +1,7 @@
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { PayloadKey } from './packet';
 
-const { SystemActionType } = system_action_type;
+const { SystemActionType } = priselpb;
 
 enum FROM {
     UNSPECIFIED = '',
@@ -14,13 +14,13 @@ interface ActionConfig {
     from: FROM;
     isRest: boolean;
     payload?: Array<[string, string]>;
-    related?: system_action_type.SystemActionType[];
+    related?: priselpb.SystemActionType[];
 }
 const request = (key: PayloadKey): [string, string] => ['request', key];
 const response = (key: PayloadKey): [string, string] => ['response', key];
 const packet = (key: PayloadKey): [string, string] => ['packet', key];
 
-const RAW_ACTION_CONFIG: Record<system_action_type.SystemActionType, ActionConfig> = {
+const RAW_ACTION_CONFIG: Record<priselpb.SystemActionType, ActionConfig> = {
     [SystemActionType.UNSPECIFIED]: {
         desc: 'Default value of action',
         from: FROM.UNSPECIFIED,
@@ -116,7 +116,7 @@ const RAW_ACTION_CONFIG: Record<system_action_type.SystemActionType, ActionConfi
 };
 
 export const ACTION_CONFIG = Object.entries(RAW_ACTION_CONFIG).map(([key, value]) => ({
-    type: system_action_type.SystemActionType[Number(key)],
+    type: priselpb.SystemActionType[Number(key)],
     ...value,
     related: value.related ? value.related.map((actionType) => SystemActionType[actionType]) : [],
 }));

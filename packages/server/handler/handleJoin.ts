@@ -1,4 +1,4 @@
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
@@ -20,4 +20,4 @@ export const handleJoin: Handler = (context, socket) => (request) => {
     roomConfig.onJoin(player, request);
 };
 
-clientHandlerRegister.push(system_action_type.SystemActionType.JOIN, handleJoin);
+clientHandlerRegister.push(priselpb.SystemActionType.JOIN, handleJoin);

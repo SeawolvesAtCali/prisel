@@ -7,16 +7,7 @@ import {
     GamePlayer,
     Property,
 } from '@prisel/monopoly-common';
-import {
-    animation_spec,
-    announce_bankrupt_spec,
-    announce_end_turn_spec,
-    announce_pay_rent_spec,
-    announce_player_left_spec,
-    announce_purchase_spec,
-    payment,
-    prompt_purchase_spec,
-} from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { assertExist, Packet, Request } from '@prisel/server';
 import { chanceHandlers } from '../chanceHandlers/index';
 import { log } from '../log';
@@ -62,7 +53,7 @@ export class Moved extends StateMachineState {
 
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_END_TURN)
-                .setPayload(announce_end_turn_spec.AnnounceEndTurnPayload, {
+                .setPayload(monopolypb.AnnounceEndTurnPayload, {
                     currentPlayer: currentPlayer.id,
                     nextPlayer: this.game.getNextPlayer().id,
                 })
@@ -80,7 +71,7 @@ export class Moved extends StateMachineState {
 
         await Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('pan', animation_spec.PanExtra)
+            Anim.create('pan', monopolypb.PanExtra)
                 .setExtra({
                     target: nextPlayerPos,
                 })
@@ -157,7 +148,7 @@ export class Moved extends StateMachineState {
         }
         await Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('open_chance_chest', animation_spec.OpenChanceChestExtra)
+            Anim.create('open_chance_chest', monopolypb.OpenChanceChestExtra)
                 .setExtra({
                     chanceChestTile: currentTile.position,
                     chance: chanceInput.display,
@@ -210,7 +201,7 @@ export class Moved extends StateMachineState {
         properties: Property[],
         currentPlayer: GamePlayer,
     ): Promise<void> | void {
-        const rentPayments: payment.Payment[] = [];
+        const rentPayments: monopolypb.Payment[] = [];
 
         // check for rent payment first
         for (const property of properties) {
@@ -227,7 +218,7 @@ export class Moved extends StateMachineState {
         this.announcePayRent(rentPayments);
         return Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('pay_rent', animation_spec.PayRentExtra)
+            Anim.create('pay_rent', monopolypb.PayRentExtra)
                 .setExtra({
                     // TODO: here we assume we are paying one player only
                     payer: this.game.getGamePlayerById(rentPayments[0].payer)?.getGamePlayerInfo(),
@@ -251,17 +242,17 @@ export class Moved extends StateMachineState {
     private announceBankrupt(player: GamePlayer) {
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_BANKRUPT)
-                .setPayload(announce_bankrupt_spec.AnnounceBankruptPayload, {
+                .setPayload(monopolypb.AnnounceBankruptPayload, {
                     player: player.id,
                 })
                 .build(),
         );
     }
 
-    private announcePayRent(payments: payment.Payment[]) {
+    private announcePayRent(payments: monopolypb.Payment[]) {
         this.game.broadcast((player) => {
             return Packet.forAction(Action.ANNOUNCE_PAY_RENT)
-                .setPayload(announce_pay_rent_spec.AnnouncePayRentPayload, {
+                .setPayload(monopolypb.AnnouncePayRentPayload, {
                     payer: this.game.getCurrentPlayer().id,
                     payments,
                     myCurrentMoney: player.money || 0,
@@ -290,7 +281,7 @@ export class Moved extends StateMachineState {
             // end while we are waiting for current player.
             const response = await getPlayer(currentPlayer).request(
                 Request.forAction(Action.PROMPT_PURCHASE).setPayload(
-                    prompt_purchase_spec.PromptPurchaseRequest,
+                    monopolypb.PromptPurchaseRequest,
                     propertyForPurchase,
                 ),
                 0, // 0 timeout means no timeout
@@ -306,14 +297,12 @@ export class Moved extends StateMachineState {
                 return;
             }
 
-            if (
-                Packet.getPayload(response, prompt_purchase_spec.PromptPurchaseResponse)?.purchased
-            ) {
+            if (Packet.getPayload(response, monopolypb.PromptPurchaseResponse)?.purchased) {
                 currentPlayer.purchaseProperty(property, propertyForPurchase);
                 // broadcast purchase
                 this.game.broadcast(
                     Packet.forAction(Action.ANNOUNCE_PURCHASE)
-                        .setPayload(announce_purchase_spec.AnnouncePurchasePayload, {
+                        .setPayload(monopolypb.AnnouncePurchasePayload, {
                             player: currentPlayer.id,
                             property: property.getBasicPropertyInfo(),
                         })
@@ -322,7 +311,7 @@ export class Moved extends StateMachineState {
 
                 await Anim.processAndWait(
                     this.broadcastAnimation,
-                    Anim.create('invested', animation_spec.InvestedExtra)
+                    Anim.create('invested', monopolypb.InvestedExtra)
                         .setExtra({ property: property.getBasicPropertyInfo() })
                         .setLength(animationMap.invested)
                         .build(),
@@ -338,7 +327,7 @@ export class Moved extends StateMachineState {
         // player left, let's just end the game
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
-                .setPayload(announce_player_left_spec.AnnouncePlayerLeftPayload, {
+                .setPayload(monopolypb.AnnouncePlayerLeftPayload, {
                     player: gamePlayer.getGamePlayerInfo(),
                 })
                 .build(),

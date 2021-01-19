@@ -1,5 +1,5 @@
 import { assertExist } from '@prisel/client';
-import { prompt_purchase_spec } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { createDialog, DialogPosition } from './components/DialogUtil';
 import { LabelConfig, LabelTheme, themeToColor } from './components/LabelConfig';
 import { LayoutConfig } from './components/LayoutConfig';
@@ -20,7 +20,7 @@ export default class PurchaseDialog extends cc.Component {
         this.eventBus.on(EVENT.PROMPT_PURCHASE, this.promptPurchase, this);
     }
 
-    private promptPurchase(promptPurchase: prompt_purchase_spec.PromptPurchaseRequest) {
+    private promptPurchase(promptPurchase: monopolypb.PromptPurchaseRequest) {
         this.dialog = new cc.Node();
         this.node.addChild(this.dialog);
         createDialog({

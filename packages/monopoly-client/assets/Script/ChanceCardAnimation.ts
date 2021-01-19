@@ -1,6 +1,6 @@
 import { assertExist } from '@prisel/client';
 import { Anim } from '@prisel/monopoly-common';
-import { animation_spec } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { subscribeAnimation } from './animations';
 import { EVENT, EVENT_BUS } from './consts';
 import GameCameraControl from './GameCameraControl';
@@ -45,8 +45,8 @@ export default class ChanceCardAnimation extends cc.Component {
         this.node.active = false;
     }
 
-    public animateOpenChanceChest(animation: animation_spec.Animation) {
-        const openChanceChestExtra = Anim.getExtra(animation, animation_spec.OpenChanceChestExtra);
+    public animateOpenChanceChest(animation: monopolypb.Animation) {
+        const openChanceChestExtra = Anim.getExtra(animation, monopolypb.OpenChanceChestExtra);
         if (openChanceChestExtra) {
             assertExist(this.titleLabel).string = openChanceChestExtra.chance?.title || 'untitled';
             assertExist(this.descriptionLable).string =

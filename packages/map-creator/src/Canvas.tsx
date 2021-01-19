@@ -1,5 +1,5 @@
 import { ChanceInput, exist, GameObject, Property, Tile, World } from '@prisel/monopoly-common';
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import {
     AnimateCallbackFn,
     CanvasForm,
@@ -23,7 +23,7 @@ import { Tool } from './tools/Tool';
 import { useMutable } from './useMutable';
 import { arrowBetweenTiles } from './utils/arrow';
 
-type Coordinate = coordinate.Coordinate;
+type Coordinate = monopolypb.Coordinate;
 
 const Palette = {
     BOARD: Color.fromHex('#9ab'),

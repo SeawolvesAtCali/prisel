@@ -1,5 +1,5 @@
 import { Packet, Response } from '@prisel/common';
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { newPlayer, PlayerId } from '../player';
 import { newId } from '../utils/idUtils';
@@ -14,7 +14,7 @@ export const handleLogin: Handler = (context, client) => (request) => {
     const id = newId<PlayerId>(SOCKET);
     const { SocketManager } = context;
     const payload = Packet.getPayload(request, 'loginRequest');
-    if (Packet.isSystemAction(request, system_action_type.SystemActionType.LOGIN) && payload) {
+    if (Packet.isSystemAction(request, priselpb.SystemActionType.LOGIN) && payload) {
         const { username } = payload;
         SocketManager.add(id, client);
         context.players.set(
@@ -31,4 +31,4 @@ export const handleLogin: Handler = (context, client) => (request) => {
     }
 };
 
-clientHandlerRegister.push(system_action_type.SystemActionType.LOGIN, handleLogin);
+clientHandlerRegister.push(priselpb.SystemActionType.LOGIN, handleLogin);

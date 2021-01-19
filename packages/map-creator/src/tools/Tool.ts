@@ -1,4 +1,4 @@
-import { coordinate } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { Pt } from 'pts';
 import { LayerType } from '../Layer';
 
@@ -22,16 +22,16 @@ export interface Tool {
     /**
      * Called when mouse down or touch start on the canvas
      */
-    onDown?: (coor: coordinate.Coordinate, pt: Pt, layer: LayerType) => void;
+    onDown?: (coor: monopolypb.Coordinate, pt: Pt, layer: LayerType) => void;
     /**
      * Called when down and when drag. This is when tool should leave a mark on
      * the canvas.
      */
-    onDraw?: (coor: coordinate.Coordinate, pt: Pt, layer: LayerType) => void;
+    onDraw?: (coor: monopolypb.Coordinate, pt: Pt, layer: LayerType) => void;
     /**
      * Called when mouse up, or touch stopped. This can only be detected while
      * inside canvas. If user drag from inside to outside, the up event will be
      * trigger when user come back to canvas.
      */
-    onUp?: (coor: coordinate.Coordinate, pt: Pt, layer: LayerType) => void;
+    onUp?: (coor: monopolypb.Coordinate, pt: Pt, layer: LayerType) => void;
 }

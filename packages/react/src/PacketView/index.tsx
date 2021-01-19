@@ -1,21 +1,21 @@
 import { Packet, Response } from '@prisel/client';
-import { packet_type, status, system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import * as React from 'react';
 import { Pill, Preset } from '../Pill';
 import cn from '../utils/classname';
 import styles from './index.module.css';
 
 interface PacketTypeLabelProps {
-    type: packet_type.PacketType;
+    type: priselpb.PacketType;
 }
 
 const PacketTypeLabel: React.FC<PacketTypeLabelProps> = (props) => {
     switch (props.type) {
-        case packet_type.PacketType.REQUEST:
+        case priselpb.PacketType.REQUEST:
             return <Pill preset={Preset.GREEN}>REQUEST</Pill>;
-        case packet_type.PacketType.RESPONSE:
+        case priselpb.PacketType.RESPONSE:
             return <Pill preset={Preset.GREEN}>RESPONSE</Pill>;
-        case packet_type.PacketType.DEFAULT:
+        case priselpb.PacketType.DEFAULT:
             return <Pill preset={Preset.GREEN}>PACKET</Pill>;
         default:
             return <Pill preset={Preset.GREEN}>UNKNOWN</Pill>;
@@ -133,7 +133,7 @@ function renderStatus(packet: Packet) {
         const response = packet;
         return (
             <div className={styles.status}>
-                <JsonView value={status.Status.toJson(response.status)} />
+                <JsonView value={priselpb.Status.toJson(response.status)} />
             </div>
         );
     }
@@ -156,9 +156,8 @@ export const PacketView: React.FC<PacketViewProps> = (props) => {
                 {Packet.isAnySystemAction(p) && (
                     <Pill preset={Preset.DEFAULT}>
                         {
-                            system_action_type.SystemActionType[
-                                Packet.getSystemAction(p) ||
-                                    system_action_type.SystemActionType.UNSPECIFIED
+                            priselpb.SystemActionType[
+                                Packet.getSystemAction(p) || priselpb.SystemActionType.UNSPECIFIED
                             ]
                         }
                     </Pill>

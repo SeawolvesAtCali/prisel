@@ -1,19 +1,19 @@
-import { packet, packet_type, system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { isValidRequest, PacketBuilder } from './packet';
 
-export interface Request extends packet.Packet {
-    type: packet_type.PacketType.REQUEST;
+export interface Request extends priselpb.Packet {
+    type: priselpb.PacketType.REQUEST;
     requestId: string;
 }
 
-function isRequest(p: packet.Packet | undefined): p is Request {
+function isRequest(p: priselpb.Packet | undefined): p is Request {
     return isValidRequest(p);
 }
 
 export class RequestBuilder extends PacketBuilder {
     id: Request['requestId'] = '';
 
-    public static forSystemAction(action: system_action_type.SystemActionType) {
+    public static forSystemAction(action: priselpb.SystemActionType) {
         const builder = new RequestBuilder();
         builder.message = 'systemAction';
         builder.systemAction = action;
@@ -34,13 +34,13 @@ export class RequestBuilder extends PacketBuilder {
 
     public build(): Request {
         const packet = super.build();
-        return { ...packet, type: packet_type.PacketType.REQUEST, requestId: this.id };
+        return { ...packet, type: priselpb.PacketType.REQUEST, requestId: this.id };
     }
 }
 
 export const Request = {
     isRequest,
-    forSystemAction(action: system_action_type.SystemActionType) {
+    forSystemAction(action: priselpb.SystemActionType) {
         return RequestBuilder.forSystemAction(action);
     },
     forAction(action: string) {

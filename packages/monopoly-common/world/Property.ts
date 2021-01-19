@@ -1,4 +1,4 @@
-import { coordinate, payment, prompt_purchase_spec, property } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { serializable } from 'serializr';
 import { exist } from '../exist';
 import { Size } from '../types';
@@ -12,7 +12,7 @@ export class Property extends GameObject {
     readonly type = 'property';
 
     @jsonSerializable
-    anchor: coordinate.Coordinate = { row: -1, col: -1 };
+    anchor: monopolypb.Coordinate = { row: -1, col: -1 };
 
     @jsonSerializable
     size: Size = { width: 0, height: 0 };
@@ -21,7 +21,7 @@ export class Property extends GameObject {
     currentLevel = -1;
 
     @jsonSerializable
-    levels: property.PropertyLevel[] = [];
+    levels: monopolypb.PropertyLevel[] = [];
 
     @serializable
     name = '';
@@ -63,7 +63,7 @@ export class Property extends GameObject {
         );
     }
 
-    getBasicPropertyInfo(): property.PropertyInfo {
+    getBasicPropertyInfo(): monopolypb.PropertyInfo {
         return {
             name: this.name,
             pos: this.anchor,
@@ -72,7 +72,7 @@ export class Property extends GameObject {
         };
     }
 
-    getNextLevel(): property.PropertyInfo {
+    getNextLevel(): monopolypb.PropertyInfo {
         return {
             ...this.getBasicPropertyInfo(),
             currentLevel: this.currentLevel + 1,
@@ -83,7 +83,7 @@ export class Property extends GameObject {
     getPromptPurchaseRequest(
         requester: GamePlayer,
         existingMoney: number,
-    ): prompt_purchase_spec.PromptPurchaseRequest | null {
+    ): monopolypb.PromptPurchaseRequest | null {
         if (this.currentLevel >= this.levels.length) {
             // max level
             return null;
@@ -102,7 +102,7 @@ export class Property extends GameObject {
         };
     }
 
-    getPaymentForRent(property: Property, payer: string, payee: string): payment.Payment | null {
+    getPaymentForRent(property: Property, payer: string, payee: string): monopolypb.Payment | null {
         const basicPropertyInfo = this.getBasicPropertyInfo();
         if (
             basicPropertyInfo.currentLevel < 0 ||

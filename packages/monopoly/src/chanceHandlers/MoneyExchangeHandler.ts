@@ -5,7 +5,7 @@ import {
     GamePlayer,
     MoneyExchangeDirection,
 } from '@prisel/monopoly-common';
-import { animation_spec, announce_received_chance_spec } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
 import { log } from '../log';
 import { getPlayer } from '../utils';
@@ -17,18 +17,18 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
     const exchanges: {
         [playerId: string]: number;
     } = {};
-    let playerEmotion: animation_spec.PlayerEmotionExtra_EmotionType =
-        animation_spec.PlayerEmotionExtra_EmotionType.UNSPECIFIED;
+    let playerEmotion: monopolypb.PlayerEmotionExtra_EmotionType =
+        monopolypb.PlayerEmotionExtra_EmotionType.UNSPECIFIED;
     switch (inputArgs.direction) {
         case MoneyExchangeDirection.FROM_BANK:
             currentPlayer.gainMoney(inputArgs.amount);
             exchanges[currentPlayer.id] = inputArgs.amount;
-            playerEmotion = animation_spec.PlayerEmotionExtra_EmotionType.CHEER;
+            playerEmotion = monopolypb.PlayerEmotionExtra_EmotionType.CHEER;
             break;
         case MoneyExchangeDirection.TO_BANK:
             currentPlayer.gainMoney(-inputArgs.amount);
             exchanges[currentPlayer.id] = -inputArgs.amount;
-            playerEmotion = animation_spec.PlayerEmotionExtra_EmotionType.CHEER;
+            playerEmotion = monopolypb.PlayerEmotionExtra_EmotionType.CHEER;
             break;
         case MoneyExchangeDirection.FROM_ALL_OTHER_PLAYERS:
             // TODO: take account of lost players if we allow them to stay in
@@ -40,7 +40,7 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
                 gamePlayer.gainMoney(-inputArgs.amount);
                 exchanges[gamePlayer.id] = -inputArgs.amount;
             });
-            playerEmotion = animation_spec.PlayerEmotionExtra_EmotionType.CHEER;
+            playerEmotion = monopolypb.PlayerEmotionExtra_EmotionType.CHEER;
             break;
         case MoneyExchangeDirection.TO_ALL_OTHER_PLAYERS:
             const totalLostMoney = inputArgs.amount * Array.from(game.players.keys()).length;
@@ -50,7 +50,7 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
                 gamePlayer.gainMoney(inputArgs.amount);
                 exchanges[gamePlayer.id] = inputArgs.amount;
             });
-            playerEmotion = animation_spec.PlayerEmotionExtra_EmotionType.ANGRY;
+            playerEmotion = monopolypb.PlayerEmotionExtra_EmotionType.ANGRY;
             break;
         default:
             // should not be here. game data is corrupted.
@@ -59,7 +59,7 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
     }
     game.broadcast((player: GamePlayer) =>
         Packet.forAction(Action.ANNOUNCE_CHANCE)
-            .setPayload(announce_received_chance_spec.AnnounceRecievedChancePayload, {
+            .setPayload(monopolypb.AnnounceRecievedChancePayload, {
                 player: currentPlayer.id,
                 chance: {
                     display: input.display,
@@ -79,7 +79,7 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
         (animation) => {
             getPlayer(currentPlayer).emit(animation);
         },
-        Anim.create('player_emotion', animation_spec.PlayerEmotionExtra)
+        Anim.create('player_emotion', monopolypb.PlayerEmotionExtra)
             .setExtra({
                 player: currentPlayer.getGamePlayerInfo(),
                 emotion: playerEmotion,

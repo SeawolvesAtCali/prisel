@@ -1,4 +1,4 @@
-import { chance } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 
 export enum MoneyExchangeDirection {
     UNSPECIFIED,
@@ -28,6 +28,6 @@ export interface ChanceInputArgs {
         steps: number;
     };
     collectible: {
-        type: chance.CollectibleExtra_CollectibleType;
+        type: monopolypb.CollectibleExtra_CollectibleType;
     };
 }

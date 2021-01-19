@@ -1,5 +1,5 @@
 import { exist } from '@prisel/monopoly-common';
-import { prompt_purchase_spec } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { EVENT, EVENT_BUS } from './consts';
 import MapLoader from './MapLoader';
 
@@ -25,9 +25,7 @@ export default class PropertySelector extends cc.Component {
         this.node.active = false;
     }
 
-    private handlePropertyForPurchase(
-        promptPurchasePayload: prompt_purchase_spec.PromptPurchaseRequest,
-    ) {
+    private handlePropertyForPurchase(promptPurchasePayload: monopolypb.PromptPurchaseRequest) {
         this.node.active = true;
         this.headAnimation?.play();
         this.shadowAnimation?.play();

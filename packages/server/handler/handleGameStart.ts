@@ -1,4 +1,4 @@
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
@@ -19,4 +19,4 @@ const handleGameStart: Handler = (context, socket) => (request) => {
     roomConfig.onGameStart(player, request);
 };
 
-clientHandlerRegister.push(system_action_type.SystemActionType.GAME_START, handleGameStart);
+clientHandlerRegister.push(priselpb.SystemActionType.GAME_START, handleGameStart);

@@ -1,5 +1,5 @@
 import { Packet, Request, Response } from '@prisel/common';
-import { login_spec, packet_type, system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import { Server } from 'mock-socket';
 import { Client } from '../client';
 import { getLogin } from '../message';
@@ -46,9 +46,9 @@ describe('Client', () => {
                 socket.on('message', (data) => {
                     const pkt = Packet.deserialize(data);
                     expect(Request.isRequest(pkt)).toBe(true);
-                    expect(Packet.isSystemAction(pkt, system_action_type.SystemActionType.LOGIN));
+                    expect(Packet.isSystemAction(pkt, priselpb.SystemActionType.LOGIN));
                     expect(Packet.getPayload(pkt, 'loginRequest')).toMatchObject<
-                        login_spec.LoginRequest
+                        priselpb.LoginRequest
                     >({
                         username: 'batman',
                     });
@@ -64,9 +64,7 @@ describe('Client', () => {
             await client.connect();
             const loginResult = await client.request(loginRequest);
             expect(Response.isResponse(loginResult));
-            expect(
-                Packet.isSystemAction(loginResult, system_action_type.SystemActionType.LOGIN),
-            ).toBe(true);
+            expect(Packet.isSystemAction(loginResult, priselpb.SystemActionType.LOGIN)).toBe(true);
             const payload = Packet.getPayload(loginResult, 'loginResponse');
             expect(payload).toBeDefined();
             if (payload) {
@@ -87,7 +85,7 @@ describe('Client', () => {
             mockServer.on('connection', (socket) => {
                 socket.on('message', (data) => {
                     const packet = Packet.deserialize(data);
-                    if (Packet.isSystemAction(packet, system_action_type.SystemActionType.EXIT)) {
+                    if (Packet.isSystemAction(packet, priselpb.SystemActionType.EXIT)) {
                         // do nothing on EXIT
                         return;
                     }
@@ -110,7 +108,7 @@ describe('Client', () => {
             mockServer.on('connection', (socket) => {
                 socket.on('message', (data) => {
                     const packet = Packet.deserialize(data);
-                    if (Packet.isSystemAction(packet, system_action_type.SystemActionType.EXIT)) {
+                    if (Packet.isSystemAction(packet, priselpb.SystemActionType.EXIT)) {
                         // do nothing on EXIT
                         return;
                     }
@@ -140,7 +138,7 @@ describe('Client', () => {
             const waitForMessage = new Promise<void>((resolve) => {
                 const mockCallback = (packet: Packet, action: string) => {
                     expect(Packet.is(packet)).toBe(true);
-                    expect(packet.type).toEqual(packet_type.PacketType.DEFAULT);
+                    expect(packet.type).toEqual(priselpb.PacketType.DEFAULT);
                     expect(Packet.isCustomAction(packet, 'MESSAGE'));
                     resolve();
                 };

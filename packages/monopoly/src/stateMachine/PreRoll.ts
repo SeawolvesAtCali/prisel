@@ -1,11 +1,5 @@
 import { Action, Anim, animationMap, GamePlayer } from '@prisel/monopoly-common';
-import {
-    animation_spec,
-    announce_player_left_spec,
-    announce_roll_spec,
-    announce_start_turn_spec,
-    roll_spec,
-} from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { assertExist, Packet, Request, Response } from '@prisel/server';
 import { getPlayer } from '../utils';
 import { GameOver } from './GameOver';
@@ -44,7 +38,7 @@ export class PreRoll extends StateMachineState {
         // start the turn
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_START_TURN)
-                .setPayload(announce_start_turn_spec.AnnounceStartTurnPayload, {
+                .setPayload(monopolypb.AnnounceStartTurnPayload, {
                     player: this.game.getCurrentPlayer().id,
                 })
                 .build(),
@@ -52,7 +46,7 @@ export class PreRoll extends StateMachineState {
 
         Anim.processAndWait(
             this.broadcastAnimation,
-            Anim.create('turn_start', animation_spec.TurnStartExtra)
+            Anim.create('turn_start', monopolypb.TurnStartExtra)
                 .setExtra({
                     player: this.game.getCurrentPlayer().getGamePlayerInfo(),
                 })
@@ -79,7 +73,7 @@ export class PreRoll extends StateMachineState {
                     const steps = pathCoordinates.length;
                     getPlayer(gamePlayer).respond(
                         Response.forRequest(packet)
-                            .setPayload(roll_spec.RollResponse, {
+                            .setPayload(monopolypb.RollResponse, {
                                 steps,
                                 path: pathCoordinates,
                             })
@@ -89,7 +83,7 @@ export class PreRoll extends StateMachineState {
                     // notify other players about current player's move
                     this.game.broadcast((player) => {
                         return Packet.forAction(Action.ANNOUNCE_ROLL)
-                            .setPayload(announce_roll_spec.AnnounceRollPayload, {
+                            .setPayload(monopolypb.AnnounceRollPayload, {
                                 player: gamePlayer.id,
                                 steps,
                                 path: pathCoordinates,
@@ -102,18 +96,18 @@ export class PreRoll extends StateMachineState {
                         Anim.sequence(
                             // turn_start animation should be terminated when dice_roll
                             // is received.
-                            Anim.create('dice_roll', animation_spec.DiceRollExtra)
+                            Anim.create('dice_roll', monopolypb.DiceRollExtra)
                                 .setExtra({
                                     player: gamePlayer.getGamePlayerInfo(),
                                 })
                                 .setLength(animationMap.dice_roll),
-                            Anim.create('dice_down', animation_spec.DiceDownExtra)
+                            Anim.create('dice_down', monopolypb.DiceDownExtra)
                                 .setExtra({
                                     steps,
                                     player: gamePlayer.getGamePlayerInfo(),
                                 })
                                 .setLength(animationMap.dice_down),
-                            Anim.create('move', animation_spec.MoveExtra)
+                            Anim.create('move', monopolypb.MoveExtra)
                                 .setExtra({
                                     player: gamePlayer.getGamePlayerInfo(),
                                     start: initialPos,
@@ -136,7 +130,7 @@ export class PreRoll extends StateMachineState {
         // player left, let's just end the game
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
-                .setPayload(announce_player_left_spec.AnnouncePlayerLeftPayload, {
+                .setPayload(monopolypb.AnnouncePlayerLeftPayload, {
                     player: gamePlayer.getGamePlayerInfo(),
                 })
                 .build(),

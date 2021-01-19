@@ -1,5 +1,5 @@
 import { Packet } from '@prisel/common';
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { broadcast } from '../utils/broadcast';
 import { getPlayerInfo, getRoom } from '../utils/stateUtils';
@@ -19,7 +19,7 @@ export const handleChat: Handler = (context, socket) => (chatPacket) => {
     const room = getRoom(context, socket);
 
     if (player && room) {
-        const packet = Packet.forSystemAction(system_action_type.SystemActionType.BROADCAST)
+        const packet = Packet.forSystemAction(priselpb.SystemActionType.BROADCAST)
             .setPayload('broadcastPayload', {
                 player: getPlayerInfo(player),
                 message,
@@ -30,4 +30,4 @@ export const handleChat: Handler = (context, socket) => (chatPacket) => {
     }
 };
 
-clientHandlerRegister.push(system_action_type.SystemActionType.CHAT, handleChat);
+clientHandlerRegister.push(priselpb.SystemActionType.CHAT, handleChat);

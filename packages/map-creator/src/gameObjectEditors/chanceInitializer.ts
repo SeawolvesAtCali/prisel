@@ -4,7 +4,7 @@ import {
     MoneyExchangeDirection,
     MoneyExchangeType,
 } from '@prisel/monopoly-common';
-import { chance } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 
 export function chanceInitializer<T extends keyof ChanceInputArgs>(
     type: T,
@@ -57,7 +57,7 @@ export function chanceInitializer<T extends keyof ChanceInputArgs>(
                 },
                 type: 'collectible',
                 inputArgs: {
-                    type: chance.CollectibleExtra_CollectibleType.GET_OUT_OF_JAIL_FREE,
+                    type: monopolypb.CollectibleExtra_CollectibleType.GET_OUT_OF_JAIL_FREE,
                 },
             };
             return collectable;

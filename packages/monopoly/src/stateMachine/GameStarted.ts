@@ -1,5 +1,5 @@
 import { Action, Anim, animationMap, GamePlayer, toAnimationPacket } from '@prisel/monopoly-common';
-import { animation_spec, announce_player_left_spec, get_initial_state_spec } from '@prisel/protos';
+import { monopolypb } from '@prisel/protos';
 import { Packet, Request, Response } from '@prisel/server';
 import { getPlayer } from '../utils';
 import { GameOver } from './GameOver';
@@ -38,7 +38,7 @@ export class GameStarted extends StateMachineState {
         switch (Packet.getAction(packet)) {
             case Action.GET_INITIAL_STATE:
                 if (Request.isRequest(packet)) {
-                    const initialStateResponse: get_initial_state_spec.GetInitialStateResponse = {
+                    const initialStateResponse: monopolypb.GetInitialStateResponse = {
                         players: Array.from(this.game.players.values()).map((player) =>
                             player.getGamePlayerInfo(),
                         ),
@@ -46,10 +46,7 @@ export class GameStarted extends StateMachineState {
                     };
                     getPlayer(gamePlayer).respond(
                         Response.forRequest(packet)
-                            .setPayload(
-                                get_initial_state_spec.GetInitialStateResponse,
-                                initialStateResponse,
-                            )
+                            .setPayload(monopolypb.GetInitialStateResponse, initialStateResponse)
                             .build(),
                     );
                 }
@@ -59,7 +56,7 @@ export class GameStarted extends StateMachineState {
                     if (!this.sync?.has(gamePlayer.id)) {
                         const startAndPan = Anim.sequence(
                             Anim.create('game_start').setLength(animationMap.game_start),
-                            Anim.create('pan', animation_spec.PanExtra)
+                            Anim.create('pan', monopolypb.PanExtra)
                                 .setExtra({
                                     target: this.game.getCurrentPlayer().pathTile?.get().position,
                                 })
@@ -85,7 +82,7 @@ export class GameStarted extends StateMachineState {
         // player left, let's just end the game
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
-                .setPayload(announce_player_left_spec.AnnouncePlayerLeftPayload, {
+                .setPayload(monopolypb.AnnouncePlayerLeftPayload, {
                     player: gamePlayer.getGamePlayerInfo(),
                 })
                 .build(),

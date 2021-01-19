@@ -1,4 +1,4 @@
-import { system_action_type } from '@prisel/protos';
+import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
@@ -21,4 +21,4 @@ export const handleCreateRoom: Handler = (context, socket) => (request) => {
     roomConfig.onCreate(player, request);
 };
 
-clientHandlerRegister.push(system_action_type.SystemActionType.CREATE_ROOM, handleCreateRoom);
+clientHandlerRegister.push(priselpb.SystemActionType.CREATE_ROOM, handleCreateRoom);

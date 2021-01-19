@@ -70,7 +70,7 @@ export class GamePlayer extends GameObject {
     }
 
     private roll(startingNode: Ref<Tile>): Tile[] {
-        if (this.forcedRollPoint) {
+        if (this.forcedRollPoint > 0) {
             // player will move a fixed ${forcedRollPoint} step
             return startingNode.get().genPath(this.forcedRollPoint);
         }

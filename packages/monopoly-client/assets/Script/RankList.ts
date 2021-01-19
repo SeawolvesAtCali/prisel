@@ -37,7 +37,7 @@ export default class RankList extends cc.Component {
         const rankListPath = root
             .addChild('ranking list')
             .addComponents(
-                LayoutConfig.verticalContainer(10),
+                LayoutConfig.verticalWrapChildren(10),
                 WidgetConfig.custom(100, 20, undefined, 20),
             )
             .getPath();

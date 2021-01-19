@@ -1,6 +1,8 @@
 import { Action, Anim, animationMap, GamePlayer } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { assertExist, Packet, Request, Response } from '@prisel/server';
+import { FIXED_STEPS, USE_FIXED_STEPS } from '../defaultFlags';
+import { flags } from '../flags';
 import { getPlayer } from '../utils';
 import { GameOver } from './GameOver';
 import { Moved } from './Moved';
@@ -68,6 +70,11 @@ export class PreRoll extends StateMachineState {
                         gamePlayer.pathTile?.get().position,
                         'initialPos',
                     );
+                    if (flags.get(USE_FIXED_STEPS)) {
+                        gamePlayer.forcedRollPoint = flags.get(FIXED_STEPS) || 1;
+                    } else {
+                        gamePlayer.forcedRollPoint = 0;
+                    }
                     const pathCoordinates = gamePlayer.rollAndMove();
                     this.rolled = true;
                     const steps = pathCoordinates.length;

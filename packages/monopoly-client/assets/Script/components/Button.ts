@@ -14,6 +14,12 @@ interface ButtonProps {
     widget?: WidgetConfig;
     textTheme?: LabelTheme;
 }
+
+/**
+ * Utility function that creates a button cc.Node (including the target area,
+ * text, etc) using the given ButtonConfig.
+ * @param props
+ */
 export function createButton(props: ButtonProps) {
     const {
         name = 'button',

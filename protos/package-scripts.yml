@@ -2,7 +2,8 @@ scripts:
     clean: rm -rf gen_ts && mkdir gen_ts
     protoc:
         protoc --experimental_allow_proto3_optional --ts_opt disable_service_client --ts_out gen_ts
-        --proto_path . $(find . -type f -name "*.proto")
+        --csharp_opt base_namespace= --csharp_out gen_csharp --proto_path . $(find . -type f -name
+        "*.proto")
     ts-check: tsc
     barrel: barrelsby -c barrelsby.json --delete
     rollup: rollup --config --silent

@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package monopoly;
+option csharp_namespace = "Monopoly.Protobuf";
 
 import "monopoly/game_player.proto";
 message Asset {

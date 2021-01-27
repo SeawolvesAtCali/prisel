@@ -88,7 +88,13 @@ export class GamePlayer extends GameObject {
         throw new Error('player not in a pathTile, cannot roll and move');
     }
 
+    public teleport(targetTile: Tile) {
+        this.pathTile = this.world.makeRef(targetTile);
+    }
+
     public move(path: Tile[]) {
+        // Currently we don't do anything different for teleport.
+        // When we implement onEnter and onLeave callback for tile.
         if (path.length > 0) {
             this.pathTile = this.world.makeRef(path[path.length - 1]);
             return path.map((pathTile) => pathTile.position);

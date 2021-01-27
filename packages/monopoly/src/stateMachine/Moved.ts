@@ -15,6 +15,7 @@ import { getPlayer, getRand } from '../utils';
 import { GameOver } from './GameOver';
 import { PreRoll } from './PreRoll';
 import { StateMachineState } from './StateMachineState';
+import { getPanAnimationLength } from './utils';
 
 /**
  * This state starts after the current player moves to the destination after
@@ -75,14 +76,7 @@ export class Moved extends StateMachineState {
                 .setExtra({
                     target: nextPlayerPos,
                 })
-                .setLength(
-                    Math.trunc(
-                        Math.sqrt(
-                            Math.pow(currentPlayerPos.row - nextPlayerPos.row, 2) +
-                                Math.pow(currentPlayerPos.col - nextPlayerPos.col, 2),
-                        ) * animationMap.pan,
-                    ),
-                )
+                .setLength(getPanAnimationLength(currentPlayerPos, nextPlayerPos))
                 .build(),
         ).promise;
         if (!this.isCurrent()) {

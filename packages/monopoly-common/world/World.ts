@@ -43,9 +43,9 @@ export class World {
         return genId();
     }
 
-    public get<T extends GameObjectClass<any>>(id: Id<InstanceType<T>>): InstanceType<T> | null {
+    public get<T extends GameObject>(id: Id<T>): T | null {
         const object = this.objectMap.get(id);
-        return (object as InstanceType<T>) || null;
+        return (object as T) || null;
     }
 
     private getIdSetOfSameType(object: GameObject) {

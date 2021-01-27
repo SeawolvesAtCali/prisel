@@ -109,6 +109,25 @@ export default class Player extends cc.Component {
                 this.stop();
             }
         });
+
+        subscribeAnimation('teleport_pickup', (anim) => {
+            const pickupExtra = Anim.getExtra(anim, monopolypb.TeleportPickupExtra);
+            if (this.getId() === pickupExtra?.player?.id) {
+                console.log(this.getComponent(cc.Animation).getClips());
+                const animState = this.getComponent(cc.Animation).playAdditive('teleport_pickup');
+                console.log('anim state', animState);
+                animState.speed = (animState.duration * 1000) / anim.length;
+            }
+        });
+
+        subscribeAnimation('teleport_dropoff', (anim) => {
+            const dropoffExtra = Anim.getExtra(anim, monopolypb.TeleportDropoffExtra);
+            if (this.getId() === dropoffExtra?.player?.id) {
+                MapLoader.get().moveToPos(this.node, assertExist(dropoffExtra.dropoffLocation));
+                const animState = this.getComponent(cc.Animation).playAdditive('teleport_dropoff');
+                animState.speed = (animState.duration * 1000) / anim.length;
+            }
+        });
     }
 
     private stale() {

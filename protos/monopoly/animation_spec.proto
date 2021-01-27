@@ -104,3 +104,22 @@ message OpenChanceChestExtra {
   Coordinate chance_chest_tile = 1;
   ChanceDisplay chance = 2;
 }
+
+// How the player is being teleported. Could be things like UFO or police car.
+enum TeleportVehicle { UNSPECIFIED = 0; }
+
+// extra for "teleport_pickup"
+// teleport is composed of 3 animations played in sequence:
+// "teleport_pickup", "pan" and "teleport_dropoff"
+message TeleportPickupExtra {
+  TeleportVehicle vehicle = 1;
+  Coordinate pickup_location = 2;
+  GamePlayer player = 3;
+}
+
+// extra for "teleport_dropoff"
+message TeleportDropoffExtra {
+  TeleportVehicle vehicle = 1;
+  Coordinate dropoff_location = 2;
+  GamePlayer player = 3;
+}

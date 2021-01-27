@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package prisel;
+option csharp_namespace = "Prisel.Protobuf";
 
 import "prisel/annotations.proto";
 

@@ -11,8 +11,6 @@ import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Any } from "../google/protobuf/any";
-import { GameStatePayload } from "../tic_tac_toe/tic_tac_toe_spec";
-import { MovePayload } from "../tic_tac_toe/tic_tac_toe_spec";
 import { RoomStateChangePayload } from "./room_state_change_spec";
 import { LoginResponse } from "./login_spec";
 import { LoginRequest } from "./login_spec";
@@ -105,18 +103,6 @@ export interface Payload {
          */
         roomStateChangePayload: RoomStateChangePayload;
     } | {
-        oneofKind: "ticTacToeMovePayload";
-        /**
-         * @generated from protobuf field: tic_tac_toe.MovePayload tic_tac_toe_move_payload = 13;
-         */
-        ticTacToeMovePayload: MovePayload;
-    } | {
-        oneofKind: "ticTacToeGameStatePayload";
-        /**
-         * @generated from protobuf field: tic_tac_toe.GameStatePayload tic_tac_toe_game_state_payload = 14;
-         */
-        ticTacToeGameStatePayload: GameStatePayload;
-    } | {
         oneofKind: "actionPayload";
         /**
          * @generated from protobuf field: google.protobuf.Any action_payload = 15;
@@ -144,8 +130,6 @@ class Payload$Type extends MessageType<Payload> {
             { no: 10, name: "login_request", kind: "message", oneof: "payload", T: () => LoginRequest },
             { no: 11, name: "login_response", kind: "message", oneof: "payload", T: () => LoginResponse },
             { no: 12, name: "room_state_change_payload", kind: "message", oneof: "payload", T: () => RoomStateChangePayload },
-            { no: 13, name: "tic_tac_toe_move_payload", kind: "message", oneof: "payload", T: () => MovePayload },
-            { no: 14, name: "tic_tac_toe_game_state_payload", kind: "message", oneof: "payload", T: () => GameStatePayload },
             { no: 15, name: "action_payload", kind: "message", oneof: "payload", T: () => Any }
         ]);
     }
@@ -232,18 +216,6 @@ class Payload$Type extends MessageType<Payload> {
                         roomStateChangePayload: RoomStateChangePayload.internalBinaryRead(reader, reader.uint32(), options, (message.payload as any).roomStateChangePayload)
                     };
                     break;
-                case /* tic_tac_toe.MovePayload tic_tac_toe_move_payload */ 13:
-                    message.payload = {
-                        oneofKind: "ticTacToeMovePayload",
-                        ticTacToeMovePayload: MovePayload.internalBinaryRead(reader, reader.uint32(), options, (message.payload as any).ticTacToeMovePayload)
-                    };
-                    break;
-                case /* tic_tac_toe.GameStatePayload tic_tac_toe_game_state_payload */ 14:
-                    message.payload = {
-                        oneofKind: "ticTacToeGameStatePayload",
-                        ticTacToeGameStatePayload: GameStatePayload.internalBinaryRead(reader, reader.uint32(), options, (message.payload as any).ticTacToeGameStatePayload)
-                    };
-                    break;
                 case /* google.protobuf.Any action_payload */ 15:
                     message.payload = {
                         oneofKind: "actionPayload",
@@ -298,12 +270,6 @@ class Payload$Type extends MessageType<Payload> {
         /* prisel.RoomStateChangePayload room_state_change_payload = 12; */
         if (message.payload.oneofKind === "roomStateChangePayload")
             RoomStateChangePayload.internalBinaryWrite(message.payload.roomStateChangePayload, writer.tag(12, WireType.LengthDelimited).fork(), options).join();
-        /* tic_tac_toe.MovePayload tic_tac_toe_move_payload = 13; */
-        if (message.payload.oneofKind === "ticTacToeMovePayload")
-            MovePayload.internalBinaryWrite(message.payload.ticTacToeMovePayload, writer.tag(13, WireType.LengthDelimited).fork(), options).join();
-        /* tic_tac_toe.GameStatePayload tic_tac_toe_game_state_payload = 14; */
-        if (message.payload.oneofKind === "ticTacToeGameStatePayload")
-            GameStatePayload.internalBinaryWrite(message.payload.ticTacToeGameStatePayload, writer.tag(14, WireType.LengthDelimited).fork(), options).join();
         /* google.protobuf.Any action_payload = 15; */
         if (message.payload.oneofKind === "actionPayload")
             Any.internalBinaryWrite(message.payload.actionPayload, writer.tag(15, WireType.LengthDelimited).fork(), options).join();

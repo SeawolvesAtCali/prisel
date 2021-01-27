@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 package monopoly;
+option csharp_namespace = "Monopoly.Protobuf";
+
 import "prisel/annotations.proto";
 import "monopoly/payment.proto";
 

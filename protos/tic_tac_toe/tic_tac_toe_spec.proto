@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package tic_tac_toe;
+option csharp_namespace = "TicTacToe.Protobuf";
 
 import "prisel/annotations.proto";
 

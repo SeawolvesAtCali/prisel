@@ -1,7 +1,7 @@
 import { Request } from './request';
 import { Response } from './response';
 
-type ResolveFunc = (value?: Response | PromiseLike<Response>) => void;
+type ResolveFunc = (value: Response | PromiseLike<Response>) => void;
 
 export interface RequestManager {
     newId(): string;

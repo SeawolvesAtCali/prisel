@@ -75,5 +75,5 @@ export function getGetRoomState(requestId: string) {
 }
 
 export function getGetLobbyState(requestId: string): Request {
-    return Request.forSystemAction(SystemActionType.GET_ROOM_STATE).setId(requestId).build();
+    return Request.forSystemAction(SystemActionType.GET_LOBBY_STATE).setId(requestId).build();
 }

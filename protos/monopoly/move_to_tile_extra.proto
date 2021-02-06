@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package monopoly;
+option csharp_namespace = "Monopoly.Protobuf";
+
+import "monopoly/coordinate.proto";
+
+// move to each of the tiles sequentially and perform actions on the each
+// tiles. Normally, player would only go to one tile.
+message MoveToTileExtra {
+  Coordinate tile = 1;
+  // if teleport, the player will immediately appear at the target tile
+  // without passing "GO"
+  bool is_teleport = 2;
+}

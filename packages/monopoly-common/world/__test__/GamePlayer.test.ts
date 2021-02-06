@@ -5,6 +5,12 @@ import { Ref } from '../ref2';
 import { Tile } from '../Tile';
 import { World } from '../World';
 
+jest.mock('../../genId', () => {
+    return {
+        genId: () => 'mocked_id_1',
+    };
+});
+
 describe('GamePlayer', () => {
     test('serialize', () => {
         const player = new GamePlayer();

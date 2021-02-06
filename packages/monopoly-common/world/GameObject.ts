@@ -1,9 +1,9 @@
 import { deserialize, serialize } from 'serializr';
 import { exist } from '../exist';
 import { Serialized } from './serializeUtil';
+import { StaticThis } from './staticThis';
 import { World } from './World';
 
-export type StaticThis<T> = { new (): T };
 export abstract class GameObject {
     /**
      * type is classname. This is used during (de)serialization to identify the

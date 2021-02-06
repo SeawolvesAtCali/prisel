@@ -1,10 +1,10 @@
 import './registerProtoTypes';
 export * from './animationSpec';
 export * from './animationUtils';
-export * from './chanceSpec';
 export * from './exist';
 export * from './genId';
 export * from './messages';
+export * from './moneyExchange';
 export * from './samePos';
 export * from './types/index';
 export * from './world/index';

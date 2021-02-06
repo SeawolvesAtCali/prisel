@@ -1,10 +1,12 @@
 import { monopolypb } from '@prisel/protos';
 import { MoneyExchangeDirection, MoneyExchangeType } from '../moneyExchange';
-export interface ChanceInputArgs {
+
+export interface TileEffectInputArgs {
     unspecified: {};
     move_to_tile: {
         tileId: string;
-        isTeleport: boolean;
+        // for tile effect, it is strange if player is already walking and we
+        // ask them to continue walking. We will always use teleport.
     };
     money_exchange: {
         direction: MoneyExchangeDirection;
@@ -19,11 +21,9 @@ export interface ChanceInputArgs {
     };
 }
 
-// Chance data generated at the begining of the game. This will be used to
-// create the Chance object at runtime. ChanceInput contains property of the
-// card that are not computed based on the game state.
-export interface ChanceInput<T extends keyof ChanceInputArgs = 'unspecified'> {
-    display: monopolypb.ChanceDisplay;
+export interface TileEffectInput<T extends keyof TileEffectInputArgs = 'unspecified'> {
+    display: monopolypb.TileEffectDisplay;
     type: T;
-    inputArgs: ChanceInputArgs[T];
+    timing: monopolypb.TileEffect_Timing;
+    inputArgs: TileEffectInputArgs[T];
 }

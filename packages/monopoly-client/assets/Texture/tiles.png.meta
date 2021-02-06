@@ -4,7 +4,7 @@
   "type": "raw",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
-  "premultiplyAlpha": false,
+  "premultiplyAlpha": true,
   "genMipmaps": false,
   "packable": true,
   "width": 1024,

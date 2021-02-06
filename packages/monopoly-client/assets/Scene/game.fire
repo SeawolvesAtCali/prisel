@@ -2394,10 +2394,10 @@
     "_enabled": true,
     "_materials": [
       {
-        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
+        "__uuid__": "40fe2023-0b83-453c-bf1e-e093bd779090"
       }
     ],
-    "_srcBlendFactor": 774,
+    "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
       "__uuid__": "71206702-4c43-46f2-b14d-80e310b9fef2"

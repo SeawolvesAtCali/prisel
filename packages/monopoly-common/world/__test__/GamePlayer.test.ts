@@ -1,3 +1,4 @@
+import { monopolypb } from '@prisel/protos';
 import { GamePlayer } from '../GamePlayer';
 import { Property } from '../Property';
 import { Ref } from '../ref2';
@@ -11,6 +12,16 @@ describe('GamePlayer', () => {
         player.id = '123';
         player.money = 100;
         player.owning = [Ref.forTest<Property>('property1'), Ref.forTest<Property>('property2')];
+        player.addCollectible({
+            display: {
+                title: 'get out of jail free',
+                description: 'activate when entering jail',
+            },
+            type: 'collectible',
+            inputArgs: {
+                type: monopolypb.CollectibleExtra_CollectibleType.GET_OUT_OF_JAIL_FREE,
+            },
+        });
         player.pathTile = Ref.forTest<Tile>('tile1');
         player.rolled = true;
         expect(player.serialize()).toMatchSnapshot();

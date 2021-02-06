@@ -47,7 +47,7 @@ const MoveToTileChanceEditor: React.FC<ChanceEditorProps<'move_to_tile'>> = ({
     );
 };
 
-export const CashExchangeChanceEditor: React.FC<ChanceEditorProps<'money_exchange'>> = ({
+export const MoneyExchangeChanceEditor: React.FC<ChanceEditorProps<'money_exchange'>> = ({
     autoFocus = false,
     input,
 }) => {
@@ -106,7 +106,7 @@ const MoveStepsChanceEditor: React.FC<ChanceEditorProps<'move_steps'>> = ({
     );
 };
 
-const CollectableChanceEditor: React.FC<ChanceEditorProps<'collectible'>> = ({
+const CollectibleChanceEditor: React.FC<ChanceEditorProps<'collectible'>> = ({
     input,
     autoFocus,
 }) => {
@@ -128,22 +128,22 @@ const CollectableChanceEditor: React.FC<ChanceEditorProps<'collectible'>> = ({
 export const ChanceEditor: React.FC<ChanceEditorProps<any>> = (props) => {
     let chanceEditor = null;
     let title = '';
-    switch (props.input.type) {
+    switch (props.input.type as keyof ChanceInputArgs) {
         case 'move_to_tile':
             title = 'move to tile';
             chanceEditor = <MoveToTileChanceEditor {...props} />;
             break;
-        case 'cash_exchange':
+        case 'money_exchange':
             title = 'cash exchange';
-            chanceEditor = <CashExchangeChanceEditor {...props} />;
+            chanceEditor = <MoneyExchangeChanceEditor {...props} />;
             break;
         case 'move_steps':
             title = 'move steps';
             chanceEditor = <MoveStepsChanceEditor {...props} />;
             break;
-        case 'collectable':
-            title = 'collectable';
-            chanceEditor = <CollectableChanceEditor {...props} />;
+        case 'collectible':
+            title = 'collectible';
+            chanceEditor = <CollectibleChanceEditor {...props} />;
             break;
     }
     return (

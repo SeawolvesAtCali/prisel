@@ -1,6 +1,9 @@
 import { monopolypb, priselpb } from '@prisel/protos';
-import { serializable } from 'serializr';
+import { list, object, serializable } from 'serializr';
 import { exist } from '../exist';
+import { genId } from '../genId';
+import { ChanceInput } from '../types';
+import { Collectible } from './Collectible';
 import { GameObject } from './GameObject';
 import { Id } from './Id';
 import type { Property } from './Property';
@@ -38,6 +41,9 @@ export class GamePlayer extends GameObject {
 
     @serializable
     character = 0;
+
+    @serializable(list(object(Collectible)))
+    collectibles: Array<Collectible> = [];
 
     player?: BoundPlayer;
 
@@ -128,5 +134,41 @@ export class GamePlayer extends GameObject {
             character: this.character,
             boundPlayer: this.player?.getPlayerInfo(),
         };
+    }
+
+    public addCollectible(chanceInput: ChanceInput<'collectible'>) {
+        this.collectibles.push({
+            id: genId(),
+            name: chanceInput.display.title,
+            description: chanceInput.display.description,
+            type: chanceInput.inputArgs.type,
+        });
+    }
+
+    public hasCollectible(type: monopolypb.CollectibleExtra_CollectibleType) {
+        return this.collectibles.some((collectible) => collectible.type === type);
+    }
+
+    /**
+     * Pick out the collectible by removing from collection and return it.
+     * @param id
+     */
+    public pickCollectible(id: string): Collectible | undefined {
+        const collectible = this.collectibles.find((item) => item.id === id);
+        this.collectibles = this.collectibles.filter((item) => item != collectible);
+        return collectible;
+    }
+
+    /**
+     * Pick out a collectible of type. This is used when an collectible
+     * automatically become effective without player choosing, e.g.
+     * get-out-of-jail card activates when going to jail
+     */
+    public consumeCollectible(
+        type: monopolypb.CollectibleExtra_CollectibleType,
+    ): Collectible | undefined {
+        const collectible = this.collectibles.find((item) => item.type === type);
+        this.collectibles = this.collectibles.filter((item) => item != collectible);
+        return collectible;
     }
 }

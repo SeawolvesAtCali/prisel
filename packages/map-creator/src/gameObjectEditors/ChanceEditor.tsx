@@ -71,7 +71,7 @@ export const MoneyExchangeChanceEditor: React.FC<ChanceEditorProps<'money_exchan
                 initialValue={input.inputArgs.type}
                 autoFocus={false}
                 enumMap={{
-                    default: MoneyExchangeType.UNSPECIFIED,
+                    default: MoneyExchangeType.DEFAULT,
                     'property tax': MoneyExchangeType.OWN_PROPERTY_PER_HUNDRED,
                 }}
                 onCommit={(exchangeType: MoneyExchangeType) => {

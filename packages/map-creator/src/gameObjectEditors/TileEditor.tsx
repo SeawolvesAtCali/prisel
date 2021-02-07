@@ -30,6 +30,7 @@ const tileEffectTypeSelectorMap: { [description: string]: keyof TileEffectInputA
     'money exchange': 'money_exchange',
     'move steps': 'move_steps',
     collectible: 'collectible',
+    detained: 'detained',
 };
 interface TileEditorProps {
     tile: Tile;

@@ -71,7 +71,7 @@ export const MoneyExchangeTileEffectEditor: React.FC<TileEffectEditorProps<'mone
                 initialValue={input.inputArgs.type}
                 autoFocus={false}
                 enumMap={{
-                    default: MoneyExchangeType.UNSPECIFIED,
+                    default: MoneyExchangeType.DEFAULT,
                     'property tax': MoneyExchangeType.OWN_PROPERTY_PER_HUNDRED,
                 }}
                 onCommit={(exchangeType: MoneyExchangeType) => {
@@ -124,6 +124,35 @@ const CollectibleTileEffectEditor: React.FC<TileEffectEditorProps<'collectible'>
     );
 };
 
+const DetainedTileEffectEditor: React.FC<TileEffectEditorProps<'detained'>> = ({
+    input,
+    autoFocus,
+}) => {
+    return (
+        <React.Fragment>
+            <EnumInput
+                label="Detained type"
+                initialValue={input.inputArgs.type}
+                autoFocus={autoFocus}
+                enumMap={{
+                    Arrested: monopolypb.DetainedExtra_Type.ARRESTED,
+                    Hospitalized: monopolypb.DetainedExtra_Type.HOSPITALIZED,
+                }}
+                onCommit={(detainedType: monopolypb.DetainedExtra_Type) => {
+                    input.inputArgs.type = detainedType;
+                }}
+            />
+            <NumberInput
+                label="turns"
+                initialValue={input.inputArgs.length}
+                onCommit={(amount) => {
+                    input.inputArgs.length = amount;
+                }}
+            />
+        </React.Fragment>
+    );
+};
+
 export const TileEffectEditor: React.FC<TileEffectEditorProps<any>> = (props) => {
     let tileEffectEditor = null;
     let title = '';
@@ -144,6 +173,9 @@ export const TileEffectEditor: React.FC<TileEffectEditorProps<any>> = (props) =>
             title = 'collectible';
             tileEffectEditor = <CollectibleTileEffectEditor {...props} />;
             break;
+        case 'detained':
+            title = 'detained';
+            tileEffectEditor = <DetainedTileEffectEditor {...props} />;
     }
     return (
         <React.Fragment>

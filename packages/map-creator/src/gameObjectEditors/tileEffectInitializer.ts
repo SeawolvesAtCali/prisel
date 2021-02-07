@@ -47,7 +47,7 @@ export function tileEffectInitializer<T extends keyof TileEffectInputArgs>(
                 timing: monopolypb.TileEffect_Timing.LEAVING,
                 inputArgs: {
                     direction: MoneyExchangeDirection.FROM_BANK,
-                    type: MoneyExchangeType.UNSPECIFIED,
+                    type: MoneyExchangeType.DEFAULT,
                     amount: 0,
                 },
             };
@@ -65,5 +65,19 @@ export function tileEffectInitializer<T extends keyof TileEffectInputArgs>(
                 },
             };
             return collectable;
+        case 'detained':
+            const detained: TileEffectInput<'detained'> = {
+                display: {
+                    title: 'detained',
+                    description: 'stay at current tile for some turns and no action can be perform',
+                },
+                type: 'detained',
+                timing: monopolypb.TileEffect_Timing.STOPPING,
+                inputArgs: {
+                    type: monopolypb.DetainedExtra_Type.ARRESTED,
+                    length: 3,
+                },
+            };
+            return detained;
     }
 }

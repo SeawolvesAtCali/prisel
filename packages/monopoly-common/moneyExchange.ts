@@ -7,6 +7,6 @@ export enum MoneyExchangeDirection {
 }
 
 export enum MoneyExchangeType {
-    UNSPECIFIED, // the default, plain fixed amount exchange
+    DEFAULT, // the default, plain fixed amount exchange
     OWN_PROPERTY_PER_HUNDRED, // based on total worth of owned properties. For every hundred of worth, pay the amount.
 }

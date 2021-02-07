@@ -27,24 +27,25 @@ namespace Monopoly.Protobuf {
             "Chptb25vcG9seS90aWxlX2VmZmVjdC5wcm90bxIIbW9ub3BvbHkaIW1vbm9w",
             "b2x5L21vdmVfdG9fdGlsZV9leHRyYS5wcm90bxojbW9ub3BvbHkvbW9uZXlf",
             "ZXhjaGFuZ2VfZXh0cmEucHJvdG8aH21vbm9wb2x5L21vdmVfc3RlcHNfZXh0",
-            "cmEucHJvdG8aIG1vbm9wb2x5L2NvbGxlY3RpYmxlX2V4dHJhLnByb3RvIjcK",
-            "EVRpbGVFZmZlY3REaXNwbGF5Eg0KBXRpdGxlGAEgASgJEhMKC2Rlc2NyaXB0",
-            "aW9uGAIgASgJIpkDCgpUaWxlRWZmZWN0EiwKB2Rpc3BsYXkYASABKAsyGy5t",
-            "b25vcG9seS5UaWxlRWZmZWN0RGlzcGxheRIrCgZ0aW1pbmcYAiABKA4yGy5t",
-            "b25vcG9seS5UaWxlRWZmZWN0LlRpbWluZxIVCgt1bnNwZWNpZmllZBgDIAEo",
-            "CEgAEjEKDG1vdmVfdG9fdGlsZRgEIAEoCzIZLm1vbm9wb2x5Lk1vdmVUb1Rp",
-            "bGVFeHRyYUgAEjYKDm1vbmV5X2V4Y2hhbmdlGAUgASgLMhwubW9ub3BvbHku",
-            "TW9uZXlFeGNoYW5nZUV4dHJhSAASLgoKbW92ZV9zdGVwcxgGIAEoCzIYLm1v",
-            "bm9wb2x5Lk1vdmVTdGVwc0V4dHJhSAASMQoLY29sbGVjdGlibGUYByABKAsy",
-            "Gi5tb25vcG9seS5Db2xsZWN0aWJsZUV4dHJhSAAiQgoGVGltaW5nEg8KC1VO",
-            "U1BFQ0lGSUVEEAASDAoIRU5URVJJTkcQARIMCghTVE9QUElORxACEgsKB0xF",
-            "QVZJTkcQA0IHCgVleHRyYUIUqgIRTW9ub3BvbHkuUHJvdG9idWZiBnByb3Rv",
-            "Mw=="));
+            "cmEucHJvdG8aIG1vbm9wb2x5L2NvbGxlY3RpYmxlX2V4dHJhLnByb3RvGh1t",
+            "b25vcG9seS9kZXRhaW5lZF9leHRyYS5wcm90byI3ChFUaWxlRWZmZWN0RGlz",
+            "cGxheRINCgV0aXRsZRgBIAEoCRITCgtkZXNjcmlwdGlvbhgCIAEoCSLGAwoK",
+            "VGlsZUVmZmVjdBIsCgdkaXNwbGF5GAEgASgLMhsubW9ub3BvbHkuVGlsZUVm",
+            "ZmVjdERpc3BsYXkSKwoGdGltaW5nGAIgASgOMhsubW9ub3BvbHkuVGlsZUVm",
+            "ZmVjdC5UaW1pbmcSFQoLdW5zcGVjaWZpZWQYAyABKAhIABIxCgxtb3ZlX3Rv",
+            "X3RpbGUYBCABKAsyGS5tb25vcG9seS5Nb3ZlVG9UaWxlRXh0cmFIABI2Cg5t",
+            "b25leV9leGNoYW5nZRgFIAEoCzIcLm1vbm9wb2x5Lk1vbmV5RXhjaGFuZ2VF",
+            "eHRyYUgAEi4KCm1vdmVfc3RlcHMYBiABKAsyGC5tb25vcG9seS5Nb3ZlU3Rl",
+            "cHNFeHRyYUgAEjEKC2NvbGxlY3RpYmxlGAcgASgLMhoubW9ub3BvbHkuQ29s",
+            "bGVjdGlibGVFeHRyYUgAEisKCGRldGFpbmVkGAggASgLMhcubW9ub3BvbHku",
+            "RGV0YWluZWRFeHRyYUgAIkIKBlRpbWluZxIPCgtVTlNQRUNJRklFRBAAEgwK",
+            "CEVOVEVSSU5HEAESDAoIU1RPUFBJTkcQAhILCgdMRUFWSU5HEANCBwoFZXh0",
+            "cmFCFKoCEU1vbm9wb2x5LlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Monopoly.Protobuf.MoveToTileExtraReflection.Descriptor, global::Monopoly.Protobuf.MoneyExchangeExtraReflection.Descriptor, global::Monopoly.Protobuf.MoveStepsExtraReflection.Descriptor, global::Monopoly.Protobuf.CollectibleExtraReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Monopoly.Protobuf.MoveToTileExtraReflection.Descriptor, global::Monopoly.Protobuf.MoneyExchangeExtraReflection.Descriptor, global::Monopoly.Protobuf.MoveStepsExtraReflection.Descriptor, global::Monopoly.Protobuf.CollectibleExtraReflection.Descriptor, global::Monopoly.Protobuf.DetainedExtraReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.TileEffectDisplay), global::Monopoly.Protobuf.TileEffectDisplay.Parser, new[]{ "Title", "Description" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.TileEffect), global::Monopoly.Protobuf.TileEffect.Parser, new[]{ "Display", "Timing", "Unspecified", "MoveToTile", "MoneyExchange", "MoveSteps", "Collectible" }, new[]{ "Extra" }, new[]{ typeof(global::Monopoly.Protobuf.TileEffect.Types.Timing) }, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.TileEffect), global::Monopoly.Protobuf.TileEffect.Parser, new[]{ "Display", "Timing", "Unspecified", "MoveToTile", "MoneyExchange", "MoveSteps", "Collectible", "Detained" }, new[]{ "Extra" }, new[]{ typeof(global::Monopoly.Protobuf.TileEffect.Types.Timing) }, null, null)
           }));
     }
     #endregion
@@ -310,6 +311,9 @@ namespace Monopoly.Protobuf {
         case ExtraOneofCase.Collectible:
           Collectible = other.Collectible.Clone();
           break;
+        case ExtraOneofCase.Detained:
+          Detained = other.Detained.Clone();
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -397,6 +401,17 @@ namespace Monopoly.Protobuf {
       }
     }
 
+    /// <summary>Field number for the "detained" field.</summary>
+    public const int DetainedFieldNumber = 8;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Monopoly.Protobuf.DetainedExtra Detained {
+      get { return extraCase_ == ExtraOneofCase.Detained ? (global::Monopoly.Protobuf.DetainedExtra) extra_ : null; }
+      set {
+        extra_ = value;
+        extraCase_ = value == null ? ExtraOneofCase.None : ExtraOneofCase.Detained;
+      }
+    }
+
     private object extra_;
     /// <summary>Enum of possible cases for the "extra" oneof.</summary>
     public enum ExtraOneofCase {
@@ -406,6 +421,7 @@ namespace Monopoly.Protobuf {
       MoneyExchange = 5,
       MoveSteps = 6,
       Collectible = 7,
+      Detained = 8,
     }
     private ExtraOneofCase extraCase_ = ExtraOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -439,6 +455,7 @@ namespace Monopoly.Protobuf {
       if (!object.Equals(MoneyExchange, other.MoneyExchange)) return false;
       if (!object.Equals(MoveSteps, other.MoveSteps)) return false;
       if (!object.Equals(Collectible, other.Collectible)) return false;
+      if (!object.Equals(Detained, other.Detained)) return false;
       if (ExtraCase != other.ExtraCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -453,6 +470,7 @@ namespace Monopoly.Protobuf {
       if (extraCase_ == ExtraOneofCase.MoneyExchange) hash ^= MoneyExchange.GetHashCode();
       if (extraCase_ == ExtraOneofCase.MoveSteps) hash ^= MoveSteps.GetHashCode();
       if (extraCase_ == ExtraOneofCase.Collectible) hash ^= Collectible.GetHashCode();
+      if (extraCase_ == ExtraOneofCase.Detained) hash ^= Detained.GetHashCode();
       hash ^= (int) extraCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -498,6 +516,10 @@ namespace Monopoly.Protobuf {
         output.WriteRawTag(58);
         output.WriteMessage(Collectible);
       }
+      if (extraCase_ == ExtraOneofCase.Detained) {
+        output.WriteRawTag(66);
+        output.WriteMessage(Detained);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -535,6 +557,10 @@ namespace Monopoly.Protobuf {
         output.WriteRawTag(58);
         output.WriteMessage(Collectible);
       }
+      if (extraCase_ == ExtraOneofCase.Detained) {
+        output.WriteRawTag(66);
+        output.WriteMessage(Detained);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -564,6 +590,9 @@ namespace Monopoly.Protobuf {
       }
       if (extraCase_ == ExtraOneofCase.Collectible) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Collectible);
+      }
+      if (extraCase_ == ExtraOneofCase.Detained) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Detained);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -612,6 +641,12 @@ namespace Monopoly.Protobuf {
             Collectible = new global::Monopoly.Protobuf.CollectibleExtra();
           }
           Collectible.MergeFrom(other.Collectible);
+          break;
+        case ExtraOneofCase.Detained:
+          if (Detained == null) {
+            Detained = new global::Monopoly.Protobuf.DetainedExtra();
+          }
+          Detained.MergeFrom(other.Detained);
           break;
       }
 
@@ -680,6 +715,15 @@ namespace Monopoly.Protobuf {
             Collectible = subBuilder;
             break;
           }
+          case 66: {
+            global::Monopoly.Protobuf.DetainedExtra subBuilder = new global::Monopoly.Protobuf.DetainedExtra();
+            if (extraCase_ == ExtraOneofCase.Detained) {
+              subBuilder.MergeFrom(Detained);
+            }
+            input.ReadMessage(subBuilder);
+            Detained = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -743,6 +787,15 @@ namespace Monopoly.Protobuf {
             }
             input.ReadMessage(subBuilder);
             Collectible = subBuilder;
+            break;
+          }
+          case 66: {
+            global::Monopoly.Protobuf.DetainedExtra subBuilder = new global::Monopoly.Protobuf.DetainedExtra();
+            if (extraCase_ == ExtraOneofCase.Detained) {
+              subBuilder.MergeFrom(Detained);
+            }
+            input.ReadMessage(subBuilder);
+            Detained = subBuilder;
             break;
           }
         }

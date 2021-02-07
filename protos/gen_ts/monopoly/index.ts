@@ -15,6 +15,7 @@ export * from "./announce_start_turn_spec";
 export * from "./chance";
 export * from "./collectible_extra";
 export * from "./coordinate";
+export * from "./detained_extra";
 export * from "./game_player";
 export * from "./get_initial_state_spec";
 export * from "./money_exchange_extra";

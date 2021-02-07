@@ -5,8 +5,7 @@ export interface TileEffectInputArgs {
     unspecified: {};
     move_to_tile: {
         tileId: string;
-        // for tile effect, it is strange if player is already walking and we
-        // ask them to continue walking. We will always use teleport.
+        isTeleport: boolean;
     };
     money_exchange: {
         direction: MoneyExchangeDirection;

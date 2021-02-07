@@ -10,6 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { DetainedExtra } from "./detained_extra";
 import { CollectibleExtra } from "./collectible_extra";
 import { MoveStepsExtra } from "./move_steps_extra";
 import { MoneyExchangeExtra } from "./money_exchange_extra";
@@ -75,6 +76,12 @@ export interface TileEffect {
          * @generated from protobuf field: monopoly.CollectibleExtra collectible = 7;
          */
         collectible: CollectibleExtra;
+    } | {
+        oneofKind: "detained";
+        /**
+         * @generated from protobuf field: monopoly.DetainedExtra detained = 8;
+         */
+        detained: DetainedExtra;
     } | {
         oneofKind: undefined;
     };
@@ -174,7 +181,8 @@ class TileEffect$Type extends MessageType<TileEffect> {
             { no: 4, name: "move_to_tile", kind: "message", oneof: "extra", T: () => MoveToTileExtra },
             { no: 5, name: "money_exchange", kind: "message", oneof: "extra", T: () => MoneyExchangeExtra },
             { no: 6, name: "move_steps", kind: "message", oneof: "extra", T: () => MoveStepsExtra },
-            { no: 7, name: "collectible", kind: "message", oneof: "extra", T: () => CollectibleExtra }
+            { no: 7, name: "collectible", kind: "message", oneof: "extra", T: () => CollectibleExtra },
+            { no: 8, name: "detained", kind: "message", oneof: "extra", T: () => DetainedExtra }
         ]);
     }
     create(value?: PartialMessage<TileEffect>): TileEffect {
@@ -224,6 +232,12 @@ class TileEffect$Type extends MessageType<TileEffect> {
                         collectible: CollectibleExtra.internalBinaryRead(reader, reader.uint32(), options, (message.extra as any).collectible)
                     };
                     break;
+                case /* monopoly.DetainedExtra detained */ 8:
+                    message.extra = {
+                        oneofKind: "detained",
+                        detained: DetainedExtra.internalBinaryRead(reader, reader.uint32(), options, (message.extra as any).detained)
+                    };
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -257,6 +271,9 @@ class TileEffect$Type extends MessageType<TileEffect> {
         /* monopoly.CollectibleExtra collectible = 7; */
         if (message.extra.oneofKind === "collectible")
             CollectibleExtra.internalBinaryWrite(message.extra.collectible, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        /* monopoly.DetainedExtra detained = 8; */
+        if (message.extra.oneofKind === "detained")
+            DetainedExtra.internalBinaryWrite(message.extra.detained, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -1,6 +1,6 @@
 import { ChanceInputArgs } from '@prisel/monopoly-common';
 import { log } from '../log';
-import { ChanceHandler } from './ChanceHander';
+import { ChanceHandler } from './ChanceHandler';
 import { collectibleHandler } from './CollectibleHandler';
 import { moneyExchangeHandler } from './MoneyExchangeHandler';
 import { moveStepsHandler } from './MoveStepsHandler';

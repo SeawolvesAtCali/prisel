@@ -5,7 +5,7 @@ import assert from 'assert';
 import { Moved } from '../stateMachine/Moved';
 import { getPanAnimationLength } from '../stateMachine/utils';
 import { getRand } from '../utils';
-import { ChanceHandler } from './ChanceHander';
+import { ChanceHandler } from './ChanceHandler';
 
 const MAX_PATH_LENGTH = 1000;
 

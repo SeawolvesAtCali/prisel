@@ -9,7 +9,7 @@ import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
 import { log } from '../log';
 import { getPlayer } from '../utils';
-import { ChanceHandler } from './ChanceHander';
+import { ChanceHandler } from './ChanceHandler';
 
 export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game, input) => {
     const currentPlayer = game.getCurrentPlayer();

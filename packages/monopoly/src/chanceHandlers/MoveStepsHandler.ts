@@ -2,7 +2,7 @@ import { Action, Anim, animationMap, exist, Tile } from '@prisel/monopoly-common
 import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
 import { Moved } from '../stateMachine/Moved';
-import { ChanceHandler } from './ChanceHander';
+import { ChanceHandler } from './ChanceHandler';
 
 export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input) => {
     const inputArgs = input.inputArgs;

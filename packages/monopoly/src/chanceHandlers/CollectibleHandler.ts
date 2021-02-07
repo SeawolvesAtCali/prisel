@@ -1,7 +1,7 @@
 import { Action, Anim, animationMap } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
-import { ChanceHandler } from './ChanceHander';
+import { ChanceHandler } from './ChanceHandler';
 
 export const collectibleHandler: ChanceHandler<'collectible'> = async (game, input) => {
     const currentPlayer = game.getCurrentPlayer();

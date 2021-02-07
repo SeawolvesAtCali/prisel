@@ -1,8 +1,8 @@
 import {
-    ChanceInput,
-    ChanceInputArgs,
     MoneyExchangeDirection,
     MoneyExchangeType,
+    TileEffectInput,
+    TileEffectInputArgs,
 } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import React from 'react';
@@ -12,12 +12,12 @@ import { NumberInput } from './NumberInput';
 import { StringInput } from './StringInput';
 import { TileSelectInput } from './TileSelectInput';
 
-interface ChanceEditorProps<T extends keyof ChanceInputArgs> {
+interface TileEffectEditorProps<T extends keyof TileEffectInputArgs> {
     autoFocus?: boolean;
-    input: ChanceInput<T>;
+    input: TileEffectInput<T>;
 }
 
-const MoveToTileChanceEditor: React.FC<ChanceEditorProps<'move_to_tile'>> = ({
+const MoveToTileTileEffectEditor: React.FC<TileEffectEditorProps<'move_to_tile'>> = ({
     input,
     autoFocus = false,
 }) => {
@@ -46,7 +46,7 @@ const MoveToTileChanceEditor: React.FC<ChanceEditorProps<'move_to_tile'>> = ({
     );
 };
 
-export const MoneyExchangeChanceEditor: React.FC<ChanceEditorProps<'money_exchange'>> = ({
+export const MoneyExchangeTileEffectEditor: React.FC<TileEffectEditorProps<'money_exchange'>> = ({
     autoFocus = false,
     input,
 }) => {
@@ -89,7 +89,7 @@ export const MoneyExchangeChanceEditor: React.FC<ChanceEditorProps<'money_exchan
     );
 };
 
-const MoveStepsChanceEditor: React.FC<ChanceEditorProps<'move_steps'>> = ({
+const MoveStepsTileEffectEditor: React.FC<TileEffectEditorProps<'move_steps'>> = ({
     input,
     autoFocus = false,
 }) => {
@@ -105,7 +105,7 @@ const MoveStepsChanceEditor: React.FC<ChanceEditorProps<'move_steps'>> = ({
     );
 };
 
-const CollectibleChanceEditor: React.FC<ChanceEditorProps<'collectible'>> = ({
+const CollectibleTileEffectEditor: React.FC<TileEffectEditorProps<'collectible'>> = ({
     input,
     autoFocus,
 }) => {
@@ -124,25 +124,25 @@ const CollectibleChanceEditor: React.FC<ChanceEditorProps<'collectible'>> = ({
     );
 };
 
-export const ChanceEditor: React.FC<ChanceEditorProps<any>> = (props) => {
-    let chanceEditor = null;
+export const TileEffectEditor: React.FC<TileEffectEditorProps<any>> = (props) => {
+    let tileEffectEditor = null;
     let title = '';
-    switch (props.input.type as keyof ChanceInputArgs) {
+    switch (props.input.type as keyof TileEffectInputArgs) {
         case 'move_to_tile':
             title = 'move to tile';
-            chanceEditor = <MoveToTileChanceEditor {...props} />;
+            tileEffectEditor = <MoveToTileTileEffectEditor {...props} />;
             break;
         case 'money_exchange':
             title = 'cash exchange';
-            chanceEditor = <MoneyExchangeChanceEditor {...props} />;
+            tileEffectEditor = <MoneyExchangeTileEffectEditor {...props} />;
             break;
         case 'move_steps':
             title = 'move steps';
-            chanceEditor = <MoveStepsChanceEditor {...props} />;
+            tileEffectEditor = <MoveStepsTileEffectEditor {...props} />;
             break;
         case 'collectible':
             title = 'collectible';
-            chanceEditor = <CollectibleChanceEditor {...props} />;
+            tileEffectEditor = <CollectibleTileEffectEditor {...props} />;
             break;
     }
     return (
@@ -162,7 +162,7 @@ export const ChanceEditor: React.FC<ChanceEditorProps<any>> = (props) => {
                     props.input.display.description = value;
                 }}
             />
-            {chanceEditor}
+            {tileEffectEditor}
         </React.Fragment>
     );
 };

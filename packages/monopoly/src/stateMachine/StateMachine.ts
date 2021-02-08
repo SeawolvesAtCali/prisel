@@ -1,10 +1,17 @@
 import { exist } from '@prisel/monopoly-common';
-import { assertExist } from '@prisel/server';
+import { assertExist, assertNever } from '@prisel/server';
 import Game from '../Game';
 import { log } from '../log';
+import { GameOver } from './GameOver';
+import { GameStarted } from './GameStarted';
+import { IStateMachine } from './IStateMachine';
+import { Moved } from './Moved';
+import { Moving } from './Moving';
+import { PreRoll } from './PreRoll';
+import { State } from './stateEnum';
 import { StateMachineState } from './StateMachineState';
 
-export class StateMachine {
+export class StateMachine implements IStateMachine {
     private currentState?: StateMachineState;
     private game: Game;
     private onEnd?: () => void;
@@ -12,8 +19,25 @@ export class StateMachine {
         this.game = game;
     }
 
-    public init(initialStateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {
-        this.currentState = new initialStateClass(this.game, this);
+    private getStateFromEnum(state: State): StateMachineState {
+        switch (state) {
+            case State.GAME_STARTED:
+                return new GameStarted(this.game, this);
+            case State.PRE_ROLL:
+                return new PreRoll(this.game, this);
+            case State.MOVING:
+                return new Moving(this.game, this);
+            case State.MOVED:
+                return new Moved(this.game, this);
+            case State.GAME_OVER:
+                return new GameOver(this.game, this);
+            default:
+                assertNever(state);
+        }
+    }
+
+    public init(initialState: State) {
+        this.currentState = this.getStateFromEnum(initialState);
         this.game.stateMachine = this;
         this.currentState.onEnter();
     }
@@ -33,7 +57,7 @@ export class StateMachine {
         }
     }
 
-    public transition(stateClass: { new (game: Game, machine: StateMachine): StateMachineState }) {
+    public transition(state: State) {
         setImmediate(() => {
             const previousState = this.currentState;
             if (previousState) {
@@ -41,7 +65,7 @@ export class StateMachine {
             } else {
                 log.warn('no previous state to transition from.');
             }
-            this.currentState = new stateClass(this.game, this);
+            this.currentState = this.getStateFromEnum(state);
             log.info(
                 `transition from ${previousState?.[Symbol.toStringTag]} to ${
                     this.currentState[Symbol.toStringTag]

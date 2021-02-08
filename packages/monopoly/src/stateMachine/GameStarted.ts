@@ -2,8 +2,7 @@ import { Action, Anim, animationMap, GamePlayer, toAnimationPacket } from '@pris
 import { monopolypb } from '@prisel/protos';
 import { Packet, Request, Response } from '@prisel/server';
 import { getPlayer } from '../utils';
-import { GameOver } from './GameOver';
-import { PreRoll } from './PreRoll';
+import { State } from './stateEnum';
 import { StateMachineState } from './StateMachineState';
 import { Sync, syncGamePlayer } from './utils';
 
@@ -69,7 +68,7 @@ export class GameStarted extends StateMachineState {
                             if (this.isTransitioned()) {
                                 return;
                             }
-                            this.transition(PreRoll);
+                            this.transition(State.PRE_ROLL);
                         }
                     }
                 })();
@@ -88,7 +87,7 @@ export class GameStarted extends StateMachineState {
                 .build(),
         );
 
-        this.transition(GameOver);
+        this.transition(State.GAME_OVER);
     }
 
     public get [Symbol.toStringTag]() {

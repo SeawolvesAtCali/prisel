@@ -1,7 +1,7 @@
 import { Action, Anim, animationMap, exist, Tile } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
-import { Moved } from '../stateMachine/Moved';
+import { State } from '../stateMachine/stateEnum';
 import { ChanceHandler } from './ChanceHandler';
 
 export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input) => {
@@ -51,5 +51,5 @@ export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input)
             })
             .setLength(animationMap.move * path.length),
     ).promise;
-    return Moved;
+    return State.MOVED;
 };

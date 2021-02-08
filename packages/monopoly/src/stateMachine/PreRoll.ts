@@ -4,8 +4,7 @@ import { assertExist, Packet, Request, Response } from '@prisel/server';
 import { FIXED_STEPS, USE_FIXED_STEPS } from '../defaultFlags';
 import { flags } from '../flags';
 import { getPlayer } from '../utils';
-import { GameOver } from './GameOver';
-import { Moved } from './Moved';
+import { State } from './stateEnum';
 import { StateMachineState } from './StateMachineState';
 
 /**
@@ -124,7 +123,7 @@ export class PreRoll extends StateMachineState {
                         ),
                     ).promise.then(() => {
                         if (this.isCurrent()) {
-                            this.transition(Moved);
+                            this.transition(State.MOVED);
                         }
                     });
 
@@ -142,7 +141,7 @@ export class PreRoll extends StateMachineState {
                 })
                 .build(),
         );
-        this.transition(GameOver);
+        this.transition(State.GAME_OVER);
     }
     public get [Symbol.toStringTag]() {
         return 'PreRoll';

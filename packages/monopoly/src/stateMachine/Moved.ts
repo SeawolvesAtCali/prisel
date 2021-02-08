@@ -12,8 +12,7 @@ import { assertExist, Packet, Request } from '@prisel/server';
 import { chanceHandlers } from '../chanceHandlers/index';
 import { log } from '../log';
 import { getPlayer, getRand } from '../utils';
-import { GameOver } from './GameOver';
-import { PreRoll } from './PreRoll';
+import { State } from './stateEnum';
 import { StateMachineState } from './StateMachineState';
 import { getPanAnimationLength } from './utils';
 
@@ -83,7 +82,7 @@ export class Moved extends StateMachineState {
             return;
         }
         this.game.giveTurnToNext();
-        this.transition(PreRoll);
+        this.transition(State.PRE_ROLL);
     }
 
     private async processPropertyManagement() {
@@ -118,7 +117,7 @@ export class Moved extends StateMachineState {
             if (player.money < 0) {
                 // player bankrupted.
                 this.announceBankrupt(player);
-                this.transition(GameOver);
+                this.transition(State.GAME_OVER);
                 return true;
             }
         }
@@ -326,7 +325,7 @@ export class Moved extends StateMachineState {
                 })
                 .build(),
         );
-        this.transition(GameOver);
+        this.transition(State.GAME_OVER);
     }
 
     public get [Symbol.toStringTag]() {

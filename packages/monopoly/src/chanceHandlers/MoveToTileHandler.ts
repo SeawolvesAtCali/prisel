@@ -2,7 +2,7 @@ import { Action, Anim, animationMap, exist, Tile } from '@prisel/monopoly-common
 import { monopolypb } from '@prisel/protos';
 import { assertExist, Packet } from '@prisel/server';
 import assert from 'assert';
-import { Moved } from '../stateMachine/Moved';
+import { State } from '../stateMachine/stateEnum';
 import { getPanAnimationLength } from '../stateMachine/utils';
 import { getRand } from '../utils';
 import { ChanceHandler } from './ChanceHandler';
@@ -74,7 +74,7 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
                     .build(),
             ),
         ).promise;
-        return Moved;
+        return State.MOVED;
     }
 
     const path = currentTile.genPathWith((current, length) => {
@@ -123,5 +123,5 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
             .setLength(animationMap.move * coordinates.length),
     ).promise;
 
-    return Moved;
+    return State.MOVED;
 };

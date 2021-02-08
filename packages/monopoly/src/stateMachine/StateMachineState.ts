@@ -1,15 +1,16 @@
 import { GamePlayer } from '@prisel/monopoly-common';
 import { Packet } from '@prisel/server';
 import Game from '../Game';
-import { StateMachine } from './StateMachine';
+import { IStateMachine } from './IStateMachine';
+import { State } from './stateEnum';
 
-export type StateMachineConstructor = new (game: Game, machine: StateMachine) => StateMachineState;
+export type StateMachineConstructor = new (game: Game, machine: IStateMachine) => StateMachineState;
 export abstract class StateMachineState {
     protected game: Game;
-    private machine: StateMachine;
-    private pendingTransition?: StateMachineConstructor;
+    private machine: IStateMachine;
+    private pendingTransition?: State;
 
-    constructor(game: Game, machine: StateMachine) {
+    constructor(game: Game, machine: IStateMachine) {
         this.game = game;
         this.machine = machine;
     }
@@ -43,7 +44,7 @@ export abstract class StateMachineState {
     // implement this for state name
     public abstract get [Symbol.toStringTag](): string;
 
-    protected transition(state: StateMachineConstructor) {
+    protected transition(state: State) {
         if (this.isCurrent()) {
             this.pendingTransition = state;
             this.machine.transition(state);

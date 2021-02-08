@@ -3,7 +3,7 @@ import { GameConfig, Packet, Player } from '@prisel/server';
 import Game from './Game';
 import { log } from './log';
 import { createIntialState } from './state';
-import { GameStarted } from './stateMachine/GameStarted';
+import { State } from './stateMachine/stateEnum';
 import { StateMachine } from './stateMachine/StateMachine';
 
 const MonopolyGameConfig: GameConfig = {
@@ -45,7 +45,7 @@ const MonopolyGameConfig: GameConfig = {
                 .filter((action) => action !== Action.UNSPECIFIED && action !== Action.DEBUG) // filter out UNSPECIFIED
                 .forEach((action) => room.listenGamePacket(action, handleGamePacket));
 
-            stateMachine.init(GameStarted);
+            stateMachine.init(State.GAME_STARTED);
             await new Promise<void>((resolve) => {
                 stateMachine.setOnEnd(resolve);
             });

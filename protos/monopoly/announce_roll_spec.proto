@@ -13,6 +13,8 @@ message AnnounceRollPayload {
   };
   string player = 1;
   int32 steps = 2;
-  repeated Coordinate path = 3;
+  // the position of the player before moving. This is used to make sure the
+  // rendering of the player is in sync on all clients.
+  Coordinate current_position = 3;
   int32 my_money = 4;
 }

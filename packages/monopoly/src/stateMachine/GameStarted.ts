@@ -51,27 +51,26 @@ export class GameStarted extends StateMachineState {
                 }
                 return true;
             case Action.READY_TO_START_GAME:
-                (async () => {
-                    if (!this.sync?.has(gamePlayer.id)) {
-                        const startAndPan = Anim.sequence(
-                            Anim.create('game_start').setLength(animationMap.game_start),
-                            Anim.create('pan', monopolypb.PanExtra)
-                                .setExtra({
-                                    target: this.game.getCurrentPlayer().pathTile?.get().position,
-                                })
-                                .setLength(300),
-                        );
-                        getPlayer(gamePlayer).emit(toAnimationPacket(startAndPan));
-                        this.sync?.add(gamePlayer.id);
-                        if (this.sync?.isSynced()) {
-                            await Anim.wait(startAndPan).promise;
-                            if (this.isTransitioned()) {
-                                return;
-                            }
-                            this.transition(State.PRE_ROLL);
-                        }
-                    }
-                })();
+                if (this.sync?.has(gamePlayer.id)) {
+                    return true;
+                }
+                const startAndPan = Anim.sequence(
+                    Anim.create('game_start').setLength(animationMap.game_start),
+                    Anim.create('pan', monopolypb.PanExtra)
+                        .setExtra({
+                            target: this.game.getCurrentPlayer().pathTile?.get().position,
+                        })
+                        .setLength(300),
+                );
+                getPlayer(gamePlayer).emit(toAnimationPacket(startAndPan));
+                this.sync?.add(gamePlayer.id);
+                if (this.sync?.isSynced()) {
+                    Anim.wait(startAndPan, { token: this.token }).then(() => {
+                        this.transition({
+                            state: State.PRE_ROLL,
+                        });
+                    });
+                }
                 return true;
         }
         return false;
@@ -87,10 +86,8 @@ export class GameStarted extends StateMachineState {
                 .build(),
         );
 
-        this.transition(State.GAME_OVER);
+        this.transition({ state: State.GAME_OVER });
     }
 
-    public get [Symbol.toStringTag]() {
-        return 'GameStarted';
-    }
+    public readonly [Symbol.toStringTag] = 'GameStarted';
 }

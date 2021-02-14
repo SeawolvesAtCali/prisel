@@ -156,7 +156,7 @@ export default class Game extends cc.Component {
             'playerNode in handleAnnounceRoll',
         );
         const playerComponent = playerNode.getComponent(Player);
-        playerComponent.pos = announceRollPayload.path.slice(-1)[0];
+        playerComponent.pos = announceRollPayload.currentPosition;
     }
 
     private handleAnnouncePayRent(packet: Packet) {

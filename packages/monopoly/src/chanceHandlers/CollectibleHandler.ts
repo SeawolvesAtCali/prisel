@@ -24,15 +24,13 @@ export const collectibleHandler: ChanceHandler<'collectible'> = async (game, inp
             .build(),
     );
 
-    await Anim.processAndWait(
-        (packet) => {
-            game.broadcast(packet);
-        },
+    await Anim.wait(
         Anim.create('player_emotion', monopolypb.PlayerEmotionExtra)
             .setExtra({
                 player: currentPlayer.getGamePlayerInfo(),
                 emotion: monopolypb.PlayerEmotionExtra_EmotionType.CHEER,
             })
             .setLength(animationMap.player_emotion),
+        { onStart: game.broadcast.bind(game) },
     );
 };

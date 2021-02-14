@@ -75,15 +75,17 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
             .build(),
     );
 
-    await Anim.processAndWait(
-        (animation) => {
-            getPlayer(currentPlayer).emit(animation);
-        },
+    await Anim.wait(
         Anim.create('player_emotion', monopolypb.PlayerEmotionExtra)
             .setExtra({
                 player: currentPlayer.getGamePlayerInfo(),
                 emotion: playerEmotion,
             })
             .setLength(animationMap.player_emotion),
-    ).promise;
+        {
+            onStart: (animation) => {
+                getPlayer(currentPlayer).emit(animation);
+            },
+        },
+    );
 };

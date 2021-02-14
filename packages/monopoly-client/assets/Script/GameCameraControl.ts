@@ -55,7 +55,7 @@ export default class GameCameraControl extends cc.Component {
                     : null;
                 if (currentGamePlayerNode) {
                     this.startFollowing(currentGamePlayerNode);
-                    await Anim.wait(anim).promise;
+                    await Anim.wait(anim);
                     this.stopFollowing();
                     this.moveToTileAtPos(moveExtra.path.slice(-1)[0]);
                 }

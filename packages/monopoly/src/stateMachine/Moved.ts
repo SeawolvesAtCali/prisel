@@ -8,7 +8,7 @@ import {
     Property,
 } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { assertExist, Packet, Request } from '@prisel/server';
+import { assertExist, Packet, Request, Token } from '@prisel/server';
 import { chanceHandlers } from '../chanceHandlers/index';
 import { log } from '../log';
 import { getPlayer, getRand } from '../utils';
@@ -41,13 +41,9 @@ export class Moved extends StateMachineState {
     public async onEnter() {
         const currentPlayer = this.game.getCurrentPlayer();
 
-        await this.processPropertyManagement();
-        if (this.isTransitioned()) {
-            return;
-        }
-
-        await this.processChance();
-        if (this.isTransitioned()) {
+        await this.startCoroutine(this.processPropertyManagement());
+        await this.startCoroutine(this.processChance());
+        if (this.token.cancelled) {
             return;
         }
 
@@ -69,23 +65,23 @@ export class Moved extends StateMachineState {
             'nextPlayerPos',
         );
 
-        await Anim.processAndWait(
-            this.broadcastAnimation,
+        await Anim.wait(
             Anim.create('pan', monopolypb.PanExtra)
                 .setExtra({
                     target: nextPlayerPos,
                 })
                 .setLength(getPanAnimationLength(currentPlayerPos, nextPlayerPos))
                 .build(),
-        ).promise;
-        if (!this.isCurrent()) {
+            { onStart: this.broadcastAnimation },
+        );
+        if (this.token.cancelled) {
             return;
         }
         this.game.giveTurnToNext();
-        this.transition(State.PRE_ROLL);
+        this.transition({ state: State.PRE_ROLL });
     }
 
-    private async processPropertyManagement() {
+    private *processPropertyManagement() {
         const currentPlayer = this.game.getCurrentPlayer();
         const currentPathTile = assertExist(currentPlayer.pathTile?.get(), 'currentPathTile');
 
@@ -93,21 +89,8 @@ export class Moved extends StateMachineState {
             const properties = currentPathTile.hasProperties.map((propertyRef) =>
                 propertyRef.get(),
             );
-            const handlePayRentPromise = this.handlePayRents(properties, currentPlayer);
-            if (handlePayRentPromise) {
-                await handlePayRentPromise;
-                if (this.isTransitioned()) {
-                    return;
-                }
-            }
-
-            const investPromise = this.handleInvest(properties, currentPlayer);
-            if (investPromise) {
-                await investPromise;
-                if (this.isTransitioned()) {
-                    return;
-                }
-            }
+            yield* this.handlePayRents(properties, currentPlayer);
+            yield* this.handleInvest(properties, currentPlayer);
         }
         this.checkGameOver();
     }
@@ -117,7 +100,7 @@ export class Moved extends StateMachineState {
             if (player.money < 0) {
                 // player bankrupted.
                 this.announceBankrupt(player);
-                this.transition(State.GAME_OVER);
+                this.transition({ state: State.GAME_OVER });
                 return true;
             }
         }
@@ -125,7 +108,7 @@ export class Moved extends StateMachineState {
     }
 
     // return true if should continue current state
-    private async processChance() {
+    private *processChance() {
         const currentPlayer = this.game.getCurrentPlayer();
         const currentTile = assertExist(currentPlayer.pathTile?.get(), 'currentTile');
 
@@ -139,8 +122,7 @@ export class Moved extends StateMachineState {
         if (!exist(chanceInput)) {
             return;
         }
-        await Anim.processAndWait(
-            this.broadcastAnimation,
+        yield Anim.wait(
             Anim.create('open_chance_chest', monopolypb.OpenChanceChestExtra)
                 .setExtra({
                     chanceChestTile: currentTile.position,
@@ -148,52 +130,36 @@ export class Moved extends StateMachineState {
                 })
                 .setLength(animationMap.open_chance_chest)
                 .build(),
-        ).promise;
-
-        if (this.isTransitioned()) {
-            return;
-        }
-
-        // wait for current player to dismiss the chance card
-        await getPlayer(this.game.getCurrentPlayer()).request(
-            Request.forAction(Action.PROMPT_CHANCE_CONFIRMATION),
-            10000,
+            { onStart: this.broadcastAnimation, token: this.token },
         );
 
-        if (this.isTransitioned()) {
-            return;
-        }
+        // wait for current player to dismiss the chance card
+        yield getPlayer(this.game.getCurrentPlayer()).request(
+            Request.forAction(Action.PROMPT_CHANCE_CONFIRMATION),
+            Token.delay(10000),
+        );
 
-        await Anim.processAndWait(
-            this.broadcastAnimation,
+        yield Anim.wait(
             Anim.create('dismiss_chance_card').setLength(animationMap.dismiss_chance_card).build(),
-        ).promise;
-        if (this.isTransitioned()) {
-            return;
-        }
+            { onStart: this.broadcastAnimation },
+        );
 
         const chanceType = (chanceInput.type as keyof ChanceInputArgs) || 'unspecified';
-        const maybeState = await chanceHandlers[chanceType](this.game, chanceInput);
+        const maybeTransition = yield chanceHandlers[chanceType](this.game, chanceInput);
 
-        if (this.isTransitioned()) {
-            return;
-        }
         // check game over
         if (this.checkGameOver()) {
             return;
         }
-        if (maybeState) {
-            this.transition(maybeState);
+        if (maybeTransition) {
+            this.transition(maybeTransition);
             return;
         }
 
         return;
     }
 
-    private handlePayRents(
-        properties: Property[],
-        currentPlayer: GamePlayer,
-    ): Promise<void> | void {
+    private *handlePayRents(properties: Property[], currentPlayer: GamePlayer) {
         const rentPayments: monopolypb.Payment[] = [];
 
         // check for rent payment first
@@ -209,8 +175,7 @@ export class Moved extends StateMachineState {
             return;
         }
         this.announcePayRent(rentPayments);
-        return Anim.processAndWait(
-            this.broadcastAnimation,
+        yield Anim.wait(
             Anim.create('pay_rent', monopolypb.PayRentExtra)
                 .setExtra({
                     // TODO: here we assume we are paying one player only
@@ -219,17 +184,15 @@ export class Moved extends StateMachineState {
                 })
                 .setLength(animationMap.pay_rent)
                 .build(),
-        ).promise;
+            { token: this.token, onStart: this.broadcastAnimation },
+        );
     }
 
-    private handleInvest(
-        properties: Property[],
-        currentPlayer: GamePlayer,
-    ): Promise<void> | undefined {
+    private *handleInvest(properties: Property[], currentPlayer: GamePlayer) {
         if (!properties.some((property) => property.investable(currentPlayer))) {
             return;
         }
-        return this.promptForPurchases(properties);
+        yield* this.promptForPurchases(properties);
     }
 
     private announceBankrupt(player: GamePlayer) {
@@ -254,7 +217,7 @@ export class Moved extends StateMachineState {
         });
     }
 
-    private async promptForPurchases(properties: Property[]) {
+    private *promptForPurchases(properties: Property[]) {
         const currentPlayer = this.game.getCurrentPlayer();
 
         for (const property of properties) {
@@ -272,20 +235,15 @@ export class Moved extends StateMachineState {
 
             // TODO it might happen that a player left and force the game to
             // end while we are waiting for current player.
-            const response = await getPlayer(currentPlayer).request(
+            const response = yield getPlayer(currentPlayer).request(
                 Request.forAction(Action.PROMPT_PURCHASE).setPayload(
                     monopolypb.PromptPurchaseRequest,
                     propertyForPurchase,
                 ),
-                0, // 0 timeout means no timeout
+                this.token, // no timeout
             );
 
-            if (!this.isCurrent()) {
-                return;
-            }
             log.info('receive response for purchase' + JSON.stringify(response));
-            // although client shouldn't send a error response, let's just
-            // check the status as well
             if (!Packet.isStatusOk(response)) {
                 return;
             }
@@ -302,16 +260,13 @@ export class Moved extends StateMachineState {
                         .build(),
                 );
 
-                await Anim.processAndWait(
-                    this.broadcastAnimation,
+                yield Anim.wait(
                     Anim.create('invested', monopolypb.InvestedExtra)
                         .setExtra({ property: property.getBasicPropertyInfo() })
                         .setLength(animationMap.invested)
                         .build(),
-                ).promise;
-                if (!this.isCurrent()) {
-                    return;
-                }
+                    { token: this.token, onStart: this.broadcastAnimation },
+                );
             }
         }
     }
@@ -325,10 +280,8 @@ export class Moved extends StateMachineState {
                 })
                 .build(),
         );
-        this.transition(State.GAME_OVER);
+        this.transition({ state: State.GAME_OVER });
     }
 
-    public get [Symbol.toStringTag]() {
-        return 'Moved';
-    }
+    public readonly [Symbol.toStringTag] = 'Moved';
 }

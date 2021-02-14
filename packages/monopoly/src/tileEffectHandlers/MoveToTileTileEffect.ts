@@ -1,6 +1,6 @@
 import { GamePlayer, TileEffectInput } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { StateMachineConstructor } from '../stateMachine/StateMachineState';
+import { State } from '../stateMachine/stateEnum';
 import { TileEffect } from './TileEffect';
 
 export class MoveToTileTileEffect implements TileEffect<'move_to_tile'> {
@@ -10,7 +10,7 @@ export class MoveToTileTileEffect implements TileEffect<'move_to_tile'> {
         this.input = input;
     }
 
-    public onEffect(player: GamePlayer): Promise<void | StateMachineConstructor> {
+    public onEffect(player: GamePlayer): Promise<void | State> {
         switch (this.input.timing) {
             case monopolypb.TileEffect_Timing.ENTERING:
             //

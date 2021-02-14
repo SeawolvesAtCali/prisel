@@ -7,6 +7,7 @@ import {
     RequestManager,
     Response,
     SERVER,
+    Token,
 } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import once from 'lodash/once';
@@ -132,9 +133,9 @@ export class Client<T = State> {
         }
     }
 
-    public async request(request: Request) {
+    public async request(request: Request, token = Token.delay(DEFAULT_TIMEOUT)) {
         this.emit(request);
-        return this.requestManager.addRequest(request, DEFAULT_TIMEOUT);
+        return this.requestManager.addRequest(request, token);
     }
 
     public respond(response: Response) {

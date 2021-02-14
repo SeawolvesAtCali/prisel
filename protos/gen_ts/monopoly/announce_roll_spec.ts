@@ -24,9 +24,12 @@ export interface AnnounceRollPayload {
      */
     steps: number;
     /**
-     * @generated from protobuf field: repeated monopoly.Coordinate path = 3;
+     * the position of the player before moving. This is used to make sure the
+     * rendering of the player is in sync on all clients.
+     *
+     * @generated from protobuf field: monopoly.Coordinate current_position = 3;
      */
-    path: Coordinate[];
+    currentPosition?: Coordinate;
     /**
      * @generated from protobuf field: int32 my_money = 4;
      */
@@ -40,12 +43,12 @@ class AnnounceRollPayload$Type extends MessageType<AnnounceRollPayload> {
         super("monopoly.AnnounceRollPayload", [
             { no: 1, name: "player", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "steps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "path", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Coordinate },
+            { no: 3, name: "current_position", kind: "message", T: () => Coordinate },
             { no: 4, name: "my_money", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value?: PartialMessage<AnnounceRollPayload>): AnnounceRollPayload {
-        const message = { player: "", steps: 0, path: [], myMoney: 0 };
+        const message = { player: "", steps: 0, myMoney: 0 };
         if (value !== undefined)
             reflectionMergePartial<AnnounceRollPayload>(this, message, value);
         return message;
@@ -61,8 +64,8 @@ class AnnounceRollPayload$Type extends MessageType<AnnounceRollPayload> {
                 case /* int32 steps */ 2:
                     message.steps = reader.int32();
                     break;
-                case /* repeated monopoly.Coordinate path */ 3:
-                    message.path.push(Coordinate.internalBinaryRead(reader, reader.uint32(), options));
+                case /* monopoly.Coordinate current_position */ 3:
+                    message.currentPosition = Coordinate.internalBinaryRead(reader, reader.uint32(), options, message.currentPosition);
                     break;
                 case /* int32 my_money */ 4:
                     message.myMoney = reader.int32();
@@ -85,9 +88,9 @@ class AnnounceRollPayload$Type extends MessageType<AnnounceRollPayload> {
         /* int32 steps = 2; */
         if (message.steps !== 0)
             writer.tag(2, WireType.Varint).int32(message.steps);
-        /* repeated monopoly.Coordinate path = 3; */
-        for (let i = 0; i < message.path.length; i++)
-            Coordinate.internalBinaryWrite(message.path[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* monopoly.Coordinate current_position = 3; */
+        if (message.currentPosition)
+            Coordinate.internalBinaryWrite(message.currentPosition, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         /* int32 my_money = 4; */
         if (message.myMoney !== 0)
             writer.tag(4, WireType.Varint).int32(message.myMoney);

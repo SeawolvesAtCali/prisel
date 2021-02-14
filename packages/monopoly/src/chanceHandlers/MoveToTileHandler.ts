@@ -1,10 +1,9 @@
-import { Action, Anim, animationMap, exist, Tile } from '@prisel/monopoly-common';
-import { monopolypb } from '@prisel/protos';
-import { assertExist, Packet } from '@prisel/server';
+import { exist, Tile } from '@prisel/monopoly-common';
 import assert from 'assert';
+import { MovingExtra } from '../stateMachine/extra';
 import { State } from '../stateMachine/stateEnum';
-import { getPanAnimationLength } from '../stateMachine/utils';
-import { getRand } from '../utils';
+import { Transition } from '../stateMachine/transition';
+import { checkType, getRand } from '../utils';
 import { ChanceHandler } from './ChanceHandler';
 
 const MAX_PATH_LENGTH = 1000;
@@ -15,7 +14,6 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
     if (!exist(currentTile)) {
         return;
     }
-    const currentLocation = currentTile.position;
     const targetTile = game.world.get<Tile>(input.inputArgs.tileId);
 
     assert(
@@ -23,58 +21,15 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
         `MoveToTile cannot find tile of id ${input.inputArgs.tileId}`,
     );
 
-    game.broadcast(
-        Packet.forAction(Action.ANNOUNCE_CHANCE)
-            .setPayload(monopolypb.AnnounceRecievedChancePayload, {
-                player: currentPlayer.id,
-                chance: {
-                    display: input.display,
-                    extra: {
-                        oneofKind: 'moveToTile',
-                        moveToTile: {
-                            tile: assertExist(targetTile?.position),
-                            isTeleport: input.inputArgs.isTeleport,
-                        },
-                    },
-                },
-            })
-            .build(),
-    );
-
     if (input.inputArgs.isTeleport) {
-        currentPlayer.teleport(targetTile);
+        return checkType<Transition<MovingExtra>>({
+            state: State.MOVING,
+            extra: {
+                type: 'usingTeleport',
 
-        const currentPlayerInfo = currentPlayer.getGamePlayerInfo();
-        await Anim.processAndWait(
-            (packet) => {
-                game.broadcast(packet);
+                target: targetTile,
             },
-            Anim.sequence(
-                Anim.create('teleport_pickup', monopolypb.TeleportPickupExtra)
-                    .setExtra({
-                        vehicle: monopolypb.TeleportVehicle.UNSPECIFIED,
-                        pickupLocation: currentLocation,
-                        player: currentPlayerInfo,
-                    })
-                    .setLength(animationMap.teleport_pickup)
-                    .build(),
-                Anim.create('pan', monopolypb.PanExtra)
-                    .setExtra({
-                        target: targetTile.position,
-                    })
-                    .setLength(getPanAnimationLength(currentLocation, targetTile.position))
-                    .build(),
-                Anim.create('teleport_dropoff', monopolypb.TeleportDropoffExtra)
-                    .setExtra({
-                        vehicle: monopolypb.TeleportVehicle.UNSPECIFIED,
-                        dropoffLocation: targetTile.position,
-                        player: currentPlayerInfo,
-                    })
-                    .setLength(animationMap.teleport_dropoff)
-                    .build(),
-            ),
-        ).promise;
-        return State.MOVED;
+        });
     }
 
     const path = currentTile.genPathWith((current, length) => {
@@ -84,44 +39,13 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
         return getRand(current.next)?.get();
     });
 
-    if (path.length === 0) {
-        return;
+    if (path.length !== 0) {
+        return checkType<Transition<MovingExtra>>({
+            state: State.MOVING,
+            extra: {
+                type: 'usingTiles',
+                tiles: path,
+            },
+        });
     }
-
-    // move to the specified tile
-    const coordinates = currentPlayer.move(path);
-    // construct PlayerReceiveChancePayload
-
-    game.broadcast(
-        Packet.forAction(Action.ANNOUNCE_CHANCE)
-            .setPayload(monopolypb.AnnounceRecievedChancePayload, {
-                player: currentPlayer.id,
-                chance: {
-                    display: input.display,
-                    extra: {
-                        oneofKind: 'moveToTile',
-                        moveToTile: {
-                            tile: targetTile?.position,
-                            isTeleport: input.inputArgs.isTeleport,
-                        },
-                    },
-                },
-            })
-            .build(),
-    );
-
-    await Anim.processAndWait(
-        (packet) => {
-            game.broadcast(packet);
-        },
-        Anim.create('move', monopolypb.MoveExtra)
-            .setExtra({
-                player: currentPlayer.getGamePlayerInfo(),
-                start: currentLocation,
-                path: coordinates,
-            })
-            .setLength(animationMap.move * coordinates.length),
-    ).promise;
-
-    return State.MOVED;
 };

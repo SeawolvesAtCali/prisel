@@ -1,9 +1,10 @@
 import { Action, Anim, animationMap, GamePlayer } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { assertExist, Packet, Request, Response } from '@prisel/server';
+import { Packet, Request, Response } from '@prisel/server';
 import { FIXED_STEPS, USE_FIXED_STEPS } from '../defaultFlags';
 import { flags } from '../flags';
 import { getPlayer } from '../utils';
+import { MovingExtra } from './extra';
 import { State } from './stateEnum';
 import { StateMachineState } from './StateMachineState';
 
@@ -35,7 +36,7 @@ import { StateMachineState } from './StateMachineState';
 export class PreRoll extends StateMachineState {
     private rolled = false;
 
-    public onEnter() {
+    public async onEnter() {
         // start the turn
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_START_TURN)
@@ -45,14 +46,14 @@ export class PreRoll extends StateMachineState {
                 .build(),
         );
 
-        Anim.processAndWait(
-            this.broadcastAnimation,
+        await Anim.wait(
             Anim.create('turn_start', monopolypb.TurnStartExtra)
                 .setExtra({
                     player: this.game.getCurrentPlayer().getGamePlayerInfo(),
                 })
                 .setLength(animationMap.turn_start)
                 .build(),
+            { onStart: this.broadcastAnimation },
         );
     }
 
@@ -65,40 +66,28 @@ export class PreRoll extends StateMachineState {
                     Request.isRequest(packet) &&
                     this.game.isCurrentPlayer(gamePlayer)
                 ) {
-                    const initialPos = assertExist(
-                        gamePlayer.pathTile?.get().position,
-                        'initialPos',
-                    );
-                    if (flags.get(USE_FIXED_STEPS)) {
-                        gamePlayer.forcedRollPoint = flags.get(FIXED_STEPS) || 1;
-                    } else {
-                        gamePlayer.forcedRollPoint = 0;
-                    }
-                    const pathCoordinates = gamePlayer.rollAndMove();
-                    this.rolled = true;
-                    const steps = pathCoordinates.length;
+                    const steps = flags.get(USE_FIXED_STEPS)
+                        ? flags.get(FIXED_STEPS)
+                        : gamePlayer.getDiceRoll();
+
                     getPlayer(gamePlayer).respond(
                         Response.forRequest(packet)
                             .setPayload(monopolypb.RollResponse, {
                                 steps,
-                                path: pathCoordinates,
                             })
                             .build(),
                     );
-
-                    // notify other players about current player's move
                     this.game.broadcast((player) => {
                         return Packet.forAction(Action.ANNOUNCE_ROLL)
                             .setPayload(monopolypb.AnnounceRollPayload, {
                                 player: gamePlayer.id,
                                 steps,
-                                path: pathCoordinates,
+                                currentPosition: gamePlayer.pathTile?.get().position,
                                 myMoney: player.money,
                             })
                             .build();
                     });
-                    Anim.processAndWait(
-                        this.broadcastAnimation,
+                    Anim.wait(
                         Anim.sequence(
                             // turn_start animation should be terminated when dice_roll
                             // is received.
@@ -113,17 +102,17 @@ export class PreRoll extends StateMachineState {
                                     player: gamePlayer.getGamePlayerInfo(),
                                 })
                                 .setLength(animationMap.dice_down),
-                            Anim.create('move', monopolypb.MoveExtra)
-                                .setExtra({
-                                    player: gamePlayer.getGamePlayerInfo(),
-                                    start: initialPos,
-                                    path: pathCoordinates,
-                                })
-                                .setLength(animationMap.move * pathCoordinates.length),
                         ),
-                    ).promise.then(() => {
-                        if (this.isCurrent()) {
-                            this.transition(State.MOVED);
+                        { onStart: this.broadcastAnimation },
+                    ).then(() => {
+                        if (!this.token.cancelled) {
+                            this.transition<MovingExtra>({
+                                state: State.MOVING,
+                                extra: {
+                                    type: 'usingSteps',
+                                    steps,
+                                },
+                            });
                         }
                     });
 
@@ -141,9 +130,7 @@ export class PreRoll extends StateMachineState {
                 })
                 .build(),
         );
-        this.transition(State.GAME_OVER);
+        this.transition({ state: State.GAME_OVER });
     }
-    public get [Symbol.toStringTag]() {
-        return 'PreRoll';
-    }
+    public readonly [Symbol.toStringTag] = 'PreRoll';
 }

@@ -1,5 +1,6 @@
 import { State } from './stateEnum';
 import type { StateMachineState } from './StateMachineState';
+import { Transition } from './transition';
 
 export interface IStateMachine {
     /**
@@ -26,5 +27,5 @@ export interface IStateMachine {
      * constructed, and newState.onEnter.
      * @param state
      */
-    transition(state: State): void;
+    transition<T = void>(transition: Transition<T>): void;
 }

@@ -40,6 +40,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// TODO: this seems useless. There is already animation for showing chance chest
+  /// open/close.
+  /// </summary>
   public sealed partial class AnnounceRecievedChancePayload : pb::IMessage<AnnounceRecievedChancePayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -25,14 +25,13 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Chhtb25vcG9seS9yb2xsX3NwZWMucHJvdG8SCG1vbm9wb2x5GhhwcmlzZWwv",
-            "YW5ub3RhdGlvbnMucHJvdG8aGW1vbm9wb2x5L2Nvb3JkaW5hdGUucHJvdG8i",
-            "TwoMUm9sbFJlc3BvbnNlEg0KBXN0ZXBzGAEgASgFEiIKBHBhdGgYAiADKAsy",
-            "FC5tb25vcG9seS5Db29yZGluYXRlOgyatRgICgRyb2xsEAJCFKoCEU1vbm9w",
-            "b2x5LlByb3RvYnVmYgZwcm90bzM="));
+            "YW5ub3RhdGlvbnMucHJvdG8iKwoMUm9sbFJlc3BvbnNlEg0KBXN0ZXBzGAEg",
+            "ASgFOgyatRgICgRyb2xsEAJCFKoCEU1vbm9wb2x5LlByb3RvYnVmYgZwcm90",
+            "bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.CoordinateReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.RollResponse), global::Monopoly.Protobuf.RollResponse.Parser, new[]{ "Steps", "Path" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.RollResponse), global::Monopoly.Protobuf.RollResponse.Parser, new[]{ "Steps" }, null, null, null, null)
           }));
     }
     #endregion
@@ -69,7 +68,6 @@ namespace Monopoly.Protobuf {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public RollResponse(RollResponse other) : this() {
       steps_ = other.steps_;
-      path_ = other.path_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -89,16 +87,6 @@ namespace Monopoly.Protobuf {
       }
     }
 
-    /// <summary>Field number for the "path" field.</summary>
-    public const int PathFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Monopoly.Protobuf.Coordinate> _repeated_path_codec
-        = pb::FieldCodec.ForMessage(18, global::Monopoly.Protobuf.Coordinate.Parser);
-    private readonly pbc::RepeatedField<global::Monopoly.Protobuf.Coordinate> path_ = new pbc::RepeatedField<global::Monopoly.Protobuf.Coordinate>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Monopoly.Protobuf.Coordinate> Path {
-      get { return path_; }
-    }
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as RollResponse);
@@ -113,7 +101,6 @@ namespace Monopoly.Protobuf {
         return true;
       }
       if (Steps != other.Steps) return false;
-      if(!path_.Equals(other.path_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -121,7 +108,6 @@ namespace Monopoly.Protobuf {
     public override int GetHashCode() {
       int hash = 1;
       if (Steps != 0) hash ^= Steps.GetHashCode();
-      hash ^= path_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -142,7 +128,6 @@ namespace Monopoly.Protobuf {
         output.WriteRawTag(8);
         output.WriteInt32(Steps);
       }
-      path_.WriteTo(output, _repeated_path_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -156,7 +141,6 @@ namespace Monopoly.Protobuf {
         output.WriteRawTag(8);
         output.WriteInt32(Steps);
       }
-      path_.WriteTo(ref output, _repeated_path_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -169,7 +153,6 @@ namespace Monopoly.Protobuf {
       if (Steps != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Steps);
       }
-      size += path_.CalculateSize(_repeated_path_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -184,7 +167,6 @@ namespace Monopoly.Protobuf {
       if (other.Steps != 0) {
         Steps = other.Steps;
       }
-      path_.Add(other.path_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -203,10 +185,6 @@ namespace Monopoly.Protobuf {
             Steps = input.ReadInt32();
             break;
           }
-          case 18: {
-            path_.AddEntriesFrom(input, _repeated_path_codec);
-            break;
-          }
         }
       }
     #endif
@@ -223,10 +201,6 @@ namespace Monopoly.Protobuf {
             break;
           case 8: {
             Steps = input.ReadInt32();
-            break;
-          }
-          case 18: {
-            path_.AddEntriesFrom(ref input, _repeated_path_codec);
             break;
           }
         }

@@ -34,6 +34,7 @@ describe('Tile', () => {
             timing: monopolypb.TileEffect_Timing.ENTERING,
             inputArgs: {
                 tileId: '1',
+                isTeleport: false,
             },
         };
         tile.tileEffect = teleportToTile;

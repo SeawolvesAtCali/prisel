@@ -1,42 +1,55 @@
 import { GamePlayer } from '@prisel/monopoly-common';
-import { Packet } from '@prisel/server';
+import { Packet, Token } from '@prisel/server';
 import Game from '../Game';
+import { log } from '../log';
 import { IStateMachine } from './IStateMachine';
-import { State } from './stateEnum';
+import { Transition } from './transition';
 
-export type StateMachineConstructor = new (game: Game, machine: IStateMachine) => StateMachineState;
-export abstract class StateMachineState {
+type PromiseOr<T> = Promise<T> | T;
+
+export enum PHASE {
+    ACTIVE = 'active',
+    EXITING = 'exiting',
+    EXITTED = 'exited',
+}
+export abstract class StateMachineState<InputType = void> {
     protected game: Game;
     private machine: IStateMachine;
-    private pendingTransition?: State;
+    // private pendingTransition?: State;
+    protected token: Token; // cancellation token
+
+    private phase_ = PHASE.ACTIVE;
+    public get phase() {
+        return this.phase_;
+    }
+    public set phase(value: PHASE) {
+        log.info(`State ${this[Symbol.toStringTag]} enters ${this.phase_} phase`);
+        this.phase_ = value;
+    }
 
     constructor(game: Game, machine: IStateMachine) {
         this.game = game;
         this.machine = machine;
-    }
-    /**
-     * Called by state to verify that if it is the current state.
-     * state can still be running even if it is not a current state if we have
-     * some async operation that is not terminated when transition.
-     */
-    protected isCurrent(): boolean {
-        return !this.pendingTransition;
+        this.token = Token.get();
     }
 
     /**
-     * Return true if there is already a pending State to transition to in the
-     * next tick. The caller should not perform more logic because we are ready
-     * to transition.
-     * This function will return true even after the transition, so it can be
-     * used as a catchall condition to determine if caller should perform
-     * further logic.
+     * Called when entering the state.
+     * @param transition The previous transition that causes state to reach
+     * current state.
      */
-    protected isTransitioned(): boolean {
-        return !!this.pendingTransition;
-    }
+    public onEnter(transition: Transition<InputType>): PromiseOr<void> {}
 
-    public onEnter(): Promise<void> | void {}
     public onExit() {}
+
+    /**
+     * Handles packet. Returns true if the packet is processed. This means that side
+     * effect is made. Even if the packet should be rejected, it is still
+     * considered processed, because error message might be returned to client.
+     * Only return false if the action is not recognized.
+     * @param packet
+     * @param gamePlayer
+     */
     public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
         return false;
     }
@@ -44,10 +57,16 @@ export abstract class StateMachineState {
     // implement this for state name
     public abstract get [Symbol.toStringTag](): string;
 
-    protected transition(state: State) {
-        if (this.isCurrent()) {
-            this.pendingTransition = state;
-            this.machine.transition(state);
+    protected transition<T = void>(transition: Transition<T>) {
+        if (!this.token.cancelled) {
+            this.token.cancel();
+            this.machine.transition(transition);
+        } else {
+            log.info(
+                `token for ${
+                    this[Symbol.toStringTag]
+                } already cancelled, cannot transition from it`,
+            );
         }
     }
     protected end() {
@@ -61,5 +80,29 @@ export abstract class StateMachineState {
             }
             this.game.broadcast(packet);
         };
+    }
+
+    protected async startCoroutine(generator: Generator<Promise<any>>): Promise<void> {
+        if (this.token.cancelled) {
+            return;
+        }
+        let result = undefined;
+        for (
+            let yielded = generator.next(result);
+            !yielded.done;
+            yielded = generator.next(result)
+        ) {
+            if (this.token.cancelled) {
+                return;
+            }
+            if (yielded.value instanceof Promise) {
+                result = await yielded.value;
+            } else {
+                result = yielded.value;
+            }
+            if (this.token.cancelled) {
+                return;
+            }
+        }
     }
 }

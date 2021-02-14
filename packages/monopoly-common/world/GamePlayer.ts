@@ -75,19 +75,24 @@ export class GamePlayer extends GameObject {
         this.money += amount;
     }
 
-    private roll(startingNode: Ref<Tile>): Tile[] {
-        if (this.forcedRollPoint > 0) {
-            // player will move a fixed ${forcedRollPoint} step
-            return startingNode.get().genPath(this.forcedRollPoint);
-        }
-        const steps = Math.trunc(Math.random() * 6) + 1;
-
-        return startingNode.get().genPath(steps);
+    /** Returns a random number from 1 to 6 */
+    public getDiceRoll(): number {
+        return Math.trunc(Math.random() * 6) + 1;
     }
 
-    public rollAndMove(): monopolypb.Coordinate[] {
+    private roll(startingNode: Ref<Tile>): Tile[] {
+        return this.fixedRoll(startingNode, this.getDiceRoll());
+    }
+
+    private fixedRoll(startingNode: Ref<Tile>, roll: number): Tile[] {
+        return startingNode.get().genPath(roll);
+    }
+
+    public rollAndMove(fixedRoll?: number): monopolypb.Coordinate[] {
         if (exist(this.pathTile)) {
-            const path = this.roll(this.pathTile);
+            const path = exist(fixedRoll)
+                ? this.fixedRoll(this.pathTile, fixedRoll)
+                : this.roll(this.pathTile);
             this.rolled = true;
             return this.move(path);
         }

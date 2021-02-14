@@ -1,6 +1,6 @@
 import { GamePlayer, TileEffectInput, TileEffectInputArgs } from '@prisel/monopoly-common';
-import { StateMachineConstructor } from '../stateMachine/StateMachineState';
+import { State } from '../stateMachine/stateEnum';
 export interface TileEffect<T extends keyof TileEffectInputArgs> {
     input: TileEffectInput<T>;
-    onEffect(gamePlayer: GamePlayer): Promise<StateMachineConstructor | void>;
+    onEffect(gamePlayer: GamePlayer): Promise<State | void>;
 }

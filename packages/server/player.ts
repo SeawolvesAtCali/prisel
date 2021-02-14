@@ -1,7 +1,6 @@
-import { assertExist, Packet, RequestBuilder, Response } from '@prisel/common';
+import { assertExist, Packet, RequestBuilder, Response, Token } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import WebSocket from 'ws';
-import debug from './debug';
 import { Context } from './objects';
 import { newRoom, Room, RoomId, RoomOption } from './room';
 import { emit } from './utils/networkUtils';
@@ -24,9 +23,9 @@ export interface Player {
      * Send a request to client
      * @param requestBuilder partial Request. no need to specify requstId as it will
      * be auto populated
-     * @param timeout timeout in ms. 0 for no timeout
+     * @param token cancellationToken
      */
-    request(requestBuilder: RequestBuilder, timeout?: number): Promise<Response>;
+    request(requestBuilder: RequestBuilder, token?: Token): Promise<Response>;
     respond(response: Response): void;
     getSocket(): WebSocket;
     equals(player: Player | undefined): boolean;
@@ -98,16 +97,17 @@ class PlayerImpl implements Player {
         setImmediate(emit, this.getSocket(), packet);
     }
 
-    public request(requestBuilder: RequestBuilder, timeout = DEFAULT_REQUEST_TIMEOUT) {
+    public async request(
+        requestBuilder: RequestBuilder,
+        token = Token.delay(DEFAULT_REQUEST_TIMEOUT),
+    ) {
         const fullRequest = requestBuilder.setId(this.newRequestId()).build();
         this.emit(fullRequest);
-        return this.context.requests.addRequest(fullRequest, timeout).catch((_) => {
-            debug('request timeout');
-            const responseForTimeout: Response = Response.forRequest(fullRequest)
-                .setFailure('timeout')
-                .build();
-            return responseForTimeout;
-        });
+        try {
+            return await this.context.requests.addRequest(fullRequest, token);
+        } catch (e) {
+            return Response.forRequest(fullRequest).setFailure(e.message).build();
+        }
     }
 
     public respond(response: Response) {

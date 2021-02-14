@@ -12,7 +12,7 @@
     ],
     "scripts": {
         "build": "nps clean ts-check build",
-        "test": "jest",
+        "test": "jest --detectOpenHandles",
         "update-snapshot": "jest --updateSnapshot"
     },
     "jest": {

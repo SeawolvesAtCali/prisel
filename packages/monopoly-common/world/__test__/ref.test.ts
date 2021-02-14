@@ -28,6 +28,6 @@ describe('ref', () => {
 
         const serializedWorld = world.serialize();
         const newWorld = new World().registerObject(TestObject).deserialize(serializedWorld);
-        expect(newWorld.get('object1').ref.get()).toBe(newWorld.get('object2'));
+        expect(newWorld.get<TestObject>('object1')?.ref?.get()).toBe(newWorld.get('object2'));
     });
 });

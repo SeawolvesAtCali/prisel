@@ -4,7 +4,6 @@ package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
 import "prisel/annotations.proto";
-import "monopoly/coordinate.proto";
 
 message RollResponse {
   option (prisel.for_action) = {
@@ -12,5 +11,4 @@ message RollResponse {
     packet_type : RESPONSE
   };
   int32 steps = 1;
-  repeated Coordinate path = 2;
 }

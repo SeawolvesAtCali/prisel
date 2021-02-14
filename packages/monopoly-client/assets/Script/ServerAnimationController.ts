@@ -44,7 +44,7 @@ export default class ServerAnimationController extends cc.Component {
                 cc.log('server animation ', animation.name, animation.length);
                 this.eventBus?.emit(EVENT.ANIMATION, animation);
                 animEmitter.emit(animation.name, animation);
-                return Anim.wait(animation).promise;
+                return Anim.wait(animation);
             case monopolypb.AnimationType.SEQUENCE:
                 return (async () => {
                     for (const child of animation.children) {

@@ -1,6 +1,9 @@
 import { monopolypb, priselpb } from '@prisel/protos';
-import { serializable } from 'serializr';
+import { list, object, serializable } from 'serializr';
 import { exist } from '../exist';
+import { genId } from '../genId';
+import { ChanceInput } from '../types';
+import { Collectible } from './Collectible';
 import { GameObject } from './GameObject';
 import { Id } from './Id';
 import type { Property } from './Property';
@@ -39,6 +42,9 @@ export class GamePlayer extends GameObject {
     @serializable
     character = 0;
 
+    @serializable(list(object(Collectible)))
+    collectibles: Array<Collectible> = [];
+
     player?: BoundPlayer;
 
     forcedRollPoint = 0;
@@ -69,26 +75,37 @@ export class GamePlayer extends GameObject {
         this.money += amount;
     }
 
-    private roll(startingNode: Ref<Tile>): Tile[] {
-        if (this.forcedRollPoint) {
-            // player will move a fixed ${forcedRollPoint} step
-            return startingNode.get().genPath(this.forcedRollPoint);
-        }
-        const steps = Math.trunc(Math.random() * 6) + 1;
-
-        return startingNode.get().genPath(steps);
+    /** Returns a random number from 1 to 6 */
+    public getDiceRoll(): number {
+        return Math.trunc(Math.random() * 6) + 1;
     }
 
-    public rollAndMove(): monopolypb.Coordinate[] {
+    private roll(startingNode: Ref<Tile>): Tile[] {
+        return this.fixedRoll(startingNode, this.getDiceRoll());
+    }
+
+    private fixedRoll(startingNode: Ref<Tile>, roll: number): Tile[] {
+        return startingNode.get().genPath(roll);
+    }
+
+    public rollAndMove(fixedRoll?: number): monopolypb.Coordinate[] {
         if (exist(this.pathTile)) {
-            const path = this.roll(this.pathTile);
+            const path = exist(fixedRoll)
+                ? this.fixedRoll(this.pathTile, fixedRoll)
+                : this.roll(this.pathTile);
             this.rolled = true;
             return this.move(path);
         }
         throw new Error('player not in a pathTile, cannot roll and move');
     }
 
+    public teleport(targetTile: Tile) {
+        this.pathTile = this.world.makeRef(targetTile);
+    }
+
     public move(path: Tile[]) {
+        // Currently we don't do anything different for teleport.
+        // When we implement onEnter and onLeave callback for tile.
         if (path.length > 0) {
             this.pathTile = this.world.makeRef(path[path.length - 1]);
             return path.map((pathTile) => pathTile.position);
@@ -122,5 +139,41 @@ export class GamePlayer extends GameObject {
             character: this.character,
             boundPlayer: this.player?.getPlayerInfo(),
         };
+    }
+
+    public addCollectible(chanceInput: ChanceInput<'collectible'>) {
+        this.collectibles.push({
+            id: genId(),
+            name: chanceInput.display.title,
+            description: chanceInput.display.description,
+            type: chanceInput.inputArgs.type,
+        });
+    }
+
+    public hasCollectible(type: monopolypb.CollectibleExtra_CollectibleType) {
+        return this.collectibles.some((collectible) => collectible.type === type);
+    }
+
+    /**
+     * Pick out the collectible by removing from collection and return it.
+     * @param id
+     */
+    public pickCollectible(id: string): Collectible | undefined {
+        const collectible = this.collectibles.find((item) => item.id === id);
+        this.collectibles = this.collectibles.filter((item) => item != collectible);
+        return collectible;
+    }
+
+    /**
+     * Pick out a collectible of type. This is used when an collectible
+     * automatically become effective without player choosing, e.g.
+     * get-out-of-jail card activates when going to jail
+     */
+    public consumeCollectible(
+        type: monopolypb.CollectibleExtra_CollectibleType,
+    ): Collectible | undefined {
+        const collectible = this.collectibles.find((item) => item.type === type);
+        this.collectibles = this.collectibles.filter((item) => item != collectible);
+        return collectible;
     }
 }

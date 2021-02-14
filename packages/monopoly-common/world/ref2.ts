@@ -23,7 +23,7 @@ export class Ref<T extends GameObject> {
     }
 
     get(): T {
-        return assertExist(this.world, 'world').get(this.id);
+        return assertExist(this.world?.get(this.id), `world or object with id ${this.id}`);
     }
 
     equals(ref: Ref<any>) {

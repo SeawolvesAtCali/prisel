@@ -6,6 +6,8 @@ option csharp_namespace = "Monopoly.Protobuf";
 import "prisel/annotations.proto";
 import "monopoly/chance.proto";
 
+// TODO: this seems useless. There is already animation for showing chance chest
+// open/close.
 message AnnounceRecievedChancePayload {
   option (prisel.for_action) = {
     type : "announce_received_chance"

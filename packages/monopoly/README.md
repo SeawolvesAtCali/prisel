@@ -27,3 +27,12 @@ action: purchase
 // Conclude current turn
 action: end_turn
 ```
+
+### TileEffect
+
+TileEffects are used to apply special effects to tiles, when user entering/stopping or leaving the
+tile, the effect might activate. A tile has at most 1 TileEffect at a time. A TileEffect can be
+activated at at most 1 timing (Entering/stopping/leaving).
+
+All effects happens at PreRolled state. If a player is currently moving according to dice roll, an
+effect might cancel the rest of the moves

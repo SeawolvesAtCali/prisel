@@ -5,22 +5,22 @@ import { Size } from '../types';
 import { GameObject } from './GameObject';
 import { GamePlayer } from './GamePlayer';
 import { Ref } from './ref2';
-import { jsonSerializable, refSerializable } from './serializeUtil';
+import { raw, refSerializable } from './serializeUtil';
 
 export class Property extends GameObject {
     static TYPE = 'property';
     readonly type = 'property';
 
-    @jsonSerializable
+    @raw
     anchor: monopolypb.Coordinate = { row: -1, col: -1 };
 
-    @jsonSerializable
+    @raw
     size: Size = { width: 0, height: 0 };
 
     @serializable
     currentLevel = -1;
 
-    @jsonSerializable
+    @raw
     levels: monopolypb.PropertyLevel[] = [];
 
     @serializable

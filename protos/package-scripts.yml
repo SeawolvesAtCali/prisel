@@ -1,5 +1,5 @@
 scripts:
-    clean: rm -rf gen_ts && mkdir gen_ts
+    clean: rm -rf gen_ts gen_csharp && mkdir gen_ts gen_csharp
     protoc:
         protoc --experimental_allow_proto3_optional --ts_opt disable_service_client --ts_out gen_ts
         --csharp_opt base_namespace= --csharp_out gen_csharp --proto_path . $(find . -type f -name

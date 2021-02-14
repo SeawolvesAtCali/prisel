@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package monopoly;
+option csharp_namespace = "Monopoly.Protobuf";
+
+// add a card to collection. For example: Get out of jail free card
+message CollectibleExtra {
+  enum CollectibleType {
+    UNSPECIFIED = 0;
+    GET_OUT_OF_JAIL_FREE = 1;
+  }
+  CollectibleType type = 1;
+}

@@ -1,17 +1,17 @@
 import { monopolypb } from '@prisel/protos';
 import { serializable } from 'serializr';
 import { getRand } from '../getRand';
-import { ChanceInput } from '../types';
+import { ChanceInput, TileEffectInput } from '../types';
 import { GameObject } from './GameObject';
 import { Property } from './Property';
 import { Ref } from './ref2';
-import { jsonSerializable, listRefSerializable } from './serializeUtil';
+import { listRefSerializable, raw } from './serializeUtil';
 
 export class Tile extends GameObject {
     static TYPE = 'tile';
     readonly type = 'tile';
 
-    @jsonSerializable
+    @raw
     position: monopolypb.Coordinate = { row: -1, col: -1 };
 
     @listRefSerializable
@@ -26,8 +26,11 @@ export class Tile extends GameObject {
     @serializable
     isStart = false;
 
-    @jsonSerializable
+    @raw
     chancePool?: ChanceInput<any>[];
+
+    @raw
+    tileEffect?: TileEffectInput<any>;
 
     /**
      * generate path not including current node using genNextPathTile funtion.If

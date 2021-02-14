@@ -1,6 +1,7 @@
 import { ChanceInputArgs } from '@prisel/monopoly-common';
 import { log } from '../log';
-import { ChanceHandler } from './ChanceHander';
+import { ChanceHandler } from './ChanceHandler';
+import { collectibleHandler } from './CollectibleHandler';
 import { moneyExchangeHandler } from './MoneyExchangeHandler';
 import { moveStepsHandler } from './MoveStepsHandler';
 import { moveToTileHandler } from './MoveToTileHandler';
@@ -12,7 +13,5 @@ export const chanceHandlers: Record<keyof ChanceInputArgs, ChanceHandler<any>> =
     move_to_tile: moveToTileHandler,
     money_exchange: moneyExchangeHandler,
     move_steps: moveStepsHandler,
-    collectible: async () => {
-        log.warn('collectable handler not implemented');
-    },
+    collectible: collectibleHandler,
 };

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package monopoly;
+option csharp_namespace = "Monopoly.Protobuf";
+
+import "monopoly/move_to_tile_extra.proto";
+import "monopoly/money_exchange_extra.proto";
+import "monopoly/move_steps_extra.proto";
+import "monopoly/collectible_extra.proto";
+import "monopoly/detained_extra.proto";
+
+// TileEffect is effect that player will take when entering/leaving/stoping at a
+// tile.
+message TileEffectDisplay {
+  string title = 1;
+  string description = 2;
+}
+
+message TileEffect {
+  enum Timing {
+    UNSPECIFIED = 0;
+    // Effect activates when entering the tile. Even if player would stop at
+    // this tile, the effect activates before any user actions at this tile (pay
+    // rent, purchase land, etc.)
+    ENTERING = 1;
+    // Effect activates when stopping at the tile. The effect activates before
+    // any user actions at this tile (pay rent, purchase land, etc.)
+    STOPPING = 2;
+    // Effect activates when leaving this tile. Either before player starts
+    // moving on a new turn, or when player passing this tile.
+    LEAVING = 3;
+  }
+  TileEffectDisplay display = 1;
+  Timing timing = 2;
+  oneof extra {
+    bool unspecified = 3;
+    MoveToTileExtra move_to_tile = 4;
+    MoneyExchangeExtra money_exchange = 5;
+    MoveStepsExtra move_steps = 6;
+    CollectibleExtra collectible = 7;
+    DetainedExtra detained = 8;
+  }
+}

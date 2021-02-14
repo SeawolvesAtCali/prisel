@@ -36,7 +36,10 @@ export default class GameScreenMenu extends cc.Component {
 
         const menuContent = root
             .addChild('menu content')
-            .addComponents(LayoutConfig.verticalContainer(20), WidgetConfig.verticalCenter(20, 20));
+            .addComponents(
+                LayoutConfig.verticalWrapChildren(20),
+                WidgetConfig.verticalCenter(20, 20),
+            );
 
         menuContent.addAllChildren(
             createButton({

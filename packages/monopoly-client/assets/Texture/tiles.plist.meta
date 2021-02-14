@@ -46,7 +46,7 @@
       "rawWidth": 60,
       "rawHeight": 30,
       "borderTop": 0,
-      "borderBottom": 0,
+      "borderBottom": 1,
       "borderLeft": 0,
       "borderRight": 0,
       "spriteType": "normal",

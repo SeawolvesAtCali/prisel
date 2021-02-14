@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package monopoly;
+option csharp_namespace = "Monopoly.Protobuf";
+
+// pay x some money; get some money from all players; pay bank; get from bank
+message MoneyExchangeExtra {
+  // player, amount
+  map<string, int32> exchanges = 1;
+  int32 my_current_money = 2;
+}

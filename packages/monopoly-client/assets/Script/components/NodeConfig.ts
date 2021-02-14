@@ -7,6 +7,14 @@ import { WidgetConfig } from './WidgetConfig';
 export interface NodeConfigExport {
     [childName: string]: string;
 }
+
+/**
+ * A configuration for a node. NodeConfig records the properties used to render
+ * a node. In CocosCreator, an UI element is made up of a tree of Nodes and
+ * Components on each Node. `componentConfigs` records the Components to be
+ * added to the current node, and `children` records the children nodes to be
+ * added as child of current node.
+ */
 export class NodeConfig<Export extends NodeConfigExport = {}> {
     public componentConfigs: ComponentConfig[] = [];
     public name: string = '';
@@ -18,6 +26,12 @@ export class NodeConfig<Export extends NodeConfigExport = {}> {
     public anchor: cc.Vec2 = cc.v2(0.5, 0.5);
     public prefab?: cc.Prefab;
     private onApply?: (node: cc.Node) => void;
+    /**
+     * exports are a map of string string pair where key is a canonical name of
+     * child and value is the actual node path from the root. For example, in a
+     * NodeConfig for dialog, there might be an export of "closeButton" and the
+     * value might be "panel/panel/button 1".
+     */
     public exports?: Export;
 
     private zeroAreaWarningSuppressed = false;
@@ -159,7 +173,8 @@ export class NodeConfig<Export extends NodeConfigExport = {}> {
     }
 
     /**
-     * Apply sets the `ComponentConfig`s and add childrens on the given node.
+     * Apply sets the `ComponentConfig`s and add childrens on the given node and
+     * children recursively.
      * @param node the root node to apply the configs on
      */
     public apply(node: cc.Node) {

@@ -26,14 +26,14 @@ namespace Monopoly.Protobuf {
           string.Concat(
             "CiFtb25vcG9seS9hbm5vdW5jZV9yb2xsX3NwZWMucHJvdG8SCG1vbm9wb2x5",
             "GhhwcmlzZWwvYW5ub3RhdGlvbnMucHJvdG8aGW1vbm9wb2x5L2Nvb3JkaW5h",
-            "dGUucHJvdG8ifwoTQW5ub3VuY2VSb2xsUGF5bG9hZBIOCgZwbGF5ZXIYASAB",
-            "KAkSDQoFc3RlcHMYAiABKAUSIgoEcGF0aBgDIAMoCzIULm1vbm9wb2x5LkNv",
-            "b3JkaW5hdGUSEAoIbXlfbW9uZXkYBCABKAU6E5q1GA8KDWFubm91bmNlX3Jv",
-            "bGxCFKoCEU1vbm9wb2x5LlByb3RvYnVmYgZwcm90bzM="));
+            "dGUucHJvdG8iiwEKE0Fubm91bmNlUm9sbFBheWxvYWQSDgoGcGxheWVyGAEg",
+            "ASgJEg0KBXN0ZXBzGAIgASgFEi4KEGN1cnJlbnRfcG9zaXRpb24YAyABKAsy",
+            "FC5tb25vcG9seS5Db29yZGluYXRlEhAKCG15X21vbmV5GAQgASgFOhOatRgP",
+            "Cg1hbm5vdW5jZV9yb2xsQhSqAhFNb25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.CoordinateReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnounceRollPayload), global::Monopoly.Protobuf.AnnounceRollPayload.Parser, new[]{ "Player", "Steps", "Path", "MyMoney" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnounceRollPayload), global::Monopoly.Protobuf.AnnounceRollPayload.Parser, new[]{ "Player", "Steps", "CurrentPosition", "MyMoney" }, null, null, null, null)
           }));
     }
     #endregion
@@ -71,7 +71,7 @@ namespace Monopoly.Protobuf {
     public AnnounceRollPayload(AnnounceRollPayload other) : this() {
       player_ = other.player_;
       steps_ = other.steps_;
-      path_ = other.path_.Clone();
+      currentPosition_ = other.currentPosition_ != null ? other.currentPosition_.Clone() : null;
       myMoney_ = other.myMoney_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -103,14 +103,19 @@ namespace Monopoly.Protobuf {
       }
     }
 
-    /// <summary>Field number for the "path" field.</summary>
-    public const int PathFieldNumber = 3;
-    private static readonly pb::FieldCodec<global::Monopoly.Protobuf.Coordinate> _repeated_path_codec
-        = pb::FieldCodec.ForMessage(26, global::Monopoly.Protobuf.Coordinate.Parser);
-    private readonly pbc::RepeatedField<global::Monopoly.Protobuf.Coordinate> path_ = new pbc::RepeatedField<global::Monopoly.Protobuf.Coordinate>();
+    /// <summary>Field number for the "current_position" field.</summary>
+    public const int CurrentPositionFieldNumber = 3;
+    private global::Monopoly.Protobuf.Coordinate currentPosition_;
+    /// <summary>
+    /// the position of the player before moving. This is used to make sure the
+    /// rendering of the player is in sync on all clients.
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Monopoly.Protobuf.Coordinate> Path {
-      get { return path_; }
+    public global::Monopoly.Protobuf.Coordinate CurrentPosition {
+      get { return currentPosition_; }
+      set {
+        currentPosition_ = value;
+      }
     }
 
     /// <summary>Field number for the "my_money" field.</summary>
@@ -139,7 +144,7 @@ namespace Monopoly.Protobuf {
       }
       if (Player != other.Player) return false;
       if (Steps != other.Steps) return false;
-      if(!path_.Equals(other.path_)) return false;
+      if (!object.Equals(CurrentPosition, other.CurrentPosition)) return false;
       if (MyMoney != other.MyMoney) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -149,7 +154,7 @@ namespace Monopoly.Protobuf {
       int hash = 1;
       if (Player.Length != 0) hash ^= Player.GetHashCode();
       if (Steps != 0) hash ^= Steps.GetHashCode();
-      hash ^= path_.GetHashCode();
+      if (currentPosition_ != null) hash ^= CurrentPosition.GetHashCode();
       if (MyMoney != 0) hash ^= MyMoney.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -175,7 +180,10 @@ namespace Monopoly.Protobuf {
         output.WriteRawTag(16);
         output.WriteInt32(Steps);
       }
-      path_.WriteTo(output, _repeated_path_codec);
+      if (currentPosition_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(CurrentPosition);
+      }
       if (MyMoney != 0) {
         output.WriteRawTag(32);
         output.WriteInt32(MyMoney);
@@ -197,7 +205,10 @@ namespace Monopoly.Protobuf {
         output.WriteRawTag(16);
         output.WriteInt32(Steps);
       }
-      path_.WriteTo(ref output, _repeated_path_codec);
+      if (currentPosition_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(CurrentPosition);
+      }
       if (MyMoney != 0) {
         output.WriteRawTag(32);
         output.WriteInt32(MyMoney);
@@ -217,7 +228,9 @@ namespace Monopoly.Protobuf {
       if (Steps != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Steps);
       }
-      size += path_.CalculateSize(_repeated_path_codec);
+      if (currentPosition_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CurrentPosition);
+      }
       if (MyMoney != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(MyMoney);
       }
@@ -238,7 +251,12 @@ namespace Monopoly.Protobuf {
       if (other.Steps != 0) {
         Steps = other.Steps;
       }
-      path_.Add(other.path_);
+      if (other.currentPosition_ != null) {
+        if (currentPosition_ == null) {
+          CurrentPosition = new global::Monopoly.Protobuf.Coordinate();
+        }
+        CurrentPosition.MergeFrom(other.CurrentPosition);
+      }
       if (other.MyMoney != 0) {
         MyMoney = other.MyMoney;
       }
@@ -265,7 +283,10 @@ namespace Monopoly.Protobuf {
             break;
           }
           case 26: {
-            path_.AddEntriesFrom(input, _repeated_path_codec);
+            if (currentPosition_ == null) {
+              CurrentPosition = new global::Monopoly.Protobuf.Coordinate();
+            }
+            input.ReadMessage(CurrentPosition);
             break;
           }
           case 32: {
@@ -295,7 +316,10 @@ namespace Monopoly.Protobuf {
             break;
           }
           case 26: {
-            path_.AddEntriesFrom(ref input, _repeated_path_codec);
+            if (currentPosition_ == null) {
+              CurrentPosition = new global::Monopoly.Protobuf.Coordinate();
+            }
+            input.ReadMessage(CurrentPosition);
             break;
           }
           case 32: {

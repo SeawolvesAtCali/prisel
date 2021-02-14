@@ -1,11 +1,12 @@
+import { Token } from './cancellationToken';
 import { Request } from './request';
 import { Response } from './response';
 
-type ResolveFunc = (value?: Response | PromiseLike<Response>) => void;
+type ResolveFunc = (value: Response | PromiseLike<Response>) => void;
 
 export interface RequestManager {
     newId(): string;
-    addRequest(request: Request, timeout: number): Promise<Response>;
+    addRequest(request: Request, token?: Token): Promise<Response>;
     onResponse(response: Response): void;
     isWaitingFor(requestId: string): boolean;
 }
@@ -13,17 +14,18 @@ export interface RequestManager {
 export function newRequestManager(): RequestManager {
     const requestIdMap = new Map<string, ResolveFunc>();
     let requestId = 1;
-    function addRequest(request: Request, timeout: number) {
+    function addRequest(request: Request, token?: Token) {
         const id = request.requestId;
         const promise = new Promise<Response>((resolve, reject) => {
             requestIdMap.set(id, resolve);
-            if (timeout > 0) {
-                setTimeout(() => {
+            if (token) {
+                token.promise.then((reason) => {
+                    console.log('token cancelled');
                     if (requestIdMap.has(id)) {
                         requestIdMap.delete(id);
-                        reject(new Error('timeout'));
+                        reject(new Error(reason));
                     }
-                }, timeout);
+                });
             }
         });
         return promise;
@@ -32,12 +34,10 @@ export function newRequestManager(): RequestManager {
     function onResponse(response: Response) {
         const id = `${response.requestId}`;
         if (requestIdMap.has(id)) {
-            const resolve = requestIdMap.get(id);
-            requestIdMap.delete(id);
             Promise.resolve().then(() => {
-                if (resolve) {
-                    resolve(response);
-                }
+                const resolve = requestIdMap.get(id);
+                requestIdMap.delete(id);
+                resolve?.(response);
             });
         }
     }

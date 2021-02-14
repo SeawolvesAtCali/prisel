@@ -215,6 +215,46 @@ export interface OpenChanceChestExtra {
     chance?: ChanceDisplay;
 }
 /**
+ * extra for "teleport_pickup"
+ * teleport is composed of 3 animations played in sequence:
+ * "teleport_pickup", "pan" and "teleport_dropoff"
+ *
+ * @generated from protobuf message monopoly.TeleportPickupExtra
+ */
+export interface TeleportPickupExtra {
+    /**
+     * @generated from protobuf field: monopoly.TeleportVehicle vehicle = 1;
+     */
+    vehicle: TeleportVehicle;
+    /**
+     * @generated from protobuf field: monopoly.Coordinate pickup_location = 2;
+     */
+    pickupLocation?: Coordinate;
+    /**
+     * @generated from protobuf field: monopoly.GamePlayer player = 3;
+     */
+    player?: GamePlayer;
+}
+/**
+ * extra for "teleport_dropoff"
+ *
+ * @generated from protobuf message monopoly.TeleportDropoffExtra
+ */
+export interface TeleportDropoffExtra {
+    /**
+     * @generated from protobuf field: monopoly.TeleportVehicle vehicle = 1;
+     */
+    vehicle: TeleportVehicle;
+    /**
+     * @generated from protobuf field: monopoly.Coordinate dropoff_location = 2;
+     */
+    dropoffLocation?: Coordinate;
+    /**
+     * @generated from protobuf field: monopoly.GamePlayer player = 3;
+     */
+    player?: GamePlayer;
+}
+/**
  * @generated from protobuf enum monopoly.AnimationType
  */
 export enum AnimationType {
@@ -242,6 +282,17 @@ export enum AnimationType {
      * @generated from protobuf enum value: ALL = 3;
      */
     ALL = 3
+}
+/**
+ * How the player is being teleported. Could be things like UFO or police car.
+ *
+ * @generated from protobuf enum monopoly.TeleportVehicle
+ */
+export enum TeleportVehicle {
+    /**
+     * @generated from protobuf enum value: UNSPECIFIED = 0;
+     */
+    UNSPECIFIED = 0
 }
 /**
  * Type for protobuf message monopoly.Animation
@@ -853,3 +904,121 @@ class OpenChanceChestExtra$Type extends MessageType<OpenChanceChestExtra> {
     }
 }
 export const OpenChanceChestExtra = new OpenChanceChestExtra$Type();
+/**
+ * Type for protobuf message monopoly.TeleportPickupExtra
+ */
+class TeleportPickupExtra$Type extends MessageType<TeleportPickupExtra> {
+    constructor() {
+        super("monopoly.TeleportPickupExtra", [
+            { no: 1, name: "vehicle", kind: "enum", T: () => ["monopoly.TeleportVehicle", TeleportVehicle] },
+            { no: 2, name: "pickup_location", kind: "message", T: () => Coordinate },
+            { no: 3, name: "player", kind: "message", T: () => GamePlayer }
+        ]);
+    }
+    create(value?: PartialMessage<TeleportPickupExtra>): TeleportPickupExtra {
+        const message = { vehicle: 0 };
+        if (value !== undefined)
+            reflectionMergePartial<TeleportPickupExtra>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TeleportPickupExtra): TeleportPickupExtra {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* monopoly.TeleportVehicle vehicle */ 1:
+                    message.vehicle = reader.int32();
+                    break;
+                case /* monopoly.Coordinate pickup_location */ 2:
+                    message.pickupLocation = Coordinate.internalBinaryRead(reader, reader.uint32(), options, message.pickupLocation);
+                    break;
+                case /* monopoly.GamePlayer player */ 3:
+                    message.player = GamePlayer.internalBinaryRead(reader, reader.uint32(), options, message.player);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: TeleportPickupExtra, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* monopoly.TeleportVehicle vehicle = 1; */
+        if (message.vehicle !== 0)
+            writer.tag(1, WireType.Varint).int32(message.vehicle);
+        /* monopoly.Coordinate pickup_location = 2; */
+        if (message.pickupLocation)
+            Coordinate.internalBinaryWrite(message.pickupLocation, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* monopoly.GamePlayer player = 3; */
+        if (message.player)
+            GamePlayer.internalBinaryWrite(message.player, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+export const TeleportPickupExtra = new TeleportPickupExtra$Type();
+/**
+ * Type for protobuf message monopoly.TeleportDropoffExtra
+ */
+class TeleportDropoffExtra$Type extends MessageType<TeleportDropoffExtra> {
+    constructor() {
+        super("monopoly.TeleportDropoffExtra", [
+            { no: 1, name: "vehicle", kind: "enum", T: () => ["monopoly.TeleportVehicle", TeleportVehicle] },
+            { no: 2, name: "dropoff_location", kind: "message", T: () => Coordinate },
+            { no: 3, name: "player", kind: "message", T: () => GamePlayer }
+        ]);
+    }
+    create(value?: PartialMessage<TeleportDropoffExtra>): TeleportDropoffExtra {
+        const message = { vehicle: 0 };
+        if (value !== undefined)
+            reflectionMergePartial<TeleportDropoffExtra>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TeleportDropoffExtra): TeleportDropoffExtra {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* monopoly.TeleportVehicle vehicle */ 1:
+                    message.vehicle = reader.int32();
+                    break;
+                case /* monopoly.Coordinate dropoff_location */ 2:
+                    message.dropoffLocation = Coordinate.internalBinaryRead(reader, reader.uint32(), options, message.dropoffLocation);
+                    break;
+                case /* monopoly.GamePlayer player */ 3:
+                    message.player = GamePlayer.internalBinaryRead(reader, reader.uint32(), options, message.player);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: TeleportDropoffExtra, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* monopoly.TeleportVehicle vehicle = 1; */
+        if (message.vehicle !== 0)
+            writer.tag(1, WireType.Varint).int32(message.vehicle);
+        /* monopoly.Coordinate dropoff_location = 2; */
+        if (message.dropoffLocation)
+            Coordinate.internalBinaryWrite(message.dropoffLocation, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* monopoly.GamePlayer player = 3; */
+        if (message.player)
+            GamePlayer.internalBinaryWrite(message.player, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+export const TeleportDropoffExtra = new TeleportDropoffExtra$Type();

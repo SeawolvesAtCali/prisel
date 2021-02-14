@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Chance } from "./chance";
 /**
+ * TODO: this seems useless. There is already animation for showing chance chest
+ * open/close.
+ *
  * @generated from protobuf message monopoly.AnnounceRecievedChancePayload
  */
 export interface AnnounceRecievedChancePayload {

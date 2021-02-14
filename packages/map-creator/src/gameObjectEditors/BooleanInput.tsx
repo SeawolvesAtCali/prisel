@@ -2,7 +2,7 @@ import React from 'react';
 
 interface BooleanInputProps {
     initialValue?: unknown;
-    children: React.ReactChild;
+    label: string;
     autoFocus?: boolean;
     onCommit?: (value: boolean) => unknown;
 }
@@ -28,7 +28,7 @@ export const BooleanInput: React.FC<BooleanInputProps> = (props) => {
                     }
                 }}
             />
-            {props.children}
+            {props.label}
         </div>
     );
 };

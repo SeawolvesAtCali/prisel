@@ -9,7 +9,7 @@ import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
 import { log } from '../log';
 import { getPlayer } from '../utils';
-import { ChanceHandler } from './ChanceHander';
+import { ChanceHandler } from './ChanceHandler';
 
 export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game, input) => {
     const currentPlayer = game.getCurrentPlayer();
@@ -75,15 +75,17 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
             .build(),
     );
 
-    await Anim.processAndWait(
-        (animation) => {
-            getPlayer(currentPlayer).emit(animation);
-        },
+    await Anim.wait(
         Anim.create('player_emotion', monopolypb.PlayerEmotionExtra)
             .setExtra({
                 player: currentPlayer.getGamePlayerInfo(),
                 emotion: playerEmotion,
             })
             .setLength(animationMap.player_emotion),
-    ).promise;
+        {
+            onStart: (animation) => {
+                getPlayer(currentPlayer).emit(animation);
+            },
+        },
+    );
 };

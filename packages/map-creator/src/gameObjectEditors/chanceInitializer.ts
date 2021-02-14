@@ -44,7 +44,7 @@ export function chanceInitializer<T extends keyof ChanceInputArgs>(
                 type: 'money_exchange',
                 inputArgs: {
                     direction: MoneyExchangeDirection.FROM_BANK,
-                    type: MoneyExchangeType.UNSPECIFIED,
+                    type: MoneyExchangeType.DEFAULT,
                     amount: 0,
                 },
             };

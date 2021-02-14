@@ -1,5 +1,6 @@
+import { animationMap } from '@prisel/monopoly-common';
+import { monopolypb } from '@prisel/protos';
 import Game from '../Game';
-
 export interface Sync {
     isSynced: () => boolean;
     add(playerId: string): boolean;
@@ -40,4 +41,11 @@ export function syncGamePlayer(game: Game): Sync {
         add,
         has,
     };
+}
+
+export function getPanAnimationLength(from: monopolypb.Coordinate, to: monopolypb.Coordinate) {
+    return Math.trunc(
+        Math.sqrt(Math.pow(from.row - to.row, 2) + Math.pow(from.col - to.col, 2)) *
+            animationMap.pan,
+    );
 }

@@ -1,4 +1,4 @@
-import { RequestManager } from '@prisel/common/requestManager';
+import { RequestManager } from '@prisel/common';
 import WebSocket from 'ws';
 import { Player } from '../player';
 import { Room } from '../room';

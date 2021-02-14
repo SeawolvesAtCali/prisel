@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package monopoly;
+option csharp_namespace = "Monopoly.Protobuf";
+
+message DetainedExtra {
+  enum Type {
+    UNSPECIFIED = 0;
+    ARRESTED = 1;
+    HOSPITALIZED = 2;
+  }
+  Type type = 1;
+  // How long show the player stay.
+  int32 length = 3;
+}

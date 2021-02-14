@@ -52,12 +52,20 @@ namespace Monopoly.Protobuf {
             "aW9uVHlwZSI0CgtFbW90aW9uVHlwZRIPCgtVTlNQRUNJRklFRBAAEgkKBUNI",
             "RUVSEAESCQoFQU5HUlkQAiJwChRPcGVuQ2hhbmNlQ2hlc3RFeHRyYRIvChFj",
             "aGFuY2VfY2hlc3RfdGlsZRgBIAEoCzIULm1vbm9wb2x5LkNvb3JkaW5hdGUS",
-            "JwoGY2hhbmNlGAIgASgLMhcubW9ub3BvbHkuQ2hhbmNlRGlzcGxheSo9Cg1B",
-            "bmltYXRpb25UeXBlEgsKB0RFRkFVTFQQABIMCghTRVFVRU5DRRABEggKBFJB",
-            "Q0UQAhIHCgNBTEwQA0IUqgIRTW9ub3BvbHkuUHJvdG9idWZiBnByb3RvMw=="));
+            "JwoGY2hhbmNlGAIgASgLMhcubW9ub3BvbHkuQ2hhbmNlRGlzcGxheSKWAQoT",
+            "VGVsZXBvcnRQaWNrdXBFeHRyYRIqCgd2ZWhpY2xlGAEgASgOMhkubW9ub3Bv",
+            "bHkuVGVsZXBvcnRWZWhpY2xlEi0KD3BpY2t1cF9sb2NhdGlvbhgCIAEoCzIU",
+            "Lm1vbm9wb2x5LkNvb3JkaW5hdGUSJAoGcGxheWVyGAMgASgLMhQubW9ub3Bv",
+            "bHkuR2FtZVBsYXllciKYAQoUVGVsZXBvcnREcm9wb2ZmRXh0cmESKgoHdmVo",
+            "aWNsZRgBIAEoDjIZLm1vbm9wb2x5LlRlbGVwb3J0VmVoaWNsZRIuChBkcm9w",
+            "b2ZmX2xvY2F0aW9uGAIgASgLMhQubW9ub3BvbHkuQ29vcmRpbmF0ZRIkCgZw",
+            "bGF5ZXIYAyABKAsyFC5tb25vcG9seS5HYW1lUGxheWVyKj0KDUFuaW1hdGlv",
+            "blR5cGUSCwoHREVGQVVMVBAAEgwKCFNFUVVFTkNFEAESCAoEUkFDRRACEgcK",
+            "A0FMTBADKiIKD1RlbGVwb3J0VmVoaWNsZRIPCgtVTlNQRUNJRklFRBAAQhSq",
+            "AhFNb25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.AnyReflection.Descriptor, global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.GamePlayerReflection.Descriptor, global::Monopoly.Protobuf.PropertyReflection.Descriptor, global::Monopoly.Protobuf.CoordinateReflection.Descriptor, global::Monopoly.Protobuf.ChanceReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Monopoly.Protobuf.AnimationType), }, null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Monopoly.Protobuf.AnimationType), typeof(global::Monopoly.Protobuf.TeleportVehicle), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.Animation), global::Monopoly.Protobuf.Animation.Parser, new[]{ "Name", "Type", "Length", "Extra", "Children" }, new[]{ "Extra" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnimationPayload), global::Monopoly.Protobuf.AnimationPayload.Parser, new[]{ "Animation" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.DiceRollExtra), global::Monopoly.Protobuf.DiceRollExtra.Parser, new[]{ "Player" }, null, null, null, null),
@@ -69,7 +77,9 @@ namespace Monopoly.Protobuf {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.TurnStartExtra), global::Monopoly.Protobuf.TurnStartExtra.Parser, new[]{ "Player" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.PayRentExtra), global::Monopoly.Protobuf.PayRentExtra.Parser, new[]{ "Payer", "Payee" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.PlayerEmotionExtra), global::Monopoly.Protobuf.PlayerEmotionExtra.Parser, new[]{ "Player", "Emotion" }, null, new[]{ typeof(global::Monopoly.Protobuf.PlayerEmotionExtra.Types.EmotionType) }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.OpenChanceChestExtra), global::Monopoly.Protobuf.OpenChanceChestExtra.Parser, new[]{ "ChanceChestTile", "Chance" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.OpenChanceChestExtra), global::Monopoly.Protobuf.OpenChanceChestExtra.Parser, new[]{ "ChanceChestTile", "Chance" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.TeleportPickupExtra), global::Monopoly.Protobuf.TeleportPickupExtra.Parser, new[]{ "Vehicle", "PickupLocation", "Player" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.TeleportDropoffExtra), global::Monopoly.Protobuf.TeleportDropoffExtra.Parser, new[]{ "Vehicle", "DropoffLocation", "Player" }, null, null, null, null)
           }));
     }
     #endregion
@@ -92,6 +102,13 @@ namespace Monopoly.Protobuf {
     /// finish.
     /// </summary>
     [pbr::OriginalName("ALL")] All = 3,
+  }
+
+  /// <summary>
+  /// How the player is being teleported. Could be things like UFO or police car.
+  /// </summary>
+  public enum TeleportVehicle {
+    [pbr::OriginalName("UNSPECIFIED")] Unspecified = 0,
   }
 
   #endregion
@@ -2683,6 +2700,538 @@ namespace Monopoly.Protobuf {
               Chance = new global::Monopoly.Protobuf.ChanceDisplay();
             }
             input.ReadMessage(Chance);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// extra for "teleport_pickup"
+  /// teleport is composed of 3 animations played in sequence:
+  /// "teleport_pickup", "pan" and "teleport_dropoff"
+  /// </summary>
+  public sealed partial class TeleportPickupExtra : pb::IMessage<TeleportPickupExtra>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<TeleportPickupExtra> _parser = new pb::MessageParser<TeleportPickupExtra>(() => new TeleportPickupExtra());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<TeleportPickupExtra> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Monopoly.Protobuf.AnimationSpecReflection.Descriptor.MessageTypes[12]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TeleportPickupExtra() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TeleportPickupExtra(TeleportPickupExtra other) : this() {
+      vehicle_ = other.vehicle_;
+      pickupLocation_ = other.pickupLocation_ != null ? other.pickupLocation_.Clone() : null;
+      player_ = other.player_ != null ? other.player_.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TeleportPickupExtra Clone() {
+      return new TeleportPickupExtra(this);
+    }
+
+    /// <summary>Field number for the "vehicle" field.</summary>
+    public const int VehicleFieldNumber = 1;
+    private global::Monopoly.Protobuf.TeleportVehicle vehicle_ = global::Monopoly.Protobuf.TeleportVehicle.Unspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Monopoly.Protobuf.TeleportVehicle Vehicle {
+      get { return vehicle_; }
+      set {
+        vehicle_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pickup_location" field.</summary>
+    public const int PickupLocationFieldNumber = 2;
+    private global::Monopoly.Protobuf.Coordinate pickupLocation_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Monopoly.Protobuf.Coordinate PickupLocation {
+      get { return pickupLocation_; }
+      set {
+        pickupLocation_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "player" field.</summary>
+    public const int PlayerFieldNumber = 3;
+    private global::Monopoly.Protobuf.GamePlayer player_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Monopoly.Protobuf.GamePlayer Player {
+      get { return player_; }
+      set {
+        player_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as TeleportPickupExtra);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(TeleportPickupExtra other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Vehicle != other.Vehicle) return false;
+      if (!object.Equals(PickupLocation, other.PickupLocation)) return false;
+      if (!object.Equals(Player, other.Player)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) hash ^= Vehicle.GetHashCode();
+      if (pickupLocation_ != null) hash ^= PickupLocation.GetHashCode();
+      if (player_ != null) hash ^= Player.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Vehicle);
+      }
+      if (pickupLocation_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(PickupLocation);
+      }
+      if (player_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Player);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Vehicle);
+      }
+      if (pickupLocation_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(PickupLocation);
+      }
+      if (player_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Player);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Vehicle);
+      }
+      if (pickupLocation_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(PickupLocation);
+      }
+      if (player_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Player);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(TeleportPickupExtra other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) {
+        Vehicle = other.Vehicle;
+      }
+      if (other.pickupLocation_ != null) {
+        if (pickupLocation_ == null) {
+          PickupLocation = new global::Monopoly.Protobuf.Coordinate();
+        }
+        PickupLocation.MergeFrom(other.PickupLocation);
+      }
+      if (other.player_ != null) {
+        if (player_ == null) {
+          Player = new global::Monopoly.Protobuf.GamePlayer();
+        }
+        Player.MergeFrom(other.Player);
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Vehicle = (global::Monopoly.Protobuf.TeleportVehicle) input.ReadEnum();
+            break;
+          }
+          case 18: {
+            if (pickupLocation_ == null) {
+              PickupLocation = new global::Monopoly.Protobuf.Coordinate();
+            }
+            input.ReadMessage(PickupLocation);
+            break;
+          }
+          case 26: {
+            if (player_ == null) {
+              Player = new global::Monopoly.Protobuf.GamePlayer();
+            }
+            input.ReadMessage(Player);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Vehicle = (global::Monopoly.Protobuf.TeleportVehicle) input.ReadEnum();
+            break;
+          }
+          case 18: {
+            if (pickupLocation_ == null) {
+              PickupLocation = new global::Monopoly.Protobuf.Coordinate();
+            }
+            input.ReadMessage(PickupLocation);
+            break;
+          }
+          case 26: {
+            if (player_ == null) {
+              Player = new global::Monopoly.Protobuf.GamePlayer();
+            }
+            input.ReadMessage(Player);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// extra for "teleport_dropoff"
+  /// </summary>
+  public sealed partial class TeleportDropoffExtra : pb::IMessage<TeleportDropoffExtra>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<TeleportDropoffExtra> _parser = new pb::MessageParser<TeleportDropoffExtra>(() => new TeleportDropoffExtra());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<TeleportDropoffExtra> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Monopoly.Protobuf.AnimationSpecReflection.Descriptor.MessageTypes[13]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TeleportDropoffExtra() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TeleportDropoffExtra(TeleportDropoffExtra other) : this() {
+      vehicle_ = other.vehicle_;
+      dropoffLocation_ = other.dropoffLocation_ != null ? other.dropoffLocation_.Clone() : null;
+      player_ = other.player_ != null ? other.player_.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TeleportDropoffExtra Clone() {
+      return new TeleportDropoffExtra(this);
+    }
+
+    /// <summary>Field number for the "vehicle" field.</summary>
+    public const int VehicleFieldNumber = 1;
+    private global::Monopoly.Protobuf.TeleportVehicle vehicle_ = global::Monopoly.Protobuf.TeleportVehicle.Unspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Monopoly.Protobuf.TeleportVehicle Vehicle {
+      get { return vehicle_; }
+      set {
+        vehicle_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dropoff_location" field.</summary>
+    public const int DropoffLocationFieldNumber = 2;
+    private global::Monopoly.Protobuf.Coordinate dropoffLocation_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Monopoly.Protobuf.Coordinate DropoffLocation {
+      get { return dropoffLocation_; }
+      set {
+        dropoffLocation_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "player" field.</summary>
+    public const int PlayerFieldNumber = 3;
+    private global::Monopoly.Protobuf.GamePlayer player_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Monopoly.Protobuf.GamePlayer Player {
+      get { return player_; }
+      set {
+        player_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as TeleportDropoffExtra);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(TeleportDropoffExtra other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Vehicle != other.Vehicle) return false;
+      if (!object.Equals(DropoffLocation, other.DropoffLocation)) return false;
+      if (!object.Equals(Player, other.Player)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) hash ^= Vehicle.GetHashCode();
+      if (dropoffLocation_ != null) hash ^= DropoffLocation.GetHashCode();
+      if (player_ != null) hash ^= Player.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Vehicle);
+      }
+      if (dropoffLocation_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(DropoffLocation);
+      }
+      if (player_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Player);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Vehicle);
+      }
+      if (dropoffLocation_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(DropoffLocation);
+      }
+      if (player_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Player);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Vehicle);
+      }
+      if (dropoffLocation_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(DropoffLocation);
+      }
+      if (player_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Player);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(TeleportDropoffExtra other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Vehicle != global::Monopoly.Protobuf.TeleportVehicle.Unspecified) {
+        Vehicle = other.Vehicle;
+      }
+      if (other.dropoffLocation_ != null) {
+        if (dropoffLocation_ == null) {
+          DropoffLocation = new global::Monopoly.Protobuf.Coordinate();
+        }
+        DropoffLocation.MergeFrom(other.DropoffLocation);
+      }
+      if (other.player_ != null) {
+        if (player_ == null) {
+          Player = new global::Monopoly.Protobuf.GamePlayer();
+        }
+        Player.MergeFrom(other.Player);
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Vehicle = (global::Monopoly.Protobuf.TeleportVehicle) input.ReadEnum();
+            break;
+          }
+          case 18: {
+            if (dropoffLocation_ == null) {
+              DropoffLocation = new global::Monopoly.Protobuf.Coordinate();
+            }
+            input.ReadMessage(DropoffLocation);
+            break;
+          }
+          case 26: {
+            if (player_ == null) {
+              Player = new global::Monopoly.Protobuf.GamePlayer();
+            }
+            input.ReadMessage(Player);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Vehicle = (global::Monopoly.Protobuf.TeleportVehicle) input.ReadEnum();
+            break;
+          }
+          case 18: {
+            if (dropoffLocation_ == null) {
+              DropoffLocation = new global::Monopoly.Protobuf.Coordinate();
+            }
+            input.ReadMessage(DropoffLocation);
+            break;
+          }
+          case 26: {
+            if (player_ == null) {
+              Player = new global::Monopoly.Protobuf.GamePlayer();
+            }
+            input.ReadMessage(Player);
             break;
           }
         }

@@ -10,7 +10,6 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Coordinate } from "./coordinate";
 /**
  * @generated from protobuf message monopoly.RollResponse
  */
@@ -19,10 +18,6 @@ export interface RollResponse {
      * @generated from protobuf field: int32 steps = 1;
      */
     steps: number;
-    /**
-     * @generated from protobuf field: repeated monopoly.Coordinate path = 2;
-     */
-    path: Coordinate[];
 }
 /**
  * Type for protobuf message monopoly.RollResponse
@@ -30,12 +25,11 @@ export interface RollResponse {
 class RollResponse$Type extends MessageType<RollResponse> {
     constructor() {
         super("monopoly.RollResponse", [
-            { no: 1, name: "steps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 2, name: "path", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Coordinate }
+            { no: 1, name: "steps", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value?: PartialMessage<RollResponse>): RollResponse {
-        const message = { steps: 0, path: [] };
+        const message = { steps: 0 };
         if (value !== undefined)
             reflectionMergePartial<RollResponse>(this, message, value);
         return message;
@@ -47,9 +41,6 @@ class RollResponse$Type extends MessageType<RollResponse> {
             switch (fieldNo) {
                 case /* int32 steps */ 1:
                     message.steps = reader.int32();
-                    break;
-                case /* repeated monopoly.Coordinate path */ 2:
-                    message.path.push(Coordinate.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -66,9 +57,6 @@ class RollResponse$Type extends MessageType<RollResponse> {
         /* int32 steps = 1; */
         if (message.steps !== 0)
             writer.tag(1, WireType.Varint).int32(message.steps);
-        /* repeated monopoly.Coordinate path = 2; */
-        for (let i = 0; i < message.path.length; i++)
-            Coordinate.internalBinaryWrite(message.path[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

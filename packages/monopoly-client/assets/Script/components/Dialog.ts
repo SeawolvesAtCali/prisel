@@ -50,7 +50,7 @@ export function createDialog(props: DialogProps): NodeConfig<DialogExport> {
         .setSize(new cc.Size(300, 0)) // height is dynamic
         .addComponents(
             SpriteConfig.panel(),
-            LayoutConfig.verticalContainer(10, 17.9, 0),
+            LayoutConfig.verticalWrapChildren(10, 17.9, 0),
             getWidgetConfigForPosition(position),
         );
 

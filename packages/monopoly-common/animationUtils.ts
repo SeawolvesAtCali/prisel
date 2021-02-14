@@ -1,4 +1,4 @@
-import { assertNever, Packet } from '@prisel/common';
+import { assertNever, Packet, Token } from '@prisel/common';
 import { monopolypb, protobuf } from '@prisel/protos';
 import type { IMessageType } from '@protobuf-ts/runtime';
 
@@ -121,23 +121,33 @@ export const Anim = {
     sequence(...animations: Animation[]): Animation {
         return new AnimationBuilder(AnimationType.SEQUENCE).addChildren(...animations).build();
     },
-    /**
-     * Package the animation into a packet and process it (usually emitting to
-     * client) then wait for the duration of the animation.
-     * @param processor A runnable that takes a Animation packet.
-     * @param animation The animation to be packaged and waited
-     */
-    processAndWait(processor: (packet: Packet) => void, animation: Animation) {
-        const packet = toAnimationPacket(animation);
-        processor(packet);
-        return Anim.wait(animation);
-    },
-    wait(animation: Animation) {
+    async wait(
+        animation: Animation,
+        {
+            token,
+            onStart,
+        }: {
+            onStart?: (packet: Packet) => void;
+            token?: Token;
+        } = {},
+    ): Promise<void> {
+        if (token?.cancelled) {
+            return;
+        }
         const waitTime = computeAnimationLength(animation);
         if (waitTime === Infinity) {
             throw new Error('cannot wait for infinite animation');
         }
-        return timeoutPromise(waitTime);
+        if (onStart) {
+            onStart(toAnimationPacket(animation));
+        }
+        const timerToken = Token.delay(waitTime);
+        if (token) {
+            await Promise.race([timerToken.promise, token.promise]);
+            timerToken.cancel();
+        } else {
+            await timerToken.promise;
+        }
     },
 };
 

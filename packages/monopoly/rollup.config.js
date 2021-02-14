@@ -5,6 +5,6 @@ export default [
     cjsAndEsBuild(
         /* entry= */ 'dist/server.js',
         /* pkgJson= */ pkg,
-        /* additionalDeps= */ ['fs', 'path'],
+        /* additionalDeps= */ ['fs', 'path', 'assert'],
     ),
 ];

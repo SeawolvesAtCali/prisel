@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package monopoly;
+option csharp_namespace = "Monopoly.Protobuf";
+
+// move a specific amount of steps forward or backward
+message MoveStepsExtra { int32 steps = 1; }

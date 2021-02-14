@@ -7,7 +7,7 @@ import { Sync, syncGamePlayer } from './utils';
 
 export class GameOver extends StateMachineState {
     private sync?: Sync;
-    public async onEnter() {
+    public onEnter() {
         this.sync = syncGamePlayer(this.game);
         this.game.broadcast(
             Packet.forAction(Action.ANNOUNCE_GAME_OVER)
@@ -70,7 +70,5 @@ export class GameOver extends StateMachineState {
         }
     }
 
-    public get [Symbol.toStringTag](): string {
-        return 'GameOver';
-    }
+    public readonly [Symbol.toStringTag] = 'GameOver';
 }

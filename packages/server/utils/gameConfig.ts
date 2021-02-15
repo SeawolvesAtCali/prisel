@@ -30,7 +30,7 @@ export interface FullGameConfig {
      */
     onAddPlayer(room: Room, player: Player): void;
     /**
-     * Function invoke when a player is removed from the game.
+     * Function invoke when a player is removed from the game while the game is running.
      */
     onRemovePlayer(room: Room, player: Player): void;
 }

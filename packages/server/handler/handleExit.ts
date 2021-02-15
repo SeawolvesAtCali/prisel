@@ -1,5 +1,6 @@
 import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
+import { GAME_PHASE } from '../objects/gamePhase';
 import { closeSocket } from '../utils/networkUtils';
 import { getPlayer, getRoom } from '../utils/stateUtils';
 
@@ -14,7 +15,9 @@ export const handleExit: Handler = (context, socket) => (_packet) => {
     const player = getPlayer(context, socket);
     if (room && player) {
         context.roomConfig.onExit(player);
-        context.gameConfig.onRemovePlayer(room, player);
+        if (room.getGamePhase() === GAME_PHASE.GAME) {
+            context.gameConfig.onRemovePlayer(room, player);
+        }
         context.players.delete(player.getId());
     }
     SocketManager.removeBySocket(socket);

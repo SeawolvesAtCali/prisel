@@ -1,6 +1,6 @@
 import { assertExist } from '@prisel/client';
 import { monopolypb } from '@prisel/protos';
-import { createDialog, DialogPosition } from './components/Dialog';
+import { createDialog, DialogPosition } from './components/DialogUtils';
 import { LabelConfig, LabelTheme, themeToColor } from './components/LabelConfig';
 import { LayoutConfig } from './components/LayoutConfig';
 import { NodeConfig } from './components/NodeConfig';

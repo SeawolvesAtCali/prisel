@@ -1,7 +1,7 @@
 import { assertExist, Client, Messages, Packet } from '@prisel/client';
 import { exist } from '@prisel/monopoly-common';
 import { client } from './Client';
-import { createDialog } from './components/Dialog';
+import { createDialog } from './components/DialogUtils';
 import { createInput } from './components/Input';
 import { WidgetConfig } from './components/WidgetConfig';
 import { PERSISTENT_NODE } from './consts';

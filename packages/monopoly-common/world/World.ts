@@ -2,10 +2,9 @@ import { genId } from '../genId';
 import { GameObject, GameObjectClass } from './GameObject';
 import { Id } from './Id';
 import { Ref as Ref2 } from './ref2';
-import { Serialized } from './serializeUtil';
 
 export interface SerializedWorld {
-    [key: string]: Array<Serialized<GameObject>>;
+    [key: string]: Array<any>;
 }
 
 /**

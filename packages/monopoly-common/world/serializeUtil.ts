@@ -1,7 +1,5 @@
 import { custom, list, raw as _raw, serializable } from 'serializr';
 import { exist } from '../exist';
-import { GameObject } from './GameObject';
-import { Id } from './Id';
 import { Ref } from './ref2';
 
 const refPropSchema = custom(
@@ -15,8 +13,8 @@ export const listRefSerializable = serializable(list(refPropSchema));
 // A simple serializer that serialize into json string
 export const raw = serializable(_raw());
 
-export type Serialized<GameObjectType extends GameObject = GameObject> = {
-    id: Id<GameObjectType>;
-    type: GameObjectType['type'];
-    data: object;
-};
+// export type Serialized<GameObjectType extends GameObject = GameObject> = {
+//     id: Id<GameObjectType>;
+//     type: GameObjectType['type'];
+//     data: object;
+// };

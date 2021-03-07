@@ -9,10 +9,7 @@ test('serialize', () => {
 
     expect(tile.serialize()).toMatchObject({
         id: expect.any(String),
-        type: 'tile',
-        data: {
-            next: [expect.any(String)],
-            prev: [expect.any(String)],
-        },
+        next: [expect.any(String)],
+        prev: [expect.any(String)],
     });
 });

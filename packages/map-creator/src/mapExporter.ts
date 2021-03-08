@@ -1,4 +1,12 @@
-import { BoardSetup, existOrThrow, Property, Ref, Tile, World } from '@prisel/monopoly-common';
+import {
+    BoardSetup,
+    existOrThrow,
+    MonopolyWorld,
+    Property,
+    Ref,
+    Tile,
+    World,
+} from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 
 type Coordinate = monopolypb.Coordinate;
@@ -7,7 +15,7 @@ type CoordinateKey = string;
 const toKey = (tile: Coordinate): CoordinateKey => `${tile.row}-${tile.col}`;
 
 export function toBoardSetup(world: World, width: number, height: number): BoardSetup {
-    const copiedWorld = world.copy();
+    const copiedWorld = new MonopolyWorld().populate(world.serialize());
     connectPathAndProperties(copiedWorld);
 
     return {

@@ -1,5 +1,5 @@
 import { assertExist, Messages, Packet, Request, Response } from '@prisel/client';
-import { Action, BoardSetup, GamePlayer, Property, Tile, World } from '@prisel/monopoly-common';
+import { Action, BoardSetup, MonopolyWorld, World } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { client } from './Client';
 import { CHARACTER_COLORS, EVENT, EVENT_BUS } from './consts';
@@ -56,11 +56,7 @@ export default class Game extends cc.Component {
     }
 
     private async setupGame(boardSetup: BoardSetup) {
-        this.world = new World()
-            .registerObject(Tile)
-            .registerObject(Property)
-            .registerObject(GamePlayer)
-            .deserialize(boardSetup.world);
+        this.world = new MonopolyWorld().populate(boardSetup.world);
         this.map = assertExist(this.mapNode, 'mapNode').getComponent(MapLoader);
         this.map.renderMap(this.world, boardSetup);
 

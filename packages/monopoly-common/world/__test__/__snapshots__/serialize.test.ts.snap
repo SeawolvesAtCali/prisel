@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`deserialize 1`] = `
+Object {
+  "tiles": Array [
+    Object {
+      "chancePool": undefined,
+      "hasProperties": Array [],
+      "id": "mocked_id_0",
+      "isStart": false,
+      "next": Array [
+        "mocked_id_2",
+      ],
+      "position": Object {
+        "col": -1,
+        "row": -1,
+      },
+      "prev": Array [
+        "mocked_id_1",
+      ],
+      "tileEffect": undefined,
+    },
+    Object {
+      "chancePool": undefined,
+      "hasProperties": Array [],
+      "id": "mocked_id_1",
+      "isStart": false,
+      "next": Array [],
+      "position": Object {
+        "col": -1,
+        "row": -1,
+      },
+      "prev": Array [],
+      "tileEffect": undefined,
+    },
+    Object {
+      "chancePool": undefined,
+      "hasProperties": Array [],
+      "id": "mocked_id_2",
+      "isStart": false,
+      "next": Array [],
+      "position": Object {
+        "col": -1,
+        "row": -1,
+      },
+      "prev": Array [],
+      "tileEffect": undefined,
+    },
+  ],
+}
+`;
+
+exports[`serialize 1`] = `
+Object {
+  "tiles": Array [
+    Object {
+      "chancePool": undefined,
+      "hasProperties": Array [],
+      "id": "mocked_id_0",
+      "isStart": false,
+      "next": Array [
+        "mocked_id_2",
+      ],
+      "position": Object {
+        "col": -1,
+        "row": -1,
+      },
+      "prev": Array [
+        "mocked_id_1",
+      ],
+      "tileEffect": undefined,
+    },
+    Object {
+      "chancePool": undefined,
+      "hasProperties": Array [],
+      "id": "mocked_id_1",
+      "isStart": false,
+      "next": Array [],
+      "position": Object {
+        "col": -1,
+        "row": -1,
+      },
+      "prev": Array [],
+      "tileEffect": undefined,
+    },
+    Object {
+      "chancePool": undefined,
+      "hasProperties": Array [],
+      "id": "mocked_id_2",
+      "isStart": false,
+      "next": Array [],
+      "position": Object {
+        "col": -1,
+        "row": -1,
+      },
+      "prev": Array [],
+      "tileEffect": undefined,
+    },
+  ],
+}
+`;

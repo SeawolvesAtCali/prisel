@@ -1,4 +1,4 @@
-import { BoardSetup, GamePlayer, genId, Property, Tile, World } from '@prisel/monopoly-common';
+import { BoardSetup, GamePlayer, genId, MonopolyWorld, Tile } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { Player, Room } from '@prisel/server';
 import fs from 'fs';
@@ -24,11 +24,7 @@ export async function createIntialState(
         throw new Error('Cannot load map');
     }
     const boardSetup: BoardSetup = JSON.parse(rawBoardSetup.toString());
-    const world = new World()
-        .registerObject(Tile)
-        .registerObject(GamePlayer)
-        .registerObject(Property)
-        .deserialize(boardSetup.world);
+    const world = new MonopolyWorld().populate(boardSetup.world);
     const startPathTiles = world.getAll(Tile).filter((tile) => tile.isStart);
     const players = room.getPlayers();
     const playerMap = new Map<string, GamePlayer>();

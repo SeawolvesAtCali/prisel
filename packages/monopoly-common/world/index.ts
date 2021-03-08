@@ -2,6 +2,7 @@ export { GameObject } from './GameObject';
 export type { GameObjectClass } from './GameObject';
 export { GamePlayer } from './GamePlayer';
 export type { Id } from './Id';
+export { MonopolyWorld } from './MonopolyWorld';
 export { Property } from './Property';
 export { Ref } from './ref2';
 export { listRefSerializable, raw, refSerializable } from './serializeUtil';

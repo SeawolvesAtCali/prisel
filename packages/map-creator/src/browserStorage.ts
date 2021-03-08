@@ -19,7 +19,7 @@ export function clearValue(key: string) {
 export function readFromStorage(bootstrappedWorld: World): World {
     const worldString = readValueFromStorage(WORLD_STORAGE_KEY);
     if (worldString) {
-        return bootstrappedWorld.deserialize(JSON.parse(worldString));
+        return bootstrappedWorld.populate(JSON.parse(worldString));
     }
     return bootstrappedWorld;
 }

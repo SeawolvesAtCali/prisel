@@ -6,7 +6,7 @@ Object {
   "collectibles": Array [
     Object {
       "description": "activate when entering jail",
-      "id": "mocked_id_1",
+      "id": "mocked_id_0",
       "name": "get out of jail free",
       "type": 1,
     },

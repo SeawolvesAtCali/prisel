@@ -92,6 +92,7 @@ export class World {
         }
         this.objectMap.set(object.id, object);
         this.getIdSetOfSameType(object).add(object.id);
+        object.world = this;
     }
 
     public remove<T extends GameObject>(idOrGameObject: Id | T) {

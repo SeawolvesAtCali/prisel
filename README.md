@@ -18,6 +18,8 @@ The main part of the project can be built inside dev container or locally. If yo
 following the following step:
 
 1. Pull down this repo.
+1. Use `npm ci` to install packages.
+1. Use `npm run build` to build packages.
 1. Install Docker Desktop 2.0+ on Windows or macOS or Docker CE/EE 18.06+ as required by
    [this doc](https://code.visualstudio.com/docs/remote/containers#_system-requirements).
 1. Install VSCode

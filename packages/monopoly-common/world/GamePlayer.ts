@@ -11,6 +11,8 @@ import { Ref } from './ref2';
 import { listRefSerializable, refSerializable } from './serializeUtil';
 import type { Tile } from './Tile';
 
+// BoundPlayer is the player.ts in @prisel/server. We don't want direct
+// reference to it because player.ts is from a server side package.
 interface BoundPlayer {
     getPlayerInfo(): priselpb.PlayerInfo;
 }
@@ -24,6 +26,10 @@ interface Props {
     rolled: boolean;
 }
 
+/**
+ * GamePlayer contains the information of the player controlled character in
+ * game. This is the server side presentation. When transfering game player data through protobuf, use game_player.proto.
+ */
 export class GamePlayer extends GameObject {
     public static TYPE = 'game_player';
     public readonly type = 'game_player';

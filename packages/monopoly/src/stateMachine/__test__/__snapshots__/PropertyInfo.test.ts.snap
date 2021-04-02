@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PropertyInfo PropertyInfo contains currentLevel 1`] = `
+"{
+  \\"property\\": {
+    \\"cost\\": 100,
+    \\"rent\\": 10,
+    \\"name\\": \\"name\\"
+  },
+  \\"moneyAfterPurchase\\": 1000,
+  \\"@type\\": \\"type.googleapis.com/monopoly.PromptPurchaseRequest\\"
+}"
+`;

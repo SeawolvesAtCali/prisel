@@ -3,20 +3,10 @@ syntax = "proto3";
 package prisel;
 option csharp_namespace = "Prisel.Protobuf";
 
-import "prisel/annotations.proto";
+// type : LOGIN,
+// packet_type : REQUEST
+message LoginRequest { string username = 1; }
 
-message LoginRequest {
-  option (for_system_action) = {
-    type : LOGIN,
-    packet_type : REQUEST
-  };
-  string username = 1;
-}
-
-message LoginResponse {
-  option (for_system_action) = {
-    type : LOGIN,
-    packet_type : RESPONSE
-  };
-  string user_id = 1;
-}
+// type : LOGIN,
+// packet_type : RESPONSE
+message LoginResponse { string user_id = 1; }

@@ -13,6 +13,9 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { RoomStateSnapshot } from "./room_state_snapshot";
 import { RoomInfo } from "./room_info";
 /**
+ * type : CREATE_ROOM,
+ * packet_type : REQUEST
+ *
  * @generated from protobuf message prisel.CreateRoomRequest
  */
 export interface CreateRoomRequest {
@@ -22,6 +25,9 @@ export interface CreateRoomRequest {
     roomName: string;
 }
 /**
+ * type : CREATE_ROOM,
+ * packet_type : RESPONSE
+ *
  * @generated from protobuf message prisel.CreateRoomResponse
  */
 export interface CreateRoomResponse {

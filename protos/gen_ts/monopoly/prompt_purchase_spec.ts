@@ -13,6 +13,9 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { PropertyLevel } from "./property";
 import { PropertyInfo } from "./property";
 /**
+ * type : "prompt_purchase"
+ * packet_type : REQUEST
+ *
  * @generated from protobuf message monopoly.PromptPurchaseRequest
  */
 export interface PromptPurchaseRequest {
@@ -37,6 +40,9 @@ export interface PromptPurchaseRequest {
     moneyAfterPurchase: number;
 }
 /**
+ * type : "prompt_purchase"
+ * packet_type : REQUEST
+ *
  * @generated from protobuf message monopoly.PromptPurchaseResponse
  */
 export interface PromptPurchaseResponse {

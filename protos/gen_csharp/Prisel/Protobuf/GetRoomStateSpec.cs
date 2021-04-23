@@ -25,13 +25,12 @@ namespace Prisel.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiBwcmlzZWwvZ2V0X3Jvb21fc3RhdGVfc3BlYy5wcm90bxIGcHJpc2VsGhhw",
-            "cmlzZWwvYW5ub3RhdGlvbnMucHJvdG8aGHByaXNlbC9wbGF5ZXJfaW5mby5w",
-            "cm90byJ2ChRHZXRSb29tU3RhdGVSZXNwb25zZRIjCgdwbGF5ZXJzGAEgAygL",
-            "MhIucHJpc2VsLlBsYXllckluZm8SFAoHaG9zdF9pZBgCIAEoCUgAiAEBEg0K",
-            "BXRva2VuGAMgASgJOgiStRgECA0QAkIKCghfaG9zdF9pZEISqgIPUHJpc2Vs",
-            "LlByb3RvYnVmYgZwcm90bzM="));
+            "cmlzZWwvcGxheWVyX2luZm8ucHJvdG8ibAoUR2V0Um9vbVN0YXRlUmVzcG9u",
+            "c2USIwoHcGxheWVycxgBIAMoCzISLnByaXNlbC5QbGF5ZXJJbmZvEhQKB2hv",
+            "c3RfaWQYAiABKAlIAIgBARINCgV0b2tlbhgDIAEoCUIKCghfaG9zdF9pZEIS",
+            "qgIPUHJpc2VsLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Prisel.Protobuf.PlayerInfoReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Prisel.Protobuf.PlayerInfoReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.GetRoomStateResponse), global::Prisel.Protobuf.GetRoomStateResponse.Parser, new[]{ "Players", "HostId", "Token" }, new[]{ "HostId" }, null, null, null)
           }));
@@ -40,6 +39,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : GET_ROOM_STATE,
+  /// packet_type : RESPONSE
+  /// </summary>
   public sealed partial class GetRoomStateResponse : pb::IMessage<GetRoomStateResponse>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -11,6 +11,9 @@ import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
+ * type : LOGIN,
+ * packet_type : REQUEST
+ *
  * @generated from protobuf message prisel.LoginRequest
  */
 export interface LoginRequest {
@@ -20,6 +23,9 @@ export interface LoginRequest {
     username: string;
 }
 /**
+ * type : LOGIN,
+ * packet_type : RESPONSE
+ *
  * @generated from protobuf message prisel.LoginResponse
  */
 export interface LoginResponse {

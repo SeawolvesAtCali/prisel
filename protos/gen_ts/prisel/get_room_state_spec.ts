@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { PlayerInfo } from "./player_info";
 /**
+ * type : GET_ROOM_STATE,
+ * packet_type : RESPONSE
+ *
  * @generated from protobuf message prisel.GetRoomStateResponse
  */
 export interface GetRoomStateResponse {

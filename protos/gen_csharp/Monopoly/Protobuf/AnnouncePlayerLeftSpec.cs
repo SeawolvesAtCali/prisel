@@ -25,13 +25,11 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cihtb25vcG9seS9hbm5vdW5jZV9wbGF5ZXJfbGVmdF9zcGVjLnByb3RvEght",
-            "b25vcG9seRoYcHJpc2VsL2Fubm90YXRpb25zLnByb3RvGhptb25vcG9seS9n",
-            "YW1lX3BsYXllci5wcm90byJfChlBbm5vdW5jZVBsYXllckxlZnRQYXlsb2Fk",
-            "EiQKBnBsYXllchgBIAEoCzIULm1vbm9wb2x5LkdhbWVQbGF5ZXI6HJq1GBgK",
-            "FGFubm91bmNlX3BsYXllcl9sZWZ0EAFCFKoCEU1vbm9wb2x5LlByb3RvYnVm",
-            "YgZwcm90bzM="));
+            "b25vcG9seRoabW9ub3BvbHkvZ2FtZV9wbGF5ZXIucHJvdG8iQQoZQW5ub3Vu",
+            "Y2VQbGF5ZXJMZWZ0UGF5bG9hZBIkCgZwbGF5ZXIYASABKAsyFC5tb25vcG9s",
+            "eS5HYW1lUGxheWVyQhSqAhFNb25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.GamePlayerReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Monopoly.Protobuf.GamePlayerReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnouncePlayerLeftPayload), global::Monopoly.Protobuf.AnnouncePlayerLeftPayload.Parser, new[]{ "Player" }, null, null, null, null)
           }));
@@ -40,6 +38,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "announce_player_left"
+  /// packet_type : REQUEST
+  /// </summary>
   public sealed partial class AnnouncePlayerLeftPayload : pb::IMessage<AnnouncePlayerLeftPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -81,9 +83,6 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "player" field.</summary>
     public const int PlayerFieldNumber = 1;
     private global::Monopoly.Protobuf.GamePlayer player_;
-    /// <summary>
-    /// TODO implement GamePlayer
-    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Monopoly.Protobuf.GamePlayer Player {
       get { return player_; }

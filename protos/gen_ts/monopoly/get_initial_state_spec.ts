@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { GamePlayer } from "./game_player";
 /**
+ * type : "get_initial_state"
+ * packet_type : RESPONSE
+ *
  * @generated from protobuf message monopoly.GetInitialStateResponse
  */
 export interface GetInitialStateResponse {

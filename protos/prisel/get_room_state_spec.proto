@@ -3,15 +3,11 @@ syntax = "proto3";
 package prisel;
 option csharp_namespace = "Prisel.Protobuf";
 
-import "prisel/annotations.proto";
 import "prisel/player_info.proto";
 
+// type : GET_ROOM_STATE,
+// packet_type : RESPONSE
 message GetRoomStateResponse {
-  option (for_system_action) = {
-    type : GET_ROOM_STATE,
-    packet_type : RESPONSE
-  };
-
   repeated PlayerInfo players = 1;
   optional string host_id = 2;
   string token = 3;

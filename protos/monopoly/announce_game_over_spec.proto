@@ -3,14 +3,8 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
 import "monopoly/rank.proto";
 
-message AnnounceGameOverPayload {
-  option (prisel.for_action) = {
-    type : "announce_game_over"
-    packet_type : DEFAULT
-  };
-
-  repeated Rank ranks = 1;
-}
+// type : "announce_game_over"
+// packet_type : DEFAULT
+message AnnounceGameOverPayload { repeated Rank ranks = 1; }

@@ -4,7 +4,6 @@ package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
 import "google/protobuf/any.proto";
-import "prisel/annotations.proto";
 import "monopoly/game_player.proto";
 import "monopoly/property.proto";
 import "monopoly/coordinate.proto";
@@ -34,13 +33,9 @@ message Animation {
   repeated Animation children = 5;
 }
 
-message AnimationPayload {
-  option (prisel.for_action) = {
-    type : "animation"
-    packet_type : DEFAULT
-  };
-  Animation animation = 1;
-}
+// type : "animation"
+// packet_type : DEFAULT
+message AnimationPayload { Animation animation = 1; }
 
 // extra for "dice_roll"
 message DiceRollExtra { GamePlayer player = 1; }

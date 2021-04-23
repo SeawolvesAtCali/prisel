@@ -25,14 +25,12 @@ namespace TicTacToe.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiJ0aWNfdGFjX3RvZS90aWNfdGFjX3RvZV9zcGVjLnByb3RvEgt0aWNfdGFj",
-            "X3RvZRoYcHJpc2VsL2Fubm90YXRpb25zLnByb3RvIi0KC01vdmVQYXlsb2Fk",
-            "EhAKCHBvc2l0aW9uGAEgASgNOgyatRgICgRtb3ZlEAEieQoQR2FtZVN0YXRl",
-            "UGF5bG9hZBIOCgZwbGF5ZXIYASADKAkSCwoDbWFwGAIgAygJEhYKDmN1cnJl",
-            "bnRfcGxheWVyGAMgASgNEhMKBndpbm5lchgEIAEoCUgAiAEBOhCatRgMCgpn",
-            "YW1lX3N0YXRlQgkKB193aW5uZXJCFaoCElRpY1RhY1RvZS5Qcm90b2J1ZmIG",
-            "cHJvdG8z"));
+            "X3RvZSIfCgtNb3ZlUGF5bG9hZBIQCghwb3NpdGlvbhgBIAEoDSJnChBHYW1l",
+            "U3RhdGVQYXlsb2FkEg4KBnBsYXllchgBIAMoCRILCgNtYXAYAiADKAkSFgoO",
+            "Y3VycmVudF9wbGF5ZXIYAyABKA0SEwoGd2lubmVyGAQgASgJSACIAQFCCQoH",
+            "X3dpbm5lckIVqgISVGljVGFjVG9lLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::TicTacToe.Protobuf.MovePayload), global::TicTacToe.Protobuf.MovePayload.Parser, new[]{ "Position" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::TicTacToe.Protobuf.GameStatePayload), global::TicTacToe.Protobuf.GameStatePayload.Parser, new[]{ "Player", "Map", "CurrentPlayer", "Winner" }, new[]{ "Winner" }, null, null, null)
@@ -42,6 +40,10 @@ namespace TicTacToe.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "move"
+  /// packet_type : REQUEST
+  /// </summary>
   public sealed partial class MovePayload : pb::IMessage<MovePayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -214,6 +216,10 @@ namespace TicTacToe.Protobuf {
 
   }
 
+  /// <summary>
+  /// type : "game_state"
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class GameStatePayload : pb::IMessage<GameStatePayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

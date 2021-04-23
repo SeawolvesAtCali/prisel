@@ -24,15 +24,14 @@ namespace Prisel.Protobuf {
     static JoinSpecReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChZwcmlzZWwvam9pbl9zcGVjLnByb3RvEgZwcmlzZWwaGHByaXNlbC9hbm5v",
-            "dGF0aW9ucy5wcm90bxoWcHJpc2VsL3Jvb21faW5mby5wcm90bxogcHJpc2Vs",
-            "L3Jvb21fc3RhdGVfc25hcHNob3QucHJvdG8iJwoLSm9pblJlcXVlc3QSDgoG",
-            "cm9vbUlkGAEgASgJOgiStRgECAMQASJmCgxKb2luUmVzcG9uc2USHgoEcm9v",
-            "bRgBIAEoCzIQLnByaXNlbC5Sb29tSW5mbxIsCglyb29tU3RhdGUYAiABKAsy",
-            "GS5wcmlzZWwuUm9vbVN0YXRlU25hcHNob3Q6CJK1GAQIAxACQhKqAg9Qcmlz",
-            "ZWwuUHJvdG9idWZiBnByb3RvMw=="));
+            "ChZwcmlzZWwvam9pbl9zcGVjLnByb3RvEgZwcmlzZWwaFnByaXNlbC9yb29t",
+            "X2luZm8ucHJvdG8aIHByaXNlbC9yb29tX3N0YXRlX3NuYXBzaG90LnByb3Rv",
+            "Ih0KC0pvaW5SZXF1ZXN0Eg4KBnJvb21JZBgBIAEoCSJcCgxKb2luUmVzcG9u",
+            "c2USHgoEcm9vbRgBIAEoCzIQLnByaXNlbC5Sb29tSW5mbxIsCglyb29tU3Rh",
+            "dGUYAiABKAsyGS5wcmlzZWwuUm9vbVN0YXRlU25hcHNob3RCEqoCD1ByaXNl",
+            "bC5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Prisel.Protobuf.RoomInfoReflection.Descriptor, global::Prisel.Protobuf.RoomStateSnapshotReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Prisel.Protobuf.RoomInfoReflection.Descriptor, global::Prisel.Protobuf.RoomStateSnapshotReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.JoinRequest), global::Prisel.Protobuf.JoinRequest.Parser, new[]{ "RoomId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.JoinResponse), global::Prisel.Protobuf.JoinResponse.Parser, new[]{ "Room", "RoomState" }, null, null, null, null)
@@ -42,6 +41,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : JOIN,
+  /// packet_type : REQUEST
+  /// </summary>
   public sealed partial class JoinRequest : pb::IMessage<JoinRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -214,6 +217,10 @@ namespace Prisel.Protobuf {
 
   }
 
+  /// <summary>
+  /// type : JOIN,
+  /// packet_type : RESPONSE
+  /// </summary>
   public sealed partial class JoinResponse : pb::IMessage<JoinResponse>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

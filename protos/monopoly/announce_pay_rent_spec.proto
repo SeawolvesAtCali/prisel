@@ -3,14 +3,11 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
 import "monopoly/payment.proto";
 
+// type : "announce_pay_rent",
+// packet_type : DEFAULT
 message AnnouncePayRentPayload {
-  option (prisel.for_action) = {
-    type : "announce_pay_rent",
-    packet_type : DEFAULT
-  };
   string payer = 1;
   repeated Payment payments = 2;
   // the updated money of the current player. This normally only affect payer

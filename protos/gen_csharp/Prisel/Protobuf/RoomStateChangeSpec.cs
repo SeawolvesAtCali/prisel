@@ -25,17 +25,16 @@ namespace Prisel.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiNwcmlzZWwvcm9vbV9zdGF0ZV9jaGFuZ2Vfc3BlYy5wcm90bxIGcHJpc2Vs",
-            "GhhwcmlzZWwvYW5ub3RhdGlvbnMucHJvdG8aGHByaXNlbC9wbGF5ZXJfaW5m",
-            "by5wcm90bxoZcHJpc2VsL3VwZGF0ZV90b2tlbi5wcm90byKMAgoWUm9vbVN0",
-            "YXRlQ2hhbmdlUGF5bG9hZBIpCgtwbGF5ZXJfam9pbhgBIAEoCzISLnByaXNl",
-            "bC5QbGF5ZXJJbmZvSAASFgoMcGxheWVyX2xlYXZlGAIgASgJSAASQgoKaG9z",
-            "dF9sZWF2ZRgDIAEoCzIsLnByaXNlbC5Sb29tU3RhdGVDaGFuZ2VQYXlsb2Fk",
-            "Lkhvc3RMZWF2ZURhdGFIABIiCgV0b2tlbhgEIAEoCzITLnByaXNlbC5VcGRh",
-            "dGVUb2tlbho1Cg1Ib3N0TGVhdmVEYXRhEg8KB2hvc3RfaWQYASABKAkSEwoL",
-            "bmV3X2hvc3RfaWQYAiABKAk6BpK1GAIICkIICgZjaGFuZ2VCEqoCD1ByaXNl",
-            "bC5Qcm90b2J1ZmIGcHJvdG8z"));
+            "GhhwcmlzZWwvcGxheWVyX2luZm8ucHJvdG8aGXByaXNlbC91cGRhdGVfdG9r",
+            "ZW4ucHJvdG8ihAIKFlJvb21TdGF0ZUNoYW5nZVBheWxvYWQSKQoLcGxheWVy",
+            "X2pvaW4YASABKAsyEi5wcmlzZWwuUGxheWVySW5mb0gAEhYKDHBsYXllcl9s",
+            "ZWF2ZRgCIAEoCUgAEkIKCmhvc3RfbGVhdmUYAyABKAsyLC5wcmlzZWwuUm9v",
+            "bVN0YXRlQ2hhbmdlUGF5bG9hZC5Ib3N0TGVhdmVEYXRhSAASIgoFdG9rZW4Y",
+            "BCABKAsyEy5wcmlzZWwuVXBkYXRlVG9rZW4aNQoNSG9zdExlYXZlRGF0YRIP",
+            "Cgdob3N0X2lkGAEgASgJEhMKC25ld19ob3N0X2lkGAIgASgJQggKBmNoYW5n",
+            "ZUISqgIPUHJpc2VsLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Prisel.Protobuf.PlayerInfoReflection.Descriptor, global::Prisel.Protobuf.UpdateTokenReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Prisel.Protobuf.PlayerInfoReflection.Descriptor, global::Prisel.Protobuf.UpdateTokenReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.RoomStateChangePayload), global::Prisel.Protobuf.RoomStateChangePayload.Parser, new[]{ "PlayerJoin", "PlayerLeave", "HostLeave", "Token" }, new[]{ "Change" }, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.RoomStateChangePayload.Types.HostLeaveData), global::Prisel.Protobuf.RoomStateChangePayload.Types.HostLeaveData.Parser, new[]{ "HostId", "NewHostId" }, null, null, null, null)})
           }));
@@ -44,6 +43,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : ROOM_STATE_CHANGE,
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class RoomStateChangePayload : pb::IMessage<RoomStateChangePayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -43,6 +43,9 @@ export interface Animation {
     children: Animation[];
 }
 /**
+ * type : "animation"
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message monopoly.AnimationPayload
  */
 export interface AnimationPayload {

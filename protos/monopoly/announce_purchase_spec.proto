@@ -3,14 +3,11 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
 import "monopoly/property.proto";
 
+// type : "announce_purchase"
+// packet_type : DEFAULT
 message AnnouncePurchasePayload {
-  option (prisel.for_action) = {
-    type : "announce_purchase"
-    packet_type : DEFAULT
-  };
   string player = 1;
   PropertyInfo property = 2;
 }

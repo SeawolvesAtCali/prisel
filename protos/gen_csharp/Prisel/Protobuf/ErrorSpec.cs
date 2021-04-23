@@ -24,12 +24,11 @@ namespace Prisel.Protobuf {
     static ErrorSpecReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChdwcmlzZWwvZXJyb3Jfc3BlYy5wcm90bxIGcHJpc2VsGhhwcmlzZWwvYW5u",
-            "b3RhdGlvbnMucHJvdG8iRwoMRXJyb3JQYXlsb2FkEg8KB21lc3NhZ2UYASAB",
-            "KAkSEwoGZGV0YWlsGAIgASgJSACIAQE6BpK1GAIIDEIJCgdfZGV0YWlsQhKq",
-            "Ag9QcmlzZWwuUHJvdG9idWZiBnByb3RvMw=="));
+            "ChdwcmlzZWwvZXJyb3Jfc3BlYy5wcm90bxIGcHJpc2VsIj8KDEVycm9yUGF5",
+            "bG9hZBIPCgdtZXNzYWdlGAEgASgJEhMKBmRldGFpbBgCIAEoCUgAiAEBQgkK",
+            "B19kZXRhaWxCEqoCD1ByaXNlbC5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.ErrorPayload), global::Prisel.Protobuf.ErrorPayload.Parser, new[]{ "Message", "Detail" }, new[]{ "Detail" }, null, null, null)
           }));
@@ -38,6 +37,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : ERROR,
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class ErrorPayload : pb::IMessage<ErrorPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

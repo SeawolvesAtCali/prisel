@@ -3,12 +3,6 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
-
-message AnnounceStartTurnPayload {
-  option (prisel.for_action) = {
-    type : "announce_start_turn"
-    packet_type : DEFAULT
-  };
-  string player = 1;
-}
+// type : "announce_start_turn"
+// packet_type : DEFAULT
+message AnnounceStartTurnPayload { string player = 1; }

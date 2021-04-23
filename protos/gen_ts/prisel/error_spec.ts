@@ -11,6 +11,9 @@ import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
+ * type : ERROR,
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message prisel.ErrorPayload
  */
 export interface ErrorPayload {

@@ -24,11 +24,11 @@ namespace Prisel.Protobuf {
     static ChatSpecReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChZwcmlzZWwvY2hhdF9zcGVjLnByb3RvEgZwcmlzZWwaGHByaXNlbC9hbm5v",
-            "dGF0aW9ucy5wcm90byImCgtDaGF0UGF5bG9hZBIPCgdtZXNzYWdlGAEgASgJ",
-            "OgaStRgCCAhCEqoCD1ByaXNlbC5Qcm90b2J1ZmIGcHJvdG8z"));
+            "ChZwcmlzZWwvY2hhdF9zcGVjLnByb3RvEgZwcmlzZWwiHgoLQ2hhdFBheWxv",
+            "YWQSDwoHbWVzc2FnZRgBIAEoCUISqgIPUHJpc2VsLlByb3RvYnVmYgZwcm90",
+            "bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.ChatPayload), global::Prisel.Protobuf.ChatPayload.Parser, new[]{ "Message" }, null, null, null, null)
           }));
@@ -37,6 +37,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : CHAT,
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class ChatPayload : pb::IMessage<ChatPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

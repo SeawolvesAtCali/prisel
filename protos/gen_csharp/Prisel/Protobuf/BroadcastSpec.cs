@@ -25,12 +25,11 @@ namespace Prisel.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChtwcmlzZWwvYnJvYWRjYXN0X3NwZWMucHJvdG8SBnByaXNlbBoYcHJpc2Vs",
-            "L2Fubm90YXRpb25zLnByb3RvGhhwcmlzZWwvcGxheWVyX2luZm8ucHJvdG8i",
-            "TwoQQnJvYWRjYXN0UGF5bG9hZBIiCgZwbGF5ZXIYASABKAsyEi5wcmlzZWwu",
-            "UGxheWVySW5mbxIPCgdtZXNzYWdlGAIgASgJOgaStRgCCAlCEqoCD1ByaXNl",
-            "bC5Qcm90b2J1ZmIGcHJvdG8z"));
+            "L3BsYXllcl9pbmZvLnByb3RvIkcKEEJyb2FkY2FzdFBheWxvYWQSIgoGcGxh",
+            "eWVyGAEgASgLMhIucHJpc2VsLlBsYXllckluZm8SDwoHbWVzc2FnZRgCIAEo",
+            "CUISqgIPUHJpc2VsLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Prisel.Protobuf.PlayerInfoReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Prisel.Protobuf.PlayerInfoReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.BroadcastPayload), global::Prisel.Protobuf.BroadcastPayload.Parser, new[]{ "Player", "Message" }, null, null, null, null)
           }));
@@ -39,6 +38,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : BROADCAST,
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class BroadcastPayload : pb::IMessage<BroadcastPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

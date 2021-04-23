@@ -25,12 +25,11 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiZtb25vcG9seS9hbm5vdW5jZV9nYW1lX292ZXJfc3BlYy5wcm90bxIIbW9u",
-            "b3BvbHkaGHByaXNlbC9hbm5vdGF0aW9ucy5wcm90bxoTbW9ub3BvbHkvcmFu",
-            "ay5wcm90byJSChdBbm5vdW5jZUdhbWVPdmVyUGF5bG9hZBIdCgVyYW5rcxgB",
-            "IAMoCzIOLm1vbm9wb2x5LlJhbms6GJq1GBQKEmFubm91bmNlX2dhbWVfb3Zl",
-            "ckIUqgIRTW9ub3BvbHkuUHJvdG9idWZiBnByb3RvMw=="));
+            "b3BvbHkaE21vbm9wb2x5L3JhbmsucHJvdG8iOAoXQW5ub3VuY2VHYW1lT3Zl",
+            "clBheWxvYWQSHQoFcmFua3MYASADKAsyDi5tb25vcG9seS5SYW5rQhSqAhFN",
+            "b25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.RankReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Monopoly.Protobuf.RankReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnounceGameOverPayload), global::Monopoly.Protobuf.AnnounceGameOverPayload.Parser, new[]{ "Ranks" }, null, null, null, null)
           }));
@@ -39,6 +38,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "announce_game_over"
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class AnnounceGameOverPayload : pb::IMessage<AnnounceGameOverPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

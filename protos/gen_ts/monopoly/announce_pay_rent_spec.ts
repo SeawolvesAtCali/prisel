@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Payment } from "./payment";
 /**
+ * type : "announce_pay_rent",
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message monopoly.AnnouncePayRentPayload
  */
 export interface AnnouncePayRentPayload {

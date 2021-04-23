@@ -3,21 +3,13 @@ syntax = "proto3";
 package tic_tac_toe;
 option csharp_namespace = "TicTacToe.Protobuf";
 
-import "prisel/annotations.proto";
+// type : "move"
+// packet_type : REQUEST
+message MovePayload { uint32 position = 1; }
 
-message MovePayload {
-  option (prisel.for_action) = {
-    type : "move"
-    packet_type : REQUEST
-  };
-  uint32 position = 1;
-}
-
+// type : "game_state"
+// packet_type : DEFAULT
 message GameStatePayload {
-  option (prisel.for_action) = {
-    type : "game_state"
-    packet_type : DEFAULT
-  };
   repeated string player = 1;
   repeated string map = 2;
   uint32 current_player = 3;

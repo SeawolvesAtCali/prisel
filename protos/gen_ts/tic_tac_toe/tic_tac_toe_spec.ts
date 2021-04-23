@@ -11,6 +11,9 @@ import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
+ * type : "move"
+ * packet_type : REQUEST
+ *
  * @generated from protobuf message tic_tac_toe.MovePayload
  */
 export interface MovePayload {
@@ -20,6 +23,9 @@ export interface MovePayload {
     position: number;
 }
 /**
+ * type : "game_state"
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message tic_tac_toe.GameStatePayload
  */
 export interface GameStatePayload {

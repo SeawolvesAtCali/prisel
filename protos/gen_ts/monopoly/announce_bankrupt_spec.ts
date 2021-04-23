@@ -11,6 +11,9 @@ import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
+ * type : "announce_bankrupt"
+ * packet_type : D
+ *
  * @generated from protobuf message monopoly.AnnounceBankruptPayload
  */
 export interface AnnounceBankruptPayload {

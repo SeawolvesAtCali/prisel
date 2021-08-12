@@ -24,12 +24,11 @@ namespace Monopoly.Protobuf {
     static RollSpecReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Chhtb25vcG9seS9yb2xsX3NwZWMucHJvdG8SCG1vbm9wb2x5GhhwcmlzZWwv",
-            "YW5ub3RhdGlvbnMucHJvdG8iKwoMUm9sbFJlc3BvbnNlEg0KBXN0ZXBzGAEg",
-            "ASgFOgyatRgICgRyb2xsEAJCFKoCEU1vbm9wb2x5LlByb3RvYnVmYgZwcm90",
-            "bzM="));
+            "Chhtb25vcG9seS9yb2xsX3NwZWMucHJvdG8SCG1vbm9wb2x5Ih0KDFJvbGxS",
+            "ZXNwb25zZRINCgVzdGVwcxgBIAEoBUIUqgIRTW9ub3BvbHkuUHJvdG9idWZi",
+            "BnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.RollResponse), global::Monopoly.Protobuf.RollResponse.Parser, new[]{ "Steps" }, null, null, null, null)
           }));
@@ -38,6 +37,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "roll"
+  /// packet_type : RESPONSE
+  /// </summary>
   public sealed partial class RollResponse : pb::IMessage<RollResponse>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

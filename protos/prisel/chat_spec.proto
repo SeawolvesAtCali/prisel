@@ -3,12 +3,6 @@ syntax = "proto3";
 package prisel;
 option csharp_namespace = "Prisel.Protobuf";
 
-import "prisel/annotations.proto";
-
-message ChatPayload {
-  option (for_system_action) = {
-    type : CHAT,
-    packet_type : DEFAULT
-  };
-  string message = 1;
-}
+// type : CHAT,
+// packet_type : DEFAULT
+message ChatPayload { string message = 1; }

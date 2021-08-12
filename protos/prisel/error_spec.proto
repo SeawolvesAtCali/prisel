@@ -3,14 +3,9 @@ syntax = "proto3";
 package prisel;
 option csharp_namespace = "Prisel.Protobuf";
 
-import "prisel/annotations.proto";
-
+// type : ERROR,
+// packet_type : DEFAULT
 message ErrorPayload {
-  option (for_system_action) = {
-    type : ERROR,
-    packet_type : DEFAULT
-  };
-
   string message = 1;
   optional string detail = 2;
 }

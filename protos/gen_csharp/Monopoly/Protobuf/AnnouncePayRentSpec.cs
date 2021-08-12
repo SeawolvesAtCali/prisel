@@ -25,13 +25,12 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiVtb25vcG9seS9hbm5vdW5jZV9wYXlfcmVudF9zcGVjLnByb3RvEghtb25v",
-            "cG9seRoYcHJpc2VsL2Fubm90YXRpb25zLnByb3RvGhZtb25vcG9seS9wYXlt",
-            "ZW50LnByb3RvIn8KFkFubm91bmNlUGF5UmVudFBheWxvYWQSDQoFcGF5ZXIY",
-            "ASABKAkSIwoIcGF5bWVudHMYAiADKAsyES5tb25vcG9seS5QYXltZW50EhgK",
-            "EG15X2N1cnJlbnRfbW9uZXkYAyABKAU6F5q1GBMKEWFubm91bmNlX3BheV9y",
-            "ZW50QhSqAhFNb25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
+            "cG9seRoWbW9ub3BvbHkvcGF5bWVudC5wcm90byJmChZBbm5vdW5jZVBheVJl",
+            "bnRQYXlsb2FkEg0KBXBheWVyGAEgASgJEiMKCHBheW1lbnRzGAIgAygLMhEu",
+            "bW9ub3BvbHkuUGF5bWVudBIYChBteV9jdXJyZW50X21vbmV5GAMgASgFQhSq",
+            "AhFNb25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.PaymentReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Monopoly.Protobuf.PaymentReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnouncePayRentPayload), global::Monopoly.Protobuf.AnnouncePayRentPayload.Parser, new[]{ "Payer", "Payments", "MyCurrentMoney" }, null, null, null, null)
           }));
@@ -40,6 +39,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "announce_pay_rent",
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class AnnouncePayRentPayload : pb::IMessage<AnnouncePayRentPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

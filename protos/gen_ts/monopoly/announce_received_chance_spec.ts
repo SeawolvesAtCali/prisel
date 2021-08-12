@@ -14,6 +14,8 @@ import { Chance } from "./chance";
 /**
  * TODO: this seems useless. There is already animation for showing chance chest
  * open/close.
+ * type : "announce_received_chance"
+ * packet_type : DEFAULT
  *
  * @generated from protobuf message monopoly.AnnounceRecievedChancePayload
  */

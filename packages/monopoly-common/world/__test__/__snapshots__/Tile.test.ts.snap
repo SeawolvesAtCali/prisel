@@ -2,68 +2,62 @@
 
 exports[`Tile barebone serialize 1`] = `
 Object {
-  "data": Object {
-    "chancePool": undefined,
-    "hasProperties": Array [],
-    "isStart": false,
-    "next": Array [],
-    "position": Object {
-      "col": 2,
-      "row": 1,
-    },
-    "prev": Array [],
-    "tileEffect": undefined,
-  },
+  "chancePool": undefined,
+  "hasProperties": Array [],
   "id": "123",
-  "type": "tile",
+  "isStart": false,
+  "next": Array [],
+  "position": Object {
+    "col": 2,
+    "row": 1,
+  },
+  "prev": Array [],
+  "tileEffect": undefined,
 }
 `;
 
 exports[`Tile serialize 1`] = `
 Object {
-  "data": Object {
-    "chancePool": Array [
-      Object {
-        "display": Object {
-          "description": "description",
-          "title": "move to tile",
-        },
-        "inputArgs": Object {
-          "isTeleport": false,
-          "tileId": "1",
-        },
-        "type": "move_to_tile",
-      },
-    ],
-    "hasProperties": Array [
-      "property1",
-    ],
-    "isStart": true,
-    "next": Array [
-      "3",
-    ],
-    "position": Object {
-      "col": 2,
-      "row": 1,
-    },
-    "prev": Array [
-      "1",
-      "2",
-    ],
-    "tileEffect": Object {
+  "chancePool": Array [
+    Object {
       "display": Object {
         "description": "description",
-        "title": "teleport to tile",
+        "title": "move to tile",
       },
       "inputArgs": Object {
         "isTeleport": false,
         "tileId": "1",
       },
-      "timing": 1,
       "type": "move_to_tile",
     },
-  },
+  ],
+  "hasProperties": Array [
+    "property1",
+  ],
   "id": "123",
-  "type": "tile",
+  "isStart": true,
+  "next": Array [
+    "3",
+  ],
+  "position": Object {
+    "col": 2,
+    "row": 1,
+  },
+  "prev": Array [
+    "1",
+    "2",
+  ],
+  "tileEffect": Object {
+    "display": Object {
+      "description": "description",
+      "title": "teleport to tile",
+    },
+    "inputArgs": Object {
+      "isTeleport": false,
+      "tileId": "1",
+    },
+    "timing": 1,
+    "type": "move_to_tile",
+  },
 }
 `;

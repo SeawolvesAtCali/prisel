@@ -24,16 +24,15 @@ namespace Prisel.Protobuf {
     static GetLobbyStateSpecReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CiFwcmlzZWwvZ2V0X2xvYmJ5X3N0YXRlX3NwZWMucHJvdG8SBnByaXNlbBoY",
-            "cHJpc2VsL2Fubm90YXRpb25zLnByb3RvGhZwcmlzZWwvcm9vbV9pbmZvLnBy",
-            "b3RvIsEBChVHZXRMb2JieVN0YXRlUmVzcG9uc2USPgoFcm9vbXMYASADKAsy",
-            "Ly5wcmlzZWwuR2V0TG9iYnlTdGF0ZVJlc3BvbnNlLkxvYmJ5Um9vbVZpZXdJ",
-            "bmZvGl4KEUxvYmJ5Um9vbVZpZXdJbmZvEh4KBHJvb20YASABKAsyEC5wcmlz",
-            "ZWwuUm9vbUluZm8SFAoMcGxheWVyX2NvdW50GAIgASgFEhMKC21heF9wbGF5",
-            "ZXJzGAMgASgFOgiStRgECA4QAkISqgIPUHJpc2VsLlByb3RvYnVmYgZwcm90",
-            "bzM="));
+            "CiFwcmlzZWwvZ2V0X2xvYmJ5X3N0YXRlX3NwZWMucHJvdG8SBnByaXNlbBoW",
+            "cHJpc2VsL3Jvb21faW5mby5wcm90byK3AQoVR2V0TG9iYnlTdGF0ZVJlc3Bv",
+            "bnNlEj4KBXJvb21zGAEgAygLMi8ucHJpc2VsLkdldExvYmJ5U3RhdGVSZXNw",
+            "b25zZS5Mb2JieVJvb21WaWV3SW5mbxpeChFMb2JieVJvb21WaWV3SW5mbxIe",
+            "CgRyb29tGAEgASgLMhAucHJpc2VsLlJvb21JbmZvEhQKDHBsYXllcl9jb3Vu",
+            "dBgCIAEoBRITCgttYXhfcGxheWVycxgDIAEoBUISqgIPUHJpc2VsLlByb3Rv",
+            "YnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Prisel.Protobuf.RoomInfoReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Prisel.Protobuf.RoomInfoReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.GetLobbyStateResponse), global::Prisel.Protobuf.GetLobbyStateResponse.Parser, new[]{ "Rooms" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.GetLobbyStateResponse.Types.LobbyRoomViewInfo), global::Prisel.Protobuf.GetLobbyStateResponse.Types.LobbyRoomViewInfo.Parser, new[]{ "Room", "PlayerCount", "MaxPlayers" }, null, null, null, null)})
           }));
@@ -42,6 +41,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : GET_LOBBY_STATE,
+  /// packet_type : RESPONSE
+  /// </summary>
   public sealed partial class GetLobbyStateResponse : pb::IMessage<GetLobbyStateResponse>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

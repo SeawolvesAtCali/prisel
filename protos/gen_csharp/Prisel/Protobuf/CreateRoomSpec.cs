@@ -24,15 +24,14 @@ namespace Prisel.Protobuf {
     static CreateRoomSpecReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Ch1wcmlzZWwvY3JlYXRlX3Jvb21fc3BlYy5wcm90bxIGcHJpc2VsGhhwcmlz",
-            "ZWwvYW5ub3RhdGlvbnMucHJvdG8aFnByaXNlbC9yb29tX2luZm8ucHJvdG8a",
-            "IHByaXNlbC9yb29tX3N0YXRlX3NuYXBzaG90LnByb3RvIi8KEUNyZWF0ZVJv",
-            "b21SZXF1ZXN0EhAKCHJvb21OYW1lGAEgASgJOgiStRgECAQQASJtChJDcmVh",
-            "dGVSb29tUmVzcG9uc2USHgoEcm9vbRgBIAEoCzIQLnByaXNlbC5Sb29tSW5m",
-            "bxItCgpyb29tX3N0YXRlGAIgASgLMhkucHJpc2VsLlJvb21TdGF0ZVNuYXBz",
-            "aG90OgiStRgECAQQAkISqgIPUHJpc2VsLlByb3RvYnVmYgZwcm90bzM="));
+            "Ch1wcmlzZWwvY3JlYXRlX3Jvb21fc3BlYy5wcm90bxIGcHJpc2VsGhZwcmlz",
+            "ZWwvcm9vbV9pbmZvLnByb3RvGiBwcmlzZWwvcm9vbV9zdGF0ZV9zbmFwc2hv",
+            "dC5wcm90byIlChFDcmVhdGVSb29tUmVxdWVzdBIQCghyb29tTmFtZRgBIAEo",
+            "CSJjChJDcmVhdGVSb29tUmVzcG9uc2USHgoEcm9vbRgBIAEoCzIQLnByaXNl",
+            "bC5Sb29tSW5mbxItCgpyb29tX3N0YXRlGAIgASgLMhkucHJpc2VsLlJvb21T",
+            "dGF0ZVNuYXBzaG90QhKqAg9QcmlzZWwuUHJvdG9idWZiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Prisel.Protobuf.RoomInfoReflection.Descriptor, global::Prisel.Protobuf.RoomStateSnapshotReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Prisel.Protobuf.RoomInfoReflection.Descriptor, global::Prisel.Protobuf.RoomStateSnapshotReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.CreateRoomRequest), global::Prisel.Protobuf.CreateRoomRequest.Parser, new[]{ "RoomName" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.CreateRoomResponse), global::Prisel.Protobuf.CreateRoomResponse.Parser, new[]{ "Room", "RoomState" }, null, null, null, null)
@@ -42,6 +41,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : CREATE_ROOM,
+  /// packet_type : REQUEST
+  /// </summary>
   public sealed partial class CreateRoomRequest : pb::IMessage<CreateRoomRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -214,6 +217,10 @@ namespace Prisel.Protobuf {
 
   }
 
+  /// <summary>
+  /// type : CREATE_ROOM,
+  /// packet_type : RESPONSE
+  /// </summary>
   public sealed partial class CreateRoomResponse : pb::IMessage<CreateRoomResponse>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

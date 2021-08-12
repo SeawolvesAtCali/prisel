@@ -3,15 +3,11 @@ syntax = "proto3";
 package prisel;
 option csharp_namespace = "Prisel.Protobuf";
 
-import "prisel/annotations.proto";
 import "prisel/room_info.proto";
 
+// type : GET_LOBBY_STATE,
+// packet_type : RESPONSE
 message GetLobbyStateResponse {
-  option (for_system_action) = {
-    type : GET_LOBBY_STATE,
-    packet_type : RESPONSE
-  };
-
   repeated LobbyRoomViewInfo rooms = 1;
 
   message LobbyRoomViewInfo {

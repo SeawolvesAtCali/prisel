@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Coordinate } from "./coordinate";
 /**
+ * type : "announce_roll"
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message monopoly.AnnounceRollPayload
  */
 export interface AnnounceRollPayload {

@@ -3,14 +3,11 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
 import "monopoly/property.proto";
 
+// type : "prompt_purchase"
+// packet_type : REQUEST
 message PromptPurchaseRequest {
-  option (prisel.for_action) = {
-    type : "prompt_purchase"
-    packet_type : REQUEST
-  };
   PropertyInfo property = 1;
   repeated PropertyLevel levels = 2;
   // Whether this property can be upgraded right now. Only purchased
@@ -19,10 +16,6 @@ message PromptPurchaseRequest {
   int32 money_after_purchase = 8;
 }
 
-message PromptPurchaseResponse {
-  option (prisel.for_action) = {
-    type : "prompt_purchase"
-    packet_type : REQUEST
-  };
-  bool purchased = 1;
-}
+// type : "prompt_purchase"
+// packet_type : REQUEST
+message PromptPurchaseResponse { bool purchased = 1; }

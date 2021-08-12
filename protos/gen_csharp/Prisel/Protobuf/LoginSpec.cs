@@ -24,12 +24,11 @@ namespace Prisel.Protobuf {
     static LoginSpecReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChdwcmlzZWwvbG9naW5fc3BlYy5wcm90bxIGcHJpc2VsGhhwcmlzZWwvYW5u",
-            "b3RhdGlvbnMucHJvdG8iKgoMTG9naW5SZXF1ZXN0EhAKCHVzZXJuYW1lGAEg",
-            "ASgJOgiStRgECAIQASIqCg1Mb2dpblJlc3BvbnNlEg8KB3VzZXJfaWQYASAB",
-            "KAk6CJK1GAQIAhACQhKqAg9QcmlzZWwuUHJvdG9idWZiBnByb3RvMw=="));
+            "ChdwcmlzZWwvbG9naW5fc3BlYy5wcm90bxIGcHJpc2VsIiAKDExvZ2luUmVx",
+            "dWVzdBIQCgh1c2VybmFtZRgBIAEoCSIgCg1Mb2dpblJlc3BvbnNlEg8KB3Vz",
+            "ZXJfaWQYASABKAlCEqoCD1ByaXNlbC5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.LoginRequest), global::Prisel.Protobuf.LoginRequest.Parser, new[]{ "Username" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.LoginResponse), global::Prisel.Protobuf.LoginResponse.Parser, new[]{ "UserId" }, null, null, null, null)
@@ -39,6 +38,10 @@ namespace Prisel.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : LOGIN,
+  /// packet_type : REQUEST
+  /// </summary>
   public sealed partial class LoginRequest : pb::IMessage<LoginRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -211,6 +214,10 @@ namespace Prisel.Protobuf {
 
   }
 
+  /// <summary>
+  /// type : LOGIN,
+  /// packet_type : RESPONSE
+  /// </summary>
   public sealed partial class LoginResponse : pb::IMessage<LoginResponse>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

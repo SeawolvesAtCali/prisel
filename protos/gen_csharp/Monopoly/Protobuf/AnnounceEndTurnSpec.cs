@@ -25,12 +25,11 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiVtb25vcG9seS9hbm5vdW5jZV9lbmRfdHVybl9zcGVjLnByb3RvEghtb25v",
-            "cG9seRoYcHJpc2VsL2Fubm90YXRpb25zLnByb3RvIl4KFkFubm91bmNlRW5k",
-            "VHVyblBheWxvYWQSFgoOY3VycmVudF9wbGF5ZXIYASABKAkSEwoLbmV4dF9w",
-            "bGF5ZXIYAiABKAk6F5q1GBMKEWFubm91bmNlX2VuZF90dXJuQhSqAhFNb25v",
-            "cG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
+            "cG9seSJFChZBbm5vdW5jZUVuZFR1cm5QYXlsb2FkEhYKDmN1cnJlbnRfcGxh",
+            "eWVyGAEgASgJEhMKC25leHRfcGxheWVyGAIgASgJQhSqAhFNb25vcG9seS5Q",
+            "cm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnounceEndTurnPayload), global::Monopoly.Protobuf.AnnounceEndTurnPayload.Parser, new[]{ "CurrentPlayer", "NextPlayer" }, null, null, null, null)
           }));
@@ -39,6 +38,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "announce_end_turn"
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class AnnounceEndTurnPayload : pb::IMessage<AnnounceEndTurnPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -3,13 +3,6 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
-
-message AnnounceBankruptPayload {
-  option (prisel.for_action) = {
-    type : "announce_bankrupt"
-    packet_type : DEFAULT
-  };
-
-  string player = 1;
-}
+// type : "announce_bankrupt"
+// packet_type : D
+message AnnounceBankruptPayload { string player = 1; }

@@ -25,13 +25,12 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cixtb25vcG9seS9hbm5vdW5jZV9yZWNlaXZlZF9jaGFuY2Vfc3BlYy5wcm90",
-            "bxIIbW9ub3BvbHkaGHByaXNlbC9hbm5vdGF0aW9ucy5wcm90bxoVbW9ub3Bv",
-            "bHkvY2hhbmNlLnByb3RvInEKHUFubm91bmNlUmVjaWV2ZWRDaGFuY2VQYXls",
-            "b2FkEg4KBnBsYXllchgBIAEoCRIgCgZjaGFuY2UYAiABKAsyEC5tb25vcG9s",
-            "eS5DaGFuY2U6Hpq1GBoKGGFubm91bmNlX3JlY2VpdmVkX2NoYW5jZUIUqgIR",
-            "TW9ub3BvbHkuUHJvdG9idWZiBnByb3RvMw=="));
+            "bxIIbW9ub3BvbHkaFW1vbm9wb2x5L2NoYW5jZS5wcm90byJRCh1Bbm5vdW5j",
+            "ZVJlY2lldmVkQ2hhbmNlUGF5bG9hZBIOCgZwbGF5ZXIYASABKAkSIAoGY2hh",
+            "bmNlGAIgASgLMhAubW9ub3BvbHkuQ2hhbmNlQhSqAhFNb25vcG9seS5Qcm90",
+            "b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.ChanceReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Monopoly.Protobuf.ChanceReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnounceRecievedChancePayload), global::Monopoly.Protobuf.AnnounceRecievedChancePayload.Parser, new[]{ "Player", "Chance" }, null, null, null, null)
           }));
@@ -43,6 +42,8 @@ namespace Monopoly.Protobuf {
   /// <summary>
   /// TODO: this seems useless. There is already animation for showing chance chest
   /// open/close.
+  /// type : "announce_received_chance"
+  /// packet_type : DEFAULT
   /// </summary>
   public sealed partial class AnnounceRecievedChancePayload : pb::IMessage<AnnounceRecievedChancePayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE

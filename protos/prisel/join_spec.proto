@@ -3,23 +3,16 @@ syntax = "proto3";
 package prisel;
 option csharp_namespace = "Prisel.Protobuf";
 
-import "prisel/annotations.proto";
 import "prisel/room_info.proto";
 import "prisel/room_state_snapshot.proto";
 
-message JoinRequest {
-  option (for_system_action) = {
-    type : JOIN,
-    packet_type : REQUEST
-  };
-  string roomId = 1;
-}
+// type : JOIN,
+// packet_type : REQUEST
+message JoinRequest { string roomId = 1; }
 
+// type : JOIN,
+// packet_type : RESPONSE
 message JoinResponse {
-  option (for_system_action) = {
-    type : JOIN,
-    packet_type : RESPONSE
-  };
   RoomInfo room = 1;
   RoomStateSnapshot roomState = 2;
 }

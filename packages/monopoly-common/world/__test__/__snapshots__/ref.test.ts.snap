@@ -2,10 +2,7 @@
 
 exports[`ref serialize 1`] = `
 Object {
-  "data": Object {
-    "ref": "object2",
-  },
   "id": "object1",
-  "type": "test",
+  "ref": "object2",
 }
 `;

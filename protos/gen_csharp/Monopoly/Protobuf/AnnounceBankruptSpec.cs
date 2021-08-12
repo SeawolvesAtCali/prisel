@@ -25,11 +25,10 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiVtb25vcG9seS9hbm5vdW5jZV9iYW5rcnVwdF9zcGVjLnByb3RvEghtb25v",
-            "cG9seRoYcHJpc2VsL2Fubm90YXRpb25zLnByb3RvIkIKF0Fubm91bmNlQmFu",
-            "a3J1cHRQYXlsb2FkEg4KBnBsYXllchgBIAEoCToXmrUYEwoRYW5ub3VuY2Vf",
-            "YmFua3J1cHRCFKoCEU1vbm9wb2x5LlByb3RvYnVmYgZwcm90bzM="));
+            "cG9seSIpChdBbm5vdW5jZUJhbmtydXB0UGF5bG9hZBIOCgZwbGF5ZXIYASAB",
+            "KAlCFKoCEU1vbm9wb2x5LlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnounceBankruptPayload), global::Monopoly.Protobuf.AnnounceBankruptPayload.Parser, new[]{ "Player" }, null, null, null, null)
           }));
@@ -38,6 +37,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "announce_bankrupt"
+  /// packet_type : D
+  /// </summary>
   public sealed partial class AnnounceBankruptPayload : pb::IMessage<AnnounceBankruptPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

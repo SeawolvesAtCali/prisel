@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Rank } from "./rank";
 /**
+ * type : "announce_game_over"
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message monopoly.AnnounceGameOverPayload
  */
 export interface AnnounceGameOverPayload {

@@ -13,6 +13,9 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { RoomStateSnapshot } from "./room_state_snapshot";
 import { RoomInfo } from "./room_info";
 /**
+ * type : JOIN,
+ * packet_type : REQUEST
+ *
  * @generated from protobuf message prisel.JoinRequest
  */
 export interface JoinRequest {
@@ -22,6 +25,9 @@ export interface JoinRequest {
     roomId: string;
 }
 /**
+ * type : JOIN,
+ * packet_type : RESPONSE
+ *
  * @generated from protobuf message prisel.JoinResponse
  */
 export interface JoinResponse {

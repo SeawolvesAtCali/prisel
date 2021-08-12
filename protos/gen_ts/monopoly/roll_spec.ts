@@ -11,6 +11,9 @@ import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
+ * type : "roll"
+ * packet_type : RESPONSE
+ *
  * @generated from protobuf message monopoly.RollResponse
  */
 export interface RollResponse {

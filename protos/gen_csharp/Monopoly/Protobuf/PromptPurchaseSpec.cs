@@ -25,16 +25,14 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiNtb25vcG9seS9wcm9tcHRfcHVyY2hhc2Vfc3BlYy5wcm90bxIIbW9ub3Bv",
-            "bHkaGHByaXNlbC9hbm5vdGF0aW9ucy5wcm90bxoXbW9ub3BvbHkvcHJvcGVy",
-            "dHkucHJvdG8itQEKFVByb21wdFB1cmNoYXNlUmVxdWVzdBIoCghwcm9wZXJ0",
-            "eRgBIAEoCzIWLm1vbm9wb2x5LlByb3BlcnR5SW5mbxInCgZsZXZlbHMYAiAD",
-            "KAsyFy5tb25vcG9seS5Qcm9wZXJ0eUxldmVsEhIKCmlzX3VwZ3JhZGUYByAB",
-            "KAgSHAoUbW9uZXlfYWZ0ZXJfcHVyY2hhc2UYCCABKAU6F5q1GBMKD3Byb21w",
-            "dF9wdXJjaGFzZRABIkQKFlByb21wdFB1cmNoYXNlUmVzcG9uc2USEQoJcHVy",
-            "Y2hhc2VkGAEgASgIOheatRgTCg9wcm9tcHRfcHVyY2hhc2UQAUIUqgIRTW9u",
-            "b3BvbHkuUHJvdG9idWZiBnByb3RvMw=="));
+            "bHkaF21vbm9wb2x5L3Byb3BlcnR5LnByb3RvIpwBChVQcm9tcHRQdXJjaGFz",
+            "ZVJlcXVlc3QSKAoIcHJvcGVydHkYASABKAsyFi5tb25vcG9seS5Qcm9wZXJ0",
+            "eUluZm8SJwoGbGV2ZWxzGAIgAygLMhcubW9ub3BvbHkuUHJvcGVydHlMZXZl",
+            "bBISCgppc191cGdyYWRlGAcgASgIEhwKFG1vbmV5X2FmdGVyX3B1cmNoYXNl",
+            "GAggASgFIisKFlByb21wdFB1cmNoYXNlUmVzcG9uc2USEQoJcHVyY2hhc2Vk",
+            "GAEgASgIQhSqAhFNb25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.PropertyReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Monopoly.Protobuf.PropertyReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.PromptPurchaseRequest), global::Monopoly.Protobuf.PromptPurchaseRequest.Parser, new[]{ "Property", "Levels", "IsUpgrade", "MoneyAfterPurchase" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.PromptPurchaseResponse), global::Monopoly.Protobuf.PromptPurchaseResponse.Parser, new[]{ "Purchased" }, null, null, null, null)
@@ -44,6 +42,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "prompt_purchase"
+  /// packet_type : REQUEST
+  /// </summary>
   public sealed partial class PromptPurchaseRequest : pb::IMessage<PromptPurchaseRequest>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -326,6 +328,10 @@ namespace Monopoly.Protobuf {
 
   }
 
+  /// <summary>
+  /// type : "prompt_purchase"
+  /// packet_type : REQUEST
+  /// </summary>
   public sealed partial class PromptPurchaseResponse : pb::IMessage<PromptPurchaseResponse>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -5,10 +5,15 @@ import { Ref } from '../ref2';
 import { Tile } from '../Tile';
 import { World } from '../World';
 
+let nextId = 0;
 jest.mock('../../genId', () => {
     return {
-        genId: () => 'mocked_id_1',
+        genId: () => `mocked_id_${nextId++}`,
     };
+});
+beforeEach(() => {
+    nextId = 0;
+    // prevent the order of test affect the mocked uuid
 });
 
 describe('GamePlayer', () => {
@@ -42,7 +47,6 @@ describe('GamePlayer', () => {
         player.pathTile = Ref.forTest<Tile>('tile1');
         player.rolled = true;
         const world = new World();
-        world.registerObject(GamePlayer);
         const deserialized = GamePlayer.deserialize(player.serialize(), world);
         expect(deserialized).toBeInstanceOf(GamePlayer);
         expect(deserialized.id).toBe('123');

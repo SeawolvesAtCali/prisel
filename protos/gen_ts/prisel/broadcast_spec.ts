@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { PlayerInfo } from "./player_info";
 /**
+ * type : BROADCAST,
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message prisel.BroadcastPayload
  */
 export interface BroadcastPayload {

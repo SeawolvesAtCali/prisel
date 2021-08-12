@@ -3,14 +3,8 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
 import "monopoly/game_player.proto";
 
-message AnnouncePlayerLeftPayload {
-  option (prisel.for_action) = {
-    type : "announce_player_left"
-    packet_type : REQUEST
-  };
-  // TODO implement GamePlayer
-  GamePlayer player = 1;
-}
+// type : "announce_player_left"
+// packet_type : REQUEST
+message AnnouncePlayerLeftPayload { GamePlayer player = 1; }

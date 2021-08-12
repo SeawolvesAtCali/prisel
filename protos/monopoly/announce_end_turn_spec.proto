@@ -3,13 +3,9 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
-
+// type : "announce_end_turn"
+// packet_type : DEFAULT
 message AnnounceEndTurnPayload {
-  option (prisel.for_action) = {
-    type : "announce_end_turn"
-    packet_type : DEFAULT
-  };
   string current_player = 1;
   string next_player = 2;
 }

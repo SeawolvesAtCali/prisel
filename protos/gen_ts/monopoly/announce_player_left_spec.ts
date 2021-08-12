@@ -12,12 +12,13 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { GamePlayer } from "./game_player";
 /**
+ * type : "announce_player_left"
+ * packet_type : REQUEST
+ *
  * @generated from protobuf message monopoly.AnnouncePlayerLeftPayload
  */
 export interface AnnouncePlayerLeftPayload {
     /**
-     * TODO implement GamePlayer
-     *
      * @generated from protobuf field: monopoly.GamePlayer player = 1;
      */
     player?: GamePlayer;

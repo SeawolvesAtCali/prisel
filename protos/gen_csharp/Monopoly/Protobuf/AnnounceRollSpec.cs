@@ -25,13 +25,12 @@ namespace Monopoly.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiFtb25vcG9seS9hbm5vdW5jZV9yb2xsX3NwZWMucHJvdG8SCG1vbm9wb2x5",
-            "GhhwcmlzZWwvYW5ub3RhdGlvbnMucHJvdG8aGW1vbm9wb2x5L2Nvb3JkaW5h",
-            "dGUucHJvdG8iiwEKE0Fubm91bmNlUm9sbFBheWxvYWQSDgoGcGxheWVyGAEg",
-            "ASgJEg0KBXN0ZXBzGAIgASgFEi4KEGN1cnJlbnRfcG9zaXRpb24YAyABKAsy",
-            "FC5tb25vcG9seS5Db29yZGluYXRlEhAKCG15X21vbmV5GAQgASgFOhOatRgP",
-            "Cg1hbm5vdW5jZV9yb2xsQhSqAhFNb25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
+            "Ghltb25vcG9seS9jb29yZGluYXRlLnByb3RvInYKE0Fubm91bmNlUm9sbFBh",
+            "eWxvYWQSDgoGcGxheWVyGAEgASgJEg0KBXN0ZXBzGAIgASgFEi4KEGN1cnJl",
+            "bnRfcG9zaXRpb24YAyABKAsyFC5tb25vcG9seS5Db29yZGluYXRlEhAKCG15",
+            "X21vbmV5GAQgASgFQhSqAhFNb25vcG9seS5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Prisel.Protobuf.AnnotationsReflection.Descriptor, global::Monopoly.Protobuf.CoordinateReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Monopoly.Protobuf.CoordinateReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Monopoly.Protobuf.AnnounceRollPayload), global::Monopoly.Protobuf.AnnounceRollPayload.Parser, new[]{ "Player", "Steps", "CurrentPosition", "MyMoney" }, null, null, null, null)
           }));
@@ -40,6 +39,10 @@ namespace Monopoly.Protobuf {
 
   }
   #region Messages
+  /// <summary>
+  /// type : "announce_roll"
+  /// packet_type : DEFAULT
+  /// </summary>
   public sealed partial class AnnounceRollPayload : pb::IMessage<AnnounceRollPayload>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

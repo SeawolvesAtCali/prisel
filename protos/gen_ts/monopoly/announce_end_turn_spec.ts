@@ -11,6 +11,9 @@ import { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
+ * type : "announce_end_turn"
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message monopoly.AnnounceEndTurnPayload
  */
 export interface AnnounceEndTurnPayload {

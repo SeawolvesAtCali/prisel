@@ -108,7 +108,7 @@ export class Moved extends StateMachineState {
     }
 
     // return true if should continue current state
-    private *processChance() {
+    private *processChance(): Generator<Promise<any>, any, any> {
         const currentPlayer = this.game.getCurrentPlayer();
         const currentTile = assertExist(currentPlayer.pathTile?.get(), 'currentTile');
 
@@ -217,7 +217,7 @@ export class Moved extends StateMachineState {
         });
     }
 
-    private *promptForPurchases(properties: Property[]) {
+    private *promptForPurchases(properties: Property[]): Generator<Promise<any>, any, any> {
         const currentPlayer = this.game.getCurrentPlayer();
 
         for (const property of properties) {
@@ -229,6 +229,7 @@ export class Moved extends StateMachineState {
                 currentPlayer,
                 currentPlayer.money,
             );
+            console.log('prompt for purchase is ' + JSON.stringify(propertyForPurchase, null, 2));
             if (!propertyForPurchase) {
                 continue;
             }

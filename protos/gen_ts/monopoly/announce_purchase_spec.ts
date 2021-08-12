@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { PropertyInfo } from "./property";
 /**
+ * type : "announce_purchase"
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message monopoly.AnnouncePurchasePayload
  */
 export interface AnnouncePurchasePayload {

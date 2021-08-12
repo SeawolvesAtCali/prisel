@@ -13,6 +13,9 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { UpdateToken } from "./update_token";
 import { PlayerInfo } from "./player_info";
 /**
+ * type : ROOM_STATE_CHANGE,
+ * packet_type : DEFAULT
+ *
  * @generated from protobuf message prisel.RoomStateChangePayload
  */
 export interface RoomStateChangePayload {

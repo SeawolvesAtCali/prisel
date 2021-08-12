@@ -12,6 +12,9 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { RoomInfo } from "./room_info";
 /**
+ * type : GET_LOBBY_STATE,
+ * packet_type : RESPONSE
+ *
  * @generated from protobuf message prisel.GetLobbyStateResponse
  */
 export interface GetLobbyStateResponse {

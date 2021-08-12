@@ -3,14 +3,11 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
 import "monopoly/game_player.proto";
 
+// type : "get_initial_state"
+// packet_type : RESPONSE
 message GetInitialStateResponse {
-  option (prisel.for_action) = {
-    type : "get_initial_state"
-    packet_type : RESPONSE
-  };
   repeated GamePlayer players = 1;
   string first_player_id = 2;
 }

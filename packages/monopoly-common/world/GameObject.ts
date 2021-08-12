@@ -1,6 +1,5 @@
-import { deserialize, serialize } from 'serializr';
+import { deserialize, serializable, serialize } from 'serializr';
 import { exist } from '../exist';
-import { Serialized } from './serializeUtil';
 import { StaticThis } from './staticThis';
 import { World } from './World';
 
@@ -13,6 +12,7 @@ export abstract class GameObject {
     /**
      * Id uniquely identify a game object
      */
+    @serializable
     public id: string = '';
 
     private _world?: World;
@@ -29,18 +29,16 @@ export abstract class GameObject {
     // Child type of GameObject should all provide a no argument constructor, or
     // just don't add constructor. This allows world to create any GameObject
 
-    public serialize(): Serialized<this> {
-        return { id: this.id, type: this.type, data: serialize(this) };
+    public serialize() {
+        return serialize(this);
     }
 
     public static deserialize<T extends GameObject>(
         this: StaticThis<T>,
-        serialized: Serialized,
+        serialized: any,
         world: World,
     ) {
-        const deserialized = deserialize(this, serialized.data, undefined, { world });
-        deserialized.id = serialized.id;
-        deserialized.world = world;
+        const deserialized = deserialize(this, serialized, undefined, { world });
         world.add(deserialized);
         return deserialized;
     }
@@ -56,6 +54,6 @@ export type GameObjectClass<T> = T extends GameObject
     ? {
           new (): T;
           TYPE: string;
-          deserialize(serialized: Serialized<T>, world: World): T;
+          deserialize(serialized: any, world: World): T;
       }
     : never;

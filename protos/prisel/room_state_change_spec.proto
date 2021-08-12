@@ -3,15 +3,12 @@ syntax = "proto3";
 package prisel;
 option csharp_namespace = "Prisel.Protobuf";
 
-import "prisel/annotations.proto";
 import "prisel/player_info.proto";
 import "prisel/update_token.proto";
 
+// type : ROOM_STATE_CHANGE,
+// packet_type : DEFAULT
 message RoomStateChangePayload {
-  option (for_system_action) = {
-    type : ROOM_STATE_CHANGE,
-    packet_type : DEFAULT
-  };
   oneof change {
     PlayerInfo player_join = 1;
     string player_leave = 2;

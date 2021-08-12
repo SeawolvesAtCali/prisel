@@ -3,14 +3,11 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
 import "monopoly/coordinate.proto";
 
+// type : "announce_roll"
+// packet_type : DEFAULT
 message AnnounceRollPayload {
-  option (prisel.for_action) = {
-    type : "announce_roll"
-    packet_type : DEFAULT
-  };
   string player = 1;
   int32 steps = 2;
   // the position of the player before moving. This is used to make sure the

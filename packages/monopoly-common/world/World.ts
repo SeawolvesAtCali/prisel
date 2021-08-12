@@ -1,11 +1,11 @@
+import { serialize, update } from 'serializr';
 import { genId } from '../genId';
 import { GameObject, GameObjectClass } from './GameObject';
 import { Id } from './Id';
 import { Ref as Ref2 } from './ref2';
-import { Serialized } from './serializeUtil';
 
 export interface SerializedWorld {
-    [key: string]: Array<Serialized<GameObject>>;
+    [key: string]: Array<any>;
 }
 
 /**
@@ -14,21 +14,9 @@ export interface SerializedWorld {
 export class World {
     private objectMap: Map<Id, GameObject> = new Map();
     private idMap: Map<string, Set<Id>> = new Map();
-    private gameObjectTypeRegistry: Map<string, GameObjectClass<any>> = new Map();
-    private serializedTypes = new Set<string>();
 
     constructor() {
         this.makeRef = this.makeRef.bind(this);
-    }
-
-    public registerObject<T extends GameObjectClass<any>>(clazz: T, enableSerialization = true) {
-        const type = clazz.TYPE;
-        this.gameObjectTypeRegistry.set(type, clazz);
-        this.idMap.set(type, new Set());
-        if (enableSerialization) {
-            this.serializedTypes.add(type);
-        }
-        return this;
     }
 
     private createId<T extends GameObject>(specifiedId?: Id<T>): Id<T> {
@@ -50,11 +38,15 @@ export class World {
 
     private getIdSetOfSameType(object: GameObject) {
         const type = object.type;
-        const gameObjectClass = this.gameObjectTypeRegistry.get(type);
-        if (gameObjectClass && object instanceof gameObjectClass) {
-            return this.idMap.get(type) ?? null;
+        // const gameObjectClass = this.gameObjectTypeRegistry.get(type);
+        // if (gameObjectClass && object instanceof gameObjectClass) {
+        const set = this.idMap.get(type);
+        if (!set) {
+            const newSet = new Set<string>();
+            this.idMap.set(type, newSet);
+            return newSet;
         }
-        return null;
+        return set;
     }
 
     private getAllFromSet<T extends GameObject>(idSet: Set<Id>): T[] {
@@ -82,7 +74,7 @@ export class World {
         const objectId = this.createId<InstanceType<T>>(id);
         object.id = objectId;
         this.objectMap.set(objectId, object);
-        this.getIdSetOfSameType(object)?.add(objectId);
+        this.getIdSetOfSameType(object).add(objectId);
 
         return object;
     }
@@ -95,14 +87,12 @@ export class World {
     }
 
     public add<T extends GameObject>(object: T) {
-        if (!this.idMap.has(object.type)) {
-            throw new Error(`object type ${object.type} is not registered`);
-        }
         if (this.idMap.get(object.type)?.has(object.id)) {
             throw new Error(`object ${object.type} already has an id ${object.id}`);
         }
         this.objectMap.set(object.id, object);
-        this.getIdSetOfSameType(object)?.add(object.id);
+        this.getIdSetOfSameType(object).add(object.id);
+        object.world = this;
     }
 
     public remove<T extends GameObject>(idOrGameObject: Id | T) {
@@ -115,7 +105,7 @@ export class World {
             this.objectMap.delete(idOrGameObject.id);
         }
         if (deletedObject) {
-            this.getIdSetOfSameType(deletedObject)?.delete(deletedObject.id);
+            this.getIdSetOfSameType(deletedObject).delete(deletedObject.id);
         }
     }
 
@@ -123,52 +113,43 @@ export class World {
         return Ref2.of<T>(keyOrObject, this);
     }
 
-    public serialize(): SerializedWorld {
-        const serialized = {};
-        for (const serializedObjectType of Array.from(this.serializedTypes)) {
-            Object.assign(serialized, {
-                [serializedObjectType]:
-                    this.getAll(serializedObjectType).map((object: GameObject) =>
-                        object.serialize(),
-                    ) ?? [],
-            });
-        }
-        return serialized;
+    /**
+     * Called before serializing. This method should be used to populate the
+     * serializable fields in sub class.
+     */
+    protected populateSerializedFields(): void {}
+    public serialize(): any {
+        this.populateSerializedFields();
+        const serialzied = serialize(this);
+        this.clearSerializedFields();
+        return serialzied;
     }
 
+    /**
+     * Called after deserialized. This method should be used to clear out the
+     * serialized fields to reduce duplicate reference. All GameObjects should
+     * already be stored inside the internal map of World.
+     */
+    protected clearSerializedFields(): void {}
     /**
      * deserialize into current world make sure this is an empty world,
      * otherwise we might have id collision
      * @param serialized
      */
-    public deserialize(serialized: SerializedWorld) {
-        for (const key of Object.keys(serialized)) {
-            if (this.serializedTypes.has(key) && this.gameObjectTypeRegistry.has(key)) {
-                const clazz = this.gameObjectTypeRegistry.get(key);
-                if (clazz) {
-                    for (const serializedObject of serialized[key]) {
-                        clazz.deserialize(serializedObject, this);
-                    }
+    public populate(serialized: any) {
+        this.clearSerializedFields();
+        update(
+            this,
+            serialized,
+            (err) => {
+                if (err) {
+                    console.error(err);
                 } else {
-                    console.error(
-                        `Cannot deserialize object of type ${key}, type might not be registered in this world.`,
-                    );
+                    this.clearSerializedFields();
                 }
-            }
-        }
+            },
+            { world: this },
+        );
         return this;
-    }
-
-    /**
-     * return a new world by copying all gameObjects in the world. GameObjects are
-     * serialzied and deserialized. If a gameObject has lossy serialization or
-     * deserialization, the copy might not be identical
-     */
-    public copy() {
-        const newWorld = new World();
-        for (const objectClass of this.gameObjectTypeRegistry.values()) {
-            newWorld.registerObject(objectClass);
-        }
-        return newWorld.deserialize(this.serialize());
     }
 }

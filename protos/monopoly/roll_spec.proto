@@ -3,12 +3,6 @@ syntax = "proto3";
 package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
-import "prisel/annotations.proto";
-
-message RollResponse {
-  option (prisel.for_action) = {
-    type : "roll"
-    packet_type : RESPONSE
-  };
-  int32 steps = 1;
-}
+// type : "roll"
+// packet_type : RESPONSE
+message RollResponse { int32 steps = 1; }

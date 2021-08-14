@@ -1,0 +1,19 @@
+include "player_info.fbs";
+
+namespace TikTacToe;
+
+// type : "move"
+// packet_type : REQUEST
+table MovePayload {
+  position:uint;
+}
+
+// type : "game_state"
+// packet_type : DEFAULT
+table GameStatePayload {
+  player:[Prisel.Common.PlayerInfo];
+  map:[string];
+  current_player:uint;
+  winner:string;
+}
+

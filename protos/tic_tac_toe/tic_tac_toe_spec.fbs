@@ -1,6 +1,6 @@
 include "player_info.fbs";
 
-namespace TikTacToe;
+namespace TicTacToe;
 
 // type : "move"
 // packet_type : REQUEST

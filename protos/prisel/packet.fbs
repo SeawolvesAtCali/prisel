@@ -10,6 +10,6 @@ table Packet {
   system_action_type:Prisel.Common.SystemActionType;
   action_type:string;
   status:Prisel.Common.Status;
-  payload:[byte];
+  payload:[ubyte];
 }
 

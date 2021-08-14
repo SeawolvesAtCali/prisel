@@ -56,7 +56,7 @@ status(obj?:Status):Status|null {
 
 payload(index: number):number|null {
   const offset = this.bb!.__offset(this.bb_pos, 14);
-  return offset ? this.bb!.readInt8(this.bb!.__vector(this.bb_pos + offset) + index) : 0;
+  return offset ? this.bb!.readUint8(this.bb!.__vector(this.bb_pos + offset) + index) : 0;
 }
 
 payloadLength():number {
@@ -64,9 +64,9 @@ payloadLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
-payloadArray():Int8Array|null {
+payloadArray():Uint8Array|null {
   const offset = this.bb!.__offset(this.bb_pos, 14);
-  return offset ? new Int8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
+  return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
 }
 
 static startPacket(builder:flatbuffers.Builder) {
@@ -97,12 +97,7 @@ static addPayload(builder:flatbuffers.Builder, payloadOffset:flatbuffers.Offset)
   builder.addFieldOffset(5, payloadOffset, 0);
 }
 
-static createPayloadVector(builder:flatbuffers.Builder, data:number[]|Int8Array):flatbuffers.Offset;
-/**
- * @deprecated This Uint8Array overload will be removed in the future.
- */
-static createPayloadVector(builder:flatbuffers.Builder, data:number[]|Uint8Array):flatbuffers.Offset;
-static createPayloadVector(builder:flatbuffers.Builder, data:number[]|Int8Array|Uint8Array):flatbuffers.Offset {
+static createPayloadVector(builder:flatbuffers.Builder, data:number[]|Uint8Array):flatbuffers.Offset {
   builder.startVector(1, data.length, 1);
   for (let i = data.length - 1; i >= 0; i--) {
     builder.addInt8(data[i]!);

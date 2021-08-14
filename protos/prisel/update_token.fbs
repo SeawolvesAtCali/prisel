@@ -1,0 +1,9 @@
+// Generated from update_token.proto
+
+namespace Prisel.Common;
+
+table UpdateToken {
+  previousToken:string;
+  token:string;
+}
+

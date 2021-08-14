@@ -1,0 +1,19 @@
+include "player_info.fbs";
+include "room_info.fbs";
+include "room_state_snapshot.fbs";
+
+namespace Prisel.Common;
+
+// type : JOIN,
+// packet_type : REQUEST
+table JoinRequest {
+  roomId:string;
+}
+
+// type : JOIN,
+// packet_type : RESPONSE
+table JoinResponse {
+  room:Prisel.Common.RoomInfo;
+  roomState:Prisel.Common.RoomStateSnapshot;
+}
+

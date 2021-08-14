@@ -1,0 +1,14 @@
+namespace Prisel.Common;
+
+// type : LOGIN,
+// packet_type : REQUEST
+table LoginRequest {
+  username:string;
+}
+
+// type : LOGIN,
+// packet_type : RESPONSE
+table LoginResponse {
+  user_id:string;
+}
+

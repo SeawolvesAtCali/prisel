@@ -1,0 +1,15 @@
+include "packet_type.fbs";
+include "system_action_type.fbs";
+include "status.fbs";
+
+namespace Prisel.Common;
+
+table Packet {
+  type:Prisel.Common.PacketType;
+  request_id:string;
+  system_action_type:Prisel.Common.SystemActionType;
+  action_type:string;
+  status:Prisel.Common.Status;
+  payload:[byte];
+}
+

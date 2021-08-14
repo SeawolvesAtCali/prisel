@@ -1,0 +1,9 @@
+namespace Prisel.Common;
+
+// type : ERROR,
+// packet_type : DEFAULT
+table ErrorPayload {
+  message:string;
+  detail:string;
+}
+

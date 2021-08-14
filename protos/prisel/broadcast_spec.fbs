@@ -1,0 +1,9 @@
+include "player_info.fbs";
+
+namespace Prisel.Common;
+
+table BroadcastPayload {
+  player:Prisel.Common.PlayerInfo;
+  message:string;
+}
+

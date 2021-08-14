@@ -1,0 +1,9 @@
+// Generated from player_info.proto
+
+namespace Prisel.Common;
+
+table PlayerInfo {
+  name:string;
+  id:string;
+}
+

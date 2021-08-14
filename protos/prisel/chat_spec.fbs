@@ -1,0 +1,8 @@
+namespace Prisel.Common;
+
+// type : CHAT,
+// packet_type : DEFAULT
+table ChatPayload {
+  message:string;
+}
+

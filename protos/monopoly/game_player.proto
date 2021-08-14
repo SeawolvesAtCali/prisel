@@ -4,7 +4,7 @@ package monopoly;
 option csharp_namespace = "Monopoly.Protobuf";
 
 import "monopoly/coordinate.proto";
-import "prisel/player_info.proto";
+import "player_info.proto";
 
 message GamePlayer {
   string id = 1;

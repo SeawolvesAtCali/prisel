@@ -1,0 +1,12 @@
+include "player_info.fbs";
+
+namespace Prisel.Common;
+
+// type : GET_ROOM_STATE,
+// packet_type : RESPONSE
+table GetRoomStateResponse {
+  players:[Prisel.Common.PlayerInfo];
+  host_id:string;
+  token:string;
+}
+

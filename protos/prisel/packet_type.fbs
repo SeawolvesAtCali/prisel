@@ -1,0 +1,8 @@
+namespace Prisel.Common;
+
+enum PacketType : int {
+  DEFAULT = 0,
+  REQUEST = 1,
+  RESPONSE = 2,
+}
+

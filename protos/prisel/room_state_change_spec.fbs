@@ -1,0 +1,28 @@
+// Generated from room_state_change_spec.proto
+
+include "update_token.fbs";
+include "player_info.fbs";
+
+namespace Prisel.Common;
+
+union RoomStateChangeInfo {PlayerJoinInfo, PlayerLeaveInfo, HostLeaveInfo}
+
+table RoomStateChangePayload {
+  change:RoomStateChangeInfo;
+  token:Prisel.Common.UpdateToken;
+}
+
+
+table PlayerJoinInfo {
+  player:Prisel.Common.PlayerInfo;
+}
+
+table PlayerLeaveInfo {
+  player_id:string;
+}
+
+table HostLeaveInfo {
+  host_id:string;
+  new_host_id:string;
+}
+

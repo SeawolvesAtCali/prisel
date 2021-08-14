@@ -1,0 +1,12 @@
+// Generated from room_state_snapshot.proto
+
+include "player_info.fbs";
+
+namespace Prisel.Common;
+
+table RoomStateSnapshot {
+  players:[Prisel.Common.PlayerInfo];
+  host_id:string;
+  token:string;
+}
+

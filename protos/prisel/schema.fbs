@@ -1,0 +1,17 @@
+include "broadcast_spec.fbs";
+include "chat_spec.fbs";
+include "create_room_spec.fbs";
+include "error_spec.fbs";
+include "get_lobby_state_spec.fbs";
+include "get_room_state_spec.fbs";
+include "join_spec.fbs";
+include "login_spec.fbs";
+include "packet.fbs";
+include "packet_type.fbs";
+include "player_info.fbs";
+include "room_info.fbs";
+include "room_state_change_spec.fbs";
+include "room_state_snapshot.fbs";
+include "status.fbs";
+include "system_action_type.fbs";
+include "update_token.fbs";

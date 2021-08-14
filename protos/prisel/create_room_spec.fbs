@@ -1,0 +1,19 @@
+include "player_info.fbs";
+include "room_info.fbs";
+include "room_state_snapshot.fbs";
+
+namespace Prisel.Common;
+
+// type : CREATE_ROOM,
+// packet_type : REQUEST
+table CreateRoomRequest {
+  roomName:string;
+}
+
+// type : CREATE_ROOM,
+// packet_type : RESPONSE
+table CreateRoomResponse {
+  room:Prisel.Common.RoomInfo;
+  room_state:Prisel.Common.RoomStateSnapshot;
+}
+

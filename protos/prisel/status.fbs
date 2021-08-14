@@ -1,0 +1,15 @@
+namespace Prisel.Common;
+
+enum StatusCode : int {
+  UNSPECIFIED = 0,
+  OK = 1,
+  FAILED = 2,
+}
+
+table Status {
+  code:StatusCode;
+  message:string;
+  detail:string;
+}
+
+

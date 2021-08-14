@@ -1,0 +1,16 @@
+include "room_info.fbs";
+
+namespace Prisel.Common;
+
+// type : GET_LOBBY_STATE,
+// packet_type : RESPONSE
+table GetLobbyStateResponse {
+  rooms:[Prisel.Common.LobbyRoomViewInfo];
+}
+
+table LobbyRoomViewInfo {
+  room:Prisel.Common.RoomInfo;
+  player_count:int;
+  max_players:int;
+}
+

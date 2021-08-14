@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package prisel;
-option csharp_namespace = "Prisel.Protobuf";
-
-// type : CHAT,
-// packet_type : DEFAULT
-message ChatPayload { string message = 1; }

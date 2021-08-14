@@ -1,0 +1,26 @@
+// Generated from chance.proto
+
+include "move_steps_extra.fbs";
+include "coordinate.fbs";
+include "collectible_extra.fbs";
+include "money_exchange_extra.fbs";
+include "move_to_tile_extra.fbs";
+
+namespace Monopoly.Schema;
+
+table ChanceDisplay {
+  title:string;
+  description:string;
+  image:string;
+}
+
+union ChanceExtra {
+    Monopoly.Schema.MoveToTileExtra,
+    Monopoly.Schema.MoneyExchangeExtra,
+    Monopoly.Schema.MoveStepsExtra,Monopoly.Schema.CollectibleExtra,
+}
+
+table Chance {
+  display:Monopoly.Schema.ChanceDisplay;
+  extra:ChanceExtra;
+}

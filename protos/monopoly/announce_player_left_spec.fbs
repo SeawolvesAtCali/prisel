@@ -1,0 +1,13 @@
+// Generated from announce_player_left_spec.proto
+
+include "coordinate.fbs";
+include "game_player.fbs";
+
+namespace Monopoly.Schema;
+
+// type : "announce_player_left"
+// packet_type : REQUEST
+table AnnouncePlayerLeftPayload {
+  player:Monopoly.Schema.GamePlayer;
+}
+

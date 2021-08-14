@@ -1,0 +1,8 @@
+namespace Monopoly.Schema;
+
+// The position of an entity on the board
+table Coordinate {
+  row:int;
+  col:int;
+}
+

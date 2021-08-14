@@ -1,0 +1,9 @@
+namespace Monopoly.Schema;
+
+// type : "announce_end_turn"
+// packet_type : DEFAULT
+table AnnounceEndTurnPayload {
+  current_player:string;
+  next_player:string;
+}
+

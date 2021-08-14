@@ -1,0 +1,18 @@
+// Generated from announce_pay_rent_spec.proto
+
+include "coordinate.fbs";
+include "property.fbs";
+include "payment.fbs";
+
+namespace Monopoly.Schema;
+
+// type : "announce_pay_rent",
+// packet_type : DEFAULT
+table AnnouncePayRentPayload {
+  payer:string;
+  payments:[Monopoly.Schema.Payment];
+  // the updated money of the current player. This normally only affect payer
+  // and payee. All other players will receive an unchanged amount.
+  my_current_money:int;
+}
+

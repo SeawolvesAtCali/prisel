@@ -1,0 +1,10 @@
+// Generated from announce_bankrupt_spec.proto
+
+namespace Monopoly.Schema;
+
+// type : "announce_bankrupt"
+// packet_type : D
+table AnnounceBankruptPayload {
+  player:string;
+}
+

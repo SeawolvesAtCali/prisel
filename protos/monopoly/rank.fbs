@@ -1,0 +1,18 @@
+// Generated from rank.proto
+
+include "coordinate.fbs";
+include "game_player.fbs";
+
+namespace Monopoly.Schema;
+
+table Asset {
+  cash:int;
+  property_worth:int;
+  total:int;
+}
+
+table Rank {
+  player:Monopoly.Schema.GamePlayer;
+  asset:Monopoly.Schema.Asset;
+}
+

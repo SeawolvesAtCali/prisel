@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package monopoly;
-option csharp_namespace = "Monopoly.Protobuf";
-
-// type : "announce_bankrupt"
-// packet_type : D
-message AnnounceBankruptPayload { string player = 1; }

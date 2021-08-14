@@ -1,0 +1,14 @@
+// Generated from announce_purchase_spec.proto
+
+include "coordinate.fbs";
+include "property.fbs";
+
+namespace Monopoly.Schema;
+
+// type : "announce_purchase"
+// packet_type : DEFAULT
+table AnnouncePurchasePayload {
+  player:string;
+  property:Monopoly.Schema.PropertyInfo;
+}
+

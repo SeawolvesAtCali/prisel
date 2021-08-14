@@ -1,0 +1,10 @@
+// Generated from announce_start_turn_spec.proto
+
+namespace Monopoly.Schema;
+
+// type : "announce_start_turn"
+// packet_type : DEFAULT
+table AnnounceStartTurnPayload {
+  player:string;
+}
+

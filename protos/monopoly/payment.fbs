@@ -1,0 +1,14 @@
+// Generated from payment.proto
+
+include "coordinate.fbs";
+include "property.fbs";
+
+namespace Monopoly.Schema;
+
+table Payment {
+  payee:string;
+  payer:string;
+  amount:int;
+  for_property:Monopoly.Schema.PropertyInfo;
+}
+

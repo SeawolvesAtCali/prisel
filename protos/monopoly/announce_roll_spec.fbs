@@ -1,0 +1,17 @@
+// Generated from announce_roll_spec.proto
+
+include "coordinate.fbs";
+
+namespace Monopoly.Schema;
+
+// type : "announce_roll"
+// packet_type : DEFAULT
+table AnnounceRollPayload {
+  player:string;
+  steps:int;
+  // the position of the player before moving. This is used to make sure the
+  // rendering of the player is in sync on all clients.
+  current_position:Monopoly.Schema.Coordinate;
+  my_money:int;
+}
+

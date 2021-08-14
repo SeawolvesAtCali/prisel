@@ -1,0 +1,9 @@
+// Generated from move_steps_extra.proto
+
+namespace Monopoly.Schema;
+
+// move a specific amount of steps forward or backward
+table MoveStepsExtra {
+  steps:int;
+}
+

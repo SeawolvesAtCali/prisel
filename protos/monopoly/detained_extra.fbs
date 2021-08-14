@@ -1,0 +1,14 @@
+namespace Monopoly.Schema;
+
+enum DetainedType : int {
+  UNSPECIFIED = 0,
+  ARRESTED = 1,
+  HOSPITALIZED = 2,
+}
+
+table DetainedExtra {
+  type:DetainedType;
+  // How many turns should the player stay.
+  length:int;
+}
+

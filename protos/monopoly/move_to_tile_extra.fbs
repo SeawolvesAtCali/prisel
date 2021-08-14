@@ -1,15 +1,15 @@
-syntax = "proto3";
+// Generated from move_to_tile_extra.proto
 
-package monopoly;
-option csharp_namespace = "Monopoly.Protobuf";
+include "coordinate.fbs";
 
-import "monopoly/coordinate.proto";
+namespace Monopoly.Schema;
 
 // move to each of the tiles sequentially and perform actions on the each
 // tiles. Normally, player would only go to one tile.
-message MoveToTileExtra {
-  Coordinate tile = 1;
+table MoveToTileExtra {
+  tile:Monopoly.Schema.Coordinate;
   // if teleport, the player will immediately appear at the target tile
   // without passing "GO"
-  bool is_teleport = 2;
+  is_teleport:bool;
 }
+

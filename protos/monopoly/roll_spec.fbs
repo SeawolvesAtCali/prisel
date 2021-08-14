@@ -1,0 +1,8 @@
+namespace Monopoly.Schema;
+
+// type : "roll"
+// packet_type : RESPONSE
+table RollResponse {
+  steps:int;
+}
+

@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package monopoly;
-option csharp_namespace = "Monopoly.Protobuf";
-
-// type : "roll"
-// packet_type : RESPONSE
-message RollResponse { int32 steps = 1; }

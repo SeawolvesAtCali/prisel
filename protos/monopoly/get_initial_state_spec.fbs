@@ -1,0 +1,14 @@
+// Generated from get_initial_state_spec.proto
+
+include "coordinate.fbs";
+include "game_player.fbs";
+
+namespace Monopoly.Schema;
+
+// type : "get_initial_state"
+// packet_type : RESPONSE
+table GetInitialStateResponse {
+  players:[Monopoly.Schema.GamePlayer];
+  first_player_id:string;
+}
+

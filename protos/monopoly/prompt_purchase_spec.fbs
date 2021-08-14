@@ -1,0 +1,24 @@
+// Generated from prompt_purchase_spec.proto
+
+include "coordinate.fbs";
+include "property.fbs";
+
+namespace Monopoly.Schema;
+
+// type : "prompt_purchase"
+// packet_type : REQUEST
+table PromptPurchaseRequest {
+  property:Monopoly.Schema.PropertyInfo;
+  levels:[Monopoly.Schema.PropertyLevel];
+  // Whether this property can be upgraded right now. Only purchased
+  // land/property that has not reached the upgrade limit can be upgraded.
+  is_upgrade:bool;
+  money_after_purchase:int;
+}
+
+// type : "prompt_purchase"
+// packet_type : REQUEST
+table PromptPurchaseResponse {
+  purchased:bool;
+}
+

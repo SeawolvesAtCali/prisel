@@ -1,0 +1,21 @@
+// Generated from property.proto
+
+include "coordinate.fbs";
+
+namespace Monopoly.Schema;
+
+table PropertyLevel {
+  // The cost to reach this level from previous level
+  // If this is the first level, the cost is land purchase cost
+  cost:int;
+  rent:int;
+}
+
+table PropertyInfo {
+  current_level:int;
+  cost:int;
+  rent:int;
+  name:string;
+  pos:Monopoly.Schema.Coordinate;
+}
+

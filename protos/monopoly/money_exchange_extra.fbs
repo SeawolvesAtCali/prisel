@@ -1,0 +1,14 @@
+// Generated from money_exchange_extra.proto
+
+namespace Monopoly.Schema;
+
+table PlayerAmountTuple {
+    player:string;
+    amount:int;
+}
+
+table MoneyExchangeExtra {
+  my_current_money:int;
+  exchanges:[PlayerAmountTuple];
+}
+

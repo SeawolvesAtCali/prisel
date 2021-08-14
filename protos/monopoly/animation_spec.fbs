@@ -1,0 +1,136 @@
+include "move_steps_extra.fbs";
+include "coordinate.fbs";
+include "game_player.fbs";
+include "collectible_extra.fbs";
+include "chance.fbs";
+include "property.fbs";
+include "money_exchange_extra.fbs";
+include "move_to_tile_extra.fbs";
+
+namespace Monopoly.Schema;
+
+enum AnimationType : int {
+  DEFAULT = 0,
+
+  // container that plays child animations one by one
+  SEQUENCE = 1,
+
+  // container that plays child animations and finish when one of them finishes.
+  // Other animations are truncated if possible
+  RACE = 2,
+
+  // container that plays child animations and wait for the longest one to
+  // finish.
+  ALL = 3,
+}
+
+enum EmotionType : int {
+  UNSPECIFIED = 0,
+  CHEER = 1,
+  ANGRY = 2,
+}
+
+// How the player is being teleported. Could be things like UFO or police car.
+enum TeleportVehicle : int {
+  UNSPECIFIED = 0,
+}
+
+table Animation {
+  name:string;
+  type:Monopoly.Schema.AnimationType;
+  // the duration in ms, specified when type is DEFAULT
+  length:int;
+  extra:[ubyte];
+  children:[Monopoly.Schema.Animation];
+}
+
+// type : "animation"
+// packet_type : DEFAULT
+table AnimationPayload {
+  animation:Monopoly.Schema.Animation;
+}
+
+// extra for "dice_roll"
+table DiceRollExtra {
+  player:Monopoly.Schema.GamePlayer;
+}
+
+// extra for "dice_down"
+// dice drop and review final number
+table DiceDownExtra {
+  steps:int;
+  player:Monopoly.Schema.GamePlayer;
+}
+
+// extra for "move"
+// player move along tile path
+table MoveExtra {
+  player:Monopoly.Schema.GamePlayer;
+  start:Monopoly.Schema.Coordinate;
+  path:[Monopoly.Schema.Coordinate];
+}
+
+// extra for "focus_land"
+// highlight the property for purchase
+table FocusLandExtra {
+  property:Monopoly.Schema.PropertyInfo;
+}
+
+// extra for "invested"
+// show animation for purchase/upgrade
+table InvestedExtra {
+  property:Monopoly.Schema.PropertyInfo;
+}
+
+// extra for "pan"
+// pan camera to next player
+table PanExtra {
+  target:Monopoly.Schema.Coordinate;
+}
+
+// extra for "turn_start"
+// current player play ready to start animation
+table TurnStartExtra {
+  player:Monopoly.Schema.GamePlayer;
+}
+
+// extra for "pay_rent"
+table PayRentExtra {
+  payer:Monopoly.Schema.GamePlayer;
+  payee:Monopoly.Schema.GamePlayer;
+}
+
+// extra for "player_emotion"
+// a general purpose animation to play to show player's emotion
+table PlayerEmotionExtra {
+  player:Monopoly.Schema.GamePlayer;
+  emotion:Monopoly.Schema.EmotionType;
+}
+
+// extra for "open_chance_chest"
+// When player arrive at the tile with chance chest, a card flyout from the
+// chance chest to the center of the screen. The current player would need
+// to click on anywhere to dismiss it after reading card. Other clients will
+// play the same animation except they won't be able to dismiss the card.
+// The card will be automatically dismissed when the current player dismiss it.
+table OpenChanceChestExtra {
+  chance_chest_tile:Monopoly.Schema.Coordinate;
+  chance:Monopoly.Schema.ChanceDisplay;
+}
+
+// extra for "teleport_pickup"
+// teleport is composed of 3 animations played in sequence:
+// "teleport_pickup", "pan" and "teleport_dropoff"
+table TeleportPickupExtra {
+  vehicle:Monopoly.Schema.TeleportVehicle;
+  pickup_location:Monopoly.Schema.Coordinate;
+  player:Monopoly.Schema.GamePlayer;
+}
+
+// extra for "teleport_dropoff"
+table TeleportDropoffExtra {
+  vehicle:Monopoly.Schema.TeleportVehicle;
+  dropoff_location:Monopoly.Schema.Coordinate;
+  player:Monopoly.Schema.GamePlayer;
+}
+

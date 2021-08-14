@@ -1,0 +1,20 @@
+// Generated from announce_received_chance_spec.proto
+
+include "move_steps_extra.fbs";
+include "coordinate.fbs";
+include "collectible_extra.fbs";
+include "chance.fbs";
+include "money_exchange_extra.fbs";
+include "move_to_tile_extra.fbs";
+
+namespace Monopoly.Schema;
+
+// TODO: this seems useless. There is already animation for showing chance chest
+// open/close.
+// type : "announce_received_chance"
+// packet_type : DEFAULT
+table AnnounceRecievedChancePayload {
+  player:string;
+  chance:Monopoly.Schema.Chance;
+}
+

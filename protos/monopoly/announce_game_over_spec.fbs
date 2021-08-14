@@ -1,0 +1,14 @@
+// Generated from announce_game_over_spec.proto
+
+include "coordinate.fbs";
+include "game_player.fbs";
+include "rank.fbs";
+
+namespace Monopoly.Schema;
+
+// type : "announce_game_over"
+// packet_type : DEFAULT
+table AnnounceGameOverPayload {
+  ranks:[Monopoly.Schema.Rank];
+}
+

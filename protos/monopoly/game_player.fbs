@@ -1,0 +1,17 @@
+// Generated from game_player.proto
+
+include "coordinate.fbs";
+include "player_info.fbs"; // from "prisel"
+
+namespace Monopoly.Schema;
+
+table GamePlayer {
+  id:string;
+  money:int;
+  pos:Monopoly.Schema.Coordinate;
+  // character determine the sprite set, or color client side use to
+  // denote the player
+  character:int;
+  bound_player:Prisel.Common.PlayerInfo;
+}
+

@@ -151,6 +151,10 @@
       "allowedCategories": [ "production", "prototype" ]
     },
     {
+      "name": "flatbuffers",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "jest",
       "allowedCategories": [ "production", "prototype", "tools" ]
     },

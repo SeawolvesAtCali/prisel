@@ -1,7 +1,4 @@
 dependencies:
-  '@protobuf-ts/plugin': 1.0.12
-  '@protobuf-ts/protoc': 1.0.12
-  '@protobuf-ts/runtime': 1.0.12
   '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
   '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
   '@rush-temp/client': 'file:projects/client.tgz'
@@ -40,6 +37,7 @@ dependencies:
   buffer: 5.6.1
   debug: 4.1.1
   deepcopy: 2.1.0
+  flatbuffers: 2.0.3
   jest: 26.0.1
   jest-dev-server: 4.4.0
   jest-environment-jsdom: 23.4.0
@@ -54,7 +52,6 @@ dependencies:
   nps: 5.9.12
   prettier: 2.0.5
   prismjs: 1.20.0
-  protobufjs: 6.10.1
   pts: 0.9.4
   react: 16.13.1
   react-dom: 16.13.1_react@16.13.1
@@ -7558,6 +7555,10 @@ packages:
       node: ^10.12.0 || >=12.0.0
     resolution:
       integrity: sha512-dm9s5Pw7Jc0GvMYbshN6zchCA9RgQlzzEZX3vylR9IqFfS8XciblUXOKfW6SiuJ0e13eDYZoZV5wdrev7P3Nwg==
+  /flatbuffers/2.0.3:
+    dev: false
+    resolution:
+      integrity: sha512-lTN0GS4FjwPY6h8BDDuq8f2ZORIyRgI4pHXzIt7GBsTgyCt2z9OAPiWNaeEaNcjrmuLLzFagEDwpYiqGv5BEWg==
   /flatted/3.1.0:
     dev: false
     resolution:
@@ -16305,7 +16306,7 @@ packages:
     dev: false
     name: '@rush-temp/client'
     resolution:
-      integrity: sha512-TDD66YVmYzYqj1ibdY3F6eYf9kONzR/hug7LOBLiTdU3X57sdAmMn/mdjcFAMr/6qJSrKx8xEW+CT93fWvC1gA==
+      integrity: sha512-0IyuFiDinly+nyfwxYmemooo6Emy89VAP82jZ9AlmHFUJkD8AOWf6MNHSs4dyucl9uVV2ql85Gj+mZwi/hLNtw==
       tarball: 'file:projects/client.tgz'
     version: 0.0.0
   'file:projects/common.tgz':
@@ -16328,7 +16329,7 @@ packages:
     dev: false
     name: '@rush-temp/common'
     resolution:
-      integrity: sha512-gRCdFxw+dl8JmYmNuOo0xt1Ws0GN9yEHwjQ2uO7MWw/7tVhB2fdezE8xX3J3nCzfy0tgaG8P9cA+s7Q+ErJaDA==
+      integrity: sha512-QxLFbsIlDdD0HafYiKuy6kjz2JHtTjR1MSwVbBvsybq2kiwC8kcXXn/Sy5WMkTN8Tx/Hm1EF57pk8d9O43amEA==
       tarball: 'file:projects/common.tgz'
     version: 0.0.0
   'file:projects/configs.tgz_rollup@2.12.0':
@@ -16439,7 +16440,7 @@ packages:
     dev: false
     name: '@rush-temp/monopoly-common'
     resolution:
-      integrity: sha512-jy61jOOyqMM524B6NxOLbO8WyfD58E03hk0LU4MWasAT+O7GuyqYiApTyb+zwlL05y4Eaz4vY7oxm6qmKZ4taw==
+      integrity: sha512-iY3HO5jPG8J+FOxyqQgED6zIW4lv80RXZo/b3gZXplwBOha3ZPIOtBCcYE49aXy6a4uZX0uOvwYt+ptizr4HjQ==
       tarball: 'file:projects/monopoly-common.tgz'
     version: 0.0.0
   'file:projects/monopoly.tgz':
@@ -16479,6 +16480,7 @@ packages:
       '@types/long': 4.0.1
       barrelsby: 2.2.0
       buffer: 5.6.1
+      flatbuffers: 2.0.3
       long: 4.0.0
       nps: 5.9.12
       protobufjs: 6.10.1
@@ -16490,7 +16492,7 @@ packages:
     dev: false
     name: '@rush-temp/protos'
     resolution:
-      integrity: sha512-dHwMh4E9YmBL/dgtQU8wN6vV81ilob9/hHzo29hu2eP9lKkCe2ws5x3P1+UioTdY8gP4RWbgJMmSILpDNUUJfw==
+      integrity: sha512-Qee1U0lYD6spCPWKEXJ84EgBuLLQ7TY2M3uP4uoMX7Dtxadvp6mVBL0mtoXI9aLsFbTNWs6cReFAtEfioMdmSw==
       tarball: 'file:projects/protos.tgz'
     version: 0.0.0
   'file:projects/react.tgz_ts-node@8.10.2':
@@ -16599,9 +16601,6 @@ packages:
     version: 9.0.3
 registry: ''
 specifiers:
-  '@protobuf-ts/plugin': 1.0.12
-  '@protobuf-ts/protoc': 1.0.12
-  '@protobuf-ts/runtime': ^1.0.10
   '@rollup/plugin-commonjs': ^11.1.0
   '@rollup/plugin-node-resolve': ^7.1.3
   '@rush-temp/client': 'file:./projects/client.tgz'
@@ -16640,6 +16639,7 @@ specifiers:
   buffer: ^5.6.0
   debug: ^4.1.0
   deepcopy: ^2.1.0
+  flatbuffers: ^2.0.3
   jest: ^26.0.1
   jest-dev-server: ^4.4.0
   jest-environment-jsdom: ^23.4.0
@@ -16654,7 +16654,6 @@ specifiers:
   nps: ^5.9.12
   prettier: 2.0.5
   prismjs: ^1.20.0
-  protobufjs: ~6.10.1
   pts: ^0.9.4
   react: ^16.13.1
   react-dom: ^16.13.1

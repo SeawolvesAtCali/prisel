@@ -1,30 +1,25 @@
 import { priselpb } from '@prisel/protos';
+import { Packet } from '../packet';
 import { Request } from '../request';
 import { Response } from '../response';
 
 describe('response', () => {
-    it('isResponse works for response created using ResponseBuilder', () => {
-        const request: Request = {
-            type: priselpb.PacketType.REQUEST,
-            requestId: '1',
-            message: {
-                oneofKind: 'systemAction',
-                systemAction: priselpb.SystemActionType.LOGIN,
-            },
-            payload: {
-                payload: {
-                    oneofKind: 'loginRequest',
-                    loginRequest: {
-                        username: 'batman',
-                    },
-                },
-            },
-        };
-        const response = Response.forRequest(request)
-            .setPayload('loginResponse', {
-                userId: '123',
-            })
+    it('verify works for response created using ResponseBuilder', () => {
+        const [, request] = Request.forSystemAction(priselpb.SystemActionType.LOGIN)
+            .setId('1')
+            .withPayloadBuilder((builder) =>
+                priselpb.LoginRequest.createLoginRequest(builder, builder.createString('batman')),
+            )
             .build();
-        expect(Response.isResponse(response)).toBe(true);
+
+        const [, response] = Response.forRequest(request)
+            .withPayloadBuilder((builder) =>
+                priselpb.LoginResponse.createLoginResponse(builder, builder.createString('123')),
+            )
+            .build();
+
+        expect(Response.verify(response)).toBe(true);
+        expect(response.requestId()).toBe('1');
+        expect(Packet.isStatusOk(response));
     });
 });

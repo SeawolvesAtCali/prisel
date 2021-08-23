@@ -15,7 +15,7 @@ export function newRequestManager(): RequestManager {
     const requestIdMap = new Map<string, ResolveFunc>();
     let requestId = 1;
     function addRequest(request: Request, token?: Token) {
-        const id = request.requestId;
+        const id = request.requestId();
         const promise = new Promise<Response>((resolve, reject) => {
             requestIdMap.set(id, resolve);
             if (token) {
@@ -32,7 +32,7 @@ export function newRequestManager(): RequestManager {
     }
 
     function onResponse(response: Response) {
-        const id = `${response.requestId}`;
+        const id = response.requestId();
         if (requestIdMap.has(id)) {
             Promise.resolve().then(() => {
                 const resolve = requestIdMap.get(id);

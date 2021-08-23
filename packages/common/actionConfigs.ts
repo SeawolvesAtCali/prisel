@@ -1,5 +1,4 @@
 import { priselpb } from '@prisel/protos';
-import { PayloadKey } from './packet';
 
 const { SystemActionType } = priselpb;
 
@@ -16,9 +15,9 @@ interface ActionConfig {
     payload?: Array<[string, string]>;
     related?: priselpb.SystemActionType[];
 }
-const request = (key: PayloadKey): [string, string] => ['request', key];
-const response = (key: PayloadKey): [string, string] => ['response', key];
-const packet = (key: PayloadKey): [string, string] => ['packet', key];
+const request = (key: string): [string, string] => ['request', key];
+const response = (key: string): [string, string] => ['response', key];
+const packet = (key: string): [string, string] => ['packet', key];
 
 const RAW_ACTION_CONFIG: Record<priselpb.SystemActionType, ActionConfig> = {
     [SystemActionType.UNSPECIFIED]: {

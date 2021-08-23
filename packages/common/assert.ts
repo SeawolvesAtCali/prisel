@@ -18,3 +18,11 @@ export function assertExist<T>(a: T, nameOfObject?: string): NonNullable<T> {
 export function assertNever(x: never): never {
     throw new Error('Unexpected value ' + x);
 }
+
+export function nonNull<T>(x: T): x is NonNullable<T> {
+    return x != null;
+}
+
+export function isNull(x: any): x is undefined | null {
+    return x == null;
+}

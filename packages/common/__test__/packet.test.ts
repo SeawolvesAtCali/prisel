@@ -1,76 +1,90 @@
 import { priselpb } from '@prisel/protos';
-import { isValidRequest, isValidResponse, Packet } from '../packet';
+import { isValidPacket, isValidRequest, isValidResponse, Packet } from '../packet';
 import { Request } from '../request';
 import { Response } from '../response';
 
 describe('packet', () => {
     it('packing and unpacking actionPayload', () => {
-        const packet = Packet.forAction('test')
-            .setPayload(priselpb.ChatPayload, { message: 'hello' })
-            .build();
-        const unpackedPayload = Packet.getPayload(packet, priselpb.ChatPayload);
-        expect(priselpb.ChatPayload.is(unpackedPayload)).toBe(true);
-        expect(unpackedPayload).toEqual({ message: 'hello' });
+        const unpackedPayload = Packet.getPayload(
+            Packet.forAction('test')
+                .withPayloadBuilder((builder) =>
+                    priselpb.ChatPayload.createChatPayload(builder, builder.createString('hello')),
+                )
+                .build()[1],
+            priselpb.ChatPayload.getRootAsChatPayload,
+        );
+        expect(unpackedPayload).not.toBeNull();
+        expect(unpackedPayload?.message()).toBe('hello');
     });
+
     it('unpacking should not throw error', () => {
         expect(
-            Packet.getPayload(Packet.forAction('test').build(), priselpb.ChatPayload),
-        ).toBeUndefined();
+            Packet.getPayload(
+                Packet.forAction('test').build()[1],
+                priselpb.ChatPayload.getRootAsChatPayload,
+            ),
+        ).toBeNull();
+
+        // extracting with different payload type will not failed. But the
+        // result will be unexpected.
         expect(
             Packet.getPayload(
                 Packet.forAction('test')
-                    .setPayload(priselpb.ChatPayload, { message: 'hello' })
-                    .build(),
-                priselpb.BroadcastPayload,
+                    .withPayloadBuilder((builder) =>
+                        priselpb.ChatPayload.createChatPayload(
+                            builder,
+                            builder.createString('test'),
+                        ),
+                    )
+                    .build()[1],
+                priselpb.BroadcastPayload.getRootAsBroadcastPayload,
             ),
-        ).toBeUndefined();
+        ).toBeDefined();
     });
-    it('systemAction payload should be read using oneof payload key', () => {
-        const packet = Request.forSystemAction(priselpb.SystemActionType.LOGIN)
-            .setPayload('loginRequest', {
-                username: 'name',
-            })
+
+    it('systemAction payload', () => {
+        const [, packet] = Request.forSystemAction(priselpb.SystemActionType.LOGIN)
+            .withPayloadBuilder((builder) =>
+                priselpb.LoginRequest.createLoginRequest(builder, builder.createString('name')),
+            )
             .build();
-        expect(Packet.hasPayload(packet, 'loginRequest')).toBe(true);
-        expect(Packet.getPayload(packet, 'loginRequest')).toMatchObject<priselpb.LoginRequest>({
-            username: 'name',
-        });
-        expect(Packet.hasPayload(packet, priselpb.LoginRequest)).toBe(false);
-        expect(Packet.getPayload(packet, priselpb.LoginRequest)).toBeUndefined();
+        expect(Packet.hasPayload(packet)).toBe(true);
+        expect(
+            Packet.getPayload(packet, priselpb.LoginRequest.getRootAsLoginRequest)?.username(),
+        ).toBe('name');
     });
-    it('serialize and deserialize', () => {
-        const request = Request.forSystemAction(priselpb.SystemActionType.LOGIN)
-            .setPayload('loginRequest', { username: 'name' })
-            .setId('2')
-            .build();
-        const serialized = Packet.serialize(request);
-        const deserialized = Packet.deserialize(serialized);
-        expect(deserialized).toBeDefined();
-        if (deserialized) {
-            expect(request).toMatchObject(deserialized);
-        }
-    });
-    it('Packet.is verifies packet', () => {
-        const request = Request.forSystemAction(priselpb.SystemActionType.LOGIN)
-            .setPayload('loginRequest', { username: 'superman' })
+
+    it('Packet.verify verifies packet', () => {
+        const [, request] = Request.forSystemAction(priselpb.SystemActionType.LOGIN)
+            .withPayloadBuilder((builder) =>
+                priselpb.LoginRequest.createLoginRequest(builder, builder.createString('superman')),
+            )
             .setId('2')
             .build();
         expect(isValidRequest(request)).toBe(true);
-        expect(Packet.is(request)).toBe(true);
+        expect(Packet.verify(request)).toBe(true);
 
-        const response = Response.forRequest(request)
-            .setPayload('loginResponse', {
-                userId: '123',
-            })
+        const [, response] = Response.forRequest(request)
+            .withPayloadBuilder((builder) =>
+                priselpb.LoginResponse.createLoginResponse(builder, builder.createString('123')),
+            )
             .build();
         expect(isValidResponse(response)).toBe(true);
-        expect(Packet.is(response)).toBe(true);
+        expect(isValidPacket(response)).toBe(true);
 
-        const packet = Packet.forAction('message')
-            .setPayload(priselpb.ChatPayload, { message: 'something' })
+        const [, packet] = Packet.forAction('message')
+            .withPayloadBuilder((builder) =>
+                priselpb.ChatPayload.createChatPayload(builder, builder.createString('something')),
+            )
             .build();
+
         expect(isValidRequest(packet)).toBe(false);
         expect(isValidResponse(packet)).toBe(false);
-        expect(Packet.is(packet)).toBe(true);
+        expect(Packet.verify(packet)).toBe(true);
+
+        // not setting requestId, making it invalid Request
+        const [, invalidRequest] = Request.forAction('test').build();
+        expect(isValidPacket(invalidRequest)).toBe(true);
+        expect(Packet.verify(invalidRequest)).toBe(false);
     });
 });

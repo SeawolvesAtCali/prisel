@@ -1,91 +1,113 @@
-import { priselpb, protobuf } from '@prisel/protos';
-import { IMessageType } from '@protobuf-ts/runtime';
-import type { SelectOneOf } from './oneof';
-import { typeRegistry } from './typeRegistry';
+import { priselpb } from '@prisel/protos';
+import * as flatbuffers from 'flatbuffers';
+import { nonNull } from './assert';
+import { StatusBuilder } from './status';
 
 export type Packet = priselpb.Packet;
 
-export type OneofPayload<Key extends string> = SelectOneOf<Key, priselpb.Payload['payload']>;
-
-export type PayloadKey = Exclude<
-    priselpb.Payload['payload']['oneofKind'],
-    undefined | 'actionPayload'
->;
 export class PacketBuilder {
-    message: 'systemAction' | 'action' = 'action';
-    systemAction: priselpb.SystemActionType = priselpb.SystemActionType.UNSPECIFIED;
-    action: string = 'unspecified';
-    payload?: priselpb.Payload;
+    systemAction = priselpb.SystemActionType.UNSPECIFIED;
+    packetType = priselpb.PacketType.DEFAULT;
+    action = 'unspecified';
+    id?: string;
+    payload?: Uint8Array;
+    status?: StatusBuilder;
 
     public static forSystemAction(action: priselpb.SystemActionType) {
         const builder = new PacketBuilder();
-        builder.message = 'systemAction';
         builder.systemAction = action;
         return builder;
     }
 
     public static forAction(action: string) {
         const builder = new PacketBuilder();
-        builder.message = 'action';
         builder.action = action;
         return builder;
     }
 
-    public setPayload<T extends PayloadKey>(payloadType: T, payload: OneofPayload<T>): this;
-    public setPayload<T extends object>(messageType: IMessageType<T>, payload: T): this;
-    setPayload(payloadTypeOrMessageType: PayloadKey | IMessageType<any>, payload: any): this {
-        if (typeof payloadTypeOrMessageType === 'string') {
-            this.payload = ({
-                payload: {
-                    oneofKind: payloadTypeOrMessageType,
-                    [payloadTypeOrMessageType]: payload,
-                },
-            } as unknown) as priselpb.Payload;
-            return this;
-        }
-        this.payload = {
-            payload: {
-                oneofKind: 'actionPayload',
-                actionPayload: protobuf.any.Any.pack(payload, payloadTypeOrMessageType),
-            },
-        };
+    public withPayload(payloadBuilder: flatbuffers.Builder) {
+        this.payload = payloadBuilder.asUint8Array();
         return this;
     }
 
-    public build(): priselpb.Packet {
-        const result: priselpb.Packet = {
-            type: priselpb.PacketType.DEFAULT,
-            message:
-                this.message === 'systemAction'
-                    ? {
-                          oneofKind: 'systemAction',
-                          systemAction: this.systemAction,
-                      }
-                    : {
-                          oneofKind: 'action',
-                          action: this.action,
-                      },
-        };
-        if (this.payload) {
-            result.payload = this.payload;
+    public withPayloadBuilder(func: (builder: flatbuffers.Builder) => number) {
+        const builder = new flatbuffers.Builder(1024);
+        const offset = func(builder);
+        builder.finish(offset);
+        return this.withPayload(builder);
+    }
+
+    public build(): [Uint8Array, priselpb.Packet] {
+        const builder: flatbuffers.Builder = new flatbuffers.Builder(1024);
+        const actionTypeString = builder.createString(this.action);
+        const requestIdString = nonNull(this.id) ? builder.createString(this.id) : undefined;
+        const payloadOffset = nonNull(this.payload)
+            ? priselpb.Packet.createPayloadVector(builder, this.payload)
+            : 0;
+
+        const statusOffset = nonNull(this.status) ? this.status.build(builder) : undefined;
+
+        priselpb.Packet.startPacket(builder);
+
+        priselpb.Packet.addType(builder, this.packetType);
+        if (nonNull(requestIdString)) {
+            priselpb.Packet.addRequestId(builder, requestIdString);
         }
-        return result;
+        if (nonNull(statusOffset)) {
+            priselpb.Packet.addStatus(builder, statusOffset);
+        }
+        priselpb.Packet.addSystemActionType(builder, this.systemAction);
+        if (nonNull(this.action)) {
+            priselpb.Packet.addActionType(builder, actionTypeString);
+        }
+
+        if (nonNull(this.payload)) {
+            priselpb.Packet.addPayload(builder, payloadOffset);
+        }
+
+        builder.finish(priselpb.Packet.endPacket(builder));
+
+        const uint8Array = builder.asUint8Array();
+        const packet = priselpb.Packet.getRootAsPacket(new flatbuffers.ByteBuffer(uint8Array));
+        return [uint8Array, packet];
     }
 }
 
-export function isValidRequest(p: Packet | undefined) {
-    return p?.type === priselpb.PacketType.REQUEST && p?.requestId !== undefined;
-}
-
-export function isValidResponse(p: Packet | undefined) {
+export function isValidPacket(p: Packet | undefined): p is Packet {
     return (
-        p?.type === priselpb.PacketType.RESPONSE &&
-        p?.requestId !== undefined &&
-        p?.status !== undefined
+        nonNull(p) &&
+        (p.systemActionType() != priselpb.SystemActionType.UNSPECIFIED || p.actionType() != null)
     );
 }
 
-class Packet$Type {
+export function isValidRequest(
+    p: Packet | undefined,
+): p is Packet & {
+    type: () => priselpb.PacketType.REQUEST;
+    requestId: () => string;
+} {
+    return isValidPacket(p) && p.type() === priselpb.PacketType.REQUEST && nonNull(p.requestId());
+}
+
+export function isValidResponse(
+    p: Packet | undefined,
+): p is Packet & {
+    type: () => priselpb.PacketType.RESPONSE;
+    requestId: () => string;
+    status: () => priselpb.Status;
+} {
+    return (
+        isValidPacket(p) &&
+        p.type() === priselpb.PacketType.RESPONSE &&
+        nonNull(p.requestId()) &&
+        nonNull(p.status())
+    );
+}
+
+class PacketHelper {
+    public getBuilder(size = 1024) {
+        return new flatbuffers.Builder(size);
+    }
     public forSystemAction(action: priselpb.SystemActionType) {
         return PacketBuilder.forSystemAction(action);
     }
@@ -93,157 +115,124 @@ class Packet$Type {
         return PacketBuilder.forAction(action);
     }
     public getSystemAction(packet: Packet | undefined) {
-        if (packet?.message?.oneofKind === 'systemAction') {
-            return packet.message.systemAction;
+        if (packet) {
+            return packet.systemActionType();
         }
-        return undefined;
+        return priselpb.SystemActionType.UNSPECIFIED;
     }
     public getAction(packet: Packet | undefined) {
-        if (packet?.message?.oneofKind === 'action') {
-            return packet.message.action;
+        if (packet) {
+            return packet.actionType();
         }
-        return undefined;
+        return null;
     }
     public isAnySystemAction(
         packet: Packet | undefined,
     ): packet is Packet & {
-        message: { oneofKind: 'systemAction'; systemAction: priselpb.SystemActionType };
+        systemActionType: () => Exclude<
+            priselpb.SystemActionType,
+            priselpb.SystemActionType.UNSPECIFIED
+        >;
     } {
         return (
-            packet?.message?.oneofKind === 'systemAction' &&
-            packet.message.systemAction != undefined
+            nonNull(packet) && packet.systemActionType() != priselpb.SystemActionType.UNSPECIFIED
         );
     }
     public isSystemAction<T extends priselpb.SystemActionType>(
         packet: Packet | undefined,
         systemActionType: T,
     ): packet is Packet & {
-        message: { oneofKind: 'systemAction'; systemAction: T };
+        systemActionType: () => T;
     } {
-        return (
-            packet?.message?.oneofKind === 'systemAction' &&
-            packet?.message?.systemAction === systemActionType
-        );
+        return this.isAnySystemAction(packet) && packet.systemActionType() === systemActionType;
     }
+
     public isAnyCustomAction(
         packet: Packet | undefined,
     ): packet is Packet & {
-        message: { oneofKind: 'action'; action: string };
+        actionType: () => string;
     } {
-        return packet?.message?.oneofKind === 'action' && packet.message.action != undefined;
+        return (
+            nonNull(packet) &&
+            packet.systemActionType() === priselpb.SystemActionType.UNSPECIFIED &&
+            nonNull(packet.actionType())
+        );
     }
+
     public isCustomAction<T extends string>(
         packet: Packet | undefined,
         action: T,
     ): packet is Packet & {
-        message: { oneofKind: 'action'; action: T };
+        actionType: () => T;
     } {
-        return packet?.message?.oneofKind === 'action' && packet?.message?.action === action;
+        return this.isAnyCustomAction(packet) && packet.actionType() === action;
     }
-    public hasPayload<T extends PayloadKey>(packet: Packet | undefined, payloadKey: T): boolean;
-    public hasPayload<T extends object>(
+
+    public hasPayload(packet: Packet | undefined) {
+        return packet && nonNull(packet.payloadArray());
+    }
+
+    /**
+     * Extract payload from packet. If the payload doesn't match the
+     * payloadCreator, it will not thrown but the result will be unexpected.
+     * @param packet
+     * @param payloadCreator
+     * @returns null if packet has no payload, otherwise the Payload.
+     */
+    public getPayload<T>(
         packet: Packet | undefined,
-        messageType: IMessageType<T>,
-    ): boolean;
-    hasPayload(
-        packet: Packet | undefined,
-        payloadKeyOrMessageType: PayloadKey | IMessageType<any>,
-    ) {
+        payloadCreator: (bb: flatbuffers.ByteBuffer, obj?: T) => T,
+    ): T | null {
         if (!packet) {
-            return false;
+            return null;
         }
-        if (typeof payloadKeyOrMessageType === 'string') {
-            return (
-                packet?.payload?.payload?.oneofKind === payloadKeyOrMessageType &&
-                (packet.payload.payload as any)[payloadKeyOrMessageType] !== undefined
-            );
+        const payloadArray: Uint8Array | null = packet.payloadArray();
+        if (nonNull(payloadArray)) {
+            return payloadCreator(new flatbuffers.ByteBuffer(payloadArray));
         }
-        if (packet.payload?.payload?.oneofKind === 'actionPayload') {
-            return protobuf.any.Any.contains(
-                packet.payload.payload.actionPayload,
-                payloadKeyOrMessageType,
-            );
-        }
-        return false;
+        return null;
     }
-    public getPayload<T extends PayloadKey>(
-        packet: Packet | undefined,
-        payloadKey: T,
-    ): OneofPayload<T> | undefined;
-    public getPayload<T extends object>(
-        packet: Packet | undefined,
-        messageType: IMessageType<T>,
-    ): T | undefined;
-    getPayload(
-        packet: Packet | undefined,
-        payloadKeyOrMessageType: PayloadKey | IMessageType<any>,
-    ) {
-        if (!packet) {
-            return undefined;
-        }
-        if (typeof payloadKeyOrMessageType === 'string') {
-            if (packet.payload?.payload?.oneofKind === payloadKeyOrMessageType) {
-                const payload = packet.payload.payload;
-                if (payloadKeyOrMessageType in payload) {
-                    return (payload as any)[payloadKeyOrMessageType];
-                }
-            }
-            return undefined;
-        }
-        if (
-            packet.payload?.payload?.oneofKind === 'actionPayload' &&
-            protobuf.any.Any.contains(packet.payload.payload.actionPayload, payloadKeyOrMessageType)
-        ) {
-            return protobuf.any.Any.unpack(
-                packet.payload.payload.actionPayload,
-                payloadKeyOrMessageType,
-            );
-        }
-        return undefined;
-    }
+
     public isStatusOk(packet: Packet | undefined) {
-        return packet?.status?.code === priselpb.Status_Code.OK;
+        return packet?.status()?.code() == priselpb.StatusCode.OK;
     }
+
     public isStatusFailed(packet: Packet | undefined) {
-        return packet?.status?.code === priselpb.Status_Code.FAILED;
+        return packet?.status()?.code() == priselpb.StatusCode.FAILED;
     }
+
     public getStatusMessage(packet: Packet | undefined) {
-        return packet?.status?.message ?? '';
+        return packet?.status()?.message() ?? '';
     }
     public getStatusDetail(packet: Packet | undefined) {
-        return packet?.status?.detail ?? '';
+        return packet?.status()?.detail() ?? '';
     }
-    /**
-     * Verify that packet is well-formed
-     * @param p a potential packet
-     */
-    public is(p: any): p is Packet {
+
+    public verify(packet: Packet | undefined) {
+        if (!isValidPacket(packet)) {
+            return false;
+        }
         return (
-            priselpb.Packet.is(p) &&
-            (isValidRequest(p) || isValidResponse(p) || p.type === priselpb.PacketType.DEFAULT)
+            isValidRequest(packet) ||
+            isValidResponse(packet) ||
+            (isValidPacket(packet) && packet.type() == priselpb.PacketType.DEFAULT)
         );
     }
+
     public toDebugString(p: Packet): string {
-        try {
-            return JSON.stringify(
-                priselpb.Packet.toJson(p, { typeRegistry: typeRegistry }),
-                null,
-                2,
-            );
-        } catch (_) {
-            return `${p}`;
-        }
-    }
-    public serialize(pkt: Packet): Uint8Array {
-        return priselpb.Packet.toBinary(pkt);
-    }
-    public deserialize(buffer: any): Packet | undefined {
-        if (buffer instanceof ArrayBuffer) {
-            return priselpb.Packet.fromBinary(new Uint8Array(buffer));
-        } else if (buffer instanceof Uint8Array) {
-            return priselpb.Packet.fromBinary(buffer);
-        }
+        return JSON.stringify({
+            type: p.type(),
+            request_id: p.requestId(),
+            systemActionType: p.systemActionType(),
+            actionType: p.actionType(),
+            status: p.status() ?? {
+                code: p.status()?.code(),
+                message: p.status()?.message(),
+                detail: p.status()?.detail(),
+            },
+            hasPayload: nonNull(p.payloadArray()),
+        });
     }
 }
 
-export const Packet = new Packet$Type();
+export const Packet = new PacketHelper();

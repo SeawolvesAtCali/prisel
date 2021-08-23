@@ -1,58 +1,90 @@
 import { priselpb } from '@prisel/protos';
+import * as flatbuffers from 'flatbuffers';
+import { BufferBuilder } from './bufferBuilder';
 
 export type RoomStateChangePayload = priselpb.RoomStateChangePayload;
 
 class Builder {
-    payload: Partial<priselpb.RoomStateChangePayload> = {};
-    token?: priselpb.UpdateToken;
+    type = priselpb.RoomStateChangeInfo.NONE;
+    playerJoinPlayerInfo: BufferBuilder = () => 0;
+    playerLeavePlayerId: string = '';
+    hostLeaveOldHostId: string = '';
+    hostLeaveNewHostId: string = '';
 
-    public static forPlayerJoin(playerInfo: priselpb.PlayerInfo) {
+    oldToken: string = '';
+    newToken: string = '';
+
+    public static forPlayerJoin(playerInfoBuilder: BufferBuilder) {
         const builder = new Builder();
-        builder.payload = {
-            change: {
-                oneofKind: 'playerJoin',
-                playerJoin: playerInfo,
-            },
-        };
+        builder.type = priselpb.RoomStateChangeInfo.PlayerJoinInfo;
+        builder.playerJoinPlayerInfo = playerInfoBuilder;
         return builder;
     }
     public static forPlayerLeave(playerId: string) {
         const builder = new Builder();
-        builder.payload = {
-            change: {
-                oneofKind: 'playerLeave',
-                playerLeave: playerId,
-            },
-        };
+        builder.type = priselpb.RoomStateChangeInfo.PlayerLeaveInfo;
+        builder.playerLeavePlayerId = playerId;
         return builder;
     }
     public static forHostLeave(hostId: string, newHostId: string) {
         const builder = new Builder();
-        builder.payload = {
-            change: {
-                oneofKind: 'hostLeave',
-                hostLeave: {
-                    hostId,
-                    newHostId,
-                },
-            },
-        };
+        builder.type = priselpb.RoomStateChangeInfo.HostLeaveInfo;
+        builder.hostLeaveOldHostId = hostId;
+        builder.hostLeaveNewHostId = newHostId;
         return builder;
     }
 
-    public setToken(token: priselpb.UpdateToken): Builder {
-        this.token = token;
+    public setToken(oldToken: string, newToken: string): Builder {
+        this.oldToken = oldToken;
+        this.newToken = newToken;
         return this;
     }
 
-    public build(): priselpb.RoomStateChangePayload {
-        if (this.payload.change === undefined) {
-            throw new Error('RoomStateChangePayload should specifiy change');
+    public build(): [Uint8Array, priselpb.RoomStateChangePayload] {
+        const fbbuilder = new flatbuffers.Builder(1024);
+
+        const updateTokenOffset = priselpb.UpdateToken.createUpdateToken(
+            fbbuilder,
+            fbbuilder.createString(this.oldToken),
+            fbbuilder.createString(this.newToken),
+        );
+
+        switch (this.type) {
+            case priselpb.RoomStateChangeInfo.PlayerJoinInfo:
+                const playerJoinInfoOffset = priselpb.PlayerJoinInfo.createPlayerJoinInfo(
+                    fbbuilder,
+                    this.playerJoinPlayerInfo(fbbuilder),
+                );
+                priselpb.RoomStateChangePayload.startRoomStateChangePayload(fbbuilder);
+                priselpb.RoomStateChangePayload.addChange(fbbuilder, playerJoinInfoOffset);
+                break;
+            case priselpb.RoomStateChangeInfo.PlayerLeaveInfo:
+                const playerLeaveInfoOffset = priselpb.PlayerLeaveInfo.createPlayerLeaveInfo(
+                    fbbuilder,
+                    fbbuilder.createString(this.playerLeavePlayerId),
+                );
+                priselpb.RoomStateChangePayload.startRoomStateChangePayload(fbbuilder);
+                priselpb.RoomStateChangePayload.addChange(fbbuilder, playerLeaveInfoOffset);
+                break;
+            case priselpb.RoomStateChangeInfo.HostLeaveInfo:
+                const hostLeaveInfoOffset = priselpb.HostLeaveInfo.createHostLeaveInfo(
+                    fbbuilder,
+                    fbbuilder.createString(this.hostLeaveOldHostId),
+                    fbbuilder.createString(this.hostLeaveOldHostId),
+                );
+                priselpb.RoomStateChangePayload.startRoomStateChangePayload(fbbuilder);
+                priselpb.RoomStateChangePayload.addChange(fbbuilder, hostLeaveInfoOffset);
+                break;
+            default:
+                // We will never get to this case.
+                throw new Error('RoomStateChangePlayer type is not defined');
         }
-        return {
-            change: this.payload.change,
-            token: this.token,
-        };
+        fbbuilder.finish(priselpb.RoomStateChangePayload.endRoomStateChangePayload(fbbuilder));
+        const uint8Array = fbbuilder.asUint8Array();
+        const payload = priselpb.RoomStateChangePayload.getRootAsRoomStateChangePayload(
+            new flatbuffers.ByteBuffer(uint8Array),
+        );
+        return [uint8Array, payload];
     }
 }
 
@@ -63,37 +95,40 @@ export const RoomStateChangePayload = {
     isPlayerJoin(
         payload: priselpb.RoomStateChangePayload,
     ): payload is priselpb.RoomStateChangePayload & {
-        change: { oneofKind: 'playerJoin' };
+        changeType: () => priselpb.RoomStateChangeInfo.PlayerJoinInfo;
     } {
-        return payload?.change?.oneofKind === 'playerJoin';
+        return payload.changeType() == priselpb.RoomStateChangeInfo.PlayerJoinInfo;
     },
     isPlayerLeave(
         payload: priselpb.RoomStateChangePayload,
     ): payload is priselpb.RoomStateChangePayload & {
-        change: { oneofKind: 'playerLeave' };
+        changeType: () => priselpb.RoomStateChangeInfo.PlayerLeaveInfo;
     } {
-        return payload?.change?.oneofKind === 'playerLeave';
+        return payload.changeType() == priselpb.RoomStateChangeInfo.PlayerLeaveInfo;
     },
     isHostLeave(
         payload: priselpb.RoomStateChangePayload,
     ): payload is priselpb.RoomStateChangePayload & {
-        change: { oneofKind: 'hostLeave' };
+        changeType: () => priselpb.RoomStateChangeInfo.HostLeaveInfo;
     } {
-        return payload?.change?.oneofKind === 'hostLeave';
+        return payload.changeType() == priselpb.RoomStateChangeInfo.HostLeaveInfo;
     },
-    getJoinedPlayer(payload: priselpb.RoomStateChangePayload) {
+    getJoinedPlayer(payload: priselpb.RoomStateChangePayload): priselpb.PlayerJoinInfo {
         if (RoomStateChangePayload.isPlayerJoin(payload)) {
-            return payload.change.playerJoin;
+            return payload.change(new priselpb.PlayerJoinInfo());
         }
+        throw new Error('RoomStateChangePayload: Should check the union type first');
     },
-    getLeftPlayer(payload: priselpb.RoomStateChangePayload) {
+    getLeftPlayer(payload: priselpb.RoomStateChangePayload): priselpb.PlayerLeaveInfo {
         if (RoomStateChangePayload.isPlayerLeave(payload)) {
-            return payload.change.playerLeave;
+            return payload.change(new priselpb.PlayerLeaveInfo());
         }
+        throw new Error('RoomStateChangePayload: Should check the union type first');
     },
-    getHostLeaveData(payload: priselpb.RoomStateChangePayload) {
+    getHostLeaveData(payload: priselpb.RoomStateChangePayload): priselpb.HostLeaveInfo {
         if (RoomStateChangePayload.isHostLeave(payload)) {
-            return payload.change.hostLeave;
+            return payload.change(new priselpb.HostLeaveInfo());
         }
+        throw new Error('RoomStateChangePayload: Should check the union type first');
     },
 };

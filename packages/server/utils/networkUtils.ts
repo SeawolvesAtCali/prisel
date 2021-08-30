@@ -2,7 +2,7 @@ import { HEARTBEAT_INTERVAL, Packet } from '@prisel/common';
 import http from 'http';
 import Koa from 'koa';
 import WebSocket from 'ws';
-import debug from '../debug';
+import { debug } from '../debug';
 import { DEBUG_MODE } from '../flags';
 
 export function createServerWithInternalHTTPServer({
@@ -68,7 +68,8 @@ export function watchForDisconnection(socket: WebSocket, connectionToken: Connec
  * Utility functions to perform network calls.
  */
 
-export function emit(client: WebSocket, packet: Packet): Packet | void {
+export function emit(client: WebSocket, byteArrayAndPacket: [Uint8Array, Packet]): Packet | void {
+    const [byteArray, packet] = byteArrayAndPacket;
     if (DEBUG_MODE) {
         if (Packet.isAnyCustomAction(packet)) {
             debug(`SERVER: [custom action] ${Packet.toDebugString(packet)}`);
@@ -79,7 +80,7 @@ export function emit(client: WebSocket, packet: Packet): Packet | void {
         }
     }
     if (client && client.readyState === WebSocket.OPEN) {
-        client.send(Packet.serialize(packet));
+        client.send(byteArray);
         return packet;
     }
 }

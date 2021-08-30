@@ -1,10 +1,22 @@
-import { Request, Response } from '@prisel/common';
+import { nonNull, PacketView, Request, Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import { getWelcome } from '../message';
 import { newPlayer } from '../player';
 import { emit } from '../utils/networkUtils';
 import { mockContext, mockSocket } from '../utils/testUtils';
 jest.mock('../utils/networkUtils');
+
+expect.extend({
+    responseHavingId(actualResponse: PacketView<Response>, expectedId?: string) {
+        const pass = nonNull(expectedId)
+            ? actualResponse[1].requestId() === expectedId
+            : actualResponse[1].requestId() !== '';
+        const message = pass
+            ? () => `expected response not to have request id ${expectedId}`
+            : () => `expected response to have request id ${expectedId}`;
+        return { message, pass };
+    },
+});
 
 describe('player', () => {
     test('creation', () => {
@@ -58,6 +70,7 @@ describe('player', () => {
         jest.runAllTimers();
         expect(emit).toHaveBeenCalledWith(socket, expect.objectContaining(packet));
     });
+
     test('request', () => {
         jest.useFakeTimers();
         const context = mockContext();
@@ -67,7 +80,7 @@ describe('player', () => {
         jest.spyOn(player, 'getSocket').mockImplementation(() => socket);
         player.request(request);
         jest.runAllTimers();
-        expect(emit).toHaveBeenCalledWith(socket, request.setId(expect.any(String)).build());
+        expect(emit).toHaveBeenCalledWith(socket, (expect as any).responseHavingId());
     });
     test('response', () => {
         jest.useFakeTimers();
@@ -76,10 +89,10 @@ describe('player', () => {
             name: 'player',
             id: '1',
         });
-        const request = Request.forSystemAction(priselpb.SystemActionType.CREATE_ROOM)
+        const [, request] = Request.forSystemAction(priselpb.SystemActionType.CREATE_ROOM)
             .setId('123')
             .build();
-        const response = Response.forRequest(request).setFailure('failure message').build();
+        const response = Response.forRequest(request).withFailure('failure message').build();
         const socket = mockSocket();
         jest.spyOn(player, 'getSocket').mockImplementation(() => socket);
         player.respond(response);

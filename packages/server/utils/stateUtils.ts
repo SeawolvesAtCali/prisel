@@ -1,4 +1,6 @@
+import { BufferOffset, nonNull } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
+import * as flatbuffers from 'flatbuffers';
 import { Context, Socket } from '../objects';
 import { Player } from '../player';
 import { Room } from '../room';
@@ -43,35 +45,19 @@ export function getRoom(context: Context, client: Socket): Room | null {
     }
     return null;
 }
-
-export function getRoomStateSnapshot(room: Room): priselpb.RoomStateSnapshot {
+export function buildRoomStateSnapshot(builder: flatbuffers.Builder, room: Room): BufferOffset {
     const host = room.getHost();
+    const hostIdOffset = nonNull(host) ? builder.createString(host?.getId()) : null;
+    const stateTokenOffset = builder.createString(room.getStateToken());
+    const playerInfoOffsets = room.getPlayers().map((player) => player.buildPlayerInfo(builder));
 
-    const players = room.getPlayers().map((player) => getPlayerInfo(player));
-    const token = room.getStateToken();
-    if (host) {
-        return {
-            players,
-            hostId: host.getId(),
-            token,
-        };
+    priselpb.RoomStateSnapshot.startRoomStateSnapshot(builder);
+
+    priselpb.RoomStateSnapshot.addToken(builder, stateTokenOffset);
+    priselpb.RoomStateSnapshot.createPlayersVector(builder, playerInfoOffsets);
+    if (nonNull(hostIdOffset)) {
+        priselpb.RoomStateSnapshot.addHostId(builder, hostIdOffset);
     }
-    return {
-        players: room.getPlayers().map((player) => getPlayerInfo(player)),
-        token: room.getStateToken(),
-    };
-}
 
-export function getPlayerInfo(player: Player): priselpb.PlayerInfo {
-    return {
-        name: player.getName(),
-        id: player.getId(),
-    };
-}
-
-export function getRoomInfo(room: Room): priselpb.RoomInfo {
-    return {
-        name: room.getName(),
-        id: room.getId(),
-    };
+    return priselpb.RoomStateSnapshot.endRoomStateSnapshot(builder);
 }

@@ -10,5 +10,5 @@ import { handleExit } from './handleExit';
  * @param socket
  */
 export const handleDisconnect = (context: Context, socket: Socket) => {
-    handleExit(context, socket)(Packet.forSystemAction(priselpb.SystemActionType.EXIT).build());
+    handleExit(context, socket)(Packet.forSystemAction(priselpb.SystemActionType.EXIT).build()[1]);
 };

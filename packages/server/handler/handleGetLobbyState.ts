@@ -1,7 +1,7 @@
 import { Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
-import { getRoomInfo, getRooms } from '../utils/stateUtils';
+import { getRooms } from '../utils/stateUtils';
 import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
 export const handleGetLobbyState: Handler = (context, socket) => (request) => {
@@ -16,13 +16,22 @@ export const handleGetLobbyState: Handler = (context, socket) => (request) => {
 
     player.respond(
         Response.forRequest(request)
-            .setPayload('getLobbyStateResponse', {
-                rooms: rooms.map((room) => ({
-                    room: getRoomInfo(room),
-                    playerCount: room.getPlayers().length,
-                    maxPlayers: context.gameConfig.maxPlayers,
-                })),
-            })
+            .withPayloadBuilder((builder) =>
+                priselpb.GetLobbyStateResponse.createGetLobbyStateResponse(
+                    builder,
+                    priselpb.GetLobbyStateResponse.createRoomsVector(
+                        builder,
+                        rooms.map((room) =>
+                            priselpb.LobbyRoomViewInfo.createLobbyRoomViewInfo(
+                                builder,
+                                /* room= */ room.buildRoomInfo(builder),
+                                /* playerCount= */ room.getPlayers().length,
+                                /* maxPlayers= */ context.gameConfig.maxPlayers,
+                            ),
+                        ),
+                    ),
+                ),
+            )
             .build(),
     );
 };

@@ -1,10 +1,10 @@
-import { Packet } from '@prisel/common';
+import { PacketView } from '@prisel/common';
 import { Player } from '../player';
 import { emit } from './networkUtils';
 
 export function broadcast(
     players: Player[],
-    packetBuilder: ((player: Player) => Packet | undefined) | Packet,
+    packetBuilder: ((player: Player) => PacketView | undefined) | PacketView,
 ) {
     if (typeof packetBuilder === 'function') {
         const packets = players.map(packetBuilder);

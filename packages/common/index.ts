@@ -1,4 +1,4 @@
-export { assert, assertExist, assertNever } from './assert';
+export { assert, assertExist, assertNever, isNull, nonNull } from './assert';
 export { Token } from './cancellationToken';
 export * from './constants';
 export { Packet } from './packet';
@@ -13,3 +13,4 @@ export { RoomStateChangePayload } from './RoomStateChangePayload';
 export { StatusBuilder } from './status';
 export { createArgEvent, createEvent } from './typedEvent';
 export type { TypedEvent, TypedEventWithArg } from './typedEvent';
+export type { BufferBuilder, BufferOffset, PacketView } from './types';

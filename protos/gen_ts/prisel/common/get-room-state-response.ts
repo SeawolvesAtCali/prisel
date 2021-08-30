@@ -2,7 +2,7 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-import { PlayerInfo } from '../../prisel/common/player-info';
+import { RoomStateSnapshot } from '../../prisel/common/room-state-snapshot';
 
 
 export class GetRoomStateResponse {
@@ -23,56 +23,17 @@ static getSizePrefixedRootAsGetRoomStateResponse(bb:flatbuffers.ByteBuffer, obj?
   return (obj || new GetRoomStateResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-players(index: number, obj?:PlayerInfo):PlayerInfo|null {
+roomState(obj?:RoomStateSnapshot):RoomStateSnapshot|null {
   const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? (obj || new PlayerInfo()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
-}
-
-playersLength():number {
-  const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
-}
-
-hostId():string|null
-hostId(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-hostId(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
-token():string|null
-token(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-token(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 8);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  return offset ? (obj || new RoomStateSnapshot()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 static startGetRoomStateResponse(builder:flatbuffers.Builder) {
-  builder.startObject(3);
+  builder.startObject(1);
 }
 
-static addPlayers(builder:flatbuffers.Builder, playersOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, playersOffset, 0);
-}
-
-static createPlayersVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
-  builder.startVector(4, data.length, 4);
-  for (let i = data.length - 1; i >= 0; i--) {
-    builder.addOffset(data[i]!);
-  }
-  return builder.endVector();
-}
-
-static startPlayersVector(builder:flatbuffers.Builder, numElems:number) {
-  builder.startVector(4, numElems, 4);
-}
-
-static addHostId(builder:flatbuffers.Builder, hostIdOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, hostIdOffset, 0);
-}
-
-static addToken(builder:flatbuffers.Builder, tokenOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(2, tokenOffset, 0);
+static addRoomState(builder:flatbuffers.Builder, roomStateOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(0, roomStateOffset, 0);
 }
 
 static endGetRoomStateResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -80,11 +41,9 @@ static endGetRoomStateResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
-static createGetRoomStateResponse(builder:flatbuffers.Builder, playersOffset:flatbuffers.Offset, hostIdOffset:flatbuffers.Offset, tokenOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createGetRoomStateResponse(builder:flatbuffers.Builder, roomStateOffset:flatbuffers.Offset):flatbuffers.Offset {
   GetRoomStateResponse.startGetRoomStateResponse(builder);
-  GetRoomStateResponse.addPlayers(builder, playersOffset);
-  GetRoomStateResponse.addHostId(builder, hostIdOffset);
-  GetRoomStateResponse.addToken(builder, tokenOffset);
+  GetRoomStateResponse.addRoomState(builder, roomStateOffset);
   return GetRoomStateResponse.endGetRoomStateResponse(builder);
 }
 }

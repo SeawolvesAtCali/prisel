@@ -1,7 +1,7 @@
 import { Packet, Request, Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import { debug } from '../debug';
-import { getError } from '../message';
+import { buildError } from '../message';
 import { Context, Socket } from '../objects';
 import { Player } from '../player';
 import { emit } from '../utils/networkUtils';
@@ -15,10 +15,10 @@ export function getPlayerOrRespondError(
 ): Player | undefined {
     const player = getPlayer(context, socket);
     if (!player) {
-        if (Request.isRequest(packet)) {
-            emit(socket, Response.forRequest(packet).setFailure('Please login first').build());
+        if (Request.verify(packet)) {
+            emit(socket, Response.forRequest(packet).withFailure('Please login first').build());
         } else {
-            emit(socket, getError('Unauthenticated'));
+            emit(socket, buildError('Unauthenticated'));
         }
         return;
     }
@@ -26,7 +26,7 @@ export function getPlayerOrRespondError(
 }
 
 export function verifyIsRequest(p: Packet): p is Request {
-    if (!Request.isRequest(p)) {
+    if (!Request.verify(p)) {
         const maybeSystemAction =
             Packet.getSystemAction(p) ?? priselpb.SystemActionType.UNSPECIFIED;
         debug(
@@ -34,8 +34,9 @@ export function verifyIsRequest(p: Packet): p is Request {
                 Packet.isAnySystemAction(p)
                     ? priselpb.SystemActionType[maybeSystemAction]
                     : Packet.getAction(p)
-            } but packet is not a request: ${safeStringify(p)}`,
+            } but packet is not a request: ${safeStringify(p)}, `,
         );
+
         return false;
     }
     return true;

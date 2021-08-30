@@ -1,6 +1,6 @@
 import { priselpb } from '@prisel/protos';
 import * as flatbuffers from 'flatbuffers';
-import { BufferBuilder } from './bufferBuilder';
+import { BufferBuilder } from './types';
 
 export type RoomStateChangePayload = priselpb.RoomStateChangePayload;
 

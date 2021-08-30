@@ -1,7 +1,7 @@
 import { Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
-import { getRoom, getRoomStateSnapshot } from '../utils/stateUtils';
+import { buildRoomStateSnapshot, getRoom } from '../utils/stateUtils';
 import { getPlayerOrRespondError, verifyIsRequest } from './utils';
 
 export const handleGetRoomState: Handler = (context, socket) => (request) => {
@@ -14,12 +14,17 @@ export const handleGetRoomState: Handler = (context, socket) => (request) => {
     }
     const room = getRoom(context, socket);
     if (!room) {
-        player.respond(Response.forRequest(request).setFailure('not in a room').build());
+        player.respond(Response.forRequest(request).withFailure('not in a room').build());
         return;
     }
     player.respond(
         Response.forRequest(request)
-            .setPayload('getRoomStateResponse', getRoomStateSnapshot(room))
+            .withPayloadBuilder((builder) =>
+                priselpb.GetRoomStateResponse.createGetRoomStateResponse(
+                    builder,
+                    buildRoomStateSnapshot(builder, room),
+                ),
+            )
             .build(),
     );
 };

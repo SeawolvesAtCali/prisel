@@ -1,4 +1,4 @@
-import { Packet, Response } from '@prisel/common';
+import { nonNull, Packet, Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import clientHandlerRegister, { Handler } from '../clientHandlerRegister';
 import { newPlayer, PlayerId } from '../player';
@@ -13,9 +13,9 @@ export const handleLogin: Handler = (context, client) => (request) => {
     }
     const id = newId<PlayerId>(SOCKET);
     const { SocketManager } = context;
-    const payload = Packet.getPayload(request, 'loginRequest');
-    if (Packet.isSystemAction(request, priselpb.SystemActionType.LOGIN) && payload) {
-        const { username } = payload;
+    const payload = Packet.getPayload(request, priselpb.LoginRequest.getRootAsLoginRequest);
+    if (Packet.isSystemAction(request, priselpb.SystemActionType.LOGIN) && nonNull(payload)) {
+        const username = payload.username() ?? 'unnamed';
         SocketManager.add(id, client);
         context.players.set(
             id,
@@ -26,7 +26,11 @@ export const handleLogin: Handler = (context, client) => (request) => {
         );
         emit(
             client,
-            Response.forRequest(request).setPayload('loginResponse', { userId: id }).build(),
+            Response.forRequest(request)
+                .withPayloadBuilder((builder) =>
+                    priselpb.LoginResponse.createLoginResponse(builder, builder.createString(id)),
+                )
+                .build(),
         );
     }
 };

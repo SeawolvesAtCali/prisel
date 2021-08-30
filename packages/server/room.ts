@@ -1,15 +1,15 @@
-import { Packet, Request, Response } from '@prisel/common';
+import { BufferOffset, isNull, nonNull, Packet, Request, Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import { EventEmitter } from 'events';
-import debug from './debug';
+import * as flatbuffers from 'flatbuffers';
+import { debug } from './debug';
 import { DEBUG_MODE } from './flags';
-import { getError } from './message';
+import { buildError } from './message';
 import { Context } from './objects';
 import { GAME_PHASE } from './objects/gamePhase';
 import { Player } from './player';
 import { newId } from './utils/idUtils';
 import { safeStringify } from './utils/safeStringify';
-
 export type RoomId = string;
 
 export type RemoveListenerFunc = () => void;
@@ -40,8 +40,9 @@ export interface Room {
     removeAllGamePacketListener(): void;
     dispatchGamePacket(packet: Packet, player: Player): void;
     equals(room: Room): boolean;
-    updateStateToken(): priselpb.UpdateToken;
+    updateStateToken(builder?: flatbuffers.Builder): BufferOffset;
     getStateToken(): string;
+    buildRoomInfo(builder: flatbuffers.Builder): BufferOffset;
 }
 
 export interface RoomOption {
@@ -124,6 +125,14 @@ class RoomImpl implements Room {
         return this.game as Game;
     }
 
+    public buildRoomInfo(builder: flatbuffers.Builder): BufferOffset {
+        return priselpb.RoomInfo.createRoomInfo(
+            builder,
+            /* nameOffset= */ builder.createString(this.getName()),
+            /* idOffset= */ builder.createString(this.getId()),
+        );
+    }
+
     public close() {
         // TODO(minor): for safety, clean up other things, like remaining
         // players, on-going games
@@ -146,13 +155,17 @@ class RoomImpl implements Room {
         this.actionListeners.removeAllListeners();
     }
 
-    public updateStateToken(): priselpb.UpdateToken {
+    public updateStateToken(builder?: flatbuffers.Builder): number {
         const previousToken = this.getStateToken();
         this.currentToken = this.currentToken + 1;
-        return {
-            previousToken,
-            token: this.getStateToken(),
-        };
+        if (nonNull(builder)) {
+            return priselpb.UpdateToken.createUpdateToken(
+                builder,
+                builder.createString(previousToken),
+                builder.createString(this.getStateToken()),
+            );
+        }
+        return NaN;
     }
     public equals(room: Room): boolean {
         if (!room) {
@@ -166,7 +179,7 @@ class RoomImpl implements Room {
 
     public dispatchGamePacket(packet: Packet, player: Player) {
         const action = Packet.getAction(packet);
-        if (action === undefined) {
+        if (isNull(action)) {
             return;
         }
 
@@ -175,17 +188,17 @@ class RoomImpl implements Room {
         // TODO(minor) there is no detection for where a response is proccessed.
         // But this might not be an issue if we don't require all response to be
         // processed.
-        if (Response.isResponse(packet)) {
+        if (Response.verify(packet)) {
             return;
         }
         setImmediate(() => {
             if (this.actionListeners.listenerCount(action) === 0) {
                 // no listener currently subscribe to this action
                 debug(`no game action listener is listening for ${action}`);
-                if (Request.isRequest(packet)) {
+                if (Request.verify(packet)) {
                     player.respond(
                         Response.forRequest(packet)
-                            .setFailure(
+                            .withFailure(
                                 'no game action listener is listening for this request',
                                 DEBUG_MODE ? safeStringify(packet) : undefined,
                             )
@@ -194,7 +207,7 @@ class RoomImpl implements Room {
                 } else {
                     // type === Packet
                     player.emit(
-                        getError(
+                        buildError(
                             'no game action listener is listening for this packet',
                             DEBUG_MODE ? safeStringify(packet) : undefined,
                         ),

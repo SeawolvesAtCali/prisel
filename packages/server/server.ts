@@ -1,12 +1,14 @@
-import { Packet, Response } from '@prisel/common';
+import { isNull, Packet, Response } from '@prisel/common';
+import { priselpb } from '@prisel/protos';
+import * as flatbuffers from 'flatbuffers';
 import http from 'http';
 import clientHandlerRegister from './clientHandlerRegister';
 import createContext from './createContext';
-import debug from './debug';
+import { debug } from './debug';
 import { DEBUG_MODE } from './flags';
 import { handleDisconnect } from './handler/handleDisconnect';
 import './handler/index';
-import { getError, getWelcome } from './message';
+import { buildError, getWelcome } from './message';
 import { Context } from './objects';
 import { GAME_PHASE } from './objects/gamePhase';
 import { BaseGameConfig, GameConfig } from './utils/gameConfig';
@@ -20,7 +22,6 @@ import {
 import { BaseRoomConfig, RoomConfig } from './utils/roomConfig';
 import { safeStringify } from './utils/safeStringify';
 import { getPlayer, getRoom } from './utils/stateUtils';
-
 interface ServerConfig {
     host?: string;
     port?: number;
@@ -109,22 +110,26 @@ export class Server {
             }
             debug('client connected');
             emit(socket, getWelcome());
-            socket.on('message', (data: any) => {
+            socket.on('message', (data) => {
                 debug(`received socket message`);
-                if (!data) {
+                if (isNull(data)) {
                     return;
                 }
-                if (!this.context) {
+                if (isNull(this.context)) {
                     return;
                 }
-                const packet = Packet.deserialize(data);
-                if (!Packet.is(packet)) {
-                    debug(`packet structure is invalid ${safeStringify(packet)}`);
+                const packet = deserialize(data);
+                if (!Packet.verify(packet)) {
+                    debug(
+                        `packet structure is invalid ${safeStringify(
+                            Packet.toDebugString(packet),
+                        )}`,
+                    );
                     if (DEBUG_MODE) {
                         const player = getPlayer(this.context, socket);
                         if (player) {
                             player.emit(
-                                getError('packet structure is invalid', safeStringify(packet)),
+                                buildError('packet structure is invalid', safeStringify(packet)),
                             );
                         } else {
                             debug(`player is not logged in, cannot send error report`);
@@ -136,8 +141,8 @@ export class Server {
                 }
 
                 // handle response
-                if (Response.isResponse(packet)) {
-                    const { requestId: id } = packet;
+                if (Response.verify(packet)) {
+                    const id = packet.requestId();
                     if (this.context.requests.isWaitingFor(id)) {
                         this.context.requests.onResponse(packet);
                     } else {
@@ -216,6 +221,14 @@ export class Server {
             }
             this.context = undefined;
         }
+    }
+}
+
+function deserialize(buffer: any): Packet | undefined {
+    if (buffer instanceof ArrayBuffer) {
+        return priselpb.Packet.getRootAsPacket(new flatbuffers.ByteBuffer(new Uint8Array(buffer)));
+    } else if (buffer instanceof Uint8Array) {
+        return priselpb.Packet.getRootAsPacket(new flatbuffers.ByteBuffer(buffer));
     }
 }
 

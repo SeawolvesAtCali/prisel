@@ -19,41 +19,17 @@ public struct GetRoomStateResponse : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public GetRoomStateResponse __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
-  public Prisel.Common.PlayerInfo? Players(int j) { int o = __p.__offset(4); return o != 0 ? (Prisel.Common.PlayerInfo?)(new Prisel.Common.PlayerInfo()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
-  public int PlayersLength { get { int o = __p.__offset(4); return o != 0 ? __p.__vector_len(o) : 0; } }
-  public string HostId { get { int o = __p.__offset(6); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
-#if ENABLE_SPAN_T
-  public Span<byte> GetHostIdBytes() { return __p.__vector_as_span<byte>(6, 1); }
-#else
-  public ArraySegment<byte>? GetHostIdBytes() { return __p.__vector_as_arraysegment(6); }
-#endif
-  public byte[] GetHostIdArray() { return __p.__vector_as_array<byte>(6); }
-  public string Token { get { int o = __p.__offset(8); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
-#if ENABLE_SPAN_T
-  public Span<byte> GetTokenBytes() { return __p.__vector_as_span<byte>(8, 1); }
-#else
-  public ArraySegment<byte>? GetTokenBytes() { return __p.__vector_as_arraysegment(8); }
-#endif
-  public byte[] GetTokenArray() { return __p.__vector_as_array<byte>(8); }
+  public Prisel.Common.RoomStateSnapshot? RoomState { get { int o = __p.__offset(4); return o != 0 ? (Prisel.Common.RoomStateSnapshot?)(new Prisel.Common.RoomStateSnapshot()).__assign(__p.__indirect(o + __p.bb_pos), __p.bb) : null; } }
 
   public static Offset<Prisel.Common.GetRoomStateResponse> CreateGetRoomStateResponse(FlatBufferBuilder builder,
-      VectorOffset playersOffset = default(VectorOffset),
-      StringOffset host_idOffset = default(StringOffset),
-      StringOffset tokenOffset = default(StringOffset)) {
-    builder.StartTable(3);
-    GetRoomStateResponse.AddToken(builder, tokenOffset);
-    GetRoomStateResponse.AddHostId(builder, host_idOffset);
-    GetRoomStateResponse.AddPlayers(builder, playersOffset);
+      Offset<Prisel.Common.RoomStateSnapshot> room_stateOffset = default(Offset<Prisel.Common.RoomStateSnapshot>)) {
+    builder.StartTable(1);
+    GetRoomStateResponse.AddRoomState(builder, room_stateOffset);
     return GetRoomStateResponse.EndGetRoomStateResponse(builder);
   }
 
-  public static void StartGetRoomStateResponse(FlatBufferBuilder builder) { builder.StartTable(3); }
-  public static void AddPlayers(FlatBufferBuilder builder, VectorOffset playersOffset) { builder.AddOffset(0, playersOffset.Value, 0); }
-  public static VectorOffset CreatePlayersVector(FlatBufferBuilder builder, Offset<Prisel.Common.PlayerInfo>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
-  public static VectorOffset CreatePlayersVectorBlock(FlatBufferBuilder builder, Offset<Prisel.Common.PlayerInfo>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
-  public static void StartPlayersVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
-  public static void AddHostId(FlatBufferBuilder builder, StringOffset hostIdOffset) { builder.AddOffset(1, hostIdOffset.Value, 0); }
-  public static void AddToken(FlatBufferBuilder builder, StringOffset tokenOffset) { builder.AddOffset(2, tokenOffset.Value, 0); }
+  public static void StartGetRoomStateResponse(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void AddRoomState(FlatBufferBuilder builder, Offset<Prisel.Common.RoomStateSnapshot> roomStateOffset) { builder.AddOffset(0, roomStateOffset.Value, 0); }
   public static Offset<Prisel.Common.GetRoomStateResponse> EndGetRoomStateResponse(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<Prisel.Common.GetRoomStateResponse>(o);

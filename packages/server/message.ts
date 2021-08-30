@@ -1,16 +1,27 @@
-import { Packet, Request, Response } from '@prisel/common';
+import { Packet, PacketView, Request, Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
+import { Player } from './player';
 
-export function getBroadcast(player: priselpb.PlayerInfo, message: string): Packet {
+declare global {
+    namespace jest {
+        interface Matchers<R> {
+            responseHavingId(id: string): CustomMatcherResult;
+        }
+    }
+}
+export function getBroadcast(player: Player, message: string): PacketView {
     return Packet.forSystemAction(priselpb.SystemActionType.BROADCAST)
-        .setPayload('broadcastPayload', {
-            message,
-            player,
-        })
+        .withPayloadBuilder((builder) =>
+            priselpb.BroadcastPayload.createBroadcastPayload(
+                builder,
+                player.buildPlayerInfo(builder),
+                builder.createString(message),
+            ),
+        )
         .build();
 }
 
-export function getWelcome(): Packet {
+export function getWelcome(): PacketView {
     return Packet.forSystemAction(priselpb.SystemActionType.WELCOME).build();
 }
 
@@ -18,21 +29,24 @@ export function getWelcome(): Packet {
  * Success response for client login
  * @param {String} userId
  */
-export function getLoginSuccess(loginRequest: Request, userId: string): Response {
+export function getLoginSuccess(loginRequest: Request, userId: string): PacketView<Response> {
     return Response.forRequest(loginRequest)
-        .setPayload('loginResponse', {
-            userId,
-        })
+        .withPayloadBuilder((builder) =>
+            priselpb.LoginResponse.createLoginResponse(builder, builder.createString(userId)),
+        )
         .build();
 }
 
-export function getError(message: string, detail?: string): priselpb.Packet {
-    const payload: priselpb.ErrorPayload = { message };
+export function buildError(message: string, detail: string = ''): PacketView {
+    const packetBuilder = Packet.forSystemAction(
+        priselpb.SystemActionType.ERROR,
+    ).withPayloadBuilder((builder) =>
+        priselpb.ErrorPayload.createErrorPayload(
+            builder,
+            builder.createString(message),
+            builder.createString(detail),
+        ),
+    );
 
-    if (detail) {
-        payload.detail = detail;
-    }
-    return Packet.forSystemAction(priselpb.SystemActionType.ERROR)
-        .setPayload('errorPayload', payload)
-        .build();
+    return packetBuilder.build();
 }

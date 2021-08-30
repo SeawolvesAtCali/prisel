@@ -1,7 +1,8 @@
 import { priselpb } from '@prisel/protos';
 import * as flatbuffers from 'flatbuffers';
-import { nonNull } from './assert';
+import { isNull, nonNull } from './assert';
 import { StatusBuilder } from './status';
+import { BufferOffset } from './types';
 
 export type Packet = priselpb.Packet;
 
@@ -30,7 +31,7 @@ export class PacketBuilder {
         return this;
     }
 
-    public withPayloadBuilder(func: (builder: flatbuffers.Builder) => number) {
+    public withPayloadBuilder(func: (builder: flatbuffers.Builder) => BufferOffset) {
         const builder = new flatbuffers.Builder(1024);
         const offset = func(builder);
         builder.finish(offset);
@@ -219,7 +220,10 @@ class PacketHelper {
         );
     }
 
-    public toDebugString(p: Packet): string {
+    public toDebugString(p: Packet | undefined): string {
+        if (isNull(p)) {
+            return 'null';
+        }
         return JSON.stringify({
             type: p.type(),
             request_id: p.requestId(),

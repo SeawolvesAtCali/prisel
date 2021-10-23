@@ -26,3 +26,11 @@ export function checkType<T>(a: T): T {
 export function getPlayer(gamePlayer: GamePlayer): Player {
     return gamePlayer.player as Player;
 }
+
+export function pipe<T>(value: T, ...modifiers: Array<(value: T) => T>): T {
+    let current = value;
+    for (const modifier of modifiers) {
+        current = modifier(current);
+    }
+    return current;
+}

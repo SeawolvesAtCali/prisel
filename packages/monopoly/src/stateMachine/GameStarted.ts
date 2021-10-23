@@ -1,10 +1,26 @@
-import { Action, Anim, animationMap, GamePlayer, toAnimationPacket } from '@prisel/monopoly-common';
+import { Action, Anim, animationMap } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { Packet, Request, Response } from '@prisel/server';
+import {
+    getAmbient,
+    newState,
+    run,
+    useComputed,
+    useEvent,
+    useLocalState,
+    useSideEffect,
+    useStored,
+} from '@prisel/state';
 import { getPlayer } from '../utils';
-import { State } from './stateEnum';
-import { StateMachineState } from './StateMachineState';
-import { Sync, syncGamePlayer } from './utils';
+import { GameOverState } from './GameOver';
+import { PreRollState } from './PreRoll';
+import {
+    getCurrentPlayer,
+    getGame,
+    PlayingAnimation,
+    receivedPacketEventAmbient,
+    usePlayerLeaveEvent,
+} from './utils';
 
 /**
  * When game starts, each client should request GET_INITIAL_STATE. This is how
@@ -26,68 +42,73 @@ import { Sync, syncGamePlayer } from './utils';
  *
  * animations: game_start, pan
  */
-export class GameStarted extends StateMachineState {
-    private sync?: Sync;
+export function GameStartedState() {
+    const game = getGame();
+    const currentPlayer = getCurrentPlayer();
+    const getInitialStateEvent = useEvent(
+        getAmbient(receivedPacketEventAmbient).filter(
+            ({ packet }) =>
+                Packet.getAction(packet) === Action.GET_INITIAL_STATE && Request.isRequest(packet),
+        ),
+    );
+    const initialState = useComputed<monopolypb.GetInitialStateResponse>(
+        () => ({
+            players: Array.from(game.players.values()).map((player) => player.getGamePlayerInfo()),
+            firstPlayerId: currentPlayer.id,
+        }),
+        [],
+    );
+    useSideEffect(() => {
+        if (getInitialStateEvent) {
+            const gamePlayer = getInitialStateEvent.value.player;
+            getPlayer(gamePlayer).respond(
+                Response.forRequest(getInitialStateEvent.value.packet as Request)
+                    .setPayload(monopolypb.GetInitialStateResponse, initialState)
+                    .build(),
+            );
+        }
+    }, [getInitialStateEvent, initialState]);
 
-    public onEnter() {
-        this.sync = syncGamePlayer(this.game);
-    }
-
-    public onPacket(packet: Packet, gamePlayer: GamePlayer): boolean {
-        switch (Packet.getAction(packet)) {
-            case Action.GET_INITIAL_STATE:
-                if (Request.isRequest(packet)) {
-                    const initialStateResponse: monopolypb.GetInitialStateResponse = {
-                        players: Array.from(this.game.players.values()).map((player) =>
-                            player.getGamePlayerInfo(),
-                        ),
-                        firstPlayerId: this.game.getCurrentPlayer().id,
-                    };
-                    getPlayer(gamePlayer).respond(
-                        Response.forRequest(packet)
-                            .setPayload(monopolypb.GetInitialStateResponse, initialStateResponse)
-                            .build(),
-                    );
-                }
-                return true;
-            case Action.READY_TO_START_GAME:
-                if (this.sync?.has(gamePlayer.id)) {
-                    return true;
-                }
-                const startAndPan = Anim.sequence(
+    const readyPlayers = useStored(new Set<string>());
+    const readyToStartEvent = useEvent(
+        getAmbient(receivedPacketEventAmbient).filter(
+            ({ packet }) => Packet.getAction(packet) === Action.READY_TO_START_GAME,
+        ),
+    );
+    const [done, setDone] = useLocalState(false);
+    useSideEffect(() => {
+        if (readyToStartEvent) {
+            const gamePlayer = readyToStartEvent.value.player;
+            if (readyPlayers.current.has(gamePlayer.id)) {
+                return;
+            }
+            readyPlayers.current.add(gamePlayer.id);
+            const inspector = run(PlayingAnimation, {
+                animation: Anim.sequence(
                     Anim.create('game_start').setLength(animationMap.game_start),
                     Anim.create('pan', monopolypb.PanExtra)
                         .setExtra({
-                            target: this.game.getCurrentPlayer().pathTile?.get().position,
+                            target: currentPlayer.pathTile?.get().position,
                         })
                         .setLength(300),
-                );
-                getPlayer(gamePlayer).emit(toAnimationPacket(startAndPan));
-                this.sync?.add(gamePlayer.id);
-                if (this.sync?.isSynced()) {
-                    Anim.wait(startAndPan, { token: this.token }).then(() => {
-                        this.transition({
-                            state: State.PRE_ROLL,
-                        });
-                    });
-                }
-                return true;
+                ),
+                player: gamePlayer,
+            });
+            if (readyPlayers.current.size === game.players.size) {
+                // all player ready to start, we will wait for last
+                // ready-to-start player to finish animation.
+                inspector.onComplete(() => setDone(true));
+            }
+            return inspector.exit;
         }
-        return false;
+    }, [readyToStartEvent]);
+
+    const leftPlayer = usePlayerLeaveEvent();
+    if (leftPlayer) {
+        return newState(GameOverState);
     }
 
-    public onPlayerLeave(gamePlayer: GamePlayer) {
-        // player left, let's just end the game
-        this.game.broadcast(
-            Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
-                .setPayload(monopolypb.AnnouncePlayerLeftPayload, {
-                    player: gamePlayer.getGamePlayerInfo(),
-                })
-                .build(),
-        );
-
-        this.transition({ state: State.GAME_OVER });
+    if (done) {
+        return newState(PreRollState);
     }
-
-    public readonly [Symbol.toStringTag] = 'GameStarted';
 }

@@ -1,18 +1,20 @@
 import { exist, Tile } from '@prisel/monopoly-common';
+import { endState, newState } from '@prisel/state';
 import assert from 'assert';
-import { MovingExtra } from '../stateMachine/extra';
-import { State } from '../stateMachine/stateEnum';
-import { Transition } from '../stateMachine/transition';
-import { checkType, getRand } from '../utils';
+import { MovingState } from '../stateMachine/Moving';
+import { getCurrentPlayer, getGame } from '../stateMachine/utils';
+import { getRand } from '../utils';
 import { ChanceHandler } from './ChanceHandler';
 
 const MAX_PATH_LENGTH = 1000;
 
-export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, input) => {
-    const currentPlayer = game.getCurrentPlayer();
+export const moveToTileHandler: ChanceHandler<'move_to_tile'> = (props) => {
+    const currentPlayer = getCurrentPlayer();
+    const game = getGame();
     const currentTile = currentPlayer.pathTile?.get();
+    const { input, setNextState } = props;
     if (!exist(currentTile)) {
-        return;
+        return endState();
     }
     const targetTile = game.world.get<Tile>(input.inputArgs.tileId);
 
@@ -22,14 +24,8 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
     );
 
     if (input.inputArgs.isTeleport) {
-        return checkType<Transition<MovingExtra>>({
-            state: State.MOVING,
-            extra: {
-                type: 'usingTeleport',
-
-                target: targetTile,
-            },
-        });
+        setNextState(newState(MovingState, { type: 'usingTeleport', target: targetTile }));
+        return endState();
     }
 
     const path = currentTile.genPathWith((current, length) => {
@@ -40,12 +36,7 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = async (game, inp
     });
 
     if (path.length !== 0) {
-        return checkType<Transition<MovingExtra>>({
-            state: State.MOVING,
-            extra: {
-                type: 'usingTiles',
-                tiles: path,
-            },
-        });
+        setNextState(newState(MovingState, { type: 'usingTiles', tiles: path }));
+        return endState();
     }
 };

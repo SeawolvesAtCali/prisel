@@ -1,12 +1,28 @@
-import { Action, Anim, animationMap, GamePlayer } from '@prisel/monopoly-common';
+import { Action, Anim, animationMap } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { Packet, Request, Response } from '@prisel/server';
+import {
+    endState,
+    getAmbient,
+    newState,
+    run,
+    StateFuncReturn,
+    useEvent,
+    useLocalState,
+    useSideEffect,
+} from '@prisel/state';
 import { FIXED_STEPS, USE_FIXED_STEPS } from '../defaultFlags';
 import { flags } from '../flags';
 import { getPlayer } from '../utils';
-import { MovingExtra } from './extra';
-import { State } from './stateEnum';
-import { StateMachineState } from './StateMachineState';
+import { GameOverState } from './GameOver';
+import { MovingState } from './Moving';
+import {
+    AnimatingAllPlayers,
+    getCurrentPlayer,
+    getGame,
+    receivedPacketEventAmbient,
+    usePlayerLeaveEvent,
+} from './utils';
 
 /**
  * This state is the start of a turn. On client side, camera is focused on the
@@ -33,104 +49,111 @@ import { StateMachineState } from './StateMachineState';
  *
  * animation: turn_start, dice_roll, dice_down, move
  */
-export class PreRoll extends StateMachineState {
-    private rolled = false;
-
-    public async onEnter() {
-        // start the turn
-        this.game.broadcast(
+export function PreRollState(): StateFuncReturn {
+    const game = getGame();
+    const [announceStartSent, setAnnounceStartSent] = useLocalState(false);
+    useSideEffect(() => {
+        game.broadcast(
             Packet.forAction(Action.ANNOUNCE_START_TURN)
                 .setPayload(monopolypb.AnnounceStartTurnPayload, {
-                    player: this.game.getCurrentPlayer().id,
+                    player: game.getCurrentPlayer().id,
                 })
                 .build(),
         );
-
-        await Anim.wait(
-            Anim.create('turn_start', monopolypb.TurnStartExtra)
-                .setExtra({
-                    player: this.game.getCurrentPlayer().getGamePlayerInfo(),
-                })
-                .setLength(animationMap.turn_start)
-                .build(),
-            { onStart: this.broadcastAnimation },
+        run(
+            newState(
+                AnimatingAllPlayers,
+                Anim.create('turn_start', monopolypb.TurnStartExtra)
+                    .setExtra({
+                        player: game.getCurrentPlayer().getGamePlayerInfo(),
+                    })
+                    .setLength(animationMap.turn_start)
+                    .build(),
+            ),
         );
-    }
+        setAnnounceStartSent(true);
+    }, []);
 
-    // override
-    public onPacket(packet: Packet, gamePlayer: GamePlayer) {
-        switch (Packet.getAction(packet)) {
-            case Action.ROLL:
-                if (
-                    !this.rolled &&
+    const packetEventData = useEvent(
+        getAmbient(receivedPacketEventAmbient)
+            .filter(
+                ({ packet, player }) =>
+                    Packet.getAction(packet) === Action.ROLL &&
                     Request.isRequest(packet) &&
-                    this.game.isCurrentPlayer(gamePlayer)
-                ) {
-                    const steps = flags.get(USE_FIXED_STEPS)
-                        ? flags.get(FIXED_STEPS)
-                        : gamePlayer.getDiceRoll();
+                    game.isCurrentPlayer(player),
+            )
+            .map(({ packet }) => packet as Request),
+    );
 
-                    getPlayer(gamePlayer).respond(
-                        Response.forRequest(packet)
-                            .setPayload(monopolypb.RollResponse, {
-                                steps,
-                            })
-                            .build(),
-                    );
-                    this.game.broadcast((player) => {
-                        return Packet.forAction(Action.ANNOUNCE_ROLL)
-                            .setPayload(monopolypb.AnnounceRollPayload, {
-                                player: gamePlayer.id,
-                                steps,
-                                currentPosition: gamePlayer.pathTile?.get().position,
-                                myMoney: player.money,
-                            })
-                            .build();
-                    });
-                    Anim.wait(
-                        Anim.sequence(
-                            // turn_start animation should be terminated when dice_roll
-                            // is received.
-                            Anim.create('dice_roll', monopolypb.DiceRollExtra)
-                                .setExtra({
-                                    player: gamePlayer.getGamePlayerInfo(),
-                                })
-                                .setLength(animationMap.dice_roll),
-                            Anim.create('dice_down', monopolypb.DiceDownExtra)
-                                .setExtra({
-                                    steps,
-                                    player: gamePlayer.getGamePlayerInfo(),
-                                })
-                                .setLength(animationMap.dice_down),
-                        ),
-                        { onStart: this.broadcastAnimation },
-                    ).then(() => {
-                        if (!this.token.cancelled) {
-                            this.transition<MovingExtra>({
-                                state: State.MOVING,
-                                extra: {
-                                    type: 'usingSteps',
-                                    steps,
-                                },
-                            });
-                        }
-                    });
-
-                    return true;
-                }
+    const [rolled, setRolled] = useLocalState(false);
+    const [steps, setSteps] = useLocalState(0);
+    const [done, setDone] = useLocalState(false);
+    useSideEffect(() => {
+        if (announceStartSent && !rolled && packetEventData) {
+            setRolled(true);
+            const inspector = run(RollReceived, { rollRequest: packetEventData.value, setSteps });
+            inspector.onComplete(() => setDone(true));
+            return inspector.exit;
         }
-        return false;
+    }, [packetEventData, rolled, announceStartSent]);
+
+    const leftPlayer = usePlayerLeaveEvent();
+    if (leftPlayer) {
+        return newState(GameOverState);
     }
-    public onPlayerLeave(gamePlayer: GamePlayer) {
-        // player left, let's just end the game
-        this.game.broadcast(
-            Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
-                .setPayload(monopolypb.AnnouncePlayerLeftPayload, {
-                    player: gamePlayer.getGamePlayerInfo(),
+
+    if (done) {
+        return newState(MovingState, {
+            type: 'usingSteps',
+            steps,
+        });
+    }
+}
+
+function* RollReceived(props: { rollRequest: Request; setSteps: (roll: number) => void }) {
+    const game = getGame();
+    const currentPlayer = getCurrentPlayer();
+    const { rollRequest, setSteps } = props;
+
+    const steps = flags.get(USE_FIXED_STEPS) ? flags.get(FIXED_STEPS) : currentPlayer.getDiceRoll();
+    setSteps(steps);
+    getPlayer(currentPlayer).respond(
+        Response.forRequest(rollRequest)
+            .setPayload(monopolypb.RollResponse, {
+                steps,
+            })
+            .build(),
+    );
+
+    game.broadcast((player) => {
+        return Packet.forAction(Action.ANNOUNCE_ROLL)
+            .setPayload(monopolypb.AnnounceRollPayload, {
+                player: currentPlayer.id,
+                steps,
+                currentPosition: currentPlayer.pathTile?.get().position,
+                myMoney: player.money,
+            })
+            .build();
+    });
+
+    yield newState(
+        AnimatingAllPlayers,
+        Anim.sequence(
+            // turn_start animation should be terminated when dice_roll
+            // is received.
+            Anim.create('dice_roll', monopolypb.DiceRollExtra)
+                .setExtra({
+                    player: currentPlayer.getGamePlayerInfo(),
                 })
-                .build(),
-        );
-        this.transition({ state: State.GAME_OVER });
-    }
-    public readonly [Symbol.toStringTag] = 'PreRoll';
+                .setLength(animationMap.dice_roll),
+            Anim.create('dice_down', monopolypb.DiceDownExtra)
+                .setExtra({
+                    steps,
+                    player: currentPlayer.getGamePlayerInfo(),
+                })
+                .setLength(animationMap.dice_down),
+        ),
+    );
+
+    return endState();
 }

@@ -2,17 +2,23 @@ import {
     Action,
     Anim,
     animationMap,
+    ChanceInput,
     GamePlayer,
     MoneyExchangeDirection,
 } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
+import { endState, newState, StateConfig } from '@prisel/state';
 import { log } from '../log';
-import { getPlayer } from '../utils';
-import { ChanceHandler } from './ChanceHandler';
+import { AnimatingAllPlayers, getCurrentPlayer, getGame } from '../stateMachine/utils';
 
-export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game, input) => {
-    const currentPlayer = game.getCurrentPlayer();
+export function* moneyExchangeHandler(props: {
+    input: ChanceInput<'money_exchange'>;
+    setNextState: (nextState: StateConfig<any>) => void;
+}) {
+    const game = getGame();
+    const currentPlayer = getCurrentPlayer();
+    const { input, setNextState } = props;
     const inputArgs = input.inputArgs;
     const exchanges: {
         [playerId: string]: number;
@@ -55,7 +61,7 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
         default:
             // should not be here. game data is corrupted.
             log.error('CashExchangeHandler cannot handle cash_exchange Chance with no direction');
-            return;
+            return endState();
     }
     game.broadcast((player: GamePlayer) =>
         Packet.forAction(Action.ANNOUNCE_CHANCE)
@@ -75,17 +81,15 @@ export const moneyExchangeHandler: ChanceHandler<'money_exchange'> = async (game
             .build(),
     );
 
-    await Anim.wait(
+    yield newState(
+        AnimatingAllPlayers,
         Anim.create('player_emotion', monopolypb.PlayerEmotionExtra)
             .setExtra({
                 player: currentPlayer.getGamePlayerInfo(),
                 emotion: playerEmotion,
             })
             .setLength(animationMap.player_emotion),
-        {
-            onStart: (animation) => {
-                getPlayer(currentPlayer).emit(animation);
-            },
-        },
     );
-};
+
+    return endState();
+}

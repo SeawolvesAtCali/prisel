@@ -1,32 +1,25 @@
 import { exist, Tile } from '@prisel/monopoly-common';
-import { MovingExtra } from '../stateMachine/extra';
-import { State } from '../stateMachine/stateEnum';
-import { Transition } from '../stateMachine/transition';
-import { checkType } from '../utils';
+import { endState, newState } from '@prisel/state';
+import { MovingState } from '../stateMachine/Moving';
+import { getCurrentPlayer } from '../stateMachine/utils';
 import { ChanceHandler } from './ChanceHandler';
 
-export const moveStepsHandler: ChanceHandler<'move_steps'> = async (game, input) => {
+export const moveStepsHandler: ChanceHandler<'move_steps'> = (props) => {
+    const { input, setNextState } = props;
+    const currentPlayer = getCurrentPlayer();
     const inputArgs = input.inputArgs;
-    const currentPlayer = game.getCurrentPlayer();
     const currentTile = currentPlayer.pathTile?.get();
     if (!exist(currentTile)) {
-        return;
+        return endState();
     }
     let path: Tile[] = [];
     if (inputArgs.steps > 0) {
         path = currentTile.genPath(inputArgs.steps);
-        // currentPlayer.move(path);
     }
     if (inputArgs.steps < 0) {
         path = currentTile.genPathReverse(-inputArgs.steps);
-        // currentPlayer.move(path);
     }
+    setNextState(newState(MovingState, { type: 'usingTiles', tiles: path }));
 
-    return checkType<Transition<MovingExtra>>({
-        state: State.MOVING,
-        extra: {
-            type: 'usingTiles',
-            tiles: path,
-        },
-    });
+    return endState();
 };

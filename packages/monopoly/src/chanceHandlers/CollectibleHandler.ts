@@ -1,10 +1,16 @@
-import { Action, Anim, animationMap } from '@prisel/monopoly-common';
+import { Action, Anim, animationMap, ChanceInput } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
 import { Packet } from '@prisel/server';
-import { ChanceHandler } from './ChanceHandler';
+import { endState, newState, StateConfig } from '@prisel/state';
+import { AnimatingAllPlayers, getCurrentPlayer, getGame } from '../stateMachine/utils';
 
-export const collectibleHandler: ChanceHandler<'collectible'> = async (game, input) => {
-    const currentPlayer = game.getCurrentPlayer();
+export function* collectibleHandler(props: {
+    input: ChanceInput<'collectible'>;
+    setNextState: (nextState: StateConfig<any>) => void;
+}) {
+    const currentPlayer = getCurrentPlayer();
+    const game = getGame();
+    const { input, setNextState } = props;
     const inputArgs = input.inputArgs;
     currentPlayer.addCollectible(input);
     game.broadcast(
@@ -24,13 +30,15 @@ export const collectibleHandler: ChanceHandler<'collectible'> = async (game, inp
             .build(),
     );
 
-    await Anim.wait(
+    yield newState(
+        AnimatingAllPlayers,
         Anim.create('player_emotion', monopolypb.PlayerEmotionExtra)
             .setExtra({
                 player: currentPlayer.getGamePlayerInfo(),
                 emotion: monopolypb.PlayerEmotionExtra_EmotionType.CHEER,
             })
             .setLength(animationMap.player_emotion),
-        { onStart: game.broadcast.bind(game) },
     );
-};
+
+    return endState();
+}

@@ -151,7 +151,7 @@ export const Anim = {
     },
 };
 
-function computeAnimationLength(animation: Animation): number {
+export function computeAnimationLength(animation: Animation): number {
     switch (animation.type) {
         case AnimationType.DEFAULT:
             return animation.length ?? 0;

@@ -8,13 +8,20 @@ import {
     Property,
 } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { assertExist, Packet, Request, Token } from '@prisel/server';
+import { assertExist, Packet, Request, Response } from '@prisel/server';
+import { endState, newState, run, StateConfig, useLocalState, useSideEffect } from '@prisel/state';
 import { chanceHandlers } from '../chanceHandlers/index';
-import { log } from '../log';
-import { getPlayer, getRand } from '../utils';
-import { State } from './stateEnum';
-import { StateMachineState } from './StateMachineState';
-import { getPanAnimationLength } from './utils';
+import { getRand } from '../utils';
+import { GameOverState } from './GameOver';
+import { PreRollState } from './PreRoll';
+import {
+    AnimatingAllPlayers,
+    getCurrentPlayer,
+    getGame,
+    getPanAnimationLength,
+    provideCurrentPlayer,
+    Requesting,
+} from './utils';
 
 /**
  * This state starts after the current player moves to the destination after
@@ -37,131 +44,66 @@ import { getPanAnimationLength } from './utils';
  *
  * Animation: pay_rent, invested, pan
  */
-export class Moved extends StateMachineState {
-    public async onEnter() {
-        const currentPlayer = this.game.getCurrentPlayer();
-
-        await this.startCoroutine(this.processPropertyManagement());
-        await this.startCoroutine(this.processChance());
-        if (this.token.cancelled) {
-            return;
-        }
-
-        this.game.broadcast(
-            Packet.forAction(Action.ANNOUNCE_END_TURN)
-                .setPayload(monopolypb.AnnounceEndTurnPayload, {
-                    currentPlayer: currentPlayer.id,
-                    nextPlayer: this.game.getNextPlayer().id,
-                })
-                .build(),
-        );
-
-        const currentPlayerPos = assertExist(
-            this.game.getCurrentPlayer().pathTile?.get().position,
-            'currentPlayerPos',
-        );
-        const nextPlayerPos = assertExist(
-            this.game.getNextPlayer().pathTile?.get().position,
-            'nextPlayerPos',
-        );
-
-        await Anim.wait(
-            Anim.create('pan', monopolypb.PanExtra)
-                .setExtra({
-                    target: nextPlayerPos,
-                })
-                .setLength(getPanAnimationLength(currentPlayerPos, nextPlayerPos))
-                .build(),
-            { onStart: this.broadcastAnimation },
-        );
-        if (this.token.cancelled) {
-            return;
-        }
-        this.game.giveTurnToNext();
-        this.transition({ state: State.PRE_ROLL });
-    }
-
-    private *processPropertyManagement() {
-        const currentPlayer = this.game.getCurrentPlayer();
-        const currentPathTile = assertExist(currentPlayer.pathTile?.get(), 'currentPathTile');
-
-        if (currentPathTile.hasProperties.length > 0) {
-            const properties = currentPathTile.hasProperties.map((propertyRef) =>
-                propertyRef.get(),
-            );
-            yield* this.handlePayRents(properties, currentPlayer);
-            yield* this.handleInvest(properties, currentPlayer);
-        }
-        this.checkGameOver();
-    }
-
-    private checkGameOver() {
-        for (const player of this.game.players.values()) {
-            if (player.money < 0) {
-                // player bankrupted.
-                this.announceBankrupt(player);
-                this.transition({ state: State.GAME_OVER });
-                return true;
+export function MovedState() {
+    const currentPlayer = getCurrentPlayer();
+    const game = getGame();
+    const [done, setDone] = useLocalState(false);
+    const [gameOver, setGameOver] = useLocalState(false);
+    useSideEffect(() => {
+        const inspector = run(function* () {
+            yield newState(ProcessingPropertyManagement, { onGameOver: () => setGameOver(true) });
+            if (gameOver) {
+                return newState(GameOverState);
             }
-        }
-        return false;
+            yield newState(ProcessingChance, { onGameOver: () => setGameOver(true) });
+            game.broadcast(
+                Packet.forAction(Action.ANNOUNCE_END_TURN)
+                    .setPayload(monopolypb.AnnounceEndTurnPayload, {
+                        currentPlayer: currentPlayer.id,
+                        nextPlayer: game.getNextPlayer().id,
+                    })
+                    .build(),
+            );
+            const currentPlayerPos = assertExist(
+                game.getCurrentPlayer().pathTile?.get().position,
+                'currentPlayerPos',
+            );
+            const nextPlayerPos = assertExist(
+                game.getNextPlayer().pathTile?.get().position,
+                'nextPlayerPos',
+            );
+
+            yield newState(
+                AnimatingAllPlayers,
+                Anim.create('pan', monopolypb.PanExtra)
+                    .setExtra({
+                        target: nextPlayerPos,
+                    })
+                    .setLength(getPanAnimationLength(currentPlayerPos, nextPlayerPos))
+                    .build(),
+            );
+
+            game.giveTurnToNext();
+            return endState({ onEnd: () => setDone(true) });
+        });
+        return inspector.exit;
+    }, []);
+
+    if (done) {
+        return provideCurrentPlayer(game.getCurrentPlayer(), newState(PreRollState));
     }
+}
 
-    // return true if should continue current state
-    private *processChance(): Generator<Promise<any>, any, any> {
-        const currentPlayer = this.game.getCurrentPlayer();
-        const currentTile = assertExist(currentPlayer.pathTile?.get(), 'currentTile');
+function* ProcessingPropertyManagement(props: { onGameOver: () => void }) {
+    const game = getGame();
+    const currentPlayer = getCurrentPlayer();
+    const { onGameOver } = props;
 
-        if (!exist(currentTile.chancePool)) {
-            return;
-        }
+    const currentPathTile = assertExist(currentPlayer.pathTile?.get(), 'currentPathTile');
 
-        // randomly select a chance
-        const chanceInput = getRand(currentTile.chancePool);
-
-        if (!exist(chanceInput)) {
-            return;
-        }
-        yield Anim.wait(
-            Anim.create('open_chance_chest', monopolypb.OpenChanceChestExtra)
-                .setExtra({
-                    chanceChestTile: currentTile.position,
-                    chance: chanceInput.display,
-                })
-                .setLength(animationMap.open_chance_chest)
-                .build(),
-            { onStart: this.broadcastAnimation, token: this.token },
-        );
-
-        // wait for current player to dismiss the chance card
-        yield getPlayer(this.game.getCurrentPlayer()).request(
-            Request.forAction(Action.PROMPT_CHANCE_CONFIRMATION),
-            Token.delay(10000),
-        );
-
-        yield Anim.wait(
-            Anim.create('dismiss_chance_card').setLength(animationMap.dismiss_chance_card).build(),
-            { onStart: this.broadcastAnimation },
-        );
-
-        const chanceType = (chanceInput.type as keyof ChanceInputArgs) || 'unspecified';
-        const maybeTransition = yield chanceHandlers[chanceType](this.game, chanceInput);
-
-        // check game over
-        if (this.checkGameOver()) {
-            return;
-        }
-        if (maybeTransition) {
-            this.transition(maybeTransition);
-            return;
-        }
-
-        return;
-    }
-
-    private *handlePayRents(properties: Property[], currentPlayer: GamePlayer) {
+    if (currentPathTile.hasProperties.length > 0) {
+        const properties = currentPathTile.hasProperties.map((propertyRef) => propertyRef.get());
         const rentPayments: monopolypb.Payment[] = [];
-
         // check for rent payment first
         for (const property of properties) {
             if (property.owner && property.owner.id !== currentPlayer.id) {
@@ -170,119 +112,170 @@ export class Moved extends StateMachineState {
                 );
             }
         }
-
-        if (!exist(rentPayments[0])) {
-            return;
-        }
-        this.announcePayRent(rentPayments);
-        yield Anim.wait(
-            Anim.create('pay_rent', monopolypb.PayRentExtra)
-                .setExtra({
-                    // TODO: here we assume we are paying one player only
-                    payer: this.game.getGamePlayerById(rentPayments[0].payer)?.getGamePlayerInfo(),
-                    payee: this.game.getGamePlayerById(rentPayments[0].payee)?.getGamePlayerInfo(),
-                })
-                .setLength(animationMap.pay_rent)
-                .build(),
-            { token: this.token, onStart: this.broadcastAnimation },
-        );
-    }
-
-    private *handleInvest(properties: Property[], currentPlayer: GamePlayer) {
-        if (!properties.some((property) => property.investable(currentPlayer))) {
-            return;
-        }
-        yield* this.promptForPurchases(properties);
-    }
-
-    private announceBankrupt(player: GamePlayer) {
-        this.game.broadcast(
-            Packet.forAction(Action.ANNOUNCE_BANKRUPT)
-                .setPayload(monopolypb.AnnounceBankruptPayload, {
-                    player: player.id,
-                })
-                .build(),
-        );
-    }
-
-    private announcePayRent(payments: monopolypb.Payment[]) {
-        this.game.broadcast((player) => {
-            return Packet.forAction(Action.ANNOUNCE_PAY_RENT)
-                .setPayload(monopolypb.AnnouncePayRentPayload, {
-                    payer: this.game.getCurrentPlayer().id,
-                    payments,
-                    myCurrentMoney: player.money || 0,
-                })
-                .build();
-        });
-    }
-
-    private *promptForPurchases(properties: Property[]): Generator<Promise<any>, any, any> {
-        const currentPlayer = this.game.getCurrentPlayer();
-
-        for (const property of properties) {
-            if (!property.investable(currentPlayer)) {
-                continue;
-            }
-
-            const propertyForPurchase = property.getPromptPurchaseRequest(
-                currentPlayer,
-                currentPlayer.money,
+        if (rentPayments.length > 0) {
+            // announce pay rent
+            game.broadcast((player) => {
+                return Packet.forAction(Action.ANNOUNCE_PAY_RENT)
+                    .setPayload(monopolypb.AnnouncePayRentPayload, {
+                        payer: game.getCurrentPlayer().id,
+                        payments: rentPayments,
+                        myCurrentMoney: player.money || 0,
+                    })
+                    .build();
+            });
+            yield newState(
+                AnimatingAllPlayers,
+                Anim.create('pay_rent', monopolypb.PayRentExtra)
+                    .setExtra({
+                        // TODO: here we assume we are paying one player only
+                        payer: game.getGamePlayerById(rentPayments[0].payer)?.getGamePlayerInfo(),
+                        payee: game.getGamePlayerById(rentPayments[0].payee)?.getGamePlayerInfo(),
+                    })
+                    .setLength(animationMap.pay_rent)
+                    .build(),
             );
-            console.log('prompt for purchase is ' + JSON.stringify(propertyForPurchase, null, 2));
-            if (!propertyForPurchase) {
-                continue;
+            if (currentPlayer.money < 0) {
+                announceBankrupt(currentPlayer);
+                onGameOver();
+                return endState();
             }
+        }
 
-            // TODO it might happen that a player left and force the game to
-            // end while we are waiting for current player.
-            const response = yield getPlayer(currentPlayer).request(
-                Request.forAction(Action.PROMPT_PURCHASE).setPayload(
-                    monopolypb.PromptPurchaseRequest,
-                    propertyForPurchase,
-                ),
-                this.token, // no timeout
-            );
+        if (properties.some((property) => property.investable(currentPlayer))) {
+            for (const property of properties) {
+                if (!property.investable(currentPlayer)) {
+                    continue;
+                }
 
-            log.info('receive response for purchase' + JSON.stringify(response));
-            if (!Packet.isStatusOk(response)) {
-                return;
-            }
-
-            if (Packet.getPayload(response, monopolypb.PromptPurchaseResponse)?.purchased) {
-                currentPlayer.purchaseProperty(property, propertyForPurchase);
-                // broadcast purchase
-                this.game.broadcast(
-                    Packet.forAction(Action.ANNOUNCE_PURCHASE)
-                        .setPayload(monopolypb.AnnouncePurchasePayload, {
-                            player: currentPlayer.id,
-                            property: property.getBasicPropertyInfo(),
-                        })
-                        .build(),
-                );
-
-                yield Anim.wait(
-                    Anim.create('invested', monopolypb.InvestedExtra)
-                        .setExtra({ property: property.getBasicPropertyInfo() })
-                        .setLength(animationMap.invested)
-                        .build(),
-                    { token: this.token, onStart: this.broadcastAnimation },
-                );
+                yield newState(PromptingForPurchase, { property });
             }
         }
     }
 
-    public onPlayerLeave(gamePlayer: GamePlayer) {
-        // player left, let's just end the game
-        this.game.broadcast(
-            Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
-                .setPayload(monopolypb.AnnouncePlayerLeftPayload, {
-                    player: gamePlayer.getGamePlayerInfo(),
+    return endState();
+}
+
+function* PromptingForPurchase(props: { property: Property }) {
+    const game = getGame();
+    const currentPlayer = getCurrentPlayer();
+    const { property } = props;
+
+    const propertyForPurchase = property.getPromptPurchaseRequest(
+        currentPlayer,
+        currentPlayer.money,
+    );
+    if (!propertyForPurchase) {
+        return endState();
+    }
+    let response: Response | undefined = undefined;
+    yield newState(Requesting, {
+        player: currentPlayer,
+        request: Request.forAction(Action.PROMPT_PURCHASE).setPayload(
+            monopolypb.PromptPurchaseRequest,
+            propertyForPurchase,
+        ),
+        callback: (resp) => (response = resp),
+    });
+
+    if (
+        response &&
+        Packet.isStatusOk(response) &&
+        Packet.getPayload(response, monopolypb.PromptPurchaseResponse)?.purchased
+    ) {
+        currentPlayer.purchaseProperty(property, propertyForPurchase);
+        // broadcast purchase
+        game.broadcast(
+            Packet.forAction(Action.ANNOUNCE_PURCHASE)
+                .setPayload(monopolypb.AnnouncePurchasePayload, {
+                    player: currentPlayer.id,
+                    property: property.getBasicPropertyInfo(),
                 })
                 .build(),
         );
-        this.transition({ state: State.GAME_OVER });
+
+        yield newState(
+            AnimatingAllPlayers,
+            Anim.create('invested', monopolypb.InvestedExtra)
+                .setExtra({ property: property.getBasicPropertyInfo() })
+                .setLength(animationMap.invested)
+                .build(),
+        );
     }
 
-    public readonly [Symbol.toStringTag] = 'Moved';
+    return endState();
+}
+
+function* ProcessingChance(props: { onGameOver: () => void }) {
+    const currentPlayer = getCurrentPlayer();
+    const game = getGame();
+    const currentTile = assertExist(currentPlayer.pathTile?.get(), 'currentTile');
+    const { onGameOver } = props;
+
+    if (!exist(currentTile.chancePool)) {
+        return endState();
+    }
+
+    // randomly select a chance
+    const chanceInput = getRand(currentTile.chancePool);
+
+    if (!exist(chanceInput)) {
+        return endState();
+    }
+    yield newState(
+        AnimatingAllPlayers,
+        Anim.create('open_chance_chest', monopolypb.OpenChanceChestExtra)
+            .setExtra({
+                chanceChestTile: currentTile.position,
+                chance: chanceInput.display,
+            })
+            .setLength(animationMap.open_chance_chest)
+            .build(),
+    );
+
+    // wait for current player to dismiss the chance card
+    yield newState(Requesting, {
+        player: currentPlayer,
+        request: Request.forAction(Action.PROMPT_CHANCE_CONFIRMATION),
+        callback: () => {
+            // we don't care about the response.
+        },
+    });
+
+    yield newState(
+        AnimatingAllPlayers,
+        Anim.create('dismiss_chance_card').setLength(animationMap.dismiss_chance_card).build(),
+    );
+
+    const chanceType = (chanceInput.type as keyof ChanceInputArgs) || 'unspecified';
+    let nextState: StateConfig<any> | null = null;
+    yield newState(chanceHandlers[chanceType], {
+        input: chanceInput,
+        setNextState: (state) => {
+            nextState = state;
+        },
+    });
+
+    // check game over
+    if (currentPlayer.money < 0) {
+        announceBankrupt(currentPlayer);
+        onGameOver();
+        return endState();
+    }
+
+    if (nextState) {
+        return nextState;
+    }
+
+    return endState();
+}
+
+function announceBankrupt(player: GamePlayer) {
+    const game = getGame();
+    game.broadcast(
+        Packet.forAction(Action.ANNOUNCE_BANKRUPT)
+            .setPayload(monopolypb.AnnounceBankruptPayload, {
+                player: player.id,
+            })
+            .build(),
+    );
 }

@@ -13,7 +13,7 @@ console.log('environment is development', process.env.NODE_ENV === 'development'
 
 export const flags = {
     // if the key doesn't exist, return undefined
-    get<T>(key: string) {
+    get<T = any>(key: string): T {
         db.read();
         return (db as any).get(key).value();
     },

@@ -50,19 +50,23 @@ namespace Monopoly.Protobuf {
     private static readonly pb::MessageParser<MoveToTileExtra> _parser = new pb::MessageParser<MoveToTileExtra>(() => new MoveToTileExtra());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<MoveToTileExtra> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Monopoly.Protobuf.MoveToTileExtraReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MoveToTileExtra() {
       OnConstruction();
     }
@@ -70,6 +74,7 @@ namespace Monopoly.Protobuf {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MoveToTileExtra(MoveToTileExtra other) : this() {
       tile_ = other.tile_ != null ? other.tile_.Clone() : null;
       isTeleport_ = other.isTeleport_;
@@ -77,6 +82,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MoveToTileExtra Clone() {
       return new MoveToTileExtra(this);
     }
@@ -85,6 +91,7 @@ namespace Monopoly.Protobuf {
     public const int TileFieldNumber = 1;
     private global::Monopoly.Protobuf.Coordinate tile_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.Coordinate Tile {
       get { return tile_; }
       set {
@@ -100,6 +107,7 @@ namespace Monopoly.Protobuf {
     /// without passing "GO"
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool IsTeleport {
       get { return isTeleport_; }
       set {
@@ -108,11 +116,13 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as MoveToTileExtra);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(MoveToTileExtra other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -126,6 +136,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (tile_ != null) hash ^= Tile.GetHashCode();
@@ -137,11 +148,13 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -162,6 +175,7 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (tile_ != null) {
         output.WriteRawTag(10);
@@ -178,6 +192,7 @@ namespace Monopoly.Protobuf {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (tile_ != null) {
@@ -193,6 +208,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(MoveToTileExtra other) {
       if (other == null) {
         return;
@@ -210,6 +226,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -238,6 +255,7 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {

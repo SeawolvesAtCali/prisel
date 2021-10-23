@@ -47,19 +47,23 @@ namespace Monopoly.Protobuf {
     private static readonly pb::MessageParser<DetainedExtra> _parser = new pb::MessageParser<DetainedExtra>(() => new DetainedExtra());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<DetainedExtra> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Monopoly.Protobuf.DetainedExtraReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public DetainedExtra() {
       OnConstruction();
     }
@@ -67,6 +71,7 @@ namespace Monopoly.Protobuf {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public DetainedExtra(DetainedExtra other) : this() {
       type_ = other.type_;
       length_ = other.length_;
@@ -74,6 +79,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public DetainedExtra Clone() {
       return new DetainedExtra(this);
     }
@@ -82,6 +88,7 @@ namespace Monopoly.Protobuf {
     public const int TypeFieldNumber = 1;
     private global::Monopoly.Protobuf.DetainedExtra.Types.Type type_ = global::Monopoly.Protobuf.DetainedExtra.Types.Type.Unspecified;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.DetainedExtra.Types.Type Type {
       get { return type_; }
       set {
@@ -96,6 +103,7 @@ namespace Monopoly.Protobuf {
     /// How long show the player stay.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int Length {
       get { return length_; }
       set {
@@ -104,11 +112,13 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as DetainedExtra);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(DetainedExtra other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -122,6 +132,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Type != global::Monopoly.Protobuf.DetainedExtra.Types.Type.Unspecified) hash ^= Type.GetHashCode();
@@ -133,11 +144,13 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -158,6 +171,7 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Type != global::Monopoly.Protobuf.DetainedExtra.Types.Type.Unspecified) {
         output.WriteRawTag(8);
@@ -174,6 +188,7 @@ namespace Monopoly.Protobuf {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Type != global::Monopoly.Protobuf.DetainedExtra.Types.Type.Unspecified) {
@@ -189,6 +204,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(DetainedExtra other) {
       if (other == null) {
         return;
@@ -203,6 +219,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -228,6 +245,7 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -251,6 +269,7 @@ namespace Monopoly.Protobuf {
     #region Nested types
     /// <summary>Container for nested types declared in the DetainedExtra message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static partial class Types {
       public enum Type {
         [pbr::OriginalName("UNSPECIFIED")] Unspecified = 0,

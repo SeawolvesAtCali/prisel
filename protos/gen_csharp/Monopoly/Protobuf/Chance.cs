@@ -56,19 +56,23 @@ namespace Monopoly.Protobuf {
     private static readonly pb::MessageParser<ChanceDisplay> _parser = new pb::MessageParser<ChanceDisplay>(() => new ChanceDisplay());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<ChanceDisplay> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Monopoly.Protobuf.ChanceReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ChanceDisplay() {
       OnConstruction();
     }
@@ -76,6 +80,7 @@ namespace Monopoly.Protobuf {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ChanceDisplay(ChanceDisplay other) : this() {
       title_ = other.title_;
       description_ = other.description_;
@@ -84,6 +89,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ChanceDisplay Clone() {
       return new ChanceDisplay(this);
     }
@@ -92,6 +98,7 @@ namespace Monopoly.Protobuf {
     public const int TitleFieldNumber = 1;
     private string title_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Title {
       get { return title_; }
       set {
@@ -103,6 +110,7 @@ namespace Monopoly.Protobuf {
     public const int DescriptionFieldNumber = 2;
     private string description_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Description {
       get { return description_; }
       set {
@@ -114,6 +122,7 @@ namespace Monopoly.Protobuf {
     public const int ImageFieldNumber = 3;
     private string image_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Image {
       get { return image_ ?? ""; }
       set {
@@ -122,21 +131,25 @@ namespace Monopoly.Protobuf {
     }
     /// <summary>Gets whether the "image" field is set</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool HasImage {
       get { return image_ != null; }
     }
     /// <summary>Clears the value of the "image" field</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void ClearImage() {
       image_ = null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as ChanceDisplay);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(ChanceDisplay other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -151,6 +164,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Title.Length != 0) hash ^= Title.GetHashCode();
@@ -163,11 +177,13 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -192,6 +208,7 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Title.Length != 0) {
         output.WriteRawTag(10);
@@ -212,6 +229,7 @@ namespace Monopoly.Protobuf {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Title.Length != 0) {
@@ -230,6 +248,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(ChanceDisplay other) {
       if (other == null) {
         return;
@@ -247,6 +266,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -276,6 +296,7 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -310,19 +331,23 @@ namespace Monopoly.Protobuf {
     private static readonly pb::MessageParser<Chance> _parser = new pb::MessageParser<Chance>(() => new Chance());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<Chance> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Monopoly.Protobuf.ChanceReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Chance() {
       OnConstruction();
     }
@@ -330,6 +355,7 @@ namespace Monopoly.Protobuf {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Chance(Chance other) : this() {
       display_ = other.display_ != null ? other.display_.Clone() : null;
       switch (other.ExtraCase) {
@@ -354,6 +380,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Chance Clone() {
       return new Chance(this);
     }
@@ -362,6 +389,7 @@ namespace Monopoly.Protobuf {
     public const int DisplayFieldNumber = 1;
     private global::Monopoly.Protobuf.ChanceDisplay display_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.ChanceDisplay Display {
       get { return display_; }
       set {
@@ -372,6 +400,7 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "unspecified" field.</summary>
     public const int UnspecifiedFieldNumber = 2;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Unspecified {
       get { return extraCase_ == ExtraOneofCase.Unspecified ? (bool) extra_ : false; }
       set {
@@ -383,6 +412,7 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "move_to_tile" field.</summary>
     public const int MoveToTileFieldNumber = 3;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.MoveToTileExtra MoveToTile {
       get { return extraCase_ == ExtraOneofCase.MoveToTile ? (global::Monopoly.Protobuf.MoveToTileExtra) extra_ : null; }
       set {
@@ -394,6 +424,7 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "money_exchange" field.</summary>
     public const int MoneyExchangeFieldNumber = 4;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.MoneyExchangeExtra MoneyExchange {
       get { return extraCase_ == ExtraOneofCase.MoneyExchange ? (global::Monopoly.Protobuf.MoneyExchangeExtra) extra_ : null; }
       set {
@@ -405,6 +436,7 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "move_steps" field.</summary>
     public const int MoveStepsFieldNumber = 5;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.MoveStepsExtra MoveSteps {
       get { return extraCase_ == ExtraOneofCase.MoveSteps ? (global::Monopoly.Protobuf.MoveStepsExtra) extra_ : null; }
       set {
@@ -416,6 +448,7 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "collectible" field.</summary>
     public const int CollectibleFieldNumber = 6;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.CollectibleExtra Collectible {
       get { return extraCase_ == ExtraOneofCase.Collectible ? (global::Monopoly.Protobuf.CollectibleExtra) extra_ : null; }
       set {
@@ -436,22 +469,26 @@ namespace Monopoly.Protobuf {
     }
     private ExtraOneofCase extraCase_ = ExtraOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ExtraOneofCase ExtraCase {
       get { return extraCase_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void ClearExtra() {
       extraCase_ = ExtraOneofCase.None;
       extra_ = null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as Chance);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(Chance other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -470,6 +507,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (display_ != null) hash ^= Display.GetHashCode();
@@ -486,11 +524,13 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -527,6 +567,7 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (display_ != null) {
         output.WriteRawTag(10);
@@ -559,6 +600,7 @@ namespace Monopoly.Protobuf {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (display_ != null) {
@@ -586,6 +628,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(Chance other) {
       if (other == null) {
         return;
@@ -630,6 +673,7 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -694,6 +738,7 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {

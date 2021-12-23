@@ -1,5 +1,5 @@
 dependencies:
-  '@prisel/state': 0.0.9
+  '@prisel/state': 0.0.11
   '@protobuf-ts/plugin': 1.0.12
   '@protobuf-ts/protoc': 1.0.12
   '@protobuf-ts/runtime': 1.0.12
@@ -2913,6 +2913,10 @@ packages:
         optional: true
     resolution:
       integrity: sha512-Loc4UDGutcZ+Bd56hBInkm6JyjyCwWy4t2wcDXzN8EDPANgVRj0VP8Nxn0Zq2pc+WKauZwEivQgbDGg4xZO20A==
+  /@prisel/state/0.0.11:
+    dev: false
+    resolution:
+      integrity: sha512-RMKmRaiGpxTy739AHMdJgud6PAxEFCBqys+bPD6U9nTuoqyiJAhBkQgCcdpFPcWTAqQrRnyIOrMwaY8NDkoK+Q==
   /@prisel/state/0.0.9:
     dev: false
     resolution:
@@ -16445,12 +16449,12 @@ packages:
     dev: false
     name: '@rush-temp/monopoly-common'
     resolution:
-      integrity: sha512-DdC0Lb23YH9k4Xt8GgSSNGIh7kyJjGY0jWzSg2bMruC5HZH7HouO0wnXZKxgizF4n8IkJsrYZb7Zz2HQU1aB8Q==
+      integrity: sha512-jy61jOOyqMM524B6NxOLbO8WyfD58E03hk0LU4MWasAT+O7GuyqYiApTyb+zwlL05y4Eaz4vY7oxm6qmKZ4taw==
       tarball: 'file:projects/monopoly-common.tgz'
     version: 0.0.0
   'file:projects/monopoly.tgz':
     dependencies:
-      '@prisel/state': 0.0.9
+      '@prisel/state': 0.0.11
       '@rollup/plugin-commonjs': 11.1.0_rollup@2.12.0
       '@rollup/plugin-json': 4.1.0_rollup@2.12.0
       '@rollup/plugin-node-resolve': 7.1.3_rollup@2.12.0
@@ -16472,7 +16476,7 @@ packages:
     dev: false
     name: '@rush-temp/monopoly'
     resolution:
-      integrity: sha512-97sOURZT4S0jpYWrwwULU+brelW+Zv+z1fROaFULdYvMFyfhYgqSMrcGi1uZaulMmqAtCZKIMsEJGtUF6hyi1w==
+      integrity: sha512-cDlwJJuBMcOKzE3y1noNj9yJtYxAm+dhXINnqELuZXr0UQor7GqRneeWDV+tjtaXEmMQkGqmb6e5a3cKgNSCfQ==
       tarball: 'file:projects/monopoly.tgz'
     version: 0.0.0
   'file:projects/protos.tgz':
@@ -16606,7 +16610,7 @@ packages:
     version: 9.0.3
 registry: ''
 specifiers:
-  '@prisel/state': ~0.0.9
+  '@prisel/state': ~0.0.11
   '@protobuf-ts/plugin': 1.0.12
   '@protobuf-ts/protoc': 1.0.12
   '@protobuf-ts/runtime': ^1.0.10

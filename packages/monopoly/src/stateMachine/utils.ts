@@ -10,7 +10,9 @@ import { Packet, RequestBuilder, Response } from '@prisel/server';
 import {
     endState,
     Event,
+    EventResult,
     getAmbient,
+    hasAmbient,
     newAmbient,
     useComputed,
     useEvent,
@@ -24,6 +26,7 @@ import { getPlayer } from '../utils';
 const [gameAmbient, _provideGame] = newAmbient<Game>('game');
 
 export const getGame = () => getAmbient(gameAmbient);
+export const hasGame = () => hasAmbient(gameAmbient);
 export const provideGame = _provideGame;
 
 const [currentPlayerAmbient, _provideCurrentPlayer] = newAmbient<GamePlayer>('current-player');
@@ -143,4 +146,13 @@ export function Requesting(props: {
 export function useCallback<T>(func: T & Function, deps?: any[]): T {
     const stored = useComputed(() => func, deps);
     return stored;
+}
+
+export function useOnetimeEvent<T>(event: Event<T>) {
+    const eventData = useEvent(event);
+    const triggered = useStored<EventResult<T> | null>(null);
+    if (eventData && triggered.current === null) {
+        triggered.current = eventData;
+    }
+    return triggered.current;
 }

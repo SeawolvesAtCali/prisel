@@ -83,6 +83,7 @@ export function GameStartedState() {
                 return;
             }
             readyPlayers.current.add(gamePlayer.id);
+            console.log('playing game start animation');
             const inspector = run(PlayingAnimation, {
                 animation: Anim.sequence(
                     Anim.create('game_start').setLength(animationMap.game_start),

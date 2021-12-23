@@ -7,7 +7,6 @@ import {
     newState,
     run,
     StateFuncReturn,
-    useEvent,
     useLocalState,
     useSideEffect,
 } from '@prisel/state';
@@ -21,6 +20,7 @@ import {
     getCurrentPlayer,
     getGame,
     receivedPacketEventAmbient,
+    useOnetimeEvent,
     usePlayerLeaveEvent,
 } from './utils';
 
@@ -60,7 +60,7 @@ export function PreRollState(): StateFuncReturn {
                 })
                 .build(),
         );
-        run(
+        const inspector = run(
             newState(
                 AnimatingAllPlayers,
                 Anim.create('turn_start', monopolypb.TurnStartExtra)
@@ -72,9 +72,10 @@ export function PreRollState(): StateFuncReturn {
             ),
         );
         setAnnounceStartSent(true);
+        return inspector.exit;
     }, []);
 
-    const packetEventData = useEvent(
+    const packetEventData = useOnetimeEvent(
         getAmbient(receivedPacketEventAmbient)
             .filter(
                 ({ packet, player }) =>
@@ -85,17 +86,16 @@ export function PreRollState(): StateFuncReturn {
             .map(({ packet }) => packet as Request),
     );
 
-    const [rolled, setRolled] = useLocalState(false);
     const [steps, setSteps] = useLocalState(0);
     const [done, setDone] = useLocalState(false);
+
     useSideEffect(() => {
-        if (announceStartSent && !rolled && packetEventData) {
-            setRolled(true);
+        if (announceStartSent && packetEventData) {
             const inspector = run(RollReceived, { rollRequest: packetEventData.value, setSteps });
             inspector.onComplete(() => setDone(true));
             return inspector.exit;
         }
-    }, [packetEventData, rolled, announceStartSent]);
+    }, [packetEventData, announceStartSent]);
 
     const leftPlayer = usePlayerLeaveEvent();
     if (leftPlayer) {

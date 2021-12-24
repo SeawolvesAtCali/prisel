@@ -32,5 +32,15 @@
         "compile_on_save": false,
         "options": ["--proto_path=${workspaceRoot}/protos"]
     },
-    "typescript.tsdk": "./common/temp/node_modules/typescript/lib"
+    "typescript.tsdk": "./common/temp/node_modules/typescript/lib",
+    "files.associations": {
+        "command-line.json": "jsonc",
+        "build-cache.json": "jsonc",
+        "browser-approved-pacakges.json": "jsonc",
+        "common-versions.json": "jsonc",
+        "experiments.json": "jsonc",
+        "nonbrowser-approved-packages.json": "jsonc",
+        "version-policies.json": "jsonc",
+        "rush.json": "jsonc"
+    }
 }

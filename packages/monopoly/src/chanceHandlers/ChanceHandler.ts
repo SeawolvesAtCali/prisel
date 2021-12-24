@@ -1,8 +1,7 @@
 import { ChanceInput, ChanceInputArgs } from '@prisel/monopoly-common';
-import Game from '../Game';
-import { Transition } from '../stateMachine/transition';
+import { StateConfig, StateFunc } from '@prisel/state';
 
-export type ChanceHandler<T extends keyof ChanceInputArgs> = (
-    game: Game,
-    chanceInput: ChanceInput<T>,
-) => Promise<Transition<any> | void>;
+export type ChanceHandler<T extends keyof ChanceInputArgs> = StateFunc<{
+    input: ChanceInput<T>;
+    setNextState: (nextState: StateConfig<any>) => void;
+}>;

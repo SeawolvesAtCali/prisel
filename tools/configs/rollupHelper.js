@@ -1,4 +1,4 @@
-const resolve = require('@rollup/plugin-node-resolve');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const commonjs = require('@rollup/plugin-commonjs');
 
 const nameRegex = /@prisel\/(.*)/;
@@ -30,7 +30,7 @@ function browserBuild(entryFile, pkgJson) {
             format: 'umd',
         },
         plugins: [
-            resolve({
+            nodeResolve({
                 // This is a browser module, should not use any node internal.
                 preferBuiltins: false,
                 mainFields: ['module', 'main', 'browser'],

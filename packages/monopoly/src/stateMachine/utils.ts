@@ -1,51 +1,158 @@
-import { animationMap } from '@prisel/monopoly-common';
+import {
+    Action,
+    animationMap,
+    computeAnimationLength,
+    GamePlayer,
+    toAnimationPacket,
+} from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
+import { Packet, RequestBuilder, Response } from '@prisel/server';
+import {
+    endState,
+    Event,
+    EventResult,
+    getAmbient,
+    hasAmbient,
+    newAmbient,
+    useComputed,
+    useEvent,
+    useLocalState,
+    useSideEffect,
+    useStored,
+} from '@prisel/state';
 import Game from '../Game';
-export interface Sync {
-    isSynced: () => boolean;
-    add(playerId: string): boolean;
-    has(playerId: string): boolean;
-}
+import { getPlayer } from '../utils';
 
-/**
- * Create a set to track players in the game. When all players are added, the
- * isSynced property will become true.
- *
- * NOTE: Sync should be used rarely as we should allow players to temporarily
- * disconnect, for example, when user switch tab and the game tab is put into
- * background, the WebSocket will still receive packets but game loop is paused.
- * In that case, we cannot expect user to send back sync response.
- *
- * @param game
- */
-export function syncGamePlayer(game: Game): Sync {
-    const syncSet = new Set<string>();
+const [gameAmbient, _provideGame] = newAmbient<Game>('game');
 
-    const isSynced = () => {
-        for (const playerInGame of game.room.getPlayers().map((player) => player.getId())) {
-            if (!syncSet.has(playerInGame)) {
-                return false;
-            }
-        }
-        return true;
-    };
+export const getGame = () => getAmbient(gameAmbient);
+export const hasGame = () => hasAmbient(gameAmbient);
+export const provideGame = _provideGame;
 
-    const add = (playerId: string) => {
-        syncSet.add(playerId);
-        return isSynced();
-    };
-    const has = (playerId: string): boolean => syncSet.has(playerId);
+const [currentPlayerAmbient, _provideCurrentPlayer] = newAmbient<GamePlayer>('current-player');
 
-    return {
-        isSynced,
-        add,
-        has,
-    };
-}
+export const getCurrentPlayer = () => getAmbient(currentPlayerAmbient);
+export const provideCurrentPlayer = _provideCurrentPlayer;
 
 export function getPanAnimationLength(from: monopolypb.Coordinate, to: monopolypb.Coordinate) {
     return Math.trunc(
         Math.sqrt(Math.pow(from.row - to.row, 2) + Math.pow(from.col - to.col, 2)) *
             animationMap.pan,
     );
+}
+
+export interface PacketEventData {
+    packet: Packet;
+    player: GamePlayer;
+}
+
+export const [receivedPacketEventAmbient, provideReceivedPacketEvent] = newAmbient<
+    Event<PacketEventData>
+>('received-packet-event-ambient');
+
+export const [playerLeftEventAmbient, providePlayerLeftEvent] = newAmbient<Event<GamePlayer>>(
+    'player-left-event-ambient',
+);
+
+export function AnimatingCurrentPlayer(props: monopolypb.Animation) {
+    return PlayingAnimation({
+        animation: props,
+        player: getCurrentPlayer(),
+    });
+}
+
+export function AnimatingAllPlayers(props: monopolypb.Animation) {
+    return PlayingAnimation({
+        animation: props,
+    });
+}
+
+export function PlayingAnimation(props: { animation: monopolypb.Animation; player?: GamePlayer }) {
+    const game = getGame();
+    const { animation, player } = props;
+    const [animationDone, setAnimationDone] = useLocalState(false);
+    useSideEffect(() => {
+        if (player) {
+            getPlayer(player).emit(toAnimationPacket(animation));
+        } else {
+            game.broadcast(toAnimationPacket(animation));
+        }
+        const length = computeAnimationLength(animation);
+        if (length === Infinity) {
+            setAnimationDone(true);
+        } else {
+            const timeoutId = setTimeout(() => {
+                setAnimationDone(true);
+            }, length);
+            return () => clearTimeout(timeoutId);
+        }
+    }, []);
+
+    if (animationDone) {
+        return endState();
+    }
+}
+
+export function useActiveCheck() {
+    const activeRef = useStored(true);
+    useSideEffect(() => {
+        return () => {
+            activeRef.current = false;
+        };
+    }, []);
+    return activeRef;
+}
+
+export function usePlayerLeaveEvent(): GamePlayer | void {
+    const playerLeaveEvent = useEvent(getAmbient(playerLeftEventAmbient));
+    const game = getGame();
+    useSideEffect(() => {
+        if (playerLeaveEvent) {
+            game.broadcast(
+                Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
+                    .setPayload(monopolypb.AnnouncePlayerLeftPayload, {
+                        player: playerLeaveEvent.value.getGamePlayerInfo(),
+                    })
+                    .build(),
+            );
+        }
+    });
+    if (playerLeaveEvent) {
+        return playerLeaveEvent.value;
+    }
+}
+
+export function Requesting(props: {
+    player: GamePlayer;
+    request: RequestBuilder;
+    callback: (response: Response) => unknown;
+}) {
+    const active = useActiveCheck();
+    const { player, request, callback } = props;
+    const [done, setDone] = useLocalState(false);
+    useSideEffect(() => {
+        getPlayer(player).request(request, (response) => {
+            if (active.current) {
+                callback(response);
+                setDone(true);
+            }
+        });
+    }, []);
+    if (done) {
+        return endState();
+    }
+}
+
+export function useCallback<T>(func: T & Function, deps?: any[]): T {
+    const stored = useComputed(() => func, deps);
+    return stored;
+}
+
+export function useOnetimeEvent<T>(event: Event<T>) {
+    const eventData = useEvent(event);
+    const triggered = useStored<EventResult<T> | null>(null);
+    if (eventData && triggered.current === null) {
+        triggered.current = eventData;
+    }
+    return triggered.current;
 }

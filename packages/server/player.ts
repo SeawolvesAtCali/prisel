@@ -25,6 +25,7 @@ export interface Player {
      * be auto populated
      * @param token cancellationToken
      */
+    request(requestBuilder: RequestBuilder, callback: (response: Response) => unknown): void;
     request(requestBuilder: RequestBuilder, token?: Token): Promise<Response>;
     respond(response: Response): void;
     getSocket(): WebSocket;
@@ -97,17 +98,22 @@ class PlayerImpl implements Player {
         setImmediate(emit, this.getSocket(), packet);
     }
 
-    public async request(
+    public request(requestBuilder: RequestBuilder, callback: (response: Response) => unknown): void;
+    public request(requestBuilder: RequestBuilder, token?: Token): Promise<Response>;
+    public request(
         requestBuilder: RequestBuilder,
-        token = Token.delay(DEFAULT_REQUEST_TIMEOUT),
+        token: Token | ((response: Response) => unknown) = Token.delay(DEFAULT_REQUEST_TIMEOUT),
     ) {
         const fullRequest = requestBuilder.setId(this.newRequestId()).build();
         this.emit(fullRequest);
-        try {
-            return await this.context.requests.addRequest(fullRequest, token);
-        } catch (e) {
-            return Response.forRequest(fullRequest).setFailure(e.message).build();
+        if (!token || token instanceof Token) {
+            return this.context.requests.addRequest(fullRequest, token).catch((error) => {
+                // possible timeout error
+                return Response.forRequest(fullRequest).setFailure(error.message).build();
+            });
         }
+
+        return this.context.requests.addRequest(fullRequest, token);
     }
 
     public respond(response: Response) {

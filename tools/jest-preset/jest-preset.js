@@ -1,13 +1,17 @@
+const { defaults: tsjPreset } = require('ts-jest/presets');
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-    verbose: true,
+    // preset: 'ts-jest',
     globals: {
         'ts-jest': {
             tsconfig: '<rootDir>/tsconfig.json',
         },
     },
     transform: {
-        '^.+\\.(ts)$': 'ts-jest',
+        ...tsjPreset.transform,
     },
+    testEnvironment: 'node',
+    verbose: true, // Indicates whether each individual test should be reported during the run.
     moduleFileExtensions: ['ts', 'tsx', 'js'],
     testRegex: '.test\\.[tj]s$',
     restoreMocks: true,
@@ -17,4 +21,9 @@ module.exports = {
     // TestEnvironment, we still output to stderr.
     reporters: ['jest-standard-reporter'],
     testEnvironment: 'node',
+    globals: {
+        'ts-jest': {
+            tsconfig: '<rootDir>/tsconfig.json',
+        },
+    },
 };

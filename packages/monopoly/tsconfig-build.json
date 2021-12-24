@@ -1,1 +1,5 @@
-{ "extends": "./tsconfig", "files": ["./server.ts"] }
+{
+    "extends": "./tsconfig",
+    "files": ["./server.ts"],
+    "exclude": ["node_modules", "**/lib", "**/node_modules"]
+}

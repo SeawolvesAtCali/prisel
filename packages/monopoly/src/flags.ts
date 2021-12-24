@@ -1,24 +1,22 @@
-import low from 'lowdb';
-import FileSync from 'lowdb/adapters/FileSync';
-import Memory from 'lowdb/adapters/Memory';
+import { JSONFileSync, LowSync, MemorySync } from 'lowdb';
+import { join } from 'path';
 import { defaultFlags } from './defaultFlags';
 
-const db = low(
-    process.env.NODE_ENV === 'development' ? new FileSync('.flags') : new Memory('.flags-memory'),
-);
+const adapter =
+    process.env.NODE_ENV === 'development'
+        ? new JSONFileSync<typeof defaultFlags>(join(__dirname, '.flags'))
+        : new MemorySync<typeof defaultFlags>();
+
+const db = new LowSync(adapter);
 
 console.log('environment is development', process.env.NODE_ENV === 'development');
 
-(db as any).defaults(defaultFlags).write();
+db.data = db.data || defaultFlags;
+db.write();
 
 export const flags = {
-    // if the key doesn't exist, return undefined
-    get<T>(key: string) {
+    get() {
         db.read();
-        return (db as any).get(key).value();
-    },
-    set: (key: string, value: unknown) => {
-        (db as any).update(key, () => value);
-        return flags;
+        return db.data;
     },
 };

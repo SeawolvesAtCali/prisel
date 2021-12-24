@@ -35,6 +35,10 @@
       "allowedCategories": [ "prototype", "tools" ]
     },
     {
+      "name": "@prisel/state",
+      "allowedCategories": [ "prototype" ]
+    },
+    {
       "name": "@protobuf-ts/plugin",
       "allowedCategories": [ "production" ]
     },

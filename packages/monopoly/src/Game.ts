@@ -1,6 +1,6 @@
 import { exist, GamePlayer, Id, World } from '@prisel/monopoly-common';
 import { assertExist, broadcast, Packet, Player, PlayerId, Room } from '@prisel/server';
-import { StateMachine } from './stateMachine/StateMachine';
+import { Emitter, Inspector } from '@prisel/state';
 
 interface Props {
     id: string;
@@ -21,7 +21,8 @@ export default class Game {
         return assertExist(this._room);
     }
 
-    public stateMachine?: StateMachine;
+    public inspector?: Inspector;
+    public playerLeftEmitter?: Emitter<GamePlayer>;
 
     private _world?: World;
     public get world() {

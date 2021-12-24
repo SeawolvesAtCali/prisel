@@ -64,23 +64,19 @@ namespace Monopoly.Protobuf {
     private static readonly pb::MessageParser<TileEffectDisplay> _parser = new pb::MessageParser<TileEffectDisplay>(() => new TileEffectDisplay());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<TileEffectDisplay> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Monopoly.Protobuf.TileEffectReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public TileEffectDisplay() {
       OnConstruction();
     }
@@ -88,7 +84,6 @@ namespace Monopoly.Protobuf {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public TileEffectDisplay(TileEffectDisplay other) : this() {
       title_ = other.title_;
       description_ = other.description_;
@@ -96,7 +91,6 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public TileEffectDisplay Clone() {
       return new TileEffectDisplay(this);
     }
@@ -105,7 +99,6 @@ namespace Monopoly.Protobuf {
     public const int TitleFieldNumber = 1;
     private string title_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Title {
       get { return title_; }
       set {
@@ -117,7 +110,6 @@ namespace Monopoly.Protobuf {
     public const int DescriptionFieldNumber = 2;
     private string description_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Description {
       get { return description_; }
       set {
@@ -126,13 +118,11 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as TileEffectDisplay);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(TileEffectDisplay other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -146,7 +136,6 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Title.Length != 0) hash ^= Title.GetHashCode();
@@ -158,13 +147,11 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -185,7 +172,6 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Title.Length != 0) {
         output.WriteRawTag(10);
@@ -202,7 +188,6 @@ namespace Monopoly.Protobuf {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Title.Length != 0) {
@@ -218,7 +203,6 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(TileEffectDisplay other) {
       if (other == null) {
         return;
@@ -233,7 +217,6 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -259,7 +242,6 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -290,23 +272,19 @@ namespace Monopoly.Protobuf {
     private static readonly pb::MessageParser<TileEffect> _parser = new pb::MessageParser<TileEffect>(() => new TileEffect());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<TileEffect> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Monopoly.Protobuf.TileEffectReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public TileEffect() {
       OnConstruction();
     }
@@ -314,7 +292,6 @@ namespace Monopoly.Protobuf {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public TileEffect(TileEffect other) : this() {
       display_ = other.display_ != null ? other.display_.Clone() : null;
       timing_ = other.timing_;
@@ -343,7 +320,6 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public TileEffect Clone() {
       return new TileEffect(this);
     }
@@ -352,7 +328,6 @@ namespace Monopoly.Protobuf {
     public const int DisplayFieldNumber = 1;
     private global::Monopoly.Protobuf.TileEffectDisplay display_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.TileEffectDisplay Display {
       get { return display_; }
       set {
@@ -364,7 +339,6 @@ namespace Monopoly.Protobuf {
     public const int TimingFieldNumber = 2;
     private global::Monopoly.Protobuf.TileEffect.Types.Timing timing_ = global::Monopoly.Protobuf.TileEffect.Types.Timing.Unspecified;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.TileEffect.Types.Timing Timing {
       get { return timing_; }
       set {
@@ -375,7 +349,6 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "unspecified" field.</summary>
     public const int UnspecifiedFieldNumber = 3;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Unspecified {
       get { return extraCase_ == ExtraOneofCase.Unspecified ? (bool) extra_ : false; }
       set {
@@ -387,7 +360,6 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "move_to_tile" field.</summary>
     public const int MoveToTileFieldNumber = 4;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.MoveToTileExtra MoveToTile {
       get { return extraCase_ == ExtraOneofCase.MoveToTile ? (global::Monopoly.Protobuf.MoveToTileExtra) extra_ : null; }
       set {
@@ -399,7 +371,6 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "money_exchange" field.</summary>
     public const int MoneyExchangeFieldNumber = 5;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.MoneyExchangeExtra MoneyExchange {
       get { return extraCase_ == ExtraOneofCase.MoneyExchange ? (global::Monopoly.Protobuf.MoneyExchangeExtra) extra_ : null; }
       set {
@@ -411,7 +382,6 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "move_steps" field.</summary>
     public const int MoveStepsFieldNumber = 6;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.MoveStepsExtra MoveSteps {
       get { return extraCase_ == ExtraOneofCase.MoveSteps ? (global::Monopoly.Protobuf.MoveStepsExtra) extra_ : null; }
       set {
@@ -423,7 +393,6 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "collectible" field.</summary>
     public const int CollectibleFieldNumber = 7;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.CollectibleExtra Collectible {
       get { return extraCase_ == ExtraOneofCase.Collectible ? (global::Monopoly.Protobuf.CollectibleExtra) extra_ : null; }
       set {
@@ -435,7 +404,6 @@ namespace Monopoly.Protobuf {
     /// <summary>Field number for the "detained" field.</summary>
     public const int DetainedFieldNumber = 8;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Monopoly.Protobuf.DetainedExtra Detained {
       get { return extraCase_ == ExtraOneofCase.Detained ? (global::Monopoly.Protobuf.DetainedExtra) extra_ : null; }
       set {
@@ -457,26 +425,22 @@ namespace Monopoly.Protobuf {
     }
     private ExtraOneofCase extraCase_ = ExtraOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ExtraOneofCase ExtraCase {
       get { return extraCase_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void ClearExtra() {
       extraCase_ = ExtraOneofCase.None;
       extra_ = null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as TileEffect);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(TileEffect other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -497,7 +461,6 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (display_ != null) hash ^= Display.GetHashCode();
@@ -516,13 +479,11 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -567,7 +528,6 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (display_ != null) {
         output.WriteRawTag(10);
@@ -608,7 +568,6 @@ namespace Monopoly.Protobuf {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (display_ != null) {
@@ -642,7 +601,6 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(TileEffect other) {
       if (other == null) {
         return;
@@ -696,7 +654,6 @@ namespace Monopoly.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -774,7 +731,6 @@ namespace Monopoly.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -850,7 +806,6 @@ namespace Monopoly.Protobuf {
     #region Nested types
     /// <summary>Container for nested types declared in the TileEffect message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static partial class Types {
       public enum Timing {
         [pbr::OriginalName("UNSPECIFIED")] Unspecified = 0,

@@ -115,7 +115,9 @@ function* RollReceived(props: { rollRequest: Request; setSteps: (roll: number) =
     const currentPlayer = getCurrentPlayer();
     const { rollRequest, setSteps } = props;
 
-    const steps = flags.get(USE_FIXED_STEPS) ? flags.get(FIXED_STEPS) : currentPlayer.getDiceRoll();
+    const steps = flags.get()?.[USE_FIXED_STEPS]
+        ? flags.get()?.[FIXED_STEPS] || 1
+        : currentPlayer.getDiceRoll();
     setSteps(steps);
     getPlayer(currentPlayer).respond(
         Response.forRequest(rollRequest)

@@ -55,23 +55,19 @@ namespace Prisel.Protobuf {
     private static readonly pb::MessageParser<RoomStateChangePayload> _parser = new pb::MessageParser<RoomStateChangePayload>(() => new RoomStateChangePayload());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<RoomStateChangePayload> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Prisel.Protobuf.RoomStateChangeSpecReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RoomStateChangePayload() {
       OnConstruction();
     }
@@ -79,7 +75,6 @@ namespace Prisel.Protobuf {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RoomStateChangePayload(RoomStateChangePayload other) : this() {
       token_ = other.token_ != null ? other.token_.Clone() : null;
       switch (other.ChangeCase) {
@@ -98,7 +93,6 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RoomStateChangePayload Clone() {
       return new RoomStateChangePayload(this);
     }
@@ -106,7 +100,6 @@ namespace Prisel.Protobuf {
     /// <summary>Field number for the "player_join" field.</summary>
     public const int PlayerJoinFieldNumber = 1;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Prisel.Protobuf.PlayerInfo PlayerJoin {
       get { return changeCase_ == ChangeOneofCase.PlayerJoin ? (global::Prisel.Protobuf.PlayerInfo) change_ : null; }
       set {
@@ -118,7 +111,6 @@ namespace Prisel.Protobuf {
     /// <summary>Field number for the "player_leave" field.</summary>
     public const int PlayerLeaveFieldNumber = 2;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string PlayerLeave {
       get { return changeCase_ == ChangeOneofCase.PlayerLeave ? (string) change_ : ""; }
       set {
@@ -130,7 +122,6 @@ namespace Prisel.Protobuf {
     /// <summary>Field number for the "host_leave" field.</summary>
     public const int HostLeaveFieldNumber = 3;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Prisel.Protobuf.RoomStateChangePayload.Types.HostLeaveData HostLeave {
       get { return changeCase_ == ChangeOneofCase.HostLeave ? (global::Prisel.Protobuf.RoomStateChangePayload.Types.HostLeaveData) change_ : null; }
       set {
@@ -143,7 +134,6 @@ namespace Prisel.Protobuf {
     public const int TokenFieldNumber = 4;
     private global::Prisel.Protobuf.UpdateToken token_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Prisel.Protobuf.UpdateToken Token {
       get { return token_; }
       set {
@@ -161,26 +151,22 @@ namespace Prisel.Protobuf {
     }
     private ChangeOneofCase changeCase_ = ChangeOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ChangeOneofCase ChangeCase {
       get { return changeCase_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void ClearChange() {
       changeCase_ = ChangeOneofCase.None;
       change_ = null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as RoomStateChangePayload);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(RoomStateChangePayload other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -197,7 +183,6 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (changeCase_ == ChangeOneofCase.PlayerJoin) hash ^= PlayerJoin.GetHashCode();
@@ -212,13 +197,11 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -247,7 +230,6 @@ namespace Prisel.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (changeCase_ == ChangeOneofCase.PlayerJoin) {
         output.WriteRawTag(10);
@@ -272,7 +254,6 @@ namespace Prisel.Protobuf {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (changeCase_ == ChangeOneofCase.PlayerJoin) {
@@ -294,7 +275,6 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(RoomStateChangePayload other) {
       if (other == null) {
         return;
@@ -327,7 +307,6 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -374,7 +353,6 @@ namespace Prisel.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -419,7 +397,6 @@ namespace Prisel.Protobuf {
     #region Nested types
     /// <summary>Container for nested types declared in the RoomStateChangePayload message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static partial class Types {
       public sealed partial class HostLeaveData : pb::IMessage<HostLeaveData>
       #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -429,23 +406,19 @@ namespace Prisel.Protobuf {
         private static readonly pb::MessageParser<HostLeaveData> _parser = new pb::MessageParser<HostLeaveData>(() => new HostLeaveData());
         private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public static pb::MessageParser<HostLeaveData> Parser { get { return _parser; } }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public static pbr::MessageDescriptor Descriptor {
           get { return global::Prisel.Protobuf.RoomStateChangePayload.Descriptor.NestedTypes[0]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         pbr::MessageDescriptor pb::IMessage.Descriptor {
           get { return Descriptor; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public HostLeaveData() {
           OnConstruction();
         }
@@ -453,7 +426,6 @@ namespace Prisel.Protobuf {
         partial void OnConstruction();
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public HostLeaveData(HostLeaveData other) : this() {
           hostId_ = other.hostId_;
           newHostId_ = other.newHostId_;
@@ -461,7 +433,6 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public HostLeaveData Clone() {
           return new HostLeaveData(this);
         }
@@ -470,7 +441,6 @@ namespace Prisel.Protobuf {
         public const int HostIdFieldNumber = 1;
         private string hostId_ = "";
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public string HostId {
           get { return hostId_; }
           set {
@@ -482,7 +452,6 @@ namespace Prisel.Protobuf {
         public const int NewHostIdFieldNumber = 2;
         private string newHostId_ = "";
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public string NewHostId {
           get { return newHostId_; }
           set {
@@ -491,13 +460,11 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public override bool Equals(object other) {
           return Equals(other as HostLeaveData);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public bool Equals(HostLeaveData other) {
           if (ReferenceEquals(other, null)) {
             return false;
@@ -511,7 +478,6 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public override int GetHashCode() {
           int hash = 1;
           if (HostId.Length != 0) hash ^= HostId.GetHashCode();
@@ -523,13 +489,11 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public override string ToString() {
           return pb::JsonFormatter.ToDiagnosticString(this);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public void WriteTo(pb::CodedOutputStream output) {
         #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
           output.WriteRawMessage(this);
@@ -550,7 +514,6 @@ namespace Prisel.Protobuf {
 
         #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
           if (HostId.Length != 0) {
             output.WriteRawTag(10);
@@ -567,7 +530,6 @@ namespace Prisel.Protobuf {
         #endif
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public int CalculateSize() {
           int size = 0;
           if (HostId.Length != 0) {
@@ -583,7 +545,6 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public void MergeFrom(HostLeaveData other) {
           if (other == null) {
             return;
@@ -598,7 +559,6 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public void MergeFrom(pb::CodedInputStream input) {
         #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
           input.ReadRawMessage(this);
@@ -624,7 +584,6 @@ namespace Prisel.Protobuf {
 
         #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {

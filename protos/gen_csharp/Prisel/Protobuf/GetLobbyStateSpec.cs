@@ -53,23 +53,19 @@ namespace Prisel.Protobuf {
     private static readonly pb::MessageParser<GetLobbyStateResponse> _parser = new pb::MessageParser<GetLobbyStateResponse>(() => new GetLobbyStateResponse());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<GetLobbyStateResponse> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Prisel.Protobuf.GetLobbyStateSpecReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public GetLobbyStateResponse() {
       OnConstruction();
     }
@@ -77,14 +73,12 @@ namespace Prisel.Protobuf {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public GetLobbyStateResponse(GetLobbyStateResponse other) : this() {
       rooms_ = other.rooms_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public GetLobbyStateResponse Clone() {
       return new GetLobbyStateResponse(this);
     }
@@ -95,19 +89,16 @@ namespace Prisel.Protobuf {
         = pb::FieldCodec.ForMessage(10, global::Prisel.Protobuf.GetLobbyStateResponse.Types.LobbyRoomViewInfo.Parser);
     private readonly pbc::RepeatedField<global::Prisel.Protobuf.GetLobbyStateResponse.Types.LobbyRoomViewInfo> rooms_ = new pbc::RepeatedField<global::Prisel.Protobuf.GetLobbyStateResponse.Types.LobbyRoomViewInfo>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Prisel.Protobuf.GetLobbyStateResponse.Types.LobbyRoomViewInfo> Rooms {
       get { return rooms_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as GetLobbyStateResponse);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(GetLobbyStateResponse other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -120,7 +111,6 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       hash ^= rooms_.GetHashCode();
@@ -131,13 +121,11 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -151,7 +139,6 @@ namespace Prisel.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       rooms_.WriteTo(ref output, _repeated_rooms_codec);
       if (_unknownFields != null) {
@@ -161,7 +148,6 @@ namespace Prisel.Protobuf {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       size += rooms_.CalculateSize(_repeated_rooms_codec);
@@ -172,7 +158,6 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(GetLobbyStateResponse other) {
       if (other == null) {
         return;
@@ -182,7 +167,6 @@ namespace Prisel.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -204,7 +188,6 @@ namespace Prisel.Protobuf {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -224,7 +207,6 @@ namespace Prisel.Protobuf {
     #region Nested types
     /// <summary>Container for nested types declared in the GetLobbyStateResponse message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static partial class Types {
       public sealed partial class LobbyRoomViewInfo : pb::IMessage<LobbyRoomViewInfo>
       #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -234,23 +216,19 @@ namespace Prisel.Protobuf {
         private static readonly pb::MessageParser<LobbyRoomViewInfo> _parser = new pb::MessageParser<LobbyRoomViewInfo>(() => new LobbyRoomViewInfo());
         private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public static pb::MessageParser<LobbyRoomViewInfo> Parser { get { return _parser; } }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public static pbr::MessageDescriptor Descriptor {
           get { return global::Prisel.Protobuf.GetLobbyStateResponse.Descriptor.NestedTypes[0]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         pbr::MessageDescriptor pb::IMessage.Descriptor {
           get { return Descriptor; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public LobbyRoomViewInfo() {
           OnConstruction();
         }
@@ -258,7 +236,6 @@ namespace Prisel.Protobuf {
         partial void OnConstruction();
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public LobbyRoomViewInfo(LobbyRoomViewInfo other) : this() {
           room_ = other.room_ != null ? other.room_.Clone() : null;
           playerCount_ = other.playerCount_;
@@ -267,7 +244,6 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public LobbyRoomViewInfo Clone() {
           return new LobbyRoomViewInfo(this);
         }
@@ -276,7 +252,6 @@ namespace Prisel.Protobuf {
         public const int RoomFieldNumber = 1;
         private global::Prisel.Protobuf.RoomInfo room_;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public global::Prisel.Protobuf.RoomInfo Room {
           get { return room_; }
           set {
@@ -288,7 +263,6 @@ namespace Prisel.Protobuf {
         public const int PlayerCountFieldNumber = 2;
         private int playerCount_;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public int PlayerCount {
           get { return playerCount_; }
           set {
@@ -300,7 +274,6 @@ namespace Prisel.Protobuf {
         public const int MaxPlayersFieldNumber = 3;
         private int maxPlayers_;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public int MaxPlayers {
           get { return maxPlayers_; }
           set {
@@ -309,13 +282,11 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public override bool Equals(object other) {
           return Equals(other as LobbyRoomViewInfo);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public bool Equals(LobbyRoomViewInfo other) {
           if (ReferenceEquals(other, null)) {
             return false;
@@ -330,7 +301,6 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public override int GetHashCode() {
           int hash = 1;
           if (room_ != null) hash ^= Room.GetHashCode();
@@ -343,13 +313,11 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public override string ToString() {
           return pb::JsonFormatter.ToDiagnosticString(this);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public void WriteTo(pb::CodedOutputStream output) {
         #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
           output.WriteRawMessage(this);
@@ -374,7 +342,6 @@ namespace Prisel.Protobuf {
 
         #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
           if (room_ != null) {
             output.WriteRawTag(10);
@@ -395,7 +362,6 @@ namespace Prisel.Protobuf {
         #endif
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public int CalculateSize() {
           int size = 0;
           if (room_ != null) {
@@ -414,7 +380,6 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public void MergeFrom(LobbyRoomViewInfo other) {
           if (other == null) {
             return;
@@ -435,7 +400,6 @@ namespace Prisel.Protobuf {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public void MergeFrom(pb::CodedInputStream input) {
         #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
           input.ReadRawMessage(this);
@@ -468,7 +432,6 @@ namespace Prisel.Protobuf {
 
         #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {

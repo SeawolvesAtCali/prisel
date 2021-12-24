@@ -31,5 +31,6 @@
     "protoc": {
         "compile_on_save": false,
         "options": ["--proto_path=${workspaceRoot}/protos"]
-    }
+    },
+    "typescript.tsdk": "./common/temp/node_modules/typescript/lib"
 }

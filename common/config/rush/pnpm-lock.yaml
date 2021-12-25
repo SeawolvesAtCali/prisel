@@ -13,7 +13,6 @@ dependencies:
   '@rush-temp/jest-preset': 'file:projects/jest-preset.tgz_b65cae1b46840061996b6cc0ea16ca56'
   '@rush-temp/map-creator': 'file:projects/map-creator.tgz_debug@4.3.3+ts-node@10.4.0'
   '@rush-temp/monopoly': 'file:projects/monopoly.tgz'
-  '@rush-temp/monopoly-client': 'file:projects/monopoly-client.tgz'
   '@rush-temp/monopoly-common': 'file:projects/monopoly-common.tgz_ts-node@10.4.0'
   '@rush-temp/protos': 'file:projects/protos.tgz'
   '@rush-temp/react': 'file:projects/react.tgz_debug@4.3.3+ts-node@10.4.0'
@@ -42,6 +41,7 @@ dependencies:
   buffer: 6.0.3
   debug: 4.3.3
   deepcopy: 2.1.0
+  events: 3.3.0
   jest: 27.4.5_ts-node@10.4.0
   jest-dev-server: 6.0.3_debug@4.3.3
   jest-environment-jsdom: 27.4.4
@@ -131,30 +131,6 @@ packages:
       node: '>=6.9.0'
     resolution:
       integrity: sha512-eTAlQKq65zHfkHZV0sIVODCPGVgoo1HdBlbSLi9CqOzuZanMv2ihzY+4paiKr1mH+XmYESMAmJ/dpZ68eN6d8w==
-  /@babel/core/7.16.5:
-    dependencies:
-      '@babel/code-frame': 7.16.0
-      '@babel/generator': 7.16.5
-      '@babel/helper-compilation-targets': 7.16.3
-      '@babel/helper-module-transforms': 7.16.5
-      '@babel/helpers': 7.16.5
-      '@babel/parser': 7.16.6
-      '@babel/template': 7.16.0
-      '@babel/traverse': 7.16.5
-      '@babel/types': 7.16.0
-      convert-source-map: 1.7.0
-      debug: 4.3.3
-      gensync: 1.0.0-beta.2
-      json5: 2.2.0
-      semver: 6.3.0
-      source-map: 0.5.7
-    dev: false
-    engines:
-      node: '>=6.9.0'
-    peerDependencies:
-      '@babel/core': '*'
-    resolution:
-      integrity: sha512-wUcenlLzuWMZ9Zt8S0KmFwGlH6QKRh3vsm/dhDA3CHkiTA45YuG1XkHRcNRl73EFPXDp/d5kVOU0/y7x2w6OaQ==
   /@babel/core/7.16.5_@babel+core@7.16.5:
     dependencies:
       '@babel/code-frame': 7.16.0
@@ -221,19 +197,6 @@ packages:
       node: '>=6.9.0'
     resolution:
       integrity: sha512-3JEA9G5dmmnIWdzaT9d0NmFRgYnWUThLsDaL7982H0XqqWr56lRrsmwheXFMjR+TMl7QMBb6mzy9kvgr1lRLUA==
-  /@babel/helper-compilation-targets/7.16.3:
-    dependencies:
-      '@babel/compat-data': 7.16.4
-      '@babel/helper-validator-option': 7.14.5
-      browserslist: 4.19.1
-      semver: 6.3.0
-    dev: false
-    engines:
-      node: '>=6.9.0'
-    peerDependencies:
-      '@babel/core': ^7.0.0
-    resolution:
-      integrity: sha512-vKsoSQAyBmxS35JUOOt+07cLc6Nk/2ljLIHwmq2/NM6hdioUaqEXq/S+nXvbvXbZkNDlWOymPanJGOc4CBjSJA==
   /@babel/helper-compilation-targets/7.16.3_@babel+core@7.16.5:
     dependencies:
       '@babel/compat-data': 7.16.4
@@ -1831,7 +1794,7 @@ packages:
       jest-haste-map: 27.4.5
       jest-message-util: 27.4.2
       jest-regex-util: 27.4.0
-      jest-resolve: 27.4.5
+      jest-resolve: 27.4.5_jest-resolve@27.4.5
       jest-resolve-dependencies: 27.4.5
       jest-runner: 27.4.5
       jest-runtime: 27.4.5
@@ -1908,7 +1871,7 @@ packages:
       istanbul-lib-source-maps: 4.0.0
       istanbul-reports: 3.0.2
       jest-haste-map: 27.4.5
-      jest-resolve: 27.4.5
+      jest-resolve: 27.4.5_jest-resolve@27.4.5
       jest-util: 27.4.2
       jest-worker: 27.4.5
       slash: 3.0.0
@@ -2151,7 +2114,7 @@ packages:
       integrity: sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
   /@rollup/plugin-babel/5.3.0_@babel+core@7.16.5+rollup@2.62.0:
     dependencies:
-      '@babel/core': 7.16.5
+      '@babel/core': 7.16.5_@babel+core@7.16.5
       '@babel/helper-module-imports': 7.16.0
       '@rollup/pluginutils': 3.1.0_rollup@2.62.0
       rollup: 2.62.0
@@ -2431,7 +2394,7 @@ packages:
       integrity: sha512-cAaR/CAiZRB8GP32N+1jocovUtvlj0+e65TB50/6Lcime+EA49m/8l+P2ko+XPJ4dw3xaPS3jOL4F2X4KWxoeQ==
   /@svgr/plugin-jsx/5.5.0:
     dependencies:
-      '@babel/core': 7.16.5
+      '@babel/core': 7.16.5_@babel+core@7.16.5
       '@svgr/babel-preset': 5.5.0
       '@svgr/hast-util-to-babel-ast': 5.5.0
       svg-parser: 2.0.4
@@ -2992,9 +2955,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-wDeUwiUmem9FzsyysEwRukaEdDNcwbROvQ9QGRKaLI6t+IltNzbn4/i4asmB10auvZGQCzSQ6t0GSczEThlUXw==
-  /@typescript-eslint/eslint-plugin/5.8.0_eslint@8.5.0+typescript@4.5.4:
+  /@typescript-eslint/eslint-plugin/5.8.0_836011a006f4f5d67178564baf2b6d34:
     dependencies:
       '@typescript-eslint/experimental-utils': 5.8.0_eslint@8.5.0+typescript@4.5.4
+      '@typescript-eslint/parser': 5.8.0_eslint@8.5.0+typescript@4.5.4
       '@typescript-eslint/scope-manager': 5.8.0
       debug: 4.3.3
       eslint: 8.5.0_eslint@8.5.0
@@ -3245,7 +3209,9 @@ packages:
       acorn: ^8
     resolution:
       integrity: sha512-m7VZ3jwz4eK6A4Vtt8Ew1/mNbP24u0FhdyfA7fSvnJR6LMdfOYnmuIrrJAgrYfYJ10F/otaHTtrtrtmHdMNzEw==
-  /acorn-jsx/5.3.1:
+  /acorn-jsx/5.3.1_acorn@8.6.0:
+    dependencies:
+      acorn: 8.6.0
     dev: false
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -5377,18 +5343,19 @@ packages:
       '@babel/core': 7.16.5_@babel+core@7.16.5
       '@babel/eslint-parser': 7.16.5_@babel+core@7.16.5+eslint@8.5.0
       '@rushstack/eslint-patch': 1.1.0
-      '@typescript-eslint/eslint-plugin': 5.8.0_eslint@8.5.0+typescript@4.5.4
+      '@typescript-eslint/eslint-plugin': 5.8.0_836011a006f4f5d67178564baf2b6d34
       '@typescript-eslint/parser': 5.8.0_eslint@8.5.0+typescript@4.5.4
       babel-preset-react-app: 10.0.1
       confusing-browser-globals: 1.0.11
       eslint: 8.5.0_eslint@8.5.0
       eslint-plugin-flowtype: 8.0.3_eslint@8.5.0
       eslint-plugin-import: 2.25.3_eslint@8.5.0
-      eslint-plugin-jest: 25.3.0_67c8b681367d853d9012c48027869743
+      eslint-plugin-jest: 25.3.0_34c4e4618752fce91afd36a6294661ac
       eslint-plugin-jsx-a11y: 6.5.1_eslint@8.5.0
       eslint-plugin-react: 7.28.0_eslint@8.5.0
       eslint-plugin-react-hooks: 4.3.0_eslint@8.5.0
       eslint-plugin-testing-library: 5.0.1_eslint@8.5.0+typescript@4.5.4
+      jest: 27.4.5_ts-node@10.4.0
       typescript: 4.5.4
     dev: false
     engines:
@@ -5453,8 +5420,9 @@ packages:
       eslint: ^2 || ^3 || ^4 || ^5 || ^6 || ^7.2.0 || ^8
     resolution:
       integrity: sha512-RzAVbby+72IB3iOEL8clzPLzL3wpDrlwjsTBAQXgyp5SeTqqY+0bFubwuo+y/HLhNZcXV4XqTBO4LGsfyHIDXg==
-  /eslint-plugin-jest/25.3.0_67c8b681367d853d9012c48027869743:
+  /eslint-plugin-jest/25.3.0_34c4e4618752fce91afd36a6294661ac:
     dependencies:
+      '@typescript-eslint/eslint-plugin': 5.8.0_836011a006f4f5d67178564baf2b6d34
       '@typescript-eslint/experimental-utils': 5.8.0_eslint@8.5.0+typescript@4.5.4
       eslint: 8.5.0_eslint@8.5.0
       jest: 27.4.5_ts-node@10.4.0
@@ -5653,7 +5621,7 @@ packages:
   /espree/9.2.0:
     dependencies:
       acorn: 8.6.0
-      acorn-jsx: 5.3.1
+      acorn-jsx: 5.3.1_acorn@8.6.0
       eslint-visitor-keys: 3.1.0
     dev: false
     engines:
@@ -7230,7 +7198,7 @@ packages:
       jest-get-type: 27.4.0
       jest-jasmine2: 27.4.5
       jest-regex-util: 27.4.0
-      jest-resolve: 27.4.5
+      jest-resolve: 27.4.5_jest-resolve@27.4.5
       jest-runner: 27.4.5
       jest-util: 27.4.2
       jest-validate: 27.4.2
@@ -7433,17 +7401,6 @@ packages:
       node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0
     resolution:
       integrity: sha512-PDDPuyhoukk20JrQKeofK12hqtSka7mWH0QQuxSNgrdiPsrnYYLS6wbzu/HDlxZRzji5ylLRULeuI/vmZZDrYA==
-  /jest-pnp-resolver/1.2.2:
-    dev: false
-    engines:
-      node: '>=6'
-    peerDependencies:
-      jest-resolve: '*'
-    peerDependenciesMeta:
-      jest-resolve:
-        optional: true
-    resolution:
-      integrity: sha512-olV41bKSMm8BdnuMsewT4jqlZ8+3TCARAXjZGT9jcoSnrfUnRCqnMoF9XEeoWjbzObpqF9dRhHQj0Xb9QdF6/w==
   /jest-pnp-resolver/1.2.2_jest-resolve@27.4.5:
     dependencies:
       jest-resolve: 27.4.5_jest-resolve@27.4.5
@@ -7473,25 +7430,6 @@ packages:
       node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0
     resolution:
       integrity: sha512-elEVvkvRK51y037NshtEkEnukMBWvlPzZHiL847OrIljJ8yIsujD2GXRPqDXC4rEVKbcdsy7W0FxoZb4WmEs7w==
-  /jest-resolve/27.4.5:
-    dependencies:
-      '@jest/types': 27.4.2
-      chalk: 4.1.2
-      graceful-fs: 4.2.8
-      jest-haste-map: 27.4.5
-      jest-pnp-resolver: 1.2.2
-      jest-util: 27.4.2
-      jest-validate: 27.4.2
-      resolve: 1.20.0
-      resolve.exports: 1.1.0
-      slash: 3.0.0
-    dev: false
-    engines:
-      node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0
-    peerDependencies:
-      jest-resolve: '*'
-    resolution:
-      integrity: sha512-xU3z1BuOz/hUhVUL+918KqUgK+skqOuUsAi7A+iwoUldK6/+PW+utK8l8cxIWT9AW7IAhGNXjSAh1UYmjULZZw==
   /jest-resolve/27.4.5_jest-resolve@27.4.5:
     dependencies:
       '@jest/types': 27.4.2
@@ -7529,7 +7467,7 @@ packages:
       jest-haste-map: 27.4.5
       jest-leak-detector: 27.4.2
       jest-message-util: 27.4.2
-      jest-resolve: 27.4.5
+      jest-resolve: 27.4.5_jest-resolve@27.4.5
       jest-runtime: 27.4.5
       jest-util: 27.4.2
       jest-worker: 27.4.5
@@ -7561,7 +7499,7 @@ packages:
       jest-message-util: 27.4.2
       jest-mock: 27.4.2
       jest-regex-util: 27.4.0
-      jest-resolve: 27.4.5
+      jest-resolve: 27.4.5_jest-resolve@27.4.5
       jest-snapshot: 27.4.5
       jest-util: 27.4.2
       jest-validate: 27.4.2
@@ -7603,7 +7541,7 @@ packages:
       jest-haste-map: 27.4.5
       jest-matcher-utils: 27.4.2
       jest-message-util: 27.4.2
-      jest-resolve: 27.4.5
+      jest-resolve: 27.4.5_jest-resolve@27.4.5
       jest-util: 27.4.2
       natural-compare: 1.4.0
       pretty-format: 27.4.2
@@ -11501,6 +11439,7 @@ packages:
       integrity: sha512-un0FmiRUQNr5PJqy9kP7c40F5BOfpGlYTrxonDChEZB7pzZxRNp/bt+ymiy9/npwXya9KH99nJ/GXFIiUkYGFQ==
   /terser-webpack-plugin/5.3.0_acorn@8.6.0+webpack@5.65.0:
     dependencies:
+      acorn: 8.6.0
       jest-worker: 27.4.5
       schema-utils: 3.1.1
       serialize-javascript: 6.0.0
@@ -12287,6 +12226,7 @@ packages:
       tapable: 2.2.1
       terser-webpack-plugin: 5.3.0_acorn@8.6.0+webpack@5.65.0
       watchpack: 2.3.1
+      webpack: 5.65.0_webpack@5.65.0
       webpack-sources: 3.2.2
     dev: false
     engines:
@@ -12404,7 +12344,7 @@ packages:
   /workbox-build/6.4.2:
     dependencies:
       '@apideck/better-ajv-errors': 0.3.2_ajv@8.8.2
-      '@babel/core': 7.16.5
+      '@babel/core': 7.16.5_@babel+core@7.16.5
       '@babel/preset-env': 7.16.5_@babel+core@7.16.5
       '@babel/runtime': 7.16.5
       '@rollup/plugin-babel': 5.3.0_@babel+core@7.16.5+rollup@2.62.0
@@ -12895,16 +12835,6 @@ packages:
       integrity: sha512-tgbC7aj+YNXg26XMbYFzJ5xplb7Ibuk1O2fDgO5J5J9kzsXVI+KSAeDpSvLzbW13Uc4GnD38hKD9chfPEyl/Tg==
       tarball: 'file:projects/map-creator.tgz'
     version: 0.0.0
-  'file:projects/monopoly-client.tgz':
-    dependencies:
-      '@types/events': 3.0.0
-      events: 3.3.0
-    dev: false
-    name: '@rush-temp/monopoly-client'
-    resolution:
-      integrity: sha512-L/vSUStxjosr2GLcJKJ56vBnN/3MP56C8+H7w83ajI95rf9SAyueXGcAgpVSyq7UZjPYjYG7qJSXuqs/zclIYA==
-      tarball: 'file:projects/monopoly-client.tgz'
-    version: 0.0.0
   'file:projects/monopoly-common.tgz_ts-node@10.4.0':
     dependencies:
       '@protobuf-ts/runtime': 2.1.0
@@ -13104,7 +13034,6 @@ specifiers:
   '@rush-temp/jest-preset': 'file:./projects/jest-preset.tgz'
   '@rush-temp/map-creator': 'file:./projects/map-creator.tgz'
   '@rush-temp/monopoly': 'file:./projects/monopoly.tgz'
-  '@rush-temp/monopoly-client': 'file:./projects/monopoly-client.tgz'
   '@rush-temp/monopoly-common': 'file:./projects/monopoly-common.tgz'
   '@rush-temp/protos': 'file:./projects/protos.tgz'
   '@rush-temp/react': 'file:./projects/react.tgz'
@@ -13133,6 +13062,7 @@ specifiers:
   buffer: ^6.0.3
   debug: ^4.3.3
   deepcopy: ^2.1.0
+  events: ^3.3.0
   jest: ^27.4.5
   jest-dev-server: ^6.0.3
   jest-environment-jsdom: ^27.4.4

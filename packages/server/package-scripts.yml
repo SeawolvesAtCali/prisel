@@ -1,7 +1,6 @@
 scripts:
     default: env DEBUG=debug ts-node --project tsconfig.demo.json src/demo.ts
     clean: rm -rf ./lib ./dist
-    build: rollup --config --silent
     build-cjs: tsc --project tsconfig.buildcjs.json
     build-esm: tsc --project tsconfig.buildesm.json
     build-types: tsc --project tsconfig.buildtypes.json

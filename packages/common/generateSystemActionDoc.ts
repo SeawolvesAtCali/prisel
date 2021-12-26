@@ -1,5 +1,5 @@
-const { ACTION_CONFIG } = require('./lib/actionConfigs.cjs.js');
-const fs = require('fs');
+import fs from 'fs';
+import { ACTION_CONFIG } from './src/actionConfigs';
 
 // print table header
 const headers = [
@@ -23,7 +23,7 @@ const content = [
         const description = config.desc;
         const isRequestResponse = config.isRest ? '✓' : '';
         const relatedActions = (config.related || []).join(' ');
-        const payload = [];
+        const payload: string[] = [];
         if (config.payload) {
             config.payload.forEach((configPayload) => {
                 payload.push(`**${configPayload[0]}**:${configPayload[1]}`);

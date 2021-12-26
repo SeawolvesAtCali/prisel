@@ -2,7 +2,7 @@
     // used by package-scripts.yml to run server in demo
     "extends": "./tsconfig",
     "compilerOptions": {
-        "rootDir": "./",
+        "rootDir": "./src",
         "noEmit": true,
         "module": "commonjs"
     },

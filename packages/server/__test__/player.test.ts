@@ -1,9 +1,9 @@
 import { Request, Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
-import { getWelcome } from '../message';
-import { newPlayer } from '../player';
-import { emit } from '../utils/networkUtils';
-import { mockContext, mockSocket } from '../utils/testUtils';
+import { getWelcome } from '../src/message';
+import { newPlayer } from '../src/player';
+import { emit } from '../src/utils/networkUtils';
+import { mockContext, mockSocket } from '../src/utils/testUtils';
 jest.mock('../utils/networkUtils');
 
 describe('player', () => {

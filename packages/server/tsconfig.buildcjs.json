@@ -1,0 +1,14 @@
+{
+    // config for build commonjs
+    "extends": "./tsconfig",
+    "files": ["src/index.ts"],
+    "exclude": ["node_modules", "lib", "dist"],
+    "compilerOptions": {
+        "rootDir": "./src",
+        "module": "commonjs",
+        "outDir": "./dist/cjs",
+        "declaration": false,
+        "declarationMap": false,
+        "target": "es2015"
+    }
+}

@@ -1,7 +1,7 @@
-import { newRoom, Room } from '../room';
-import { mockContext } from '../utils/testUtils';
-import { GAME_PHASE } from '../objects/gamePhase';
-import { Context } from '../objects';
+import { Context } from '../src/objects';
+import { GAME_PHASE } from '../src/objects/gamePhase';
+import { newRoom, Room } from '../src/room';
+import { mockContext } from '../src/utils/testUtils';
 
 describe('room', () => {
     let context: Context;

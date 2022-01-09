@@ -2,6 +2,8 @@ export type { IMessageType } from '@protobuf-ts/runtime';
 export { assert, assertExist, assertNever } from './assert';
 export { Token } from './cancellationToken';
 export * from './constants';
+export { newClientId, newId, newRequestId, newRoomId } from './newId';
+export type { ClientId, RequestId, RoomId } from './newId';
 export type { SelectOneOf } from './oneof';
 export { Packet } from './packet';
 export type { PacketBuilder } from './packet';

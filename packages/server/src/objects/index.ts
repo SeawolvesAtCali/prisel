@@ -1,4 +1,4 @@
 export type { AnyObject } from './anyObject';
-export type { Context } from './context';
+export type { CreateGameStatus } from './createGameStatus';
 export type { wsServer } from './server';
 export { Socket } from './socket';

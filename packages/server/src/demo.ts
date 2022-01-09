@@ -1,17 +1,17 @@
 import { debug, Server } from './index';
 
-const server = Server.create();
+const close = Server.create();
 process.stdout.write('starting server');
 
 process.title = 'prisel-server';
 
 process.on('exit', () => {
     debug('on exit');
-    server.close();
+    close();
 });
 
 process.on('SIGINT', () => {
     debug('on siginit');
-    server.close();
+    close();
     process.exit();
 });

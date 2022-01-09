@@ -8,7 +8,12 @@ import "prisel/room_state_snapshot.proto";
 
 // type : JOIN,
 // packet_type : REQUEST
-message JoinRequest { string roomId = 1; }
+message JoinRequest {
+  oneof room {
+    string roomId = 1;
+    bool defaultRoom = 2;
+  }
+}
 
 // type : JOIN,
 // packet_type : RESPONSE

@@ -30,12 +30,13 @@
         "build": "nps clean build-types build-cjs build-esm",
         "docgen": "typedoc index.ts",
         "start": "nps",
-        "test": "jest"
+        "test": "jest --passWithNoTests"
     },
     "jest": {
         "preset": "@prisel/jest-preset"
     },
     "dependencies": {
+        "@prisel/state": "~0.0.13",
         "@prisel/protos": "^0.1.3",
         "@prisel/common": "^0.1.3",
         "debug": "^4.3.3",

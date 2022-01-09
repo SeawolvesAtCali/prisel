@@ -12,19 +12,23 @@
     },
     "license": "MIT",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
-    "main": "./lib/index.cjs.js",
-    "module": "./lib/index.esm.js",
-    "browser": "./lib/index.umd.js",
-    "types": "./dist/index.d.ts",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "browser": "./dist/umd/index.umd.js",
     "directories": {
-        "lib": "./",
-        "test": "__test__"
+        "lib": "src",
+        "test": "src/__test__"
     },
     "files": [
-        "lib"
+        "dist"
     ],
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+        "import": "./dist/esm/index.js",
+        "require": "./dist/cjs/index.js"
+    },
     "scripts": {
-        "build": "nps clean ts-check build",
+        "build": "nps clean build-types build-cjs build-esm build-umd",
         "fix": "tslint --project tsconfig.json --fix",
         "lint": "tslint --project tsconfig.json",
         "test": "jest --runInBand --detectOpenHandles"

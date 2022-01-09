@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { createEvent } from '../typedEvent';
+import { createEvent } from '../src/index';
 
 describe('typedEvent', () => {
     test('sub adds the callback', () => {

@@ -1,4 +1,5 @@
 import { Token } from './cancellationToken';
+import { newRequestId } from './newId';
 import { Request } from './request';
 import { Response } from './response';
 
@@ -11,6 +12,7 @@ export interface RequestManager {
     cancelRequest(request: Request): void;
     onResponse(response: Response): void;
     isWaitingFor(requestId: string): boolean;
+    clear(): void;
 }
 
 export function newRequestManager(): RequestManager {
@@ -54,12 +56,12 @@ export function newRequestManager(): RequestManager {
         addRequest,
         cancelRequest,
         onResponse,
-        newId() {
-            requestId = requestId + 1;
-            return `${requestId}`;
-        },
+        newId: newRequestId,
         isWaitingFor(id: string) {
             return requestIdMap.has(id);
+        },
+        clear() {
+            requestIdMap.clear();
         },
     };
 }

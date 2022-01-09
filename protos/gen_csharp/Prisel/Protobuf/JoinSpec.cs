@@ -26,14 +26,15 @@ namespace Prisel.Protobuf {
           string.Concat(
             "ChZwcmlzZWwvam9pbl9zcGVjLnByb3RvEgZwcmlzZWwaFnByaXNlbC9yb29t",
             "X2luZm8ucHJvdG8aIHByaXNlbC9yb29tX3N0YXRlX3NuYXBzaG90LnByb3Rv",
-            "Ih0KC0pvaW5SZXF1ZXN0Eg4KBnJvb21JZBgBIAEoCSJcCgxKb2luUmVzcG9u",
-            "c2USHgoEcm9vbRgBIAEoCzIQLnByaXNlbC5Sb29tSW5mbxIsCglyb29tU3Rh",
-            "dGUYAiABKAsyGS5wcmlzZWwuUm9vbVN0YXRlU25hcHNob3RCEqoCD1ByaXNl",
-            "bC5Qcm90b2J1ZmIGcHJvdG8z"));
+            "Ij4KC0pvaW5SZXF1ZXN0EhAKBnJvb21JZBgBIAEoCUgAEhUKC2RlZmF1bHRS",
+            "b29tGAIgASgISABCBgoEcm9vbSJcCgxKb2luUmVzcG9uc2USHgoEcm9vbRgB",
+            "IAEoCzIQLnByaXNlbC5Sb29tSW5mbxIsCglyb29tU3RhdGUYAiABKAsyGS5w",
+            "cmlzZWwuUm9vbVN0YXRlU25hcHNob3RCEqoCD1ByaXNlbC5Qcm90b2J1ZmIG",
+            "cHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Prisel.Protobuf.RoomInfoReflection.Descriptor, global::Prisel.Protobuf.RoomStateSnapshotReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.JoinRequest), global::Prisel.Protobuf.JoinRequest.Parser, new[]{ "RoomId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.JoinRequest), global::Prisel.Protobuf.JoinRequest.Parser, new[]{ "RoomId", "DefaultRoom" }, new[]{ "Room" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Prisel.Protobuf.JoinResponse), global::Prisel.Protobuf.JoinResponse.Parser, new[]{ "Room", "RoomState" }, null, null, null, null)
           }));
     }
@@ -74,7 +75,15 @@ namespace Prisel.Protobuf {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public JoinRequest(JoinRequest other) : this() {
-      roomId_ = other.roomId_;
+      switch (other.RoomCase) {
+        case RoomOneofCase.RoomId:
+          RoomId = other.RoomId;
+          break;
+        case RoomOneofCase.DefaultRoom:
+          DefaultRoom = other.DefaultRoom;
+          break;
+      }
+
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -85,13 +94,43 @@ namespace Prisel.Protobuf {
 
     /// <summary>Field number for the "roomId" field.</summary>
     public const int RoomIdFieldNumber = 1;
-    private string roomId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public string RoomId {
-      get { return roomId_; }
+      get { return roomCase_ == RoomOneofCase.RoomId ? (string) room_ : ""; }
       set {
-        roomId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        room_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        roomCase_ = RoomOneofCase.RoomId;
       }
+    }
+
+    /// <summary>Field number for the "defaultRoom" field.</summary>
+    public const int DefaultRoomFieldNumber = 2;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool DefaultRoom {
+      get { return roomCase_ == RoomOneofCase.DefaultRoom ? (bool) room_ : false; }
+      set {
+        room_ = value;
+        roomCase_ = RoomOneofCase.DefaultRoom;
+      }
+    }
+
+    private object room_;
+    /// <summary>Enum of possible cases for the "room" oneof.</summary>
+    public enum RoomOneofCase {
+      None = 0,
+      RoomId = 1,
+      DefaultRoom = 2,
+    }
+    private RoomOneofCase roomCase_ = RoomOneofCase.None;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RoomOneofCase RoomCase {
+      get { return roomCase_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void ClearRoom() {
+      roomCase_ = RoomOneofCase.None;
+      room_ = null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -108,13 +147,17 @@ namespace Prisel.Protobuf {
         return true;
       }
       if (RoomId != other.RoomId) return false;
+      if (DefaultRoom != other.DefaultRoom) return false;
+      if (RoomCase != other.RoomCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (RoomId.Length != 0) hash ^= RoomId.GetHashCode();
+      if (roomCase_ == RoomOneofCase.RoomId) hash ^= RoomId.GetHashCode();
+      if (roomCase_ == RoomOneofCase.DefaultRoom) hash ^= DefaultRoom.GetHashCode();
+      hash ^= (int) roomCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -131,9 +174,13 @@ namespace Prisel.Protobuf {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (RoomId.Length != 0) {
+      if (roomCase_ == RoomOneofCase.RoomId) {
         output.WriteRawTag(10);
         output.WriteString(RoomId);
+      }
+      if (roomCase_ == RoomOneofCase.DefaultRoom) {
+        output.WriteRawTag(16);
+        output.WriteBool(DefaultRoom);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -144,9 +191,13 @@ namespace Prisel.Protobuf {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (RoomId.Length != 0) {
+      if (roomCase_ == RoomOneofCase.RoomId) {
         output.WriteRawTag(10);
         output.WriteString(RoomId);
+      }
+      if (roomCase_ == RoomOneofCase.DefaultRoom) {
+        output.WriteRawTag(16);
+        output.WriteBool(DefaultRoom);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -157,8 +208,11 @@ namespace Prisel.Protobuf {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (RoomId.Length != 0) {
+      if (roomCase_ == RoomOneofCase.RoomId) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(RoomId);
+      }
+      if (roomCase_ == RoomOneofCase.DefaultRoom) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -171,9 +225,15 @@ namespace Prisel.Protobuf {
       if (other == null) {
         return;
       }
-      if (other.RoomId.Length != 0) {
-        RoomId = other.RoomId;
+      switch (other.RoomCase) {
+        case RoomOneofCase.RoomId:
+          RoomId = other.RoomId;
+          break;
+        case RoomOneofCase.DefaultRoom:
+          DefaultRoom = other.DefaultRoom;
+          break;
       }
+
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -192,6 +252,10 @@ namespace Prisel.Protobuf {
             RoomId = input.ReadString();
             break;
           }
+          case 16: {
+            DefaultRoom = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -208,6 +272,10 @@ namespace Prisel.Protobuf {
             break;
           case 10: {
             RoomId = input.ReadString();
+            break;
+          }
+          case 16: {
+            DefaultRoom = input.ReadBool();
             break;
           }
         }

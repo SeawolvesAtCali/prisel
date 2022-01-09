@@ -81,6 +81,11 @@ class SocketManager {
         }
         this.socketMap.delete(socket);
     }
+
+    public clear() {
+        this.socketMap.clear();
+        this.idMap.clear();
+    }
 }
 
 export default SocketManager;

@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@prisel/state': ~0.0.12
+  '@prisel/state': ~0.0.13
   '@protobuf-ts/plugin': 2.1.0
   '@protobuf-ts/protoc': 2.1.0
   '@protobuf-ts/runtime': ^2.1.0
@@ -77,7 +77,7 @@ specifiers:
   ws: ^8.4.0
 
 dependencies:
-  '@prisel/state': 0.0.12
+  '@prisel/state': 0.0.13
   '@protobuf-ts/plugin': 2.1.0
   '@protobuf-ts/protoc': 2.1.0
   '@protobuf-ts/runtime': 2.1.0
@@ -96,7 +96,7 @@ dependencies:
   '@rush-temp/react': file:projects/react.tgz_debug@4.3.3+ts-node@10.4.0
   '@rush-temp/server': file:projects/server.tgz
   '@rush-temp/tic-tac-toe': file:projects/tic-tac-toe.tgz_@types+node@17.0.4
-  '@rush-temp/tic-tac-toe-client': file:projects/tic-tac-toe-client.tgz_106e18bbbc3df49a0ff5322ef4781d60
+  '@rush-temp/tic-tac-toe-client': file:projects/tic-tac-toe-client.tgz_debug@4.3.3+ts-node@10.4.0
   '@testing-library/jest-dom': 5.16.1
   '@testing-library/react': 12.1.2_react-dom@17.0.2+react@17.0.2
   '@testing-library/react-hooks': 7.0.2_fc2bb8a5b006d3f25c5f84ea777e678d
@@ -2049,8 +2049,8 @@ packages:
       webpack-dev-server: 4.7.1_debug@4.3.3+webpack@5.65.0
     dev: false
 
-  /@prisel/state/0.0.12:
-    resolution: {integrity: sha512-61BQwFWxTzPO74s2KkLuXMXVRbYCJzik34pLa6F00S9te+ght9pekTPRRcz3oYbHeciMYT0HlzdIPEfbsFbRiw==}
+  /@prisel/state/0.0.13:
+    resolution: {integrity: sha512-Sql+B1f9pizEigBsDUdmNH1+aTvd1MJiVsxAGJl5cdq/5H4nrs+ov5x3Zp5IgM264BbGCF2Oc4hCHZmqHPQJ8A==}
     dev: false
 
   /@protobuf-ts/plugin-framework/2.1.0:
@@ -12359,11 +12359,11 @@ packages:
     dev: false
 
   file:projects/monopoly.tgz:
-    resolution: {integrity: sha512-J+5gY5GLDHlgBH9Hdu5tmqvhFehv2FlRimNkTwOdyF/brhr7kNAnNOS5vTGG6040vMhV5jl/PT+sIMIsbU5TAw==, tarball: file:projects/monopoly.tgz}
+    resolution: {integrity: sha512-byt+xCS0FlOA4+nS+PpUdCriINQykA+rVH4KAdA5IUkXcRCbL2eThysqgw5eBIjMuGlRaa9SLpiJtWzEgbA4bA==, tarball: file:projects/monopoly.tgz}
     name: '@rush-temp/monopoly'
     version: 0.0.0
     dependencies:
-      '@prisel/state': 0.0.12
+      '@prisel/state': 0.0.13
       '@rollup/plugin-commonjs': 11.1.0_rollup@2.62.0
       '@rollup/plugin-json': 4.1.0_rollup@2.62.0
       '@rollup/plugin-node-resolve': 7.1.3_rollup@2.62.0
@@ -12473,10 +12473,11 @@ packages:
     dev: false
 
   file:projects/server.tgz:
-    resolution: {integrity: sha512-6C3mRFNQROmHAUL48YxB3G287giD/Vkzp5zEP7mhXfVJk2w0EWy77qYM1B9/TBZXHqaSLj3pkx7Elyz3IsRruA==, tarball: file:projects/server.tgz}
+    resolution: {integrity: sha512-olltlGJbbpWh7TQ4xHxeQwukaDPOKcphNrQ3ZSxwXZ0EMuKHOirAoqtaolSWrqLPB8gr6qi0IJ0cluZ6sA1/KA==, tarball: file:projects/server.tgz}
     name: '@rush-temp/server'
     version: 0.0.0
     dependencies:
+      '@prisel/state': 0.0.13
       '@types/debug': 4.1.7
       '@types/jest': 27.0.3
       '@types/koa': 2.13.4
@@ -12508,8 +12509,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  file:projects/tic-tac-toe-client.tgz_106e18bbbc3df49a0ff5322ef4781d60:
-    resolution: {integrity: sha512-2zzo5zqeUTerY+F/I0sgOTN76wxd0levcP9zUY2k7gvfR0Y8tkYIkco1WHDfxyMlpdUdAuOQ/xoZ85AQBq/p+A==, tarball: file:projects/tic-tac-toe-client.tgz}
+  file:projects/tic-tac-toe-client.tgz_debug@4.3.3+ts-node@10.4.0:
+    resolution: {integrity: sha512-kNW2QGK2ZO81DnL8yUU3DnGY3gxYy0SfnvJin2eEkfK6jSBDx2V32I9yisGDLiSP4+b2WUW21rYX5MQdAspiMg==, tarball: file:projects/tic-tac-toe-client.tgz}
     id: file:projects/tic-tac-toe-client.tgz
     name: '@rush-temp/tic-tac-toe-client'
     version: 0.0.0
@@ -12517,11 +12518,18 @@ packages:
       '@testing-library/jest-dom': 5.16.1
       '@testing-library/react': 12.1.2_react-dom@17.0.2+react@17.0.2
       '@testing-library/user-event': 13.5.0
+      '@types/jest': 27.0.3
+      '@types/lodash': 4.14.178
+      '@types/node': 17.0.4
+      '@types/prismjs': 1.16.6
+      '@types/react': 17.0.38
+      '@types/react-dom': 17.0.11
       jest-standard-reporter: 2.0.0
       normalize.css: 8.0.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-scripts: 5.0.0_45f63f0d63b7ffcd4c9998ba52be823f
+      typescript: 4.5.4
     transitivePeerDependencies:
       - '@babel/plugin-syntax-flow'
       - '@babel/plugin-transform-react-jsx'
@@ -12547,7 +12555,6 @@ packages:
       - supports-color
       - ts-node
       - type-fest
-      - typescript
       - uglify-js
       - utf-8-validate
       - vue-template-compiler
@@ -12557,11 +12564,12 @@ packages:
     dev: false
 
   file:projects/tic-tac-toe.tgz_@types+node@17.0.4:
-    resolution: {integrity: sha512-6gLqc1d8FrnxO7MNJ0haCtB0lIs5K6E3PeDTod/fCuKnVTBufPr7CPBdeq+EthSXZpBtbMIte9Hz+NEe7ZRuHA==, tarball: file:projects/tic-tac-toe.tgz}
+    resolution: {integrity: sha512-D23CjcR64nMF0j/ep90clnK0n70Rr44njOkSVhNxt0WwxWB8KyUQnTcUgAhmVWNSaH5mBkXbaTkNCmbRXdbVGQ==, tarball: file:projects/tic-tac-toe.tgz}
     id: file:projects/tic-tac-toe.tgz
     name: '@rush-temp/tic-tac-toe'
     version: 0.0.0
     dependencies:
+      '@prisel/state': 0.0.13
       '@types/jest': 27.0.3
       jest: 27.4.5_ts-node@10.4.0
       nps: 5.10.0

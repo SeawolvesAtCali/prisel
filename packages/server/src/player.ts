@@ -1,8 +1,14 @@
-import { assertExist, Packet, RequestBuilder, Response, Token } from '@prisel/common';
+import {
+    assertExist,
+    newRequestId,
+    Packet,
+    RequestBuilder,
+    RequestManager,
+    Response,
+    Token,
+} from '@prisel/common';
 import { priselpb } from '@prisel/protos';
 import WebSocket from 'ws';
-import { Context } from './objects';
-import { newRoom, Room, RoomId, RoomOption } from './room';
 import { emit } from './utils/networkUtils';
 
 export type PlayerId = string;
@@ -10,14 +16,17 @@ export type PlayerId = string;
 const DEFAULT_REQUEST_TIMEOUT = 1000;
 
 export interface Player {
+    getRoomId(): string | null;
+    setRoomId(roomId: string): void;
+    clearRoomId(): void;
     getName(): string;
     getId(): PlayerId;
     getPlayerInfo(): priselpb.PlayerInfo;
-    getRoom(): Room | null;
-    findRoomById(roomId: RoomId): Room | null;
-    createRoom(config: Omit<RoomOption, 'id'>): Room;
-    joinRoom(roomId: RoomId): Room | null;
-    leaveRoom(): void;
+    // getRoom(): Room | null;
+    // findRoomById(roomId: RoomId): Room | null;
+    // createRoom(config: Omit<RoomOption, 'id'>): Room;
+    // joinRoom(roomId: RoomId): Room | null;
+    // leaveRoom(): void;
     emit(packet: Packet): void;
     /**
      * Send a request to client
@@ -35,20 +44,38 @@ export interface Player {
 export interface PlayerOption {
     name: string;
     id: string;
+    getSocket: () => WebSocket | undefined;
+    requests: RequestManager;
 }
 /* tslint:disable: max-classes-per-file*/
 class PlayerImpl implements Player {
-    private room: Room | null = null;
-    private context: Context;
+    private roomId: string | null = null;
     private id: string;
     private name: string;
-    constructor(context: Context, config: PlayerOption) {
-        this.context = context;
-        this.id = config.id;
-        this.name = config.name;
+    private getSocketNullable: () => WebSocket | undefined;
+    private requests: RequestManager;
+    constructor(config: PlayerOption) {
+        const { name, id, getSocket, requests } = config;
+        this.getSocketNullable = getSocket;
+        this.id = id;
+        this.name = name;
+        this.requests = requests;
     }
+
+    public setRoomId(roomId: string): void {
+        this.roomId = roomId;
+    }
+
+    public getRoomId(): string | null {
+        return this.roomId;
+    }
+
+    public clearRoomId() {
+        this.roomId = null;
+    }
+
     public getSocket(): WebSocket {
-        return assertExist(this.context.SocketManager.getSocket(this.id));
+        return assertExist(this.getSocketNullable());
     }
 
     public getName() {
@@ -64,35 +91,32 @@ class PlayerImpl implements Player {
             id: this.id,
         };
     }
-    public newRequestId() {
-        return this.context.newRequestId();
-    }
-    public getRoom() {
-        return this.room;
-    }
-    public createRoom(config: Omit<RoomOption, 'id'>) {
-        return newRoom(this.context, config);
-    }
+    // public getRoom() {
+    //     return this.room;
+    // }
+    // public createRoom(config: Omit<RoomOption, 'id'>) {
+    //     return newRoom(this.context, config);
+    // }
 
-    public findRoomById(roomId: RoomId) {
-        return this.context.rooms.get(roomId) || null;
-    }
+    // public findRoomById(roomId: RoomId) {
+    //     return this.context.rooms.get(roomId) || null;
+    // }
 
-    public joinRoom(roomId: RoomId) {
-        const targetRoom = this.findRoomById(roomId);
-        if (targetRoom) {
-            this.room = targetRoom;
-            targetRoom.addPlayer(this);
-        }
-        return this.room;
-    }
+    // public joinRoom(roomId: RoomId) {
+    //     const targetRoom = this.findRoomById(roomId);
+    //     if (targetRoom) {
+    //         this.room = targetRoom;
+    //         targetRoom.addPlayer(this);
+    //     }
+    //     return this.room;
+    // }
 
-    public leaveRoom() {
-        if (this.room) {
-            this.room.removePlayer(this);
-            this.room = null;
-        }
-    }
+    // public leaveRoom() {
+    //     if (this.room) {
+    //         this.room.removePlayer(this);
+    //         this.room = null;
+    //     }
+    // }
 
     public emit(packet: Packet) {
         setImmediate(emit, this.getSocket(), packet);
@@ -104,16 +128,16 @@ class PlayerImpl implements Player {
         requestBuilder: RequestBuilder,
         token: Token | ((response: Response) => unknown) = Token.delay(DEFAULT_REQUEST_TIMEOUT),
     ) {
-        const fullRequest = requestBuilder.setId(this.newRequestId()).build();
+        const fullRequest = requestBuilder.setId(newRequestId()).build();
         this.emit(fullRequest);
         if (!token || token instanceof Token) {
-            return this.context.requests.addRequest(fullRequest, token).catch((error) => {
+            return this.requests.addRequest(fullRequest, token).catch((error) => {
                 // possible timeout error
                 return Response.forRequest(fullRequest).setFailure(error.message).build();
             });
         }
 
-        return this.context.requests.addRequest(fullRequest, token);
+        return this.requests.addRequest(fullRequest, token);
     }
 
     public respond(response: Response) {
@@ -127,12 +151,7 @@ class PlayerImpl implements Player {
     }
 }
 
-export function newPlayer(context: Context, config: PlayerOption): Player {
-    const existingPlayer = context.players.get(config.id);
-    if (existingPlayer) {
-        return existingPlayer;
-    }
-    const player = new PlayerImpl(context, config);
-    context.players.set(config.id, player);
+export function newPlayer(config: PlayerOption): Player {
+    const player = new PlayerImpl(config);
     return player;
 }

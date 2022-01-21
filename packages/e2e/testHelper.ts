@@ -1,5 +1,5 @@
 import { Client, Messages, Packet } from '@prisel/client';
-import { priselpb } from '../common/node_modules/@prisel/protos/dist';
+import { priselpb } from '@prisel/protos';
 
 export function createClients(num = 1) {
     return Array.from({ length: num }).map(() => new Client());

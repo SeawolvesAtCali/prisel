@@ -1,6 +1,14 @@
 import { newRequestManager, newRoomId, Packet, Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
-import { Inspector, newState, run, useComputed, useLocalState, useSideEffect } from '@prisel/state';
+import {
+    endState,
+    Inspector,
+    newState,
+    run,
+    useComputed,
+    useLocalState,
+    useSideEffect,
+} from '@prisel/state';
 import { Server as WebSocketServer, WebSocket } from 'ws';
 import { provideGetPlayerAmbient, provideRoomIdAmbient, provideRoomTypeAmbient } from './ambients';
 import debug from './debug';
@@ -22,6 +30,7 @@ function ServerState(
         host: 'localhost',
         port: 3000,
         roomType: RoomType.DEFAULT,
+        onCreateGame: () => () => endState(),
     },
 ) {
     const { roomType = RoomType.DEFAULT } = props;
@@ -142,14 +151,11 @@ function runRoom(
 
 function useDefaultRoom(
     roomType: RoomType,
-    onCreateGame: CreateGame | undefined,
+    onCreateGame: CreateGame,
     getPlayer: (player: WebSocket) => Player | undefined,
 ) {
     const defaultRoom = useComputed(
-        () =>
-            roomType === RoomType.DEFAULT && onCreateGame
-                ? runRoom(roomType, onCreateGame, getPlayer)
-                : null,
+        () => (roomType === RoomType.DEFAULT ? runRoom(roomType, onCreateGame, getPlayer) : null),
         [roomType, onCreateGame],
     );
     useSideEffect(() => {

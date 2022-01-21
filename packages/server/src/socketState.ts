@@ -23,7 +23,7 @@ export function SocketState(props: {
     socket: WebSocket;
     socketManager: SocketManager;
     players: Map<string, Player>;
-    onCreateRoom?: (player: Player, request: Request) => void;
+    onCreateRoom: (player: Player, request: Request) => void;
     onEnd?: () => void;
 }) {
     const { requests, socket, socketManager, players } = props;
@@ -127,11 +127,11 @@ export function SocketState(props: {
             // handle CREATE_ROOM
             if (
                 player &&
-                props.onCreateRoom &&
                 Request.isRequest(packet) &&
                 Packet.isSystemAction(packet, priselpb.SystemActionType.CREATE_ROOM)
             ) {
                 props.onCreateRoom(player, packet);
+                // re-dispatch create room request
                 emitPacketEvent.send({ socket, packet });
                 return;
             }

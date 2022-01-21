@@ -17,5 +17,5 @@ export interface ServerConfig {
     server?: http.Server;
     roomType?: RoomType;
     onClose?: () => void;
-    onCreateGame?: CreateGame;
+    onCreateGame: CreateGame;
 }

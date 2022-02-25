@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@prisel/state': ~0.0.13
+  '@prisel/state': ~0.0.14
   '@protobuf-ts/plugin': 2.1.0
   '@protobuf-ts/protoc': 2.1.0
   '@protobuf-ts/runtime': ^2.1.0
@@ -77,7 +77,7 @@ specifiers:
   ws: ^8.4.0
 
 dependencies:
-  '@prisel/state': 0.0.13
+  '@prisel/state': 0.0.14
   '@protobuf-ts/plugin': 2.1.0
   '@protobuf-ts/protoc': 2.1.0
   '@protobuf-ts/runtime': 2.1.0
@@ -2049,8 +2049,8 @@ packages:
       webpack-dev-server: 4.7.1_debug@4.3.3+webpack@5.65.0
     dev: false
 
-  /@prisel/state/0.0.13:
-    resolution: {integrity: sha512-Sql+B1f9pizEigBsDUdmNH1+aTvd1MJiVsxAGJl5cdq/5H4nrs+ov5x3Zp5IgM264BbGCF2Oc4hCHZmqHPQJ8A==}
+  /@prisel/state/0.0.14:
+    resolution: {integrity: sha512-WgsefpTytykJOiAIgHOWq2kj7RdBKOQ7DBMJnTtFB4jUGcFYV8lp/V1KzDeAaO+VwsjZIPkCmCNJfUaEUNg1Lw==}
     dev: false
 
   /@protobuf-ts/plugin-framework/2.1.0:
@@ -12359,11 +12359,11 @@ packages:
     dev: false
 
   file:projects/monopoly.tgz:
-    resolution: {integrity: sha512-byt+xCS0FlOA4+nS+PpUdCriINQykA+rVH4KAdA5IUkXcRCbL2eThysqgw5eBIjMuGlRaa9SLpiJtWzEgbA4bA==, tarball: file:projects/monopoly.tgz}
+    resolution: {integrity: sha512-FimH7Xnr7RTtge5dbJQn3iKYNhKoqbMaaWwatBDEJR9ZQmKsBgF0e8qAKbagZjSmCsubQ3s9IA3xwLaSHMfz6A==, tarball: file:projects/monopoly.tgz}
     name: '@rush-temp/monopoly'
     version: 0.0.0
     dependencies:
-      '@prisel/state': 0.0.13
+      '@prisel/state': 0.0.14
       '@rollup/plugin-commonjs': 11.1.0_rollup@2.62.0
       '@rollup/plugin-json': 4.1.0_rollup@2.62.0
       '@rollup/plugin-node-resolve': 7.1.3_rollup@2.62.0
@@ -12473,11 +12473,11 @@ packages:
     dev: false
 
   file:projects/server.tgz:
-    resolution: {integrity: sha512-olltlGJbbpWh7TQ4xHxeQwukaDPOKcphNrQ3ZSxwXZ0EMuKHOirAoqtaolSWrqLPB8gr6qi0IJ0cluZ6sA1/KA==, tarball: file:projects/server.tgz}
+    resolution: {integrity: sha512-KIAHf1MUUDPnRNlTIQfYtgsohlnzG1WiBgwgWkzyTIUThi5svkA1VxqijypkE3PJ3zrQ07bUDfr5mjyySkQ6LQ==, tarball: file:projects/server.tgz}
     name: '@rush-temp/server'
     version: 0.0.0
     dependencies:
-      '@prisel/state': 0.0.13
+      '@prisel/state': 0.0.14
       '@types/debug': 4.1.7
       '@types/jest': 27.0.3
       '@types/koa': 2.13.4
@@ -12564,12 +12564,12 @@ packages:
     dev: false
 
   file:projects/tic-tac-toe.tgz_@types+node@17.0.4:
-    resolution: {integrity: sha512-D23CjcR64nMF0j/ep90clnK0n70Rr44njOkSVhNxt0WwxWB8KyUQnTcUgAhmVWNSaH5mBkXbaTkNCmbRXdbVGQ==, tarball: file:projects/tic-tac-toe.tgz}
+    resolution: {integrity: sha512-8UBr2tcTVO2oi2lXUrmp52NuId4Enr1Z3RX4IlJkXWpORFdAwPhu6eUGVQ5MHkbXmbt2ATUwxuALsdzJUTc7Tg==, tarball: file:projects/tic-tac-toe.tgz}
     id: file:projects/tic-tac-toe.tgz
     name: '@rush-temp/tic-tac-toe'
     version: 0.0.0
     dependencies:
-      '@prisel/state': 0.0.13
+      '@prisel/state': 0.0.14
       '@types/jest': 27.0.3
       jest: 27.4.5_ts-node@10.4.0
       nps: 5.10.0

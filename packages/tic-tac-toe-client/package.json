@@ -10,7 +10,7 @@
         "url": "git+https://github.com/SeawolvesAtCali/prisel.git"
     },
     "scripts": {
-        "start": "FAST_REFRESH=false react-scripts start",
+        "start": "FAST_REFRESH=false PORT=3001 react-scripts start",
         "build": "react-scripts build",
         "test": "env CI=true react-scripts test --passWithNoTests --reporters=jest-standard-reporter",
         "eject": "react-scripts eject"

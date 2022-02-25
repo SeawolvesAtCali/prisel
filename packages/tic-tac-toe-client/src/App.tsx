@@ -12,7 +12,7 @@ function App() {
     const { roomId, roomName, players, host, onJoin, onRoomStateChange } = useRoomState();
     const { id, setUserInfo } = useUserInfo();
 
-    const { client, login } = useClient(process.env.SERVER!!, connectedRef);
+    const { client, login } = useClient(getServer(), connectedRef);
     useEffect(() => {
         return client.onRoomStateChange(onRoomStateChange);
     }, [client, onRoomStateChange]);
@@ -69,6 +69,18 @@ function App() {
         }
     })();
     return <Context.Provider value={context}>{Phase}</Context.Provider>;
+}
+
+function getUrlParams() {
+    const queryString = window.location.search;
+    return new URLSearchParams(queryString);
+}
+function getServer() {
+    const params = getUrlParams();
+    if (params.has('server')) {
+        return params.get('server') || undefined;
+    }
+    return process.env.SERVER;
 }
 
 export default App;

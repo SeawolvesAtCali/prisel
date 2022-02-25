@@ -36,51 +36,47 @@ export function TicTacToeState(props: { players: { current: Player[] } }) {
                 .build(),
         );
     }, []);
-    useEventHandler(
-        actionPacketEvent('move'),
-        ({ player, packet }) => {
-            if (player.getId() != playerIds[currentPlayer]) {
-                return;
-            }
-            const sign = currentPlayer === 0 ? 'O' : 'X';
-            const nextPlayer = 1 - currentPlayer;
-            setCurrentPlayer(nextPlayer);
-            const currentMap = map.current;
+    useEventHandler(actionPacketEvent('move'), ({ player, packet }) => {
+        if (player.getId() != playerIds[currentPlayer]) {
+            return;
+        }
+        const sign = currentPlayer === 0 ? 'O' : 'X';
+        const nextPlayer = 1 - currentPlayer;
+        setCurrentPlayer(nextPlayer);
+        const currentMap = map.current;
 
-            const newMove = Packet.getPayload(packet, tic_tac_toepb.MovePayload)?.position;
-            if (
-                typeof newMove === 'number' &&
-                newMove < 9 &&
-                newMove >= 0 &&
-                currentMap[newMove] === ''
-            ) {
-                currentMap[newMove] = sign;
-                map.current = currentMap;
-            } else {
-                debug('invalid move');
-                return;
-            }
+        const newMove = Packet.getPayload(packet, tic_tac_toepb.MovePayload)?.position;
+        if (
+            typeof newMove === 'number' &&
+            newMove < 9 &&
+            newMove >= 0 &&
+            currentMap[newMove] === ''
+        ) {
+            currentMap[newMove] = sign;
+            map.current = currentMap;
+        } else {
+            debug('invalid move');
+            return;
+        }
 
-            let winnerId = '';
-            if (checkWin(currentMap)) {
-                setWinner([currentPlayer]);
-                winnerId = players.current[currentPlayer].getId();
-            } else if (isEven(currentMap)) {
-                setWinner([0, 1]); // both are winner
-                winnerId = 'even';
-            }
-            const newGameStateMessage = Packet.forAction('game_state')
-                .setPayload(tic_tac_toepb.GameStatePayload, {
-                    player: playerIds,
-                    map: currentMap,
-                    currentPlayer: nextPlayer,
-                    winner: winnerId,
-                })
-                .build();
-            broadcast(players.current, newGameStateMessage);
-        },
-        [currentPlayer],
-    );
+        let winnerId = '';
+        if (checkWin(currentMap)) {
+            setWinner([currentPlayer]);
+            winnerId = players.current[currentPlayer].getId();
+        } else if (isEven(currentMap)) {
+            setWinner([0, 1]); // both are winner
+            winnerId = 'even';
+        }
+        const newGameStateMessage = Packet.forAction('game_state')
+            .setPayload(tic_tac_toepb.GameStatePayload, {
+                player: playerIds,
+                map: currentMap,
+                currentPlayer: nextPlayer,
+                winner: winnerId,
+            })
+            .build();
+        broadcast(players.current, newGameStateMessage);
+    });
 
     if (winner.length > 0) {
         return newState(TicTacToeEnding, { winner, players });

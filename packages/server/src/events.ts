@@ -1,6 +1,6 @@
 import { Packet, Request, Response } from '@prisel/common';
 import { priselpb } from '@prisel/protos';
-import { getAmbient, hasAmbient, newEvent } from '@prisel/state';
+import { getAmbient, newEvent } from '@prisel/state';
 import { getPlayerAmbient, roomIdAmbient } from './ambients';
 import { Socket } from './objects';
 import { Player } from './player';
@@ -66,7 +66,7 @@ export const customActionPacketEvent = (action: string) =>
         .filter(isCustomAction(action));
 
 export function isInRoom(data: { player: Player }) {
-    return hasAmbient(roomIdAmbient) && data.player.getRoomId() === getAmbient(roomIdAmbient);
+    return data.player.getRoomId() === getAmbient(roomIdAmbient);
 }
 
 export function isSystemAction(systemActionType: priselpb.SystemActionType) {
@@ -74,3 +74,9 @@ export function isSystemAction(systemActionType: priselpb.SystemActionType) {
         return Request.isRequest(packet) && Packet.getSystemAction(packet) === systemActionType;
     };
 }
+
+const [playerExitEvent, _emitPlayerExitEvent] = newEvent<Player>('player-exit');
+export const emitPlayerExitEvent = _emitPlayerExitEvent;
+export const playerExitRoomEvent = playerExitEvent.filter(
+    (player) => player.getRoomId() === getAmbient(roomIdAmbient),
+);

@@ -10,12 +10,12 @@ import { priselpb } from '@prisel/protos';
 import { endState, useComputed, useLocalState, useSideEffect, useStored } from '@prisel/state';
 import { RawData, WebSocket } from 'ws';
 import debug from './debug';
-import { emitPacketEvent } from './events';
+import { emitPacketEvent, emitPlayerExitEvent } from './events';
 import { DEBUG_MODE } from './flags';
 import { getError, getWelcome } from './message';
 import { newPlayer, Player } from './player';
 import SocketManager from './socketManager';
-import { emit } from './utils/networkUtils';
+import { closeSocket, emit } from './utils/networkUtils';
 import { safeStringify } from './utils/safeStringify';
 
 export function SocketState(props: {
@@ -131,8 +131,6 @@ export function SocketState(props: {
                 Packet.isSystemAction(packet, priselpb.SystemActionType.CREATE_ROOM)
             ) {
                 props.onCreateRoom(player, packet);
-                // re-dispatch create room request
-                emitPacketEvent.send({ socket, packet });
                 return;
             }
 
@@ -151,10 +149,19 @@ export function SocketState(props: {
 
     useSideEffect(() => {
         return () => {
+            closeSocket(socket);
             players.delete(id);
             socketManager.removeById(id);
         };
-    }, [id]);
+    }, []);
+
+    useSideEffect(() => {
+        if (player) {
+            return () => {
+                emitPlayerExitEvent.send(player);
+            };
+        }
+    }, [player]);
 
     if (dead) {
         return endState({ onEnd: props.onEnd || (() => {}) });

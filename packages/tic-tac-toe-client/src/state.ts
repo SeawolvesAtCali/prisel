@@ -144,7 +144,7 @@ async function clientSetup(client: Client) {
     return await client.connect();
 }
 
-export function useClient(url: string, connectedRef: MutableRefObject<boolean>) {
+export function useClient(url: string | undefined, connectedRef: MutableRefObject<boolean>) {
     const client = useMemo(() => {
         return new Client(url);
     }, [url]);

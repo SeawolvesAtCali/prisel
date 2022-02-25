@@ -1,18 +1,10 @@
-import { Event, useEvent, useSideEffect, useStored } from '@prisel/state';
+import { Event, useEvent, useSideEffect } from '@prisel/state';
 
-export function useEventHandler<T>(
-    event: Event<T>,
-    eventHandler: (eventResult: T) => void,
-    additionalDeps: any[] = [],
-    once: boolean = false,
-) {
-    const eventRef = useEvent(event);
-    const expired = useStored(false);
+export function useEventHandler<T>(event: Event<T>, eventHandler: (eventResult: T) => void) {
+    const eventResult = useEvent(event);
     useSideEffect(() => {
-        const shouldBailDueToExpired = eventRef && once && expired.current;
-        if (eventRef && !shouldBailDueToExpired) {
-            expired.current = true;
-            eventHandler(eventRef.value);
+        if (eventResult) {
+            eventHandler(eventResult.value);
         }
-    }, [eventRef, ...additionalDeps]);
+    }, [eventResult]);
 }

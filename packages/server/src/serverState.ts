@@ -1,8 +1,7 @@
-import { newRequestManager, newRoomId, Packet, Response } from '@prisel/common';
-import { priselpb } from '@prisel/protos';
+import { newRequestManager, newRoomId, Request, Response } from '@prisel/common';
 import {
     endState,
-    Inspector,
+    newEvent,
     newState,
     run,
     useComputed,
@@ -11,19 +10,23 @@ import {
 } from '@prisel/state';
 import { Server as WebSocketServer, WebSocket } from 'ws';
 import { provideGetPlayerAmbient, provideRoomIdAmbient, provideRoomTypeAmbient } from './ambients';
-import debug from './debug';
-import { emitPacketEvent } from './events';
 import { Player } from './player';
 import { RoomState } from './roomState';
 import { CreateGame, RoomType, ServerConfig } from './serverConfig';
 import SocketManager from './socketManager';
 import { SocketState } from './socketState';
 import {
-    closeSocket,
     createServerFromHTTPServer,
     createServerWithInternalHTTPServer,
 } from './utils/networkUtils';
 import { pipe } from './utils/pipe';
+import { useEventHandler } from './utils/useEventHandler';
+
+const [createRoomEvent, emitCreateRoomEvent] = newEvent<{ player: Player; request: Request }>(
+    'socket-requested-createRoom',
+);
+
+const [createSocketEvent, emitCreateSocketEvent] = newEvent<WebSocket>('create-socket');
 
 function ServerState(
     props: ServerConfig = {
@@ -34,6 +37,56 @@ function ServerState(
     },
 ) {
     const { roomType = RoomType.DEFAULT } = props;
+    const server = useServer(props);
+    const requests = useComputed(() => newRequestManager(), []);
+    const socketManager = useComputed(() => new SocketManager(), []);
+    const players = useComputed(() => new Map<string, Player>(), []);
+    const getPlayer = useComputed(
+        () => (socket: WebSocket) => players.get(socketManager.getId(socket) || ''),
+        [],
+    );
+    const isDefaultRoom = useDefaultRoom(roomType, props.onCreateGame, getPlayer);
+    useEventHandler(createRoomEvent, (createEvent) => {
+        runRoom(roomType, props.onCreateGame, getPlayer, createEvent);
+    });
+
+    useSideEffect(() => {
+        if (server) {
+            const connectionListener = (socket: WebSocket) => {
+                emitCreateSocketEvent.send(socket);
+            };
+            server.on('connection', connectionListener);
+            return () => {
+                server.off('connection', connectionListener);
+                requests.clear();
+            };
+        }
+    }, [server]);
+
+    useEventHandler(createSocketEvent, (socket) => {
+        run(SocketState, {
+            requests,
+            socket,
+            socketManager,
+            players,
+            onCreateRoom: (player, request) => {
+                // if server is single room mode, we don't allow
+                // creating room
+                if (isDefaultRoom) {
+                    player.respond(
+                        Response.forRequest(request)
+                            .setFailure('Cannot create room in single room server')
+                            .build(),
+                    );
+                    return;
+                }
+                emitCreateRoomEvent.send({ player, request });
+            },
+        });
+    });
+}
+
+function useServer(props: ServerConfig) {
     const [server, setServer] = useLocalState<WebSocketServer>();
     useSideEffect(() => {
         if (props.server) {
@@ -60,87 +113,20 @@ function ServerState(
             };
         }
     }, []);
-
-    const requests = useComputed(() => newRequestManager(), []);
-    const socketManager = useComputed(() => new SocketManager(), []);
-    const players = useComputed(() => new Map<string, Player>(), []);
-    const socketInspectors = useComputed(() => new Set<Inspector>(), []);
-    const roomInspectors = useComputed(() => new Set<Inspector>(), []);
-    const getPlayer = useComputed(
-        () => (socket: WebSocket) => players.get(socketManager.getId(socket) || ''),
-        [],
-    );
-
-    const defaultRoom = useDefaultRoom(roomType, props.onCreateGame, getPlayer);
-    useSideEffect(() => {
-        if (server) {
-            const connectionListener = (socket: WebSocket) => {
-                const inspector = run(SocketState, {
-                    requests,
-                    socket,
-                    socketManager,
-                    players,
-                    onCreateRoom: (player, request) => {
-                        // if server is single room mode, we don't allow
-                        // creating room
-                        if (defaultRoom) {
-                            player.respond(
-                                Response.forRequest(request)
-                                    .setFailure('Cannot create room in single room server')
-                                    .build(),
-                            );
-                            return;
-                        }
-                        if (props.onCreateGame) {
-                            roomInspectors.add(runRoom(roomType, props.onCreateGame, getPlayer));
-                            // We don't add player to room here because it will
-                            // be handled by RoomState.
-                        }
-                    },
-                    onEnd: () => {
-                        // socket disconnects by itself (disconnect or timeout)
-                        // before server ends
-                        socketInspectors.delete(inspector);
-                        debug('client disconnected');
-                        emitPacketEvent.send({
-                            socket,
-                            packet: Packet.forSystemAction(priselpb.SystemActionType.EXIT).build(),
-                        });
-                        closeSocket(socket);
-                        const userId = socketManager.getId(socket);
-                        if (userId) {
-                            socketManager.removeById(userId);
-                            players.delete(userId);
-                        }
-                    },
-                });
-                socketInspectors.add(inspector);
-            };
-            server.on('connection', connectionListener);
-            return () => {
-                server.off('connection', connectionListener);
-                // clean up inspectors because server is cancelled.
-                for (const inspector of socketInspectors) {
-                    inspector.exit();
-                }
-                for (const inspector of roomInspectors) {
-                    inspector.exit();
-                }
-                requests.clear();
-            };
-        }
-    }, [server]);
+    return server;
 }
 
 function runRoom(
     roomType: RoomType,
     onCreateGame: CreateGame,
     getPlayer: (player: WebSocket) => Player | undefined,
+    createEvent?: { player: Player; request: Request },
 ) {
     return run(
         pipe(
             newState(RoomState, {
                 onCreateGame,
+                createEvent,
             }),
             provideGetPlayerAmbient(getPlayer),
             provideRoomIdAmbient(newRoomId()),
@@ -154,18 +140,16 @@ function useDefaultRoom(
     onCreateGame: CreateGame,
     getPlayer: (player: WebSocket) => Player | undefined,
 ) {
-    const defaultRoom = useComputed(
-        () => (roomType === RoomType.DEFAULT ? runRoom(roomType, onCreateGame, getPlayer) : null),
-        [roomType, onCreateGame],
-    );
+    const isDefaultRoom = roomType === RoomType.DEFAULT;
     useSideEffect(() => {
-        if (defaultRoom) {
+        if (isDefaultRoom) {
+            const inspector = runRoom(roomType, onCreateGame, getPlayer);
             return () => {
-                defaultRoom.exit();
+                inspector.exit();
             };
         }
-    }, [defaultRoom]);
-    return defaultRoom;
+    }, []);
+    return isDefaultRoom;
 }
 
 /**

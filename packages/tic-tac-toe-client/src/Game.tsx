@@ -16,7 +16,7 @@ export class Game extends React.Component<GameProp> {
                             return null;
                         }
                         const { gameState, id } = context;
-                        const isMyTurn = gameState.player[gameState.currentPlayer] === id;
+                        const isMyTurn = gameState.currentPlayer === id;
                         const gameBoard = gameState.map;
                         return (
                             <React.Fragment>

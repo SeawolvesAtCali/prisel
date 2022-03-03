@@ -14,6 +14,7 @@ export type { RequestManager } from './requestManager';
 export { Response } from './response';
 export type { ResponseBuilder } from './response';
 export { RoomStateChangePayload } from './RoomStateChangePayload';
+export { newTag } from './tag';
 export { createArgEvent, createEvent } from './typedEvent';
 export type { TypedEvent, TypedEventWithArg } from './typedEvent';
 export { typeRegistry } from './typeRegistry';

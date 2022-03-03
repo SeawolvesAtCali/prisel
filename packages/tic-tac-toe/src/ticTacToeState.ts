@@ -4,7 +4,7 @@ import {
     broadcast,
     debug,
     Packet,
-    Player,
+    TurnOrder,
     useEventHandler,
 } from '@prisel/server';
 import {
@@ -16,33 +16,30 @@ import {
     useStored,
 } from '@prisel/state';
 
-export function TicTacToeState(props: { players: { current: Player[] } }) {
+export function TicTacToeState(props: { turnOrder: TurnOrder }) {
     const map = useStored(new Array(9).fill(''));
-    const { players } = props;
-    const [currentPlayer, setCurrentPlayer] = useLocalState(0);
-    const [winner, setWinner] = useLocalState<number[]>([]);
-    const playerIds = useComputed(() => players.current.map((player) => player.getId()), []);
+    const { turnOrder } = props;
+    const [gameOver, setGameOver] = useLocalState(false);
+    const firstPlayerId = useComputed(() => turnOrder.getCurrentPlayer()?.getId(), []);
 
     useSideEffect(() => {
         // sending initial state
         broadcast(
-            players.current,
+            turnOrder.getAllPlayers(),
             Packet.forAction('game_state')
                 .setPayload(tic_tac_toepb.GameStatePayload, {
-                    player: playerIds,
+                    player: turnOrder.getAllPlayers().map((player) => player.getId()),
                     map: map.current,
-                    currentPlayer,
+                    currentPlayer: turnOrder.getCurrentPlayer()?.getId() ?? '',
                 })
                 .build(),
         );
     }, []);
     useEventHandler(actionPacketEvent('move'), ({ player, packet }) => {
-        if (player.getId() != playerIds[currentPlayer]) {
+        if (player.getId() != turnOrder.getCurrentPlayer()?.getId()) {
             return;
         }
-        const sign = currentPlayer === 0 ? 'O' : 'X';
-        const nextPlayer = 1 - currentPlayer;
-        setCurrentPlayer(nextPlayer);
+        const sign = turnOrder.getCurrentPlayer()?.getId() === firstPlayerId ? 'O' : 'X';
         const currentMap = map.current;
 
         const newMove = Packet.getPayload(packet, tic_tac_toepb.MovePayload)?.position;
@@ -59,37 +56,38 @@ export function TicTacToeState(props: { players: { current: Player[] } }) {
             return;
         }
 
-        let winnerId = '';
+        let winnerText = '';
         if (checkWin(currentMap)) {
-            setWinner([currentPlayer]);
-            winnerId = players.current[currentPlayer].getId();
+            setGameOver(true);
+            winnerText = `${turnOrder.getCurrentPlayer()?.getName() || ''} won!`;
         } else if (isEven(currentMap)) {
-            setWinner([0, 1]); // both are winner
-            winnerId = 'even';
+            setGameOver(true);
+            winnerText = `It's a tie!`;
         }
+        turnOrder.giveTurnToNext();
         const newGameStateMessage = Packet.forAction('game_state')
             .setPayload(tic_tac_toepb.GameStatePayload, {
-                player: playerIds,
+                player: turnOrder.getAllPlayers().map((player) => player.getId()),
                 map: currentMap,
-                currentPlayer: nextPlayer,
-                winner: winnerId,
+                currentPlayer: turnOrder.getCurrentPlayer()?.getId() ?? '',
+                winner: winnerText,
             })
             .build();
-        broadcast(players.current, newGameStateMessage);
+        broadcast(turnOrder.getAllPlayers(), newGameStateMessage);
     });
 
-    if (winner.length > 0) {
-        return newState(TicTacToeEnding, { winner, players });
+    if (gameOver) {
+        return newState(TicTacToeEnding, { turnOrder });
     }
 }
 
-function TicTacToeEnding(props: { winner: number[]; players: { current: Player[] } }) {
-    const { players } = props;
+function TicTacToeEnding(props: { turnOrder: TurnOrder }) {
+    const { turnOrder } = props;
     const [done, setDone] = useLocalState(false);
     useSideEffect(() => {
         // end the game 500 ms later to allow clients to paint the last move
         const timeoutId = setTimeout(() => {
-            broadcast(players.current, Packet.forAction('game_over').build());
+            broadcast(turnOrder.getAllPlayers(), Packet.forAction('game_over').build());
             setDone(true);
         }, 500);
 

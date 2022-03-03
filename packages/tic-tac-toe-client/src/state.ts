@@ -81,7 +81,7 @@ export function useRoomState() {
 
 const initialGameState: tic_tac_toepb.GameStatePayload = {
     winner: undefined,
-    currentPlayer: 0,
+    currentPlayer: '',
     map: [],
     player: [],
 };

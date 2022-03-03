@@ -1,4 +1,4 @@
 export interface CreateGameStatus {
     message: string;
-    detail: string;
+    detail?: string;
 }

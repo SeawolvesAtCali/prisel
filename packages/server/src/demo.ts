@@ -1,6 +1,9 @@
+import { endState } from '@prisel/state';
 import { debug, Server } from './index';
 
-const close = Server.create();
+const close = Server.create({
+    onCreateGame: () => () => endState(),
+});
 process.stdout.write('starting server');
 
 process.title = 'prisel-server';

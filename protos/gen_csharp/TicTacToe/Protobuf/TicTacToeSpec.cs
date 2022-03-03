@@ -27,7 +27,7 @@ namespace TicTacToe.Protobuf {
             "CiJ0aWNfdGFjX3RvZS90aWNfdGFjX3RvZV9zcGVjLnByb3RvEgt0aWNfdGFj",
             "X3RvZSIfCgtNb3ZlUGF5bG9hZBIQCghwb3NpdGlvbhgBIAEoDSJnChBHYW1l",
             "U3RhdGVQYXlsb2FkEg4KBnBsYXllchgBIAMoCRILCgNtYXAYAiADKAkSFgoO",
-            "Y3VycmVudF9wbGF5ZXIYAyABKA0SEwoGd2lubmVyGAQgASgJSACIAQFCCQoH",
+            "Y3VycmVudF9wbGF5ZXIYAyABKAkSEwoGd2lubmVyGAQgASgJSACIAQFCCQoH",
             "X3dpbm5lckIVqgISVGljVGFjVG9lLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
@@ -283,12 +283,12 @@ namespace TicTacToe.Protobuf {
 
     /// <summary>Field number for the "current_player" field.</summary>
     public const int CurrentPlayerFieldNumber = 3;
-    private uint currentPlayer_;
+    private string currentPlayer_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public uint CurrentPlayer {
+    public string CurrentPlayer {
       get { return currentPlayer_; }
       set {
-        currentPlayer_ = value;
+        currentPlayer_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -338,7 +338,7 @@ namespace TicTacToe.Protobuf {
       int hash = 1;
       hash ^= player_.GetHashCode();
       hash ^= map_.GetHashCode();
-      if (CurrentPlayer != 0) hash ^= CurrentPlayer.GetHashCode();
+      if (CurrentPlayer.Length != 0) hash ^= CurrentPlayer.GetHashCode();
       if (HasWinner) hash ^= Winner.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -358,9 +358,9 @@ namespace TicTacToe.Protobuf {
     #else
       player_.WriteTo(output, _repeated_player_codec);
       map_.WriteTo(output, _repeated_map_codec);
-      if (CurrentPlayer != 0) {
-        output.WriteRawTag(24);
-        output.WriteUInt32(CurrentPlayer);
+      if (CurrentPlayer.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(CurrentPlayer);
       }
       if (HasWinner) {
         output.WriteRawTag(34);
@@ -377,9 +377,9 @@ namespace TicTacToe.Protobuf {
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       player_.WriteTo(ref output, _repeated_player_codec);
       map_.WriteTo(ref output, _repeated_map_codec);
-      if (CurrentPlayer != 0) {
-        output.WriteRawTag(24);
-        output.WriteUInt32(CurrentPlayer);
+      if (CurrentPlayer.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(CurrentPlayer);
       }
       if (HasWinner) {
         output.WriteRawTag(34);
@@ -396,8 +396,8 @@ namespace TicTacToe.Protobuf {
       int size = 0;
       size += player_.CalculateSize(_repeated_player_codec);
       size += map_.CalculateSize(_repeated_map_codec);
-      if (CurrentPlayer != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(CurrentPlayer);
+      if (CurrentPlayer.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(CurrentPlayer);
       }
       if (HasWinner) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Winner);
@@ -415,7 +415,7 @@ namespace TicTacToe.Protobuf {
       }
       player_.Add(other.player_);
       map_.Add(other.map_);
-      if (other.CurrentPlayer != 0) {
+      if (other.CurrentPlayer.Length != 0) {
         CurrentPlayer = other.CurrentPlayer;
       }
       if (other.HasWinner) {
@@ -443,8 +443,8 @@ namespace TicTacToe.Protobuf {
             map_.AddEntriesFrom(input, _repeated_map_codec);
             break;
           }
-          case 24: {
-            CurrentPlayer = input.ReadUInt32();
+          case 26: {
+            CurrentPlayer = input.ReadString();
             break;
           }
           case 34: {
@@ -473,8 +473,8 @@ namespace TicTacToe.Protobuf {
             map_.AddEntriesFrom(ref input, _repeated_map_codec);
             break;
           }
-          case 24: {
-            CurrentPlayer = input.ReadUInt32();
+          case 26: {
+            CurrentPlayer = input.ReadString();
             break;
           }
           case 34: {

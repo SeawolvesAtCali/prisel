@@ -39,9 +39,9 @@ export interface GameStatePayload {
      */
     map: string[];
     /**
-     * @generated from protobuf field: uint32 current_player = 3;
+     * @generated from protobuf field: string current_player = 3;
      */
-    currentPlayer: number;
+    currentPlayer: string;
     /**
      * @generated from protobuf field: optional string winner = 4;
      */
@@ -100,12 +100,12 @@ class GameStatePayload$Type extends MessageType<GameStatePayload> {
         super("tic_tac_toe.GameStatePayload", [
             { no: 1, name: "player", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "map", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "current_player", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 3, name: "current_player", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "winner", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<GameStatePayload>): GameStatePayload {
-        const message = { player: [], map: [], currentPlayer: 0 };
+        const message = { player: [], map: [], currentPlayer: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<GameStatePayload>(this, message, value);
@@ -122,8 +122,8 @@ class GameStatePayload$Type extends MessageType<GameStatePayload> {
                 case /* repeated string map */ 2:
                     message.map.push(reader.string());
                     break;
-                case /* uint32 current_player */ 3:
-                    message.currentPlayer = reader.uint32();
+                case /* string current_player */ 3:
+                    message.currentPlayer = reader.string();
                     break;
                 case /* optional string winner */ 4:
                     message.winner = reader.string();
@@ -146,9 +146,9 @@ class GameStatePayload$Type extends MessageType<GameStatePayload> {
         /* repeated string map = 2; */
         for (let i = 0; i < message.map.length; i++)
             writer.tag(2, WireType.LengthDelimited).string(message.map[i]);
-        /* uint32 current_player = 3; */
-        if (message.currentPlayer !== 0)
-            writer.tag(3, WireType.Varint).uint32(message.currentPlayer);
+        /* string current_player = 3; */
+        if (message.currentPlayer !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.currentPlayer);
         /* optional string winner = 4; */
         if (message.winner !== undefined)
             writer.tag(4, WireType.LengthDelimited).string(message.winner);

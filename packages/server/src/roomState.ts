@@ -13,8 +13,6 @@ import {
     useStored,
 } from '@prisel/state';
 import {
-    playersAmbient,
-    providePlayersAmbient,
     provideRoomNameAmbient,
     roomIdAmbient,
     roomNameAmbient,
@@ -23,7 +21,8 @@ import {
 import { isInRoom, isSystemAction, playerExitRoomEvent, systemActionRequestEvent } from './events';
 import { Player } from './player';
 import { emitPlayerJoinEvent, emitPlayerLeaveEvent } from './roomEvent';
-import { CreateGame, RoomType } from './serverConfig';
+import { CreateGame, CreateTurnOrder, RoomType } from './serverConfig';
+import { RoundRobin, TurnOrder } from './turnOrder';
 import { broadcast } from './utils/broadcast';
 import { pipe } from './utils/pipe';
 import { getPlayerInfo, getRoomStateSnapshot2 } from './utils/stateUtils';
@@ -64,30 +63,34 @@ const [roomStateToken, provideRoomStateToken] = newAmbient<{ current: number }>(
 
 export function RoomState(props: {
     onCreateGame: CreateGame;
-    createEvent?: { player: Player; request: Request };
+    createRoomEvent?: { player: Player; request: Request };
+    onCreateTurnOrder?: CreateTurnOrder;
 }): StateFuncReturn {
-    const players = useStored<Player[]>([]); // TODO: players will change
     const roomStateToken = useStored(0);
 
-    const { onCreateGame, createEvent } = props;
+    const {
+        onCreateGame,
+        createRoomEvent: createEvent,
+        onCreateTurnOrder = (players) => new RoundRobin(players),
+    } = props;
 
     useSideEffect(() => {
-        const inspector = run(
+        const turnOrder = onCreateTurnOrder([]);
+        run(
             pipe(
-                newState(PreoccupiedRoomState, { onCreateGame, createEvent }),
-                providePlayersAmbient(players),
+                newState(PreoccupiedRoomState, { onCreateGame, createEvent, turnOrder }),
                 provideRoomStateToken(roomStateToken),
             ),
         );
-        return inspector.exit;
     }, []);
 }
 
 export function PreoccupiedRoomState(props: {
     onCreateGame: CreateGame;
     createEvent?: { player: Player; request: Request };
+    turnOrder: TurnOrder;
 }): StateFuncReturn {
-    const { onCreateGame, createEvent } = props;
+    const { onCreateGame, createEvent, turnOrder } = props;
     const [roomName, setRoomName] = useLocalState('room');
     const [host, setHost] = useLocalState<Player>();
     const [occupied, setOccupied] = useLocalState(false);
@@ -109,7 +112,7 @@ export function PreoccupiedRoomState(props: {
         }
         const { roomName } = payload;
         setRoomName(roomName);
-        addPlayer(player);
+        addPlayer(turnOrder, player);
         setOccupied(true);
         setHost(player);
 
@@ -121,7 +124,7 @@ export function PreoccupiedRoomState(props: {
                         id: getAmbient(roomIdAmbient),
                     },
                     roomState: getRoomStateSnapshot2(
-                        getAmbient(playersAmbient).current,
+                        turnOrder.getAllPlayers(),
                         updateRoomStateToken(),
                         player.getId(),
                     ),
@@ -137,7 +140,7 @@ export function PreoccupiedRoomState(props: {
             player.respond(Response.forRequest(request).setFailure('No payload').build());
             return;
         }
-        addPlayer(player);
+        addPlayer(turnOrder, player);
         setOccupied(true);
         setHost(player);
         const previousToken = getRoomStateToken();
@@ -150,7 +153,7 @@ export function PreoccupiedRoomState(props: {
                         id,
                     },
                     roomState: getRoomStateSnapshot2(
-                        getAmbient(playersAmbient).current,
+                        turnOrder.getAllPlayers(),
                         token,
                         player.getId(),
                     ),
@@ -158,7 +161,7 @@ export function PreoccupiedRoomState(props: {
                 .build(),
         );
         broadcast(
-            getAmbient(playersAmbient).current,
+            turnOrder.getAllPlayers(),
             Packet.forSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE)
                 .setPayload('roomStateChangePayload', {
                     change: {
@@ -177,13 +180,17 @@ export function PreoccupiedRoomState(props: {
     if (occupied && host) {
         return provideRoomNameAmbient(
             roomName,
-            newState(OccupiedRoomState, { host, onCreateGame }),
+            newState(OccupiedRoomState, { host, onCreateGame, turnOrder }),
         );
     }
 }
 
-function OccupiedRoomState(props: { host: Player; onCreateGame: CreateGame }): StateFuncReturn {
-    const { onCreateGame } = props;
+function OccupiedRoomState(props: {
+    host: Player;
+    onCreateGame: CreateGame;
+    turnOrder: TurnOrder;
+}): StateFuncReturn {
+    const { onCreateGame, turnOrder } = props;
     const [host, setHost] = useLocalState(props.host);
     const [gameStarted, setGameStarted] = useLocalState(false);
     const [allPlayerLeft, setAllPlayerLeft] = useLocalState(false);
@@ -197,7 +204,7 @@ function OccupiedRoomState(props: { host: Player; onCreateGame: CreateGame }): S
             player.respond(Response.forRequest(request).setFailure('No payload').build());
             return;
         }
-        addPlayer(player);
+        addPlayer(turnOrder, player);
         const previousToken = getRoomStateToken();
         const token = updateRoomStateToken();
         player.respond(
@@ -208,7 +215,7 @@ function OccupiedRoomState(props: { host: Player; onCreateGame: CreateGame }): S
                         id: getAmbient(roomIdAmbient),
                     },
                     roomState: getRoomStateSnapshot2(
-                        getAmbient(playersAmbient).current,
+                        turnOrder.getAllPlayers(),
                         token,
                         host.getId(),
                     ),
@@ -216,7 +223,7 @@ function OccupiedRoomState(props: { host: Player; onCreateGame: CreateGame }): S
                 .build(),
         );
         broadcast(
-            getAmbient(playersAmbient).current,
+            turnOrder.getAllPlayers(),
             Packet.forSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE)
                 .setPayload('roomStateChangePayload', {
                     change: {
@@ -247,11 +254,11 @@ function OccupiedRoomState(props: { host: Player; onCreateGame: CreateGame }): S
             return;
         }
 
-        const createGameResult = onCreateGame({ players: getAmbient(playersAmbient) });
+        const createGameResult = onCreateGame({ turnOrder });
         if (typeof createGameResult === 'function') {
             player.respond(Response.forRequest(request).build());
             broadcast(
-                getAmbient(playersAmbient).current,
+                turnOrder.getAllPlayers(),
                 Packet.forSystemAction(priselpb.SystemActionType.ANNOUNCE_GAME_START).build(),
             );
             run(createGameResult).onComplete(() => {
@@ -268,20 +275,32 @@ function OccupiedRoomState(props: { host: Player; onCreateGame: CreateGame }): S
     });
 
     useEventHandler(leaveRequestEvent, ({ player, packet: request }) => {
-        removePlayer(player);
+        removePlayer(turnOrder, player);
         player.respond(Response.forRequest(request).build());
-        updateRoomStateAfterPlayerLeave(player, host, setHost, setAllPlayerLeft);
+        updateRoomStateAfterPlayerLeave(
+            player,
+            player.equals(host),
+            turnOrder,
+            setHost,
+            setAllPlayerLeft,
+        );
     });
     // if player disconnect without leaving the room first
     useEventHandler(playerExitRoomEvent, (player) => {
-        removePlayer(player);
-        updateRoomStateAfterPlayerLeave(player, host, setHost, setAllPlayerLeft);
+        removePlayer(turnOrder, player);
+        updateRoomStateAfterPlayerLeave(
+            player,
+            player.equals(host),
+            turnOrder,
+            setHost,
+            setAllPlayerLeft,
+        );
     });
     if (allPlayerLeft) {
         switch (getAmbient(roomTypeAmbient)) {
             case RoomType.DEFAULT:
                 // single room mode, we will allow reentrance
-                return newState(AllPlayerLeftRoomState, { onCreateGame });
+                return newState(AllPlayerLeftRoomState, { onCreateGame, turnOrder });
             case RoomType.MULTI:
                 // multi room mode, we will end the room
                 return endState();
@@ -289,8 +308,11 @@ function OccupiedRoomState(props: { host: Player; onCreateGame: CreateGame }): S
     }
 }
 
-export function AllPlayerLeftRoomState(props: { onCreateGame: CreateGame }): StateFuncReturn {
-    const { onCreateGame } = props;
+export function AllPlayerLeftRoomState(props: {
+    onCreateGame: CreateGame;
+    turnOrder: TurnOrder;
+}): StateFuncReturn {
+    const { onCreateGame, turnOrder } = props;
     const [host, setHost] = useLocalState<Player>();
     const [occupied, setOccupied] = useLocalState(false);
     const id = getAmbient(roomIdAmbient);
@@ -301,7 +323,7 @@ export function AllPlayerLeftRoomState(props: { onCreateGame: CreateGame }): Sta
             player.respond(Response.forRequest(request).setFailure('No payload').build());
             return;
         }
-        addPlayer(player);
+        addPlayer(turnOrder, player);
         setOccupied(true);
         setHost(player);
         const previousToken = getRoomStateToken();
@@ -314,7 +336,7 @@ export function AllPlayerLeftRoomState(props: { onCreateGame: CreateGame }): Sta
                         id: getAmbient(roomIdAmbient),
                     },
                     roomState: getRoomStateSnapshot2(
-                        getAmbient(playersAmbient).current,
+                        turnOrder.getAllPlayers(),
                         token,
                         player.getId(),
                     ),
@@ -322,7 +344,7 @@ export function AllPlayerLeftRoomState(props: { onCreateGame: CreateGame }): Sta
                 .build(),
         );
         broadcast(
-            getAmbient(playersAmbient).current,
+            turnOrder.getAllPlayers(),
             Packet.forSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE)
                 .setPayload('roomStateChangePayload', {
                     change: {
@@ -339,30 +361,30 @@ export function AllPlayerLeftRoomState(props: { onCreateGame: CreateGame }): Sta
     });
 
     if (occupied && host) {
-        return newState(OccupiedRoomState, { host, onCreateGame });
+        return newState(OccupiedRoomState, { host, onCreateGame, turnOrder });
     }
 }
 
 function updateRoomStateAfterPlayerLeave(
     player: Player,
-    host: Player,
+    isHostLeft: boolean,
+    turnOrder: TurnOrder,
     setHost: SetLocalState<Player>,
     setAllPlayerLeft: SetLocalState<boolean>,
 ) {
-    const players = getAmbient(playersAmbient).current;
-    if (players.length === 0) {
+    if (turnOrder.size === 0) {
         // all player left.
         setAllPlayerLeft(true);
         return;
     }
     const previousToken = getRoomStateToken();
     const token = updateRoomStateToken();
-    if (player.equals(host)) {
-        // host left. We will replace host
-        const newHost = players[0];
+    if (isHostLeft) {
+        // host left. We will choose the current player as host
+        const newHost = turnOrder.getCurrentPlayer()!!;
         setHost(newHost);
         broadcast(
-            players,
+            turnOrder.getAllPlayers(),
             Packet.forSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE)
                 .setPayload('roomStateChangePayload', {
                     change: {
@@ -383,7 +405,7 @@ function updateRoomStateAfterPlayerLeave(
     }
     // player left
     broadcast(
-        players,
+        turnOrder.getAllPlayers(),
         Packet.forSystemAction(priselpb.SystemActionType.ROOM_STATE_CHANGE)
             .setPayload('roomStateChangePayload', {
                 change: {
@@ -409,14 +431,15 @@ function updateRoomStateToken(): string {
     return `${token.current}`;
 }
 
-function addPlayer(player: Player) {
-    const players = getAmbient(playersAmbient);
+function addPlayer(turnOrder: TurnOrder, player: Player) {
     player.setRoomId(getAmbient(roomIdAmbient));
-    players.current.push(player);
+    turnOrder.addPlayer(player);
 }
 
-function removePlayer(player: Player) {
-    const players = getAmbient(playersAmbient);
+function removePlayer(turnOrder: TurnOrder, player: Player) {
     player.clearRoomId();
-    players.current = players.current.filter((target) => !target.equals(player));
+    if (player.equals(turnOrder.getCurrentPlayer())) {
+        turnOrder.giveTurnToNext();
+    }
+    turnOrder.removePlayer(player);
 }

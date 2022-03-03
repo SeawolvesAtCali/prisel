@@ -22,7 +22,7 @@ function App() {
         });
     }, [client]);
     const handleGameOver = (winner: string) => {
-        window.alert('winner: ' + winner);
+        window.alert(winner);
         setPhase(phases.ROOM);
     };
     const { gameState, handleMove } = useGameState(client, handleGameOver);

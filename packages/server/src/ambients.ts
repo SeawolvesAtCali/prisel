@@ -10,7 +10,6 @@ export const [getPlayerAmbient, provideGetPlayerAmbient] =
 /**
  * Player in a room
  */
-export const [playersAmbient, providePlayersAmbient] = newAmbient<{ current: Player[] }>('players');
 export const [roomNameAmbient, provideRoomNameAmbient] = newAmbient<string>('room-name');
 export const [roomIdAmbient, provideRoomIdAmbient] = newAmbient<RoomId>('room-id');
 export const [roomTypeAmbient, provideRoomTypeAmbient] = newAmbient<RoomType>('room-type');

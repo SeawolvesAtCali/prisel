@@ -1,18 +1,10 @@
 import { newRequestManager, newRoomId, Request, Response } from '@prisel/common';
-import {
-    endState,
-    newEvent,
-    newState,
-    run,
-    useComputed,
-    useLocalState,
-    useSideEffect,
-} from '@prisel/state';
+import { newEvent, newState, run, useComputed, useLocalState, useSideEffect } from '@prisel/state';
 import { Server as WebSocketServer, WebSocket } from 'ws';
 import { provideGetPlayerAmbient, provideRoomIdAmbient, provideRoomTypeAmbient } from './ambients';
 import { Player } from './player';
 import { RoomState } from './roomState';
-import { CreateGame, RoomType, ServerConfig } from './serverConfig';
+import { CreateGame, CreateTurnOrder, RoomType, ServerConfig } from './serverConfig';
 import SocketManager from './socketManager';
 import { SocketState } from './socketState';
 import {
@@ -28,14 +20,7 @@ const [createRoomEvent, emitCreateRoomEvent] = newEvent<{ player: Player; reques
 
 const [createSocketEvent, emitCreateSocketEvent] = newEvent<WebSocket>('create-socket');
 
-function ServerState(
-    props: ServerConfig = {
-        host: 'localhost',
-        port: 3000,
-        roomType: RoomType.DEFAULT,
-        onCreateGame: () => () => endState(),
-    },
-) {
+function ServerState(props: ServerConfig) {
     const { roomType = RoomType.DEFAULT } = props;
     const server = useServer(props);
     const requests = useComputed(() => newRequestManager(), []);
@@ -47,7 +32,7 @@ function ServerState(
     );
     const isDefaultRoom = useDefaultRoom(roomType, props.onCreateGame, getPlayer);
     useEventHandler(createRoomEvent, (createEvent) => {
-        runRoom(roomType, props.onCreateGame, getPlayer, createEvent);
+        runRoom(roomType, props.onCreateGame, getPlayer, props.onCreateTurnOrder, createEvent);
     });
 
     useSideEffect(() => {
@@ -120,13 +105,15 @@ function runRoom(
     roomType: RoomType,
     onCreateGame: CreateGame,
     getPlayer: (player: WebSocket) => Player | undefined,
-    createEvent?: { player: Player; request: Request },
+    onCreateTurnOrder?: CreateTurnOrder,
+    createRoomEvent?: { player: Player; request: Request },
 ) {
     return run(
         pipe(
             newState(RoomState, {
                 onCreateGame,
-                createEvent,
+                createRoomEvent,
+                onCreateTurnOrder,
             }),
             provideGetPlayerAmbient(getPlayer),
             provideRoomIdAmbient(newRoomId()),
@@ -139,11 +126,12 @@ function useDefaultRoom(
     roomType: RoomType,
     onCreateGame: CreateGame,
     getPlayer: (player: WebSocket) => Player | undefined,
+    onCreateTurnOrder?: CreateTurnOrder,
 ) {
     const isDefaultRoom = roomType === RoomType.DEFAULT;
     useSideEffect(() => {
         if (isDefaultRoom) {
-            const inspector = runRoom(roomType, onCreateGame, getPlayer);
+            const inspector = runRoom(roomType, onCreateGame, getPlayer, onCreateTurnOrder);
             return () => {
                 inspector.exit();
             };
@@ -182,7 +170,7 @@ function useDefaultRoom(
  * ```
  */
 export const Server = {
-    create(config?: ServerConfig) {
+    create(config: ServerConfig) {
         return run(ServerState, config).exit;
     },
 };

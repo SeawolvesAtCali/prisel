@@ -22,11 +22,6 @@ export interface Player {
     getName(): string;
     getId(): PlayerId;
     getPlayerInfo(): priselpb.PlayerInfo;
-    // getRoom(): Room | null;
-    // findRoomById(roomId: RoomId): Room | null;
-    // createRoom(config: Omit<RoomOption, 'id'>): Room;
-    // joinRoom(roomId: RoomId): Room | null;
-    // leaveRoom(): void;
     emit(packet: Packet): void;
     /**
      * Send a request to client
@@ -91,32 +86,6 @@ class PlayerImpl implements Player {
             id: this.id,
         };
     }
-    // public getRoom() {
-    //     return this.room;
-    // }
-    // public createRoom(config: Omit<RoomOption, 'id'>) {
-    //     return newRoom(this.context, config);
-    // }
-
-    // public findRoomById(roomId: RoomId) {
-    //     return this.context.rooms.get(roomId) || null;
-    // }
-
-    // public joinRoom(roomId: RoomId) {
-    //     const targetRoom = this.findRoomById(roomId);
-    //     if (targetRoom) {
-    //         this.room = targetRoom;
-    //         targetRoom.addPlayer(this);
-    //     }
-    //     return this.room;
-    // }
-
-    // public leaveRoom() {
-    //     if (this.room) {
-    //         this.room.removePlayer(this);
-    //         this.room = null;
-    //     }
-    // }
 
     public emit(packet: Packet) {
         setImmediate(emit, this.getSocket(), packet);

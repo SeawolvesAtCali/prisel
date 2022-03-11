@@ -1,5 +1,7 @@
 import { Player } from './player';
 
+type Nullable<T> = T | undefined | null;
+
 export interface TurnOrder {
     /**
      * Return the current player. If currentPlayer is removed, return undefined.
@@ -16,7 +18,7 @@ export interface TurnOrder {
      * not exit, return undefined.
      * @param player
      */
-    getNextPlayerOf(player: Player): Player | undefined;
+    getNextPlayerOf(player: Nullable<Player>): Player | undefined;
 
     /**
      * move the pointer to the next player specified by getNextPlayerOf so that
@@ -29,14 +31,14 @@ export interface TurnOrder {
      * @param player
      * @returns true if successfully removed.
      */
-    removePlayer(player: Player): boolean;
+    removePlayer(player: Nullable<Player>): boolean;
 
     /**
      * Add the player to the order.
      * @param newPlayer
      * @param predicate
      */
-    addPlayer(newPlayer: Player): void;
+    addPlayer(newPlayer: Nullable<Player>): void;
 
     size: number;
 }
@@ -79,7 +81,10 @@ export class RoundRobin implements TurnOrder {
         return list;
     }
 
-    removePlayer(player: Player): boolean {
+    removePlayer(player: Nullable<Player>): boolean {
+        if (!player) {
+            return false;
+        }
         let currentPlayer = this.currentPlayerNode;
         if (!currentPlayer) {
             return false;
@@ -102,7 +107,10 @@ export class RoundRobin implements TurnOrder {
         return false;
     }
 
-    addPlayer(newPlayer: Player): void {
+    addPlayer(newPlayer: Nullable<Player>): void {
+        if (!newPlayer) {
+            return;
+        }
         const currentPlayer = this.currentPlayerNode;
         if (!currentPlayer) {
             const playerNode: Partial<PlayerNode> = {
@@ -146,7 +154,10 @@ export class RoundRobin implements TurnOrder {
         return undefined;
     }
 
-    getNextPlayerOf(player: Player): Player | undefined {
+    getNextPlayerOf(player: Nullable<Player>): Player | undefined {
+        if (!player) {
+            return undefined;
+        }
         const foundPlayerNode = this.getPlayerNode(player);
         return foundPlayerNode?.next.player;
     }

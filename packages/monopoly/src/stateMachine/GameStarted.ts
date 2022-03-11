@@ -1,26 +1,16 @@
 import { Action, Anim, animationMap } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { Packet, Request, Response } from '@prisel/server';
 import {
-    getAmbient,
-    newState,
-    run,
-    useComputed,
-    useEvent,
-    useLocalState,
-    useSideEffect,
-    useStored,
-} from '@prisel/state';
-import { getPlayer } from '../utils';
+    actionPacketEvent,
+    actionRequestEvent,
+    Response,
+    TurnOrder,
+    useEventHandler,
+} from '@prisel/server';
+import { newState, run, useComputed, useLocalState, useStored } from '@prisel/state';
 import { GameOverState } from './GameOver';
 import { PreRollState } from './PreRoll';
-import {
-    getCurrentPlayer,
-    getGame,
-    PlayingAnimation,
-    receivedPacketEventAmbient,
-    usePlayerLeaveEvent,
-} from './utils';
+import { getGamePlayer, PlayingAnimation, usePlayerLeaveEvent } from './utils';
 
 /**
  * When game starts, each client should request GET_INITIAL_STATE. This is how
@@ -42,74 +32,73 @@ import {
  *
  * animations: game_start, pan
  */
-export function GameStartedState() {
-    const game = getGame();
-    const currentPlayer = getCurrentPlayer();
-    const getInitialStateEvent = useEvent(
-        getAmbient(receivedPacketEventAmbient).filter(
-            ({ packet }) =>
-                Packet.getAction(packet) === Action.GET_INITIAL_STATE && Request.isRequest(packet),
-        ),
-    );
+export function GameStartedState(props: { turnOrder: TurnOrder }) {
+    const { turnOrder } = props;
     const initialState = useComputed<monopolypb.GetInitialStateResponse>(
         () => ({
-            players: Array.from(game.players.values()).map((player) => player.getGamePlayerInfo()),
-            firstPlayerId: currentPlayer.id,
+            players: turnOrder.getAllPlayers().map((player) => {
+                const gamePlayer = getGamePlayer(player)!;
+                return gamePlayer.getGamePlayerInfo();
+            }),
+            firstPlayerId: getGamePlayer(turnOrder.getCurrentPlayer())!.id,
         }),
         [],
     );
-    useSideEffect(() => {
-        if (getInitialStateEvent) {
-            const gamePlayer = getInitialStateEvent.value.player;
-            getPlayer(gamePlayer).respond(
-                Response.forRequest(getInitialStateEvent.value.packet as Request)
+    useEventHandler(actionRequestEvent(Action.GET_INITIAL_STATE), ({ player, packet: request }) => {
+        if (initialState) {
+            player.respond(
+                Response.forRequest(request)
                     .setPayload(monopolypb.GetInitialStateResponse, initialState)
                     .build(),
             );
+        } else {
+            player.respond(
+                Response.forRequest(request)
+                    .setFailure('Failed to get initial state because game is still loading.')
+                    .build(),
+            );
         }
-    }, [getInitialStateEvent, initialState]);
+    });
 
     const readyPlayers = useStored(new Set<string>());
-    const readyToStartEvent = useEvent(
-        getAmbient(receivedPacketEventAmbient).filter(
-            ({ packet }) => Packet.getAction(packet) === Action.READY_TO_START_GAME,
-        ),
-    );
     const [done, setDone] = useLocalState(false);
-    useSideEffect(() => {
-        if (readyToStartEvent) {
-            const gamePlayer = readyToStartEvent.value.player;
-            if (readyPlayers.current.has(gamePlayer.id)) {
-                return;
-            }
-            readyPlayers.current.add(gamePlayer.id);
-            console.log('playing game start animation');
-            const inspector = run(PlayingAnimation, {
-                animation: Anim.sequence(
-                    Anim.create('game_start').setLength(animationMap.game_start),
-                    Anim.create('pan', monopolypb.PanExtra)
-                        .setExtra({
-                            target: currentPlayer.pathTile?.get().position,
-                        })
-                        .setLength(300),
-                ),
-                player: gamePlayer,
-            });
-            if (readyPlayers.current.size === game.players.size) {
-                // all player ready to start, we will wait for last
-                // ready-to-start player to finish animation.
-                inspector.onComplete(() => setDone(true));
-            }
-            return inspector.exit;
-        }
-    }, [readyToStartEvent]);
 
-    const leftPlayer = usePlayerLeaveEvent();
+    useEventHandler(actionPacketEvent(Action.READY_TO_START_GAME), ({ player }) => {
+        const gamePlayer = getGamePlayer(player);
+        if (!gamePlayer) {
+            return;
+        }
+        if (readyPlayers.current.has(gamePlayer.id)) {
+            return;
+        }
+        readyPlayers.current.add(gamePlayer.id);
+        const inspector = run(PlayingAnimation, {
+            animation: Anim.sequence(
+                Anim.create('game_start').setLength(animationMap.game_start),
+                Anim.create('pan', monopolypb.PanExtra)
+                    .setExtra({
+                        target: getGamePlayer(turnOrder.getCurrentPlayer())?.pathTile?.get()
+                            .position,
+                    })
+                    .setLength(300),
+            ),
+            player: gamePlayer,
+            turnOrder,
+        });
+        if (readyPlayers.current.size === turnOrder.size) {
+            // all player ready to start, we will wait for last
+            // ready-to-start player to finish animation.
+            inspector.onComplete(() => setDone(true));
+        }
+        return inspector.exit;
+    });
+
+    const leftPlayer = usePlayerLeaveEvent(turnOrder);
     if (leftPlayer) {
-        return newState(GameOverState);
+        return newState(GameOverState, { turnOrder });
     }
 
     if (done) {
-        return newState(PreRollState);
+        return newState(PreRollState, { turnOrder });
     }
 }

@@ -8,10 +8,7 @@ export enum RoomType {
     DEFAULT = 0, // single room
     MULTI = 1,
 }
-export type CreateGame = (props: {
-    turnOrder: TurnOrder;
-    // players: { current: Player[] };
-}) => StateFunc | CreateGameStatus;
+export type CreateGame = (props: { turnOrder: TurnOrder }) => StateFunc | CreateGameStatus;
 
 export type CreateTurnOrder = (players: Player[]) => TurnOrder;
 

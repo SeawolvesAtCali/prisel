@@ -1,9 +1,17 @@
 import { Action, Anim, animationMap } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { Packet, Request, Response } from '@prisel/server';
+import {
+    actionRequestEvent,
+    broadcast,
+    Packet,
+    Player,
+    Request,
+    Response,
+    TurnOrder,
+    useEventHandler,
+} from '@prisel/server';
 import {
     endState,
-    getAmbient,
     newState,
     run,
     StateFuncReturn,
@@ -12,17 +20,9 @@ import {
 } from '@prisel/state';
 import { FIXED_STEPS, USE_FIXED_STEPS } from '../defaultFlags';
 import { flags } from '../flags';
-import { getPlayer } from '../utils';
 import { GameOverState } from './GameOver';
 import { MovingState } from './Moving';
-import {
-    AnimatingAllPlayers,
-    getCurrentPlayer,
-    getGame,
-    receivedPacketEventAmbient,
-    useOnetimeEvent,
-    usePlayerLeaveEvent,
-} from './utils';
+import { getGamePlayer, PlayingAnimation, usePlayerLeaveEvent } from './utils';
 
 /**
  * This state is the start of a turn. On client side, camera is focused on the
@@ -49,77 +49,79 @@ import {
  *
  * animation: turn_start, dice_roll, dice_down, move
  */
-export function PreRollState(): StateFuncReturn {
-    const game = getGame();
+export function PreRollState(props: { turnOrder: TurnOrder }): StateFuncReturn {
+    const { turnOrder } = props;
     const [announceStartSent, setAnnounceStartSent] = useLocalState(false);
+    const [rolled, setRolled] = useLocalState(false);
     useSideEffect(() => {
-        game.broadcast(
+        broadcast(
+            turnOrder.getAllPlayers(),
             Packet.forAction(Action.ANNOUNCE_START_TURN)
                 .setPayload(monopolypb.AnnounceStartTurnPayload, {
-                    player: game.getCurrentPlayer().id,
+                    player: getGamePlayer(turnOrder.getCurrentPlayer())?.id,
                 })
                 .build(),
         );
         const inspector = run(
-            newState(
-                AnimatingAllPlayers,
-                Anim.create('turn_start', monopolypb.TurnStartExtra)
+            newState(PlayingAnimation, {
+                animation: Anim.create('turn_start', monopolypb.TurnStartExtra)
                     .setExtra({
-                        player: game.getCurrentPlayer().getGamePlayerInfo(),
+                        player: getGamePlayer(turnOrder.getCurrentPlayer())?.getGamePlayerInfo(),
                     })
                     .setLength(animationMap.turn_start)
                     .build(),
-            ),
+                turnOrder,
+            }),
         );
         setAnnounceStartSent(true);
         return inspector.exit;
     }, []);
 
-    const packetEventData = useOnetimeEvent(
-        getAmbient(receivedPacketEventAmbient)
-            .filter(
-                ({ packet, player }) =>
-                    Packet.getAction(packet) === Action.ROLL &&
-                    Request.isRequest(packet) &&
-                    game.isCurrentPlayer(player),
-            )
-            .map(({ packet }) => packet as Request),
-    );
-
     const [steps, setSteps] = useLocalState(0);
     const [done, setDone] = useLocalState(false);
 
-    useSideEffect(() => {
-        if (announceStartSent && packetEventData) {
-            const inspector = run(RollReceived, { rollRequest: packetEventData.value, setSteps });
-            inspector.onComplete(() => setDone(true));
-            return inspector.exit;
-        }
-    }, [packetEventData, announceStartSent]);
+    useEventHandler(
+        actionRequestEvent(Action.ROLL).filter(
+            ({ player }) => turnOrder.getCurrentPlayer()?.equals(player) ?? false,
+        ),
+        ({ player, packet }) => {
+            if (announceStartSent && !rolled) {
+                setRolled(true);
+                run(RollReceived, { rollRequest: packet, setSteps, turnOrder, player }).onComplete(
+                    () => setDone(true),
+                );
+            }
+        },
+    );
 
-    const leftPlayer = usePlayerLeaveEvent();
+    const leftPlayer = usePlayerLeaveEvent(turnOrder);
     if (leftPlayer) {
-        return newState(GameOverState);
+        return newState(GameOverState, { turnOrder });
     }
 
     if (done) {
         return newState(MovingState, {
             type: 'usingSteps',
             steps,
+            turnOrder,
         });
     }
 }
 
-function* RollReceived(props: { rollRequest: Request; setSteps: (roll: number) => void }) {
-    const game = getGame();
-    const currentPlayer = getCurrentPlayer();
-    const { rollRequest, setSteps } = props;
+function* RollReceived(props: {
+    player: Player;
+    rollRequest: Request;
+    setSteps: (roll: number) => void;
+    turnOrder: TurnOrder;
+}) {
+    const { rollRequest, setSteps, turnOrder, player } = props;
+    const currentPlayer = getGamePlayer(player)!;
 
     const steps = flags.get()?.[USE_FIXED_STEPS]
         ? flags.get()?.[FIXED_STEPS] || 1
         : currentPlayer.getDiceRoll();
     setSteps(steps);
-    getPlayer(currentPlayer).respond(
+    player.respond(
         Response.forRequest(rollRequest)
             .setPayload(monopolypb.RollResponse, {
                 steps,
@@ -127,20 +129,19 @@ function* RollReceived(props: { rollRequest: Request; setSteps: (roll: number) =
             .build(),
     );
 
-    game.broadcast((player) => {
+    broadcast(turnOrder.getAllPlayers(), (player) => {
         return Packet.forAction(Action.ANNOUNCE_ROLL)
             .setPayload(monopolypb.AnnounceRollPayload, {
                 player: currentPlayer.id,
                 steps,
                 currentPosition: currentPlayer.pathTile?.get().position,
-                myMoney: player.money,
+                myMoney: getGamePlayer(player)?.money ?? -1,
             })
             .build();
     });
 
-    yield newState(
-        AnimatingAllPlayers,
-        Anim.sequence(
+    yield newState(PlayingAnimation, {
+        animation: Anim.sequence(
             // turn_start animation should be terminated when dice_roll
             // is received.
             Anim.create('dice_roll', monopolypb.DiceRollExtra)
@@ -155,7 +156,8 @@ function* RollReceived(props: { rollRequest: Request; setSteps: (roll: number) =
                 })
                 .setLength(animationMap.dice_down),
         ),
-    );
+        turnOrder,
+    });
 
     return endState();
 }

@@ -1,7 +1,5 @@
 import { priselpb } from '@prisel/protos';
-import { isValidRequest, isValidResponse, Packet } from '../packet';
-import { Request } from '../request';
-import { Response } from '../response';
+import { Packet, Request, Response } from '../src/index';
 
 describe('packet', () => {
     it('packing and unpacking actionPayload', () => {
@@ -55,7 +53,7 @@ describe('packet', () => {
             .setPayload('loginRequest', { username: 'superman' })
             .setId('2')
             .build();
-        expect(isValidRequest(request)).toBe(true);
+        expect(Request.isRequest(request)).toBe(true);
         expect(Packet.is(request)).toBe(true);
 
         const response = Response.forRequest(request)
@@ -63,14 +61,14 @@ describe('packet', () => {
                 userId: '123',
             })
             .build();
-        expect(isValidResponse(response)).toBe(true);
+        expect(Response.isResponse(response)).toBe(true);
         expect(Packet.is(response)).toBe(true);
 
         const packet = Packet.forAction('message')
             .setPayload(priselpb.ChatPayload, { message: 'something' })
             .build();
-        expect(isValidRequest(packet)).toBe(false);
-        expect(isValidResponse(packet)).toBe(false);
+        expect(Request.isRequest(packet)).toBe(false);
+        expect(Response.isResponse(packet)).toBe(false);
         expect(Packet.is(packet)).toBe(true);
     });
 });

@@ -1,0 +1,15 @@
+{
+    // config for building types
+    "extends": "./tsconfig",
+    "files": ["src/index.ts"],
+    "exclude": ["node_modules", "lib", "dist"],
+    "compilerOptions": {
+        "rootDir": "./src",
+        "module": "esnext",
+        "outDir": "./dist/types",
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": true,
+        "target": "esnext"
+    }
+}

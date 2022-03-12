@@ -1,5 +1,8 @@
 {
     "extends": "./tsconfig",
     "files": ["./server.ts"],
-    "exclude": ["node_modules", "**/lib", "**/node_modules"]
+    "exclude": ["node_modules", "**/lib", "**/node_modules"],
+    "compilerOptions": {
+        "module": "commonjs"
+    }
 }

@@ -21,9 +21,23 @@ import { RoomInfo } from "./room_info";
  */
 export interface JoinRequest {
     /**
-     * @generated from protobuf field: string roomId = 1;
+     * @generated from protobuf oneof: room
      */
-    roomId: string;
+    room: {
+        oneofKind: "roomId";
+        /**
+         * @generated from protobuf field: string roomId = 1;
+         */
+        roomId: string;
+    } | {
+        oneofKind: "defaultRoom";
+        /**
+         * @generated from protobuf field: bool defaultRoom = 2;
+         */
+        defaultRoom: boolean;
+    } | {
+        oneofKind: undefined;
+    };
 }
 /**
  * type : JOIN,
@@ -45,11 +59,12 @@ export interface JoinResponse {
 class JoinRequest$Type extends MessageType<JoinRequest> {
     constructor() {
         super("prisel.JoinRequest", [
-            { no: 1, name: "roomId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "roomId", kind: "scalar", oneof: "room", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "defaultRoom", kind: "scalar", oneof: "room", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<JoinRequest>): JoinRequest {
-        const message = { roomId: "" };
+        const message = { room: { oneofKind: undefined } };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<JoinRequest>(this, message, value);
@@ -61,7 +76,16 @@ class JoinRequest$Type extends MessageType<JoinRequest> {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
                 case /* string roomId */ 1:
-                    message.roomId = reader.string();
+                    message.room = {
+                        oneofKind: "roomId",
+                        roomId: reader.string()
+                    };
+                    break;
+                case /* bool defaultRoom */ 2:
+                    message.room = {
+                        oneofKind: "defaultRoom",
+                        defaultRoom: reader.bool()
+                    };
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -76,8 +100,11 @@ class JoinRequest$Type extends MessageType<JoinRequest> {
     }
     internalBinaryWrite(message: JoinRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string roomId = 1; */
-        if (message.roomId !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.roomId);
+        if (message.room.oneofKind === "roomId")
+            writer.tag(1, WireType.LengthDelimited).string(message.room.roomId);
+        /* bool defaultRoom = 2; */
+        if (message.room.oneofKind === "defaultRoom")
+            writer.tag(2, WireType.Varint).bool(message.room.defaultRoom);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

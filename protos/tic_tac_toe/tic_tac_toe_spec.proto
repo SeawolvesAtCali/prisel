@@ -12,6 +12,6 @@ message MovePayload { uint32 position = 1; }
 message GameStatePayload {
   repeated string player = 1;
   repeated string map = 2;
-  uint32 current_player = 3;
+  string current_player = 3;
   optional string winner = 4;
 }

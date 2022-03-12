@@ -1,6 +1,5 @@
 import { priselpb } from '@prisel/protos';
-import { Request } from '../request';
-import { Response } from '../response';
+import { Request, Response } from '../src/index';
 
 describe('response', () => {
     it('isResponse works for response created using ResponseBuilder', () => {

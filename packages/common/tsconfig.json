@@ -1,4 +1,5 @@
 {
+    // config for editor
     "extends": "../../configs/tsconfig-base.json",
     "compilerOptions": {
         "outDir": "./dist",

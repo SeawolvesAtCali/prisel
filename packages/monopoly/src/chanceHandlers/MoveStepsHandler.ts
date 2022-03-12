@@ -1,12 +1,15 @@
 import { exist, Tile } from '@prisel/monopoly-common';
 import { endState, newState } from '@prisel/state';
 import { MovingState } from '../stateMachine/Moving';
-import { getCurrentPlayer } from '../stateMachine/utils';
+import { getGamePlayer } from '../stateMachine/utils';
 import { ChanceHandler } from './ChanceHandler';
 
 export const moveStepsHandler: ChanceHandler<'move_steps'> = (props) => {
-    const { input, setNextState } = props;
-    const currentPlayer = getCurrentPlayer();
+    const { input, setNextState, turnOrder } = props;
+    const currentPlayer = getGamePlayer(turnOrder.getCurrentPlayer());
+    if (!currentPlayer) {
+        return endState();
+    }
     const inputArgs = input.inputArgs;
     const currentTile = currentPlayer.pathTile?.get();
     if (!exist(currentTile)) {
@@ -19,7 +22,7 @@ export const moveStepsHandler: ChanceHandler<'move_steps'> = (props) => {
     if (inputArgs.steps < 0) {
         path = currentTile.genPathReverse(-inputArgs.steps);
     }
-    setNextState(newState(MovingState, { type: 'usingTiles', tiles: path }));
+    setNextState(newState(MovingState, { type: 'usingTiles', tiles: path, turnOrder }));
 
     return endState();
 };

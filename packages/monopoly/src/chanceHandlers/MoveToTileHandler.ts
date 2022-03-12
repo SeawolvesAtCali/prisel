@@ -2,17 +2,20 @@ import { exist, Tile } from '@prisel/monopoly-common';
 import { endState, newState } from '@prisel/state';
 import assert from 'assert';
 import { MovingState } from '../stateMachine/Moving';
-import { getCurrentPlayer, getGame } from '../stateMachine/utils';
+import { getGame, getGamePlayer } from '../stateMachine/utils';
 import { getRand } from '../utils';
 import { ChanceHandler } from './ChanceHandler';
 
 const MAX_PATH_LENGTH = 1000;
 
 export const moveToTileHandler: ChanceHandler<'move_to_tile'> = (props) => {
-    const currentPlayer = getCurrentPlayer();
+    const { input, setNextState, turnOrder } = props;
+    const currentPlayer = getGamePlayer(turnOrder.getCurrentPlayer());
+    if (!currentPlayer) {
+        return endState();
+    }
     const game = getGame();
     const currentTile = currentPlayer.pathTile?.get();
-    const { input, setNextState } = props;
     if (!exist(currentTile)) {
         return endState();
     }
@@ -24,7 +27,9 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = (props) => {
     );
 
     if (input.inputArgs.isTeleport) {
-        setNextState(newState(MovingState, { type: 'usingTeleport', target: targetTile }));
+        setNextState(
+            newState(MovingState, { type: 'usingTeleport', target: targetTile, turnOrder }),
+        );
         return endState();
     }
 
@@ -36,7 +41,7 @@ export const moveToTileHandler: ChanceHandler<'move_to_tile'> = (props) => {
     });
 
     if (path.length !== 0) {
-        setNextState(newState(MovingState, { type: 'usingTiles', tiles: path }));
+        setNextState(newState(MovingState, { type: 'usingTiles', tiles: path, turnOrder }));
         return endState();
     }
 };

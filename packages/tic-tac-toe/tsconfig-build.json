@@ -1,4 +1,9 @@
 {
     "extends": "./tsconfig",
-    "files": ["index.ts"]
+    "files": ["src/index.ts"],
+    "compilerOptions": {
+        "rootDir": "./src/",
+        "module": "CommonJS",
+        "target": "ES2015"
+    }
 }

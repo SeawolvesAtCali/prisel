@@ -1,17 +1,17 @@
-import { checkWin, isEven } from '../gameConfig';
+import { checkWin, isEven } from '../src/ticTacToeState';
 
 describe('@prisel/template', () => {
     describe('checkWin', () => {
         it('should win if line up horizontally', () => {
-            expect(checkWin({ map: ['', '', '', 'x', 'x', 'x', '', '', ''] })).toBe(true);
+            expect(checkWin(['', '', '', 'x', 'x', 'x', '', '', ''])).toBe(true);
         });
         it('should win if line up vertically', () => {
-            expect(checkWin({ map: ['', '', 'o', '', '', 'o', '', '', 'o'] })).toBe(true);
+            expect(checkWin(['', '', 'o', '', '', 'o', '', '', 'o'])).toBe(true);
         });
 
         it('should win if line up diagnally', () => {
-            expect(checkWin({ map: ['', '', 'o', '', 'o', '', 'o', '', ''] })).toBe(true);
-            expect(checkWin({ map: ['x', '', '', '', 'x', '', '', '', 'x'] })).toBe(true);
+            expect(checkWin(['', '', 'o', '', 'o', '', 'o', '', ''])).toBe(true);
+            expect(checkWin(['x', '', '', '', 'x', '', '', '', 'x'])).toBe(true);
         });
     });
     describe('isEven', () => {

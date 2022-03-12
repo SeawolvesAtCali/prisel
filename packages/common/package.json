@@ -12,10 +12,14 @@
     },
     "license": "MIT",
     "author": "Yiou Chen <chen.yiou1992@gmail.com>",
-    "main": "./lib/index.cjs.js",
-    "module": "./lib/index.esm.js",
-    "browser": "./lib/index.umd.js",
-    "types": "./dist/index.d.ts",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "browser": "./dist/umd/index.js",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+        "import": "./dist/esm/index.js",
+        "require": "./dist/cjs/index.js"
+    },
     "directories": {
         "lib": "./",
         "test": "__test__"
@@ -24,9 +28,7 @@
         "lib"
     ],
     "scripts": {
-        "build": "nps clean ts-check build gendoc",
-        "fix": "tslint --project tsconfig.json --fix",
-        "lint": "tslint --project tsconfig.json",
+        "build": "nps clean build-types build-cjs build-esm build-umd gendoc",
         "test": "jest"
     },
     "jest": {
@@ -41,6 +43,7 @@
         "protobufjs": "~6.11.2"
     },
     "devDependencies": {
+        "ts-node": "^10.4.0",
         "@prisel/configs": "1.0.0",
         "@prisel/jest-preset": "0.0.0",
         "@types/jest": "^27.0.3",

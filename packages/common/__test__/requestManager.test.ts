@@ -1,9 +1,5 @@
 import { priselpb } from '@prisel/protos';
-import { Token } from '../cancellationToken';
-import { Packet } from '../packet';
-import { Request } from '../request';
-import { newRequestManager, RequestManager } from '../requestManager';
-import { Response } from '../response';
+import { newRequestManager, Packet, Request, RequestManager, Response, Token } from '../src/index';
 
 describe('requestManager', () => {
     let manager: RequestManager;

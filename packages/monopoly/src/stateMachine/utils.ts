@@ -6,7 +6,17 @@ import {
     toAnimationPacket,
 } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { Packet, RequestBuilder, Response } from '@prisel/server';
+import {
+    broadcast,
+    newTag,
+    Packet,
+    Player,
+    playerLeaveEvent,
+    RequestBuilder,
+    Response,
+    TurnOrder,
+    useEventHandler,
+} from '@prisel/server';
 import {
     endState,
     Event,
@@ -29,10 +39,7 @@ export const getGame = () => getAmbient(gameAmbient);
 export const hasGame = () => hasAmbient(gameAmbient);
 export const provideGame = _provideGame;
 
-const [currentPlayerAmbient, _provideCurrentPlayer] = newAmbient<GamePlayer>('current-player');
-
-export const getCurrentPlayer = () => getAmbient(currentPlayerAmbient);
-export const provideCurrentPlayer = _provideCurrentPlayer;
+export const [setGamePlayer, getGamePlayer] = newTag<Player, GamePlayer>('gameplayer-tag');
 
 export function getPanAnimationLength(from: monopolypb.Coordinate, to: monopolypb.Coordinate) {
     return Math.trunc(
@@ -41,41 +48,34 @@ export function getPanAnimationLength(from: monopolypb.Coordinate, to: monopolyp
     );
 }
 
-export interface PacketEventData {
-    packet: Packet;
-    player: GamePlayer;
-}
-
-export const [receivedPacketEventAmbient, provideReceivedPacketEvent] = newAmbient<
-    Event<PacketEventData>
->('received-packet-event-ambient');
-
-export const [playerLeftEventAmbient, providePlayerLeftEvent] = newAmbient<Event<GamePlayer>>(
-    'player-left-event-ambient',
-);
-
-export function AnimatingCurrentPlayer(props: monopolypb.Animation) {
+export function AnimatingCurrentPlayer(props: {
+    animation: monopolypb.Animation;
+    turnOrder: TurnOrder;
+}) {
+    const { animation, turnOrder } = props;
+    const currentPlayer = getGamePlayer(turnOrder.getCurrentPlayer());
+    if (!currentPlayer) {
+        return endState();
+    }
     return PlayingAnimation({
-        animation: props,
-        player: getCurrentPlayer(),
+        animation,
+        player: getGamePlayer(turnOrder.getCurrentPlayer()),
+        turnOrder,
     });
 }
 
-export function AnimatingAllPlayers(props: monopolypb.Animation) {
-    return PlayingAnimation({
-        animation: props,
-    });
-}
-
-export function PlayingAnimation(props: { animation: monopolypb.Animation; player?: GamePlayer }) {
-    const game = getGame();
-    const { animation, player } = props;
+export function PlayingAnimation(props: {
+    animation: monopolypb.Animation;
+    player?: GamePlayer;
+    turnOrder: TurnOrder;
+}) {
+    const { animation, player, turnOrder } = props;
     const [animationDone, setAnimationDone] = useLocalState(false);
     useSideEffect(() => {
         if (player) {
             getPlayer(player).emit(toAnimationPacket(animation));
         } else {
-            game.broadcast(toAnimationPacket(animation));
+            broadcast(turnOrder.getAllPlayers(), toAnimationPacket(animation));
         }
         const length = computeAnimationLength(animation);
         if (length === Infinity) {
@@ -93,33 +93,25 @@ export function PlayingAnimation(props: { animation: monopolypb.Animation; playe
     }
 }
 
-export function useActiveCheck() {
-    const activeRef = useStored(true);
-    useSideEffect(() => {
-        return () => {
-            activeRef.current = false;
-        };
-    }, []);
-    return activeRef;
-}
-
-export function usePlayerLeaveEvent(): GamePlayer | void {
-    const playerLeaveEvent = useEvent(getAmbient(playerLeftEventAmbient));
-    const game = getGame();
-    useSideEffect(() => {
-        if (playerLeaveEvent) {
-            game.broadcast(
+export function usePlayerLeaveEvent(turnOrder: TurnOrder): GamePlayer | undefined {
+    const eventResult = useEvent(playerLeaveEvent);
+    useEventHandler(playerLeaveEvent, (player) => {
+        const gamePlayer = getGamePlayer(player);
+        if (gamePlayer) {
+            broadcast(
+                turnOrder.getAllPlayers(),
                 Packet.forAction(Action.ANNOUNCE_PLAYER_LEFT)
                     .setPayload(monopolypb.AnnouncePlayerLeftPayload, {
-                        player: playerLeaveEvent.value.getGamePlayerInfo(),
+                        player: gamePlayer.getGamePlayerInfo(),
                     })
                     .build(),
             );
         }
     });
-    if (playerLeaveEvent) {
-        return playerLeaveEvent.value;
+    if (eventResult) {
+        return getGamePlayer(eventResult.value);
     }
+    return undefined;
 }
 
 export function Requesting(props: {
@@ -127,15 +119,18 @@ export function Requesting(props: {
     request: RequestBuilder;
     callback: (response: Response) => unknown;
 }) {
-    const active = useActiveCheck();
     const { player, request, callback } = props;
     const [done, setDone] = useLocalState(false);
     useSideEffect(() => {
+        let active = true;
         getPlayer(player).request(request, (response) => {
-            if (active.current) {
+            if (active) {
                 callback(response);
                 setDone(true);
             }
+            return () => {
+                active = false;
+            };
         });
     }, []);
     if (done) {

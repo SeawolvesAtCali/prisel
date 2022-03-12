@@ -3,22 +3,24 @@ import {
     Anim,
     animationMap,
     ChanceInput,
-    GamePlayer,
     MoneyExchangeDirection,
 } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { Packet } from '@prisel/server';
+import { broadcast, Packet, TurnOrder } from '@prisel/server';
 import { endState, newState, StateConfig } from '@prisel/state';
 import { log } from '../log';
-import { AnimatingAllPlayers, getCurrentPlayer, getGame } from '../stateMachine/utils';
+import { getGamePlayer, PlayingAnimation } from '../stateMachine/utils';
 
 export function* moneyExchangeHandler(props: {
     input: ChanceInput<'money_exchange'>;
     setNextState: (nextState: StateConfig<any>) => void;
+    turnOrder: TurnOrder;
 }) {
-    const game = getGame();
-    const currentPlayer = getCurrentPlayer();
-    const { input, setNextState } = props;
+    const { input, turnOrder } = props;
+    const currentPlayer = getGamePlayer(turnOrder.getCurrentPlayer());
+    if (!currentPlayer) {
+        return endState();
+    }
     const inputArgs = input.inputArgs;
     const exchanges: {
         [playerId: string]: number;
@@ -39,22 +41,28 @@ export function* moneyExchangeHandler(props: {
         case MoneyExchangeDirection.FROM_ALL_OTHER_PLAYERS:
             // TODO: take account of lost players if we allow them to stay in
             // game
-            const totalGainedMoney = inputArgs.amount * Array.from(game.players.keys()).length;
+            const totalGainedMoney = inputArgs.amount * turnOrder.size;
             currentPlayer.gainMoney(totalGainedMoney);
             exchanges[currentPlayer.id] = totalGainedMoney;
-            game.players.forEach((gamePlayer) => {
-                gamePlayer.gainMoney(-inputArgs.amount);
-                exchanges[gamePlayer.id] = -inputArgs.amount;
+            turnOrder.getAllPlayers().forEach((player) => {
+                const gamePlayer = getGamePlayer(player);
+                if (gamePlayer) {
+                    gamePlayer.gainMoney(-inputArgs.amount);
+                    exchanges[gamePlayer.id] = -inputArgs.amount;
+                }
             });
             playerEmotion = monopolypb.PlayerEmotionExtra_EmotionType.CHEER;
             break;
         case MoneyExchangeDirection.TO_ALL_OTHER_PLAYERS:
-            const totalLostMoney = inputArgs.amount * Array.from(game.players.keys()).length;
+            const totalLostMoney = inputArgs.amount * turnOrder.size;
             currentPlayer.gainMoney(-totalLostMoney);
             exchanges[currentPlayer.id] = -totalLostMoney;
-            game.players.forEach((gamePlayer) => {
-                gamePlayer.gainMoney(inputArgs.amount);
-                exchanges[gamePlayer.id] = inputArgs.amount;
+            turnOrder.getAllPlayers().forEach((player) => {
+                const gamePlayer = getGamePlayer(player);
+                if (gamePlayer) {
+                    gamePlayer.gainMoney(inputArgs.amount);
+                    exchanges[gamePlayer.id] = inputArgs.amount;
+                }
             });
             playerEmotion = monopolypb.PlayerEmotionExtra_EmotionType.ANGRY;
             break;
@@ -63,8 +71,12 @@ export function* moneyExchangeHandler(props: {
             log.error('CashExchangeHandler cannot handle cash_exchange Chance with no direction');
             return endState();
     }
-    game.broadcast((player: GamePlayer) =>
-        Packet.forAction(Action.ANNOUNCE_CHANCE)
+    broadcast(turnOrder.getAllPlayers(), (player) => {
+        const gamePlayer = getGamePlayer(player);
+        if (!gamePlayer) {
+            return;
+        }
+        return Packet.forAction(Action.ANNOUNCE_CHANCE)
             .setPayload(monopolypb.AnnounceRecievedChancePayload, {
                 player: currentPlayer.id,
                 chance: {
@@ -73,23 +85,23 @@ export function* moneyExchangeHandler(props: {
                         oneofKind: 'moneyExchange',
                         moneyExchange: {
                             exchanges,
-                            myCurrentMoney: player.money,
+                            myCurrentMoney: gamePlayer.money,
                         },
                     },
                 },
             })
-            .build(),
-    );
+            .build();
+    });
 
-    yield newState(
-        AnimatingAllPlayers,
-        Anim.create('player_emotion', monopolypb.PlayerEmotionExtra)
+    yield newState(PlayingAnimation, {
+        animation: Anim.create('player_emotion', monopolypb.PlayerEmotionExtra)
             .setExtra({
                 player: currentPlayer.getGamePlayerInfo(),
                 emotion: playerEmotion,
             })
             .setLength(animationMap.player_emotion),
-    );
+        turnOrder,
+    });
 
     return endState();
 }

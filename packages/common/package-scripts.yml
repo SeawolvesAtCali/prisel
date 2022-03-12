@@ -1,5 +1,7 @@
 scripts:
     clean: rm -rf ./lib ./dist
-    ts-check: tsc --project tsconfig-build.json
-    build: rollup --config --silent
-    gendoc: node ./generateSystemActionDoc.js
+    build-umd: rollup --config --silent
+    build-cjs: tsc --project tsconfig.buildcjs.json
+    build-esm: tsc --project tsconfig.buildesm.json
+    build-types: tsc --project tsconfig.buildtypes.json
+    gendoc: ts-node -O '{"module":"commonjs"}' generateSystemActionDoc.ts

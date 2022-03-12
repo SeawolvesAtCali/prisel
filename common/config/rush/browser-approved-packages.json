@@ -36,7 +36,7 @@
     },
     {
       "name": "@prisel/state",
-      "allowedCategories": [ "prototype" ]
+      "allowedCategories": [ "production", "prototype" ]
     },
     {
       "name": "@protobuf-ts/plugin",
@@ -96,7 +96,7 @@
     },
     {
       "name": "@types/lodash",
-      "allowedCategories": [ "production", "tools" ]
+      "allowedCategories": [ "production", "prototype", "tools" ]
     },
     {
       "name": "@types/long",
@@ -112,15 +112,15 @@
     },
     {
       "name": "@types/prismjs",
-      "allowedCategories": [ "tools" ]
+      "allowedCategories": [ "prototype", "tools" ]
     },
     {
       "name": "@types/react",
-      "allowedCategories": [ "tools" ]
+      "allowedCategories": [ "prototype", "tools" ]
     },
     {
       "name": "@types/react-dom",
-      "allowedCategories": [ "tools" ]
+      "allowedCategories": [ "prototype", "tools" ]
     },
     {
       "name": "@types/shortid",

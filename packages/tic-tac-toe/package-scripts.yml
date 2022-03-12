@@ -1,5 +1,4 @@
 scripts:
-    default: env DEBUG=debug node lib/index.js
-    clean: rm -rf ./lib ./dist
+    default: env DEBUG=debug node --enable-source-maps --stack-trace-limit=100 dist/index.js
+    clean: rm -rf ./dist
     ts-check: tsc --project tsconfig-build.json
-    build: rollup --config --silent

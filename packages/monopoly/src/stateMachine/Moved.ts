@@ -8,19 +8,19 @@ import {
     Property,
 } from '@prisel/monopoly-common';
 import { monopolypb } from '@prisel/protos';
-import { assertExist, Packet, Request, Response } from '@prisel/server';
+import { assertExist, broadcast, Packet, Request, Response, TurnOrder } from '@prisel/server';
 import { endState, newState, run, StateConfig, useLocalState, useSideEffect } from '@prisel/state';
 import { chanceHandlers } from '../chanceHandlers/index';
 import { getRand } from '../utils';
 import { GameOverState } from './GameOver';
 import { PreRollState } from './PreRoll';
 import {
-    AnimatingAllPlayers,
-    getCurrentPlayer,
     getGame,
+    getGamePlayer,
     getPanAnimationLength,
-    provideCurrentPlayer,
+    PlayingAnimation,
     Requesting,
+    usePlayerLeaveEvent,
 } from './utils';
 
 /**
@@ -44,69 +44,94 @@ import {
  *
  * Animation: pay_rent, invested, pan
  */
-export function MovedState() {
-    const currentPlayer = getCurrentPlayer();
-    const game = getGame();
+export function MovedState(props: { turnOrder: TurnOrder }) {
+    const { turnOrder } = props;
+    const currentPlayer = getGamePlayer(turnOrder.getCurrentPlayer());
     const [done, setDone] = useLocalState(false);
     const [gameOver, setGameOver] = useLocalState(false);
     useSideEffect(() => {
-        const inspector = run(function* () {
-            yield newState(ProcessingPropertyManagement, { onGameOver: () => setGameOver(true) });
-            if (gameOver) {
-                return newState(GameOverState);
+        run(function* () {
+            let isGameOver = false;
+            yield newState(ProcessingPropertyManagement, {
+                onGameOver: () => {
+                    isGameOver = true;
+                    setGameOver(true);
+                },
+                turnOrder,
+            });
+            if (isGameOver) {
+                return endState();
             }
-            yield newState(ProcessingChance, { onGameOver: () => setGameOver(true) });
-            game.broadcast(
+            yield newState(ProcessingChance, {
+                onGameOver: () => {
+                    isGameOver = true;
+                    setGameOver(true);
+                },
+                turnOrder,
+            });
+            if (isGameOver) {
+                return endState();
+            }
+            if (!currentPlayer) {
+                return endState();
+            }
+            const nextPlayer = turnOrder.getNextPlayerOf(turnOrder.getCurrentPlayer());
+            broadcast(
+                turnOrder.getAllPlayers(),
                 Packet.forAction(Action.ANNOUNCE_END_TURN)
                     .setPayload(monopolypb.AnnounceEndTurnPayload, {
                         currentPlayer: currentPlayer.id,
-                        nextPlayer: game.getNextPlayer().id,
+                        nextPlayer: getGamePlayer(nextPlayer)?.id,
                     })
                     .build(),
             );
             const currentPlayerPos = assertExist(
-                game.getCurrentPlayer().pathTile?.get().position,
+                currentPlayer.pathTile?.get().position,
                 'currentPlayerPos',
             );
             const nextPlayerPos = assertExist(
-                game.getNextPlayer().pathTile?.get().position,
+                currentPlayer.pathTile?.get().position,
                 'nextPlayerPos',
             );
 
-            yield newState(
-                AnimatingAllPlayers,
-                Anim.create('pan', monopolypb.PanExtra)
+            yield newState(PlayingAnimation, {
+                animation: Anim.create('pan', monopolypb.PanExtra)
                     .setExtra({
                         target: nextPlayerPos,
                     })
                     .setLength(getPanAnimationLength(currentPlayerPos, nextPlayerPos))
                     .build(),
-            );
+                turnOrder,
+            });
 
-            game.giveTurnToNext();
+            turnOrder.giveTurnToNext();
             return endState({ onEnd: () => setDone(true) });
         });
-        return inspector.exit;
     }, []);
 
+    const leftPlayer = usePlayerLeaveEvent(turnOrder);
+    if (leftPlayer || gameOver) {
+        return newState(GameOverState, { turnOrder });
+    }
+
     if (done) {
-        return provideCurrentPlayer(game.getCurrentPlayer(), newState(PreRollState));
+        return newState(PreRollState, { turnOrder });
     }
 }
 
-function* ProcessingPropertyManagement(props: { onGameOver: () => void }) {
+function* ProcessingPropertyManagement(props: { onGameOver: () => void; turnOrder: TurnOrder }) {
     const game = getGame();
-    const currentPlayer = getCurrentPlayer();
-    const { onGameOver } = props;
+    const { turnOrder, onGameOver } = props;
+    const currentPlayer = getGamePlayer(turnOrder.getCurrentPlayer());
 
-    const currentPathTile = assertExist(currentPlayer.pathTile?.get(), 'currentPathTile');
+    const currentPathTile = assertExist(currentPlayer?.pathTile?.get(), 'currentPathTile');
 
-    if (currentPathTile.hasProperties.length > 0) {
+    if (currentPathTile.hasProperties.length > 0 && currentPlayer) {
         const properties = currentPathTile.hasProperties.map((propertyRef) => propertyRef.get());
         const rentPayments: monopolypb.Payment[] = [];
         // check for rent payment first
         for (const property of properties) {
-            if (property.owner && property.owner.id !== currentPlayer.id) {
+            if (property.owner && property.owner.id !== currentPlayer?.id) {
                 rentPayments.push(
                     currentPlayer.payRent(property.owner.get(), property.getBasicPropertyInfo()),
                 );
@@ -114,18 +139,17 @@ function* ProcessingPropertyManagement(props: { onGameOver: () => void }) {
         }
         if (rentPayments.length > 0) {
             // announce pay rent
-            game.broadcast((player) => {
+            broadcast(turnOrder.getAllPlayers(), (player) => {
                 return Packet.forAction(Action.ANNOUNCE_PAY_RENT)
                     .setPayload(monopolypb.AnnouncePayRentPayload, {
-                        payer: game.getCurrentPlayer().id,
+                        payer: currentPlayer.id,
                         payments: rentPayments,
-                        myCurrentMoney: player.money || 0,
+                        myCurrentMoney: getGamePlayer(player)?.money || 0,
                     })
                     .build();
             });
-            yield newState(
-                AnimatingAllPlayers,
-                Anim.create('pay_rent', monopolypb.PayRentExtra)
+            yield newState(PlayingAnimation, {
+                animation: Anim.create('pay_rent', monopolypb.PayRentExtra)
                     .setExtra({
                         // TODO: here we assume we are paying one player only
                         payer: game.getGamePlayerById(rentPayments[0].payer)?.getGamePlayerInfo(),
@@ -133,9 +157,10 @@ function* ProcessingPropertyManagement(props: { onGameOver: () => void }) {
                     })
                     .setLength(animationMap.pay_rent)
                     .build(),
-            );
+                turnOrder,
+            });
             if (currentPlayer.money < 0) {
-                announceBankrupt(currentPlayer);
+                announceBankrupt(currentPlayer, turnOrder);
                 onGameOver();
                 return endState();
             }
@@ -147,7 +172,7 @@ function* ProcessingPropertyManagement(props: { onGameOver: () => void }) {
                     continue;
                 }
 
-                yield newState(PromptingForPurchase, { property });
+                yield newState(PromptingForPurchase, { property, turnOrder });
             }
         }
     }
@@ -155,10 +180,12 @@ function* ProcessingPropertyManagement(props: { onGameOver: () => void }) {
     return endState();
 }
 
-function* PromptingForPurchase(props: { property: Property }) {
-    const game = getGame();
-    const currentPlayer = getCurrentPlayer();
-    const { property } = props;
+function* PromptingForPurchase(props: { property: Property; turnOrder: TurnOrder }) {
+    const { turnOrder, property } = props;
+    const currentPlayer = getGamePlayer(turnOrder.getCurrentPlayer());
+    if (!currentPlayer) {
+        return endState();
+    }
 
     const propertyForPurchase = property.getPromptPurchaseRequest(
         currentPlayer,
@@ -184,7 +211,8 @@ function* PromptingForPurchase(props: { property: Property }) {
     ) {
         currentPlayer.purchaseProperty(property, propertyForPurchase);
         // broadcast purchase
-        game.broadcast(
+        broadcast(
+            turnOrder.getAllPlayers(),
             Packet.forAction(Action.ANNOUNCE_PURCHASE)
                 .setPayload(monopolypb.AnnouncePurchasePayload, {
                     player: currentPlayer.id,
@@ -193,23 +221,25 @@ function* PromptingForPurchase(props: { property: Property }) {
                 .build(),
         );
 
-        yield newState(
-            AnimatingAllPlayers,
-            Anim.create('invested', monopolypb.InvestedExtra)
+        yield newState(PlayingAnimation, {
+            animation: Anim.create('invested', monopolypb.InvestedExtra)
                 .setExtra({ property: property.getBasicPropertyInfo() })
                 .setLength(animationMap.invested)
                 .build(),
-        );
+            turnOrder,
+        });
     }
 
     return endState();
 }
 
-function* ProcessingChance(props: { onGameOver: () => void }) {
-    const currentPlayer = getCurrentPlayer();
-    const game = getGame();
+function* ProcessingChance(props: { onGameOver: () => void; turnOrder: TurnOrder }) {
+    const { turnOrder, onGameOver } = props;
+    const currentPlayer = getGamePlayer(turnOrder.getCurrentPlayer());
+    if (!currentPlayer) {
+        return endState();
+    }
     const currentTile = assertExist(currentPlayer.pathTile?.get(), 'currentTile');
-    const { onGameOver } = props;
 
     if (!exist(currentTile.chancePool)) {
         return endState();
@@ -221,16 +251,16 @@ function* ProcessingChance(props: { onGameOver: () => void }) {
     if (!exist(chanceInput)) {
         return endState();
     }
-    yield newState(
-        AnimatingAllPlayers,
-        Anim.create('open_chance_chest', monopolypb.OpenChanceChestExtra)
+    yield newState(PlayingAnimation, {
+        animation: Anim.create('open_chance_chest', monopolypb.OpenChanceChestExtra)
             .setExtra({
                 chanceChestTile: currentTile.position,
                 chance: chanceInput.display,
             })
             .setLength(animationMap.open_chance_chest)
             .build(),
-    );
+        turnOrder,
+    });
 
     // wait for current player to dismiss the chance card
     yield newState(Requesting, {
@@ -241,10 +271,12 @@ function* ProcessingChance(props: { onGameOver: () => void }) {
         },
     });
 
-    yield newState(
-        AnimatingAllPlayers,
-        Anim.create('dismiss_chance_card').setLength(animationMap.dismiss_chance_card).build(),
-    );
+    yield newState(PlayingAnimation, {
+        animation: Anim.create('dismiss_chance_card')
+            .setLength(animationMap.dismiss_chance_card)
+            .build(),
+        turnOrder,
+    });
 
     const chanceType = (chanceInput.type as keyof ChanceInputArgs) || 'unspecified';
     let nextState: StateConfig<any> | null = null;
@@ -253,11 +285,12 @@ function* ProcessingChance(props: { onGameOver: () => void }) {
         setNextState: (state) => {
             nextState = state;
         },
+        turnOrder,
     });
 
     // check game over
     if (currentPlayer.money < 0) {
-        announceBankrupt(currentPlayer);
+        announceBankrupt(currentPlayer, turnOrder);
         onGameOver();
         return endState();
     }
@@ -269,9 +302,9 @@ function* ProcessingChance(props: { onGameOver: () => void }) {
     return endState();
 }
 
-function announceBankrupt(player: GamePlayer) {
-    const game = getGame();
-    game.broadcast(
+function announceBankrupt(player: GamePlayer, turnOrder: TurnOrder) {
+    broadcast(
+        turnOrder.getAllPlayers(),
         Packet.forAction(Action.ANNOUNCE_BANKRUPT)
             .setPayload(monopolypb.AnnounceBankruptPayload, {
                 player: player.id,
